@@ -1,10 +1,10 @@
-# OXS UI Platform — UIP13 Studio self-hosting + generated workbench
+# OntologyX UI Platform — UIP13 Studio self-hosting + generated workbench
 
 Status: implemented; stable workspace validation runs from the delivery script.
 
 ## What changed
 
-The UI Studio is now a developer application built by the UI Kit it documents. Vite/React bootstrap, URL glue, generated metadata, error isolation and visualization scaffolding remain Studio-local; reusable visible controls and interaction surfaces come from public `@oxs/ui`.
+The UI Studio is now a developer application built by the UI Kit it documents. Vite/React bootstrap, URL glue, generated metadata, error isolation and visualization scaffolding remain Studio-local; reusable visible controls and interaction surfaces come from public `@ontologyx/ui`.
 
 ### Generated information architecture
 
@@ -31,7 +31,7 @@ The toolbar changes the outer `UiRoot`: theme/custom tokens, LTR/RTL, density, m
 - generated catalog freshness/discovery;
 - `scripts/check-ui-studio-self-hosting.py`;
 - UI architecture/runtime/motion/System ownership/quality gates;
-- `@oxs/ui` TypeScript + tests;
-- `@oxs/ui-studio` TypeScript + build.
+- `@ontologyx/ui` TypeScript + tests;
+- `@ontologyx/ui-studio` TypeScript + build.
 
 UIP14 starts only after these gates pass on the real workspace and the revised workbench is visually accepted.

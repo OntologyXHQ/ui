@@ -1,10 +1,10 @@
-# OXS UI Platform Architecture
+# OntologyX UI Platform Architecture
 
 Status: canonical for the focused UI Platform track (`UIP00..UIP14`).
 
 ## 1. Purpose
 
-OXS UI is a platform dependency stack, not a collection of unrelated React components. The platform must let lower layers be stabilized once and then reused upward without feature-local visual or interaction implementations.
+OntologyX UI is a platform dependency stack, not a collection of unrelated React components. The platform must let lower layers be stabilized once and then reused upward without feature-local visual or interaction implementations.
 
 Canonical production direction:
 
@@ -59,16 +59,16 @@ foundations -> no visual lower layer
 primitives  -> foundations
 components  -> foundations + primitives + component-owned support
 system      -> public components + explicit system-support component contracts
-shell       -> public @oxs/ui exports
-studio      -> public @oxs/ui exports (development only)
+shell       -> public @ontologyx/ui exports
+studio      -> public @ontologyx/ui exports (development only)
 ```
 
 Forbidden:
 
 ```text
 system      -> primitives
-shell       -> @oxs/ui deep/internal imports
-feature     -> @oxs/ui deep/internal imports
+shell       -> @ontologyx/ui deep/internal imports
+feature     -> @ontologyx/ui deep/internal imports
 production  -> apps/ui-studio
 studio      -> production ownership or product runtime dependency
 ```
@@ -86,7 +86,7 @@ theme × direction × container/size × modality × keyboard/focus × state × m
 ## 6. Physical ownership after UIP00
 
 ```text
-packages/ui/       @oxs/ui production owner
+packages/ui/       @ontologyx/ui production owner
 apps/ui-studio/    development-only inspection/documentation app
 apps/shell/        product consumer
 ```

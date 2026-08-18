@@ -19,7 +19,7 @@ import {
   Tile,
   TileGrid,
   UiRoot,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import { useState } from 'react';
 import { StudioNav } from './StudioNav';
 
@@ -45,7 +45,7 @@ export function DeveloperCompositionsPage() {
   return (
     <UiRoot>
       <main className="ui-studio-page">
-        <ScrollView className="ui-studio-page__scroll" ariaLabel="OXS UI developer compositions">
+        <ScrollView className="ui-studio-page__scroll" ariaLabel="OntologyX UI developer compositions">
           <Stack className="ui-studio-page__content" gap="xl">
             <StudioNav current="compositions" />
 

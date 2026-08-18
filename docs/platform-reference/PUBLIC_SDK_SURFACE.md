@@ -1,8 +1,8 @@
-# OXS UI Platform — Public SDK Surface
+# OntologyX UI Platform — Public SDK Surface
 
 Status: canonical after UIP14 pre-privileged-surface hardening.
 
-## 1. Canonical developer surface: `@oxs/ui`
+## 1. Canonical developer surface: `@ontologyx/ui`
 
 New application and System UI code starts here. The root surface owns:
 
@@ -16,15 +16,15 @@ New application and System UI code starts here. The root surface owns:
 
 The generated public catalog documents this surface only. An implementation being present in `packages/ui/src` does not make it public.
 
-## 2. Advanced infrastructure surface: `@oxs/ui/advanced`
+## 2. Advanced infrastructure surface: `@ontologyx/ui/advanced`
 
 This subpath exists for platform integration and engineering diagnostics. It can expose lower-level runtime APIs such as cursor, drag/drop, editing, foundations observation/environment plumbing, Gesture Arena internals, interaction/overlay/focus infrastructure, motion and scroll runtimes.
 
-Normal product/System composition must not use this surface to bypass a missing Component. UI Studio diagnostic labs may use it only when their explicit purpose is inspecting a runtime; reusable Studio chrome remains self-hosted on `@oxs/ui`.
+Normal product/System composition must not use this surface to bypass a missing Component. UI Studio diagnostic labs may use it only when their explicit purpose is inspecting a runtime; reusable Studio chrome remains self-hosted on `@ontologyx/ui`.
 
 ## 3. Compatibility surface removal
 
-UIP14 removes the completed Pattern/AppTile compatibility layer. `@oxs/ui/legacy`, `AppTile`, `ApplicationLauncherPattern`, `DesktopWorkspacePattern` and the Pattern forwarding wrappers are no longer package surfaces.
+UIP14 removes the completed Pattern/AppTile compatibility layer. `@ontologyx/ui/legacy`, `AppTile`, `ApplicationLauncherPattern`, `DesktopWorkspacePattern` and the Pattern forwarding wrappers are no longer package surfaces.
 
 The canonical replacements are `ApplicationItem`, `SystemLauncher`, `SystemWorkspace`, Component overlays (`Sheet`, `Popover`, `Menu`, `Tooltip`, `ContextMenu`) and shared interaction/runtime services. Historical validation evidence may still mention the old names; that evidence is historical text, not a current API contract.
 
@@ -32,7 +32,7 @@ UIP22 still owns removal of any *future/current System migration adapters* that 
 
 ## 4. CSS host contract
 
-Importing `@oxs/ui` must not claim the host document. Production package CSS therefore may not set global layout/overflow/type/tokens on `html`, `body`, `#root` or `:root`.
+Importing `@ontologyx/ui` must not claim the host document. Production package CSS therefore may not set global layout/overflow/type/tokens on `html`, `body`, `#root` or `:root`.
 
 UI defaults and tokens are scoped to `.ui-root`. Applications that need full-window reset/layout own an explicit app-level stylesheet. This keeps the package embeddable in Studio previews, nested roots and future hosts.
 

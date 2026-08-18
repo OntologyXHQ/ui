@@ -1,22 +1,22 @@
-# @oxs/ui
+# @ontologyx/ui
 
 Production UI package extracted from the OXS product repository. It owns Foundations → Primitives → Components → System UI plus runtime-neutral interaction contracts.
 
 ## Install
 
 ```bash
-pnpm add @oxs/ui react react-dom
+pnpm add @ontologyx/ui react react-dom
 ```
 
 ```tsx
-import { Button, Stack, UiRoot } from '@oxs/ui';
+import { Button, Stack, UiRoot } from '@ontologyx/ui';
 
 export function Example() {
   return <UiRoot><Stack><Button>Continue</Button></Stack></UiRoot>;
 }
 ```
 
-Published JavaScript entries are stylesheet-neutral so Node, SSR, test runners, and other non-CSS hosts can import `@oxs/ui` safely. Browser/application hosts must import `@oxs/ui/styles.css` once at their composition entry. Advanced infrastructure intended for diagnostics/platform integration is available from `@oxs/ui/advanced`.
+Published JavaScript entries are stylesheet-neutral so Node, SSR, test runners, and other non-CSS hosts can import `@ontologyx/ui` safely. Browser/application hosts must import `@ontologyx/ui/styles.css` once at their composition entry. Advanced infrastructure intended for diagnostics/platform integration is available from `@ontologyx/ui/advanced`.
 
 ## Package contract
 
@@ -29,4 +29,4 @@ Published JavaScript entries are stylesheet-neutral so Node, SSR, test runners, 
 
 ## Licensing
 
-The extraction seed is marked `UNLICENSED`. Choose the intended commercial/open-source license before enabling public publication.
+Released under the MIT License. See `LICENSE`.

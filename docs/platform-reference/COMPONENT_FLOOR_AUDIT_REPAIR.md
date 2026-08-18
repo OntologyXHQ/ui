@@ -1,4 +1,4 @@
-# OXS UI Platform — Pre-UIP13 Component Floor Audit Repair
+# OntologyX UI Platform — Pre-UIP13 Component Floor Audit Repair
 
 Status: repair implementation prepared; visible acceptance remains required in UI Studio before UIP13 starts.
 
@@ -147,9 +147,9 @@ A second independent audit of snapshot `OXS-snapshot-20260818-142321.zip` intent
 
 - production UI CSS no longer claims `html`, `body`, `#root` or `:root`; tokens/defaults are scoped under `.ui-root`;
 - Shell and Studio own their optional document/app reset styles explicitly;
-- `@oxs/ui` is the canonical developer-facing visual surface;
-- `@oxs/ui/advanced` is an explicit infrastructure/diagnostics surface for Studio/platform integration;
-- `@oxs/ui/legacy` is an explicit temporary compatibility surface and is forbidden for new Studio/product code;
+- `@ontologyx/ui` is the canonical developer-facing visual surface;
+- `@ontologyx/ui/advanced` is an explicit infrastructure/diagnostics surface for Studio/platform integration;
+- `@ontologyx/ui/legacy` is an explicit temporary compatibility surface and is forbidden for new Studio/product code;
 - the generated public catalog is derived from the canonical root surface and excludes runtime providers and legacy Pattern wrappers.
 
 See `PUBLIC_SDK_SURFACE.md` for the package contract.
@@ -226,7 +226,7 @@ No unresolved P0/P1 defect was found in the runtime/SDK-boundary classes covered
 - `tools/checks/ui.sh`: PASS, including boundary regression probes and runtime/motion/overlay ownership checks;
 - TypeScript transpile sweep across production UI, UI Studio and Shell TS/TSX sources: PASS with no syntax diagnostics;
 - generated catalog generation/check/fixture: PASS with 100 canonical public visual entries and no runtime-provider/legacy-pattern leakage;
-- host-safety scan: no production `html`/`body`/`#root`/`:root` ownership remains in `@oxs/ui`;
+- host-safety scan: no production `html`/`body`/`#root`/`:root` ownership remains in `@ontologyx/ui`;
 - raw Pointer Capture scan: all production direct calls are centralized through the guarded capability helper;
 - System lower-layer bypass scan and Component→Pattern scan: clean;
 - diff whitespace validation: clean.

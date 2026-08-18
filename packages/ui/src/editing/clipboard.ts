@@ -29,7 +29,7 @@ export function writeUiClipboardText(text: string): boolean {
 
 export function readUiClipboardText(): Promise<string> {
   if (!configuredClipboardAdapter) {
-    return Promise.reject(new Error('OXS UI clipboard adapter is unavailable.'));
+    return Promise.reject(new Error('OntologyX UI clipboard adapter is unavailable.'));
   }
   return configuredClipboardAdapter.readText();
 }

@@ -16,7 +16,7 @@ The standalone repository does **not** own compositor/Wayland/native IME/physica
 
 - Production UI has zero runtime dependencies beyond React/React DOM peers.
 - System UI consumes public Components, not Primitives directly.
-- Studio may consume `@oxs/ui`, `@oxs/ui/advanced`, and source-owned docs metadata only.
+- Studio may consume `@ontologyx/ui`, `@ontologyx/ui/advanced`, and source-owned docs metadata only.
 - No production source may import product repository internals.
 - Published package exports resolve only to `dist`.
 - Tarball consumer smoke is mandatory before release.

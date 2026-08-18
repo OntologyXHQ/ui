@@ -7,8 +7,8 @@ import type {
   UiSafeAreaInsets,
   UiTheme,
   UiTokenOverrides,
-} from '@oxs/ui';
-import { UiRoot } from '@oxs/ui';
+} from '@ontologyx/ui';
+import { UiRoot } from '@ontologyx/ui';
 import { createContext, type CSSProperties, type PropsWithChildren, useContext, useMemo, useState } from 'react';
 
 export type StudioViewport = 'fit' | 'phone' | 'tablet' | 'desktop' | 'ultrawide';

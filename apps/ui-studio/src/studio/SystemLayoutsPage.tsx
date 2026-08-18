@@ -26,7 +26,7 @@ import {
   SystemWorkspace,
   Text,
   UiRoot,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import { useMemo, useState } from 'react';
 import { StudioNav } from './StudioNav';
 

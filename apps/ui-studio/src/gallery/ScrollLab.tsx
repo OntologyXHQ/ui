@@ -9,7 +9,7 @@ import {
   Stack,
   Surface,
   Text,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import { useRef } from 'react';
 
 const rows = Array.from({ length: 18 }, (_, index) => index + 1);

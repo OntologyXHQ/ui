@@ -1,10 +1,10 @@
-# OXS UI Studio — Self-hosting contract
+# OntologyX UI Studio — Self-hosting contract
 
 Status: **canonical from UIP11; implemented in UIP13 and proven again in UIP23**.
 
 ## Principle
 
-The Studio is the first developer application of `@oxs/ui`. It must not maintain a second reusable UI system beside the package it documents.
+The Studio is the first developer application of `@ontologyx/ui`. It must not maintain a second reusable UI system beside the package it documents.
 
 Production-shaped dependency direction:
 
@@ -13,12 +13,12 @@ Vite / React mount + generated catalog tooling
                     ↓
                   UiRoot
                     ↓
-                @oxs/ui
+                @ontologyx/ui
                     ↓
       all reusable visible Studio chrome
 ```
 
-## Must dogfood `@oxs/ui`
+## Must dogfood `@ontologyx/ui`
 
 As the corresponding public Components become available, the Studio must consume them for:
 
@@ -31,7 +31,7 @@ As the corresponding public Components become available, the Studio must consume
 - scroll containers;
 - System-surface previews where the Studio demonstrates System UI.
 
-The Studio may add Studio-specific composition classes, example/demo fixtures and visualization-only decoration, but it may not create a reusable control family that competes with `@oxs/ui`.
+The Studio may add Studio-specific composition classes, example/demo fixtures and visualization-only decoration, but it may not create a reusable control family that competes with `@ontologyx/ui`.
 
 ## Allowed outside the UI Kit
 

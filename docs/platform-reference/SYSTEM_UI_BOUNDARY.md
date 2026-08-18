@@ -1,4 +1,4 @@
-# OXS UI Platform — System UI boundary
+# OntologyX UI Platform — System UI boundary
 
 Status: **canonical from UIP11**.
 
@@ -49,4 +49,4 @@ Those owners feed typed state/commands across explicit boundaries.
 
 ## Studio
 
-The Studio demonstrates this System boundary but is itself only a dev consumer. It must progressively dogfood public `@oxs/ui`; see `STUDIO_SELF_HOSTING.md`.
+The Studio demonstrates this System boundary but is itself only a dev consumer. It must progressively dogfood public `@ontologyx/ui`; see `STUDIO_SELF_HOSTING.md`.

@@ -1,4 +1,4 @@
-# OXS UI Platform — Component System-support Surface
+# OntologyX UI Platform — Component System-support Surface
 
 Status: **UIP10 readiness checkpoint**. This document freezes the generic public Component floor that System UI may consume beginning with UIP11. A missing generic capability must be added here first; System UI may not bypass this surface through Primitives, Patterns, or shared runtime internals.
 

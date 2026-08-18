@@ -21,7 +21,7 @@ import {
   Tooltip,
   UiRoot,
   useToastQueue,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import { useRef, useState } from 'react';
 import { StudioNav } from './StudioNav';
 
@@ -41,7 +41,7 @@ export function OverlaysFeedbackPage() {
   return (
     <UiRoot>
       <main className="ui-studio-page">
-        <ScrollView className="ui-studio-page__scroll" ariaLabel="OXS UI overlays and feedback Components">
+        <ScrollView className="ui-studio-page__scroll" ariaLabel="OntologyX UI overlays and feedback Components">
           <Stack className="ui-studio-page__content" gap="xl">
             <StudioNav current="overlays" />
 

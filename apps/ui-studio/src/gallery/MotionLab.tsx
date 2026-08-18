@@ -9,11 +9,11 @@ import {
   Surface,
   Text,
   useDragReveal,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import {
   type SpringPreset,
   useFramePerformanceSnapshot,
-} from '@oxs/ui/advanced';
+} from '@ontologyx/ui/advanced';
 import { useEffect, useRef, useState } from 'react';
 
 const springPresets: SpringPreset[] = ['gentle', 'standard', 'snappy', 'expressive'];

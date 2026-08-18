@@ -51,7 +51,7 @@ try {
   if (!fixture.props.some((prop) => prop.name === 'elevated' && prop.optional))
     throw new Error('fixture optional prop metadata missing');
   if (fixture.order !== 10) throw new Error('fixture source-owned navigation order missing');
-  console.log('OXS UI catalog fixture passed: public export + colocated docs + source-owned order + local static spread auto-discovered.');
+  console.log('OntologyX UI catalog fixture passed: public export + colocated docs + source-owned order + local static spread auto-discovered.');
 } finally {
   fs.rmSync(root, { recursive: true, force: true });
 }
@@ -79,5 +79,5 @@ if (staleCategoryEntries.length > 0) {
   throw new Error(`Canonical catalog leaked pre-UIP13 taxonomy: ${staleCategoryEntries.map((entry) => `${entry.exportName}:${entry.category}`).join(', ')}`);
 }
 console.log(
-  `OXS UI canonical catalog boundary passed: ${realCatalog.length} SDK visual entries with no runtime providers or legacy patterns.`,
+  `OntologyX UI canonical catalog boundary passed: ${realCatalog.length} SDK visual entries with no runtime providers or legacy patterns.`,
 );

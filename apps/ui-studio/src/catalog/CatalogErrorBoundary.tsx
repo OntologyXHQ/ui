@@ -1,4 +1,4 @@
-import { Label, Stack, Surface, Text } from '@oxs/ui';
+import { Label, Stack, Surface, Text } from '@ontologyx/ui';
 import type { ErrorInfo, PropsWithChildren, ReactNode } from 'react';
 import { Component } from 'react';
 
@@ -12,7 +12,7 @@ export class CatalogErrorBoundary extends Component<PropsWithChildren<{ label: s
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error(`OXS UI Studio isolated failure: ${this.props.label}`, error, info);
+    console.error(`OntologyX UI Studio isolated failure: ${this.props.label}`, error, info);
   }
 
   render(): ReactNode {

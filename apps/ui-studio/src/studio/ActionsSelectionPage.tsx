@@ -19,7 +19,7 @@ import {
   ToggleGroup,
   UiRoot,
   Wrap,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import { useState } from 'react';
 import { StudioNav } from './StudioNav';
 
@@ -45,7 +45,7 @@ export function ActionsSelectionPage() {
   return (
     <UiRoot>
       <main className="ui-studio-page">
-        <ScrollView className="ui-studio-page__scroll" ariaLabel="OXS UI actions and selection Components">
+        <ScrollView className="ui-studio-page__scroll" ariaLabel="OntologyX UI actions and selection Components">
           <Stack className="ui-studio-page__content" gap="xl">
             <StudioNav current="actions" />
 

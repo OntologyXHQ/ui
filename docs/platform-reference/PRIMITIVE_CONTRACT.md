@@ -1,4 +1,4 @@
-# OXS UI Primitive Contract — UIP05
+# OntologyX UI Primitive Contract — UIP05
 
 Primitives are the lowest visual vocabulary above Foundations. They may express only structure/layout, typography, material/separation, and icon rendering. They never own product, application, system-surface, navigation, field, action, selection, overlay, or workflow semantics.
 
@@ -11,7 +11,7 @@ Primitives are the lowest visual vocabulary above Foundations. They may express 
 
 ## Escape hatch policy
 
-Public Primitive props intentionally exclude inline `style`. Values that belong to the design language must be expressed through Foundations tokens or typed Primitive props. `className` remains the narrow composition escape hatch for selectors owned by `@oxs/ui` and the development-only Studio; it is not a replacement for feature-local visual systems.
+Public Primitive props intentionally exclude inline `style`. Values that belong to the design language must be expressed through Foundations tokens or typed Primitive props. `className` remains the narrow composition escape hatch for selectors owned by `@ontologyx/ui` and the development-only Studio; it is not a replacement for feature-local visual systems.
 
 ## Classification of the pre-UIP05 surface
 

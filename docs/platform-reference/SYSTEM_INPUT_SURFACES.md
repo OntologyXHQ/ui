@@ -1,4 +1,4 @@
-# OXS UI Platform — Privileged input/system-surface contract
+# OntologyX UI Platform — Privileged input/system-surface contract
 
 Status: **UIP15 visual surface implemented**. Native/runtime integration is accepted in UIP16/UIP17 and final proof is required by UIP23.
 

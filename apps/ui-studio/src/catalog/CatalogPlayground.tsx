@@ -1,4 +1,4 @@
-import * as UiKit from '@oxs/ui';
+import * as UiKit from '@ontologyx/ui';
 import {
   Badge,
   Button,
@@ -12,7 +12,7 @@ import {
   Switch,
   Text,
   TextField,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import { createElement, lazy, Suspense, type ComponentType, useMemo, useState } from 'react';
 import { CatalogErrorBoundary } from './CatalogErrorBoundary';
 import { updateCatalogRoute } from './routing';
@@ -44,7 +44,7 @@ function sampleString(entry: UiCatalogEntry, prop: UiCatalogProp) {
   if (prop.name === 'label' || prop.name === 'ariaLabel' || prop.name.endsWith('Label')) return component;
   if (prop.name === 'placeholder' || prop.name.endsWith('Placeholder')) return `Try ${component.toLocaleLowerCase()}…`;
   if (prop.name === 'title') return `${component} preview`;
-  if (prop.name === 'description') return 'Rendered from the real public @oxs/ui export.';
+  if (prop.name === 'description') return 'Rendered from the real public @ontologyx/ui export.';
   if (prop.name === 'value') return entry.exportName === 'SearchField' ? 'Launcher' : 'Example';
   if (prop.name === 'query') return '';
   if (prop.name === 'name') return component;
@@ -64,7 +64,7 @@ function seedValue(entry: UiCatalogEntry, prop: UiCatalogProp): unknown {
   if (prop.type === 'number') return 0;
   if (prop.type === 'boolean') return false;
   if (prop.type === 'ReactNode') return prop.name === 'description'
-    ? 'Rendered from the real public @oxs/ui export.'
+    ? 'Rendered from the real public @ontologyx/ui export.'
     : humanize(entry.exportName);
   if (/^\(.*\) => /.test(prop.type) || prop.type.includes('=>')) return () => undefined;
   return undefined;
@@ -280,7 +280,7 @@ export function CatalogComponentPreview({ entry, compact = false }: { entry: UiC
         <Row justify="between" align="center" gap="sm" className="ui-studio-component-preview__header">
           <Stack gap="3xs">
             <Label tone="accent" emphasis="strong">Live component</Label>
-            <Text tone="tertiary">Real <Code>{`@oxs/ui.${entry.exportName}`}</Code> · interactive</Text>
+            <Text tone="tertiary">Real <Code>{`@ontologyx/ui.${entry.exportName}`}</Code> · interactive</Text>
           </Stack>
           <Badge tone="success">public export</Badge>
         </Row>
@@ -311,7 +311,7 @@ export function CatalogPlayground({ entry }: { entry: UiCatalogEntry }) {
                 <Label tone="accent" emphasis="strong">Live preview</Label>
                 <Text tone="tertiary">Interact with the actual public component.</Text>
               </Stack>
-              <Badge tone="success">@oxs/ui</Badge>
+              <Badge tone="success">@ontologyx/ui</Badge>
             </Row>
             <PreviewStage entry={entry} props={values} onChange={setValues} />
           </Stack>

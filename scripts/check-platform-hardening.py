@@ -30,7 +30,7 @@ raw_control = re.compile(r'<(?:button|input|select|textarea)(?:\s|>)')
 for source in studio.rglob('*.tsx'):
     text = source.read_text()
     if raw_control.search(text):
-        issues.append(f'{source.relative_to(ROOT)}: raw reusable control bypasses self-hosted @oxs/ui')
+        issues.append(f'{source.relative_to(ROOT)}: raw reusable control bypasses self-hosted @ontologyx/ui')
 
 for removed in [
     'packages/ui/src/components/AppTile.tsx',
@@ -41,7 +41,7 @@ for removed in [
         issues.append(f'completed compatibility path still present: {removed}')
 
 if (ROOT / 'packages/ui/src/legacy.ts').exists():
-    issues.append('completed @oxs/ui/legacy compatibility surface still exists')
+    issues.append('completed @ontologyx/ui/legacy compatibility surface still exists')
 
 if issues:
     print('UI platform hardening gate failed:')

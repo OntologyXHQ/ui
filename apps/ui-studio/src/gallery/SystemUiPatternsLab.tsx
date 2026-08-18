@@ -14,7 +14,7 @@ import {
   Surface,
   Text,
   Tooltip,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import { useRef, useState } from 'react';
 
 const contextActions = [

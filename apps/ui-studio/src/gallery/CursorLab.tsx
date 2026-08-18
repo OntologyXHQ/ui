@@ -7,11 +7,11 @@ import {
   Stack,
   Surface,
   Text,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import {
   SYSTEM_CURSOR_ROLES,
   useCursorRuntime,
-} from '@oxs/ui/advanced';
+} from '@ontologyx/ui/advanced';
 import type { CSSProperties } from 'react';
 
 export type CursorLabProps = {

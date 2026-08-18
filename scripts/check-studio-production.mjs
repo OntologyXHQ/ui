@@ -19,10 +19,10 @@ if (!(await exists(indexPath))) {
   failures.push('apps/ui-studio/dist/index.html is missing');
 } else {
   const html = await readFile(indexPath, 'utf8');
-  for (const forbidden of ['localhost:', '/src/main.tsx', '@oxs/ui-docs']) {
+  for (const forbidden of ['localhost:', '/src/main.tsx', '@ontologyx/ui-docs']) {
     if (html.includes(forbidden)) failures.push(`production index leaks development marker ${JSON.stringify(forbidden)}`);
   }
-  if (!html.includes('OXS UI Studio')) failures.push('production index is missing Studio identity');
+  if (!html.includes('OntologyX UI Studio')) failures.push('production index is missing Studio identity');
 }
 
 const assetsDir = path.join(dist, 'assets');
@@ -42,8 +42,8 @@ if (!(await exists(assetsDir))) {
 }
 
 if (failures.length) {
-  console.error('OXS UI Studio production artifact check failed:');
+  console.error('OntologyX UI Studio production artifact check failed:');
   for (const failure of failures) console.error(` - ${failure}`);
   process.exit(1);
 }
-console.log('OXS UI Studio production artifact passed: static entry · no dev leakage · JS/CSS assets · production budgets.');
+console.log('OntologyX UI Studio production artifact passed: static entry · no dev leakage · JS/CSS assets · production budgets.');

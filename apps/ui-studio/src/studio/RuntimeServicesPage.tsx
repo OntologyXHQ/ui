@@ -12,7 +12,7 @@ import {
   Text,
   TextField,
   UiRoot,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import {
   reorderItemsById,
   useCursorRuntime,
@@ -21,7 +21,7 @@ import {
   useEditableTextRuntime,
   useObservedElementSize,
   type EditableTextBridge,
-} from '@oxs/ui/advanced';
+} from '@ontologyx/ui/advanced';
 import { useMemo, useRef, useState } from 'react';
 import { StudioNav } from './StudioNav';
 
@@ -179,7 +179,7 @@ export function RuntimeServicesPage() {
   return (
     <UiRoot direction={direction} modality={modality} editingBridge={editingBridge}>
       <main className="ui-studio-page">
-        <ScrollView className="ui-studio-page__scroll" ariaLabel="OXS UI runtime services workbench">
+        <ScrollView className="ui-studio-page__scroll" ariaLabel="OntologyX UI runtime services workbench">
           <Stack className="ui-studio-page__content" gap="xl">
             <StudioNav current="runtime" />
             <section className="ui-runtime-hero">

@@ -10,7 +10,7 @@ const check = process.argv.includes('--check');
 try {
   const catalog = writeCatalog({ uiRoot, studioRoot, check });
   console.log(
-    `OXS UI catalog ${check ? 'check' : 'generation'} passed: ${catalog.length} public visual entries.`,
+    `OntologyX UI catalog ${check ? 'check' : 'generation'} passed: ${catalog.length} public visual entries.`,
   );
 } catch (error) {
   console.error(error instanceof Error ? error.message : error);

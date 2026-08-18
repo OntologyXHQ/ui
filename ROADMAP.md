@@ -11,4 +11,4 @@ The detailed carried roadmap is `docs/roadmap/UI_KIT_TASK_LIST.md`.
 - this repository: reusable contracts, UI state/visual behavior, host-neutral adapters, Studio acceptance;
 - host/product repositories: Wayland/compositor/native IME lifecycle, physical-keyboard detection, native occlusion source, process/surface integration.
 
-Do not move host implementations back into `@oxs/ui` merely to make the standalone package self-sufficient.
+Do not move host implementations back into `@ontologyx/ui` merely to make the standalone package self-sufficient.

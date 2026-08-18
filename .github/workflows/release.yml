@@ -1,4 +1,4 @@
-name: Release @oxs/ui
+name: Release @ontologyx/ui
 
 on:
   push:
@@ -7,11 +7,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
 
 jobs:
-  verify:
+  verify-and-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -24,6 +24,8 @@ jobs:
           node-version-file: .node-version
           registry-url: https://registry.npmjs.org
           package-manager-cache: false
+      - name: Use npm with Trusted Publishing support
+        run: npm install --global npm@^11.15.0
       - run: pnpm install --frozen-lockfile
       - if: github.ref_type == 'tag'
         run: node scripts/check-release-tag.mjs
@@ -31,7 +33,40 @@ jobs:
       - name: Validate public publish configuration
         if: github.ref_type == 'tag' && vars.NPM_PUBLISH_ENABLED == 'true'
         run: node scripts/check-publish-readiness.mjs
+      - name: Resolve release identity
+        if: github.ref_type == 'tag'
+        id: release
+        shell: bash
+        run: |
+          version="$(node -p "require('./packages/ui/package.json').version")"
+          if [[ "$version" == *-* ]]; then
+            dist_tag=beta
+            prerelease=true
+          else
+            dist_tag=latest
+            prerelease=false
+          fi
+          if npm view "@ontologyx/ui@$version" version >/dev/null 2>&1; then
+            published=true
+          else
+            published=false
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "dist_tag=$dist_tag" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
+          echo "published=$published" >> "$GITHUB_OUTPUT"
       - name: Publish with npm Trusted Publishing
-        if: github.ref_type == 'tag' && vars.NPM_PUBLISH_ENABLED == 'true'
+        if: github.ref_type == 'tag' && vars.NPM_PUBLISH_ENABLED == 'true' && steps.release.outputs.published != 'true'
         working-directory: packages/ui
-        run: npm publish --access public
+        run: npm publish --access public --tag "${{ steps.release.outputs.dist_tag }}"
+      - name: Create GitHub Release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          args=("${GITHUB_REF_NAME}" --verify-tag --generate-notes --title "${GITHUB_REF_NAME}")
+          if [[ "${{ steps.release.outputs.prerelease }}" == "true" ]]; then
+            args+=(--prerelease)
+          fi
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || gh release create "${args[@]}"

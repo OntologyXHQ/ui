@@ -15,7 +15,7 @@ import {
   TabPanel,
   Tabs,
   Text,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import { useEffect, useMemo, useState } from 'react';
 import { StudioEnvironmentToolbar } from '../studio/StudioEnvironmentToolbar';
 import { StudioSidebar } from '../studio/StudioSidebar';
@@ -110,7 +110,7 @@ function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
       <Surface material="subtle" radius="md" className="ui-studio-import-card">
         <Stack gap="xs">
           <Label tone="accent" emphasis="strong">Canonical import</Label>
-          <Code wrap="normal" className="ui-studio-code-anywhere">{`import { ${entry.exportName} } from '@oxs/ui';`}</Code>
+          <Code wrap="normal" className="ui-studio-code-anywhere">{`import { ${entry.exportName} } from '@ontologyx/ui';`}</Code>
         </Stack>
       </Surface>
 

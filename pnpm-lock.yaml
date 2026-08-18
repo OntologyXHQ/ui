@@ -12,10 +12,9 @@ importers:
         specifier: 2.5.7
         version: 2.5.7
 
-
   apps/ui-studio:
     dependencies:
-      '@oxs/ui':
+      '@ontologyx/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       react:

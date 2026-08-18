@@ -43,7 +43,7 @@ try {
         private: true,
         type: 'module',
         dependencies: {
-          '@oxs/ui': `file:${tarball}`,
+          '@ontologyx/ui': `file:${tarball}`,
           react: '19.2.8',
           'react-dom': '19.2.8',
         },
@@ -93,9 +93,9 @@ try {
 
   await writeFile(
     path.join(consumer, 'src/main.tsx'),
-    `import '@oxs/ui/styles.css';
-import { Button, Stack, UiRoot, type SystemKeyboardSurfaceState } from '@oxs/ui';
-import { usePress } from '@oxs/ui/advanced';
+    `import '@ontologyx/ui/styles.css';
+import { Button, Stack, UiRoot, type SystemKeyboardSurfaceState } from '@ontologyx/ui';
+import { usePress } from '@ontologyx/ui/advanced';
 
 const state: SystemKeyboardSurfaceState = {
   surfaceId: 'smoke',
@@ -120,7 +120,7 @@ export const Smoke = () => (
   );
 
   run(['install', '--prefer-offline', '--ignore-scripts', '--strict-peer-dependencies'], consumer);
-  runNode(['--input-type=module', '--eval', "await import('@oxs/ui'); await import('@oxs/ui/advanced');"], consumer);
+  runNode(['--input-type=module', '--eval', "await import('@ontologyx/ui'); await import('@ontologyx/ui/advanced');"], consumer);
   run(['exec', 'tsc', '--noEmit', '-p', 'tsconfig.json', '--pretty', 'false'], consumer);
   run(['exec', 'vite', 'build'], consumer);
   console.log('Published-tarball consumer smoke passed: install · Node import · types · explicit styles export · Vite build.');

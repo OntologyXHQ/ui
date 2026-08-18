@@ -1,4 +1,4 @@
-# OXS UI Platform — Foundations Contract
+# OntologyX UI Platform — Foundations Contract
 
 UIP02 freezes the cross-cutting environment that every later Primitive, Component and System UI surface consumes.
 
@@ -30,7 +30,7 @@ Input modality vocabulary is `keyboard | mouse | touch | pen`; pointer precision
 
 - allowed UI layer dependency direction;
 - public-package boundaries and no deep Shell imports;
-- reusable interactive-control ownership inside `@oxs/ui`;
+- reusable interactive-control ownership inside `@ontologyx/ui`;
 - logical CSS spacing/alignment for RTL;
 - no required runtime CSS-in-JS dependency.
 

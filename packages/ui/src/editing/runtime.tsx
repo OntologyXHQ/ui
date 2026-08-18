@@ -80,7 +80,7 @@ export function EditableTextRuntimeProvider({
   );
   const readClipboardText = useCallback(() => {
     const adapter = adapterRef.current;
-    if (!adapter) return Promise.reject(new Error('OXS UI clipboard adapter is unavailable.'));
+    if (!adapter) return Promise.reject(new Error('OntologyX UI clipboard adapter is unavailable.'));
     return adapter.readText();
   }, []);
 

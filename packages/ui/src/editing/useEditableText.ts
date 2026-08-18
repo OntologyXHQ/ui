@@ -196,7 +196,7 @@ export function useEditableTextContract<T extends EditableTextElement>({
         })
         .catch((error: unknown) => {
           if (requestId !== asyncRequestRef.current) return;
-          console.error('OXS UI clipboard paste failed.', error);
+          console.error('OntologyX UI clipboard paste failed.', error);
         });
     },
     [inputRef, invalidateAsyncRequests, publishState, runtime, secure],

@@ -1,4 +1,4 @@
-# OXS UI Platform — Top-down Capability Demand Map
+# OntologyX UI Platform — Top-down Capability Demand Map
 
 The demand map is intentionally written before lower-layer APIs are frozen. It describes what higher layers need; it does not prescribe premature component names where the final abstraction is still open.
 

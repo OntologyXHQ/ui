@@ -1,4 +1,4 @@
-# OXS UI Platform — UIP00 Source Inventory
+# OntologyX UI Platform — UIP00 Source Inventory
 
 This inventory records the source state at the start of the focused UI Platform track and the intended ownership/disposition. It is a migration map, not a claim that every current API already satisfies the final layer contracts.
 
@@ -96,7 +96,7 @@ All tests that verify reusable UI behavior move with the production owner into `
 | `preview/SystemUiPatternsLab.tsx` | MOVE | Studio-only lab |
 | `preview/ui-kit-gallery.css` | MOVE | Studio-only styling |
 
-Studio code is intentionally absent from the `@oxs/ui` public export graph.
+Studio code is intentionally absent from the `@ontologyx/ui` public export graph.
 
 ## 10. Shell consumers
 
@@ -121,7 +121,7 @@ These are planned migrations, not reasons to redesign APIs during UIP00.
 
 ## 12. UIP00 public export snapshot
 
-This is the explicit public surface moved behind `@oxs/ui` before later reconciliation patches. It prevents an export from disappearing silently during the ownership migration.
+This is the explicit public surface moved behind `@ontologyx/ui` before later reconciliation patches. It prevents an export from disappearing silently during the ownership migration.
 
 ### Adaptive/environment
 

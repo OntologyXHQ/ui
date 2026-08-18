@@ -1,4 +1,4 @@
-# OXS UI Platform — System layout library
+# OntologyX UI Platform — System layout library
 
 Status: **canonical from UIP12**.
 

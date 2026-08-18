@@ -1,6 +1,6 @@
 /**
  * Advanced infrastructure surface for UI Studio diagnostics and platform integration.
- * Product UI should prefer the canonical `@oxs/ui` Components/Primitives/System surface.
+ * Product UI should prefer the canonical `@ontologyx/ui` Components/Primitives/System surface.
  */
 export * from './cursor';
 export * from './drag-drop';

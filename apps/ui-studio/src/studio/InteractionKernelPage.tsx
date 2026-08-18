@@ -17,13 +17,13 @@ import {
   Surface,
   Text,
   UiRoot,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import {
   useMotionPolicy,
   usePanGesture,
   usePress,
   useRovingFocus,
-} from '@oxs/ui/advanced';
+} from '@ontologyx/ui/advanced';
 import { StudioNav } from './StudioNav';
 
 function PressProbe() {
@@ -262,7 +262,7 @@ export function InteractionKernelPage() {
   return (
     <UiRoot direction={direction} motion={motion}>
       <main className="ui-studio-page">
-        <ScrollView className="ui-studio-page__scroll" ariaLabel="OXS UI interaction kernel playground">
+        <ScrollView className="ui-studio-page__scroll" ariaLabel="OntologyX UI interaction kernel playground">
           <Stack className="ui-studio-page__content" gap="xl">
             <StudioNav current="interaction" />
             <section className="ui-interaction-hero">

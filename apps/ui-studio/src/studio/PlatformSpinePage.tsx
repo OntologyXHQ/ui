@@ -1,4 +1,4 @@
-import { Grid, Heading, Label, Row, ScrollView, Stack, Surface, Text, UiRoot } from '@oxs/ui';
+import { Grid, Heading, Label, Row, ScrollView, Stack, Surface, Text, UiRoot } from '@ontologyx/ui';
 import { StudioNav } from './StudioNav';
 
 const layers = [
@@ -49,9 +49,9 @@ const capabilityGroups = [
 ] as const;
 
 const migrationFacts = [
-  ['Production owner', 'packages/ui · @oxs/ui'],
+  ['Production owner', 'packages/ui · @ontologyx/ui'],
   ['Studio owner', 'apps/ui-studio · development only'],
-  ['Consumer contract', 'published @oxs/ui exports only'],
+  ['Consumer contract', 'published @ontologyx/ui exports only'],
   ['Studio command', 'pnpm dev · localhost:5174'],
   ['Current frontier', 'Standalone 0.1.0 · UIP15'],
   ['Next dependency', 'UIP16 · host-neutral text input contracts'],
@@ -61,7 +61,7 @@ export function PlatformSpinePage() {
   return (
     <UiRoot instrumentPerformance>
       <main className="ui-studio-page">
-        <ScrollView className="ui-studio-page__scroll" ariaLabel="OXS UI Platform spine">
+        <ScrollView className="ui-studio-page__scroll" ariaLabel="OntologyX UI Platform spine">
           <Stack className="ui-studio-page__content" gap="2xl">
             <StudioNav current="spine" />
 
@@ -77,7 +77,7 @@ export function PlatformSpinePage() {
                   Build upward once.
                 </Heading>
                 <Text className="ui-studio-hero__lede" tone="secondary" selectable>
-                  OXS UI now ships from an independent workspace as a production platform with four strict
+                  OntologyX UI now ships from an independent workspace as a production platform with four strict
                   layers. Host products consume the published package; implementation remains bottom-up
                   without later RTL, touch, responsive, accessibility, or documentation retrofit passes.
                 </Text>

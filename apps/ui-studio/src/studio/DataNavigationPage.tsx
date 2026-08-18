@@ -26,7 +26,7 @@ import {
   Toolbar,
   UiRoot,
   Wrap,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import { useState } from 'react';
 import { StudioNav } from './StudioNav';
 
@@ -44,7 +44,7 @@ export function DataNavigationPage() {
   return (
     <UiRoot>
       <main className="ui-studio-page">
-        <ScrollView className="ui-studio-page__scroll" ariaLabel="OXS UI data and navigation Components">
+        <ScrollView className="ui-studio-page__scroll" ariaLabel="OntologyX UI data and navigation Components">
           <Stack className="ui-studio-page__content" gap="xl">
             <StudioNav current="data" />
 

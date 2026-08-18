@@ -7,7 +7,7 @@ const root = path.resolve(here, '..');
 const pkg = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
 const failures = [];
 if (pkg.private === true) failures.push('package is still private');
-if (pkg.license !== 'UNLICENSED' && typeof pkg.license !== 'string') failures.push('license field is missing');
+if (pkg.license !== 'MIT') failures.push('package license must be MIT for the public OntologyX release');
 for (const [subpath, target] of Object.entries(pkg.exports ?? {})) {
   const values = typeof target === 'string' ? [target] : Object.values(target);
   for (const value of values) if (typeof value === 'string' && value.includes('/src/')) failures.push(`${subpath} leaks source export ${value}`);
@@ -19,7 +19,7 @@ for (const rel of ['dist/index.js', 'dist/advanced.js']) {
   try {
     const javascript = await readFile(path.join(root, rel), 'utf8');
     if (/['"][^'"\n]+\.css['"]/.test(javascript)) {
-      failures.push(`${rel} must be stylesheet-neutral; consumers import @oxs/ui/styles.css explicitly`);
+      failures.push(`${rel} must be stylesheet-neutral; consumers import @ontologyx/ui/styles.css explicitly`);
     }
   } catch {}
 }
@@ -45,9 +45,9 @@ for (const file of distFiles) {
   if (/(__tests__|\.test\.|\.docs\.)/.test(file)) failures.push(`test/docs artifact leaked into dist: ${path.relative(root, file)}`);
 }
 if (failures.length) {
-  console.error('@oxs/ui package artifact check failed:');
+  console.error('@ontologyx/ui package artifact check failed:');
   for (const failure of failures) console.error(` - ${failure}`);
   process.exit(1);
 }
 const total = (await Promise.all(distFiles.map((file) => stat(file)))).reduce((sum, item) => sum + item.size, 0);
-console.log(`@oxs/ui package artifact check passed: ${distFiles.length} files · ${total} bytes.`);
+console.log(`@ontologyx/ui package artifact check passed: ${distFiles.length} files · ${total} bytes.`);

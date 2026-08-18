@@ -24,12 +24,12 @@ for path in required:
     if not path.exists():
         errors.append(f'missing UIP13 self-hosting artifact: {path.relative_to(ROOT)}')
 
-# Studio may compose semantic/layout wrappers, but reusable controls must come from @oxs/ui.
+# Studio may compose semantic/layout wrappers, but reusable controls must come from @ontologyx/ui.
 raw_control = re.compile(r'<(?:button|input|select|textarea)\b')
 for path in STUDIO.rglob('*.tsx'):
     text = path.read_text(encoding='utf-8')
     if raw_control.search(text):
-        errors.append(f'Studio contains raw reusable control instead of @oxs/ui: {path.relative_to(ROOT)}')
+        errors.append(f'Studio contains raw reusable control instead of @ontologyx/ui: {path.relative_to(ROOT)}')
 
 studio = (STUDIO / 'studio' / 'UiKitStudio.tsx').read_text(encoding='utf-8')
 for forbidden in ['currentView()', "view ===", "get('view')"]:
@@ -42,7 +42,7 @@ for marker in ['StudioEnvironmentProvider', 'CatalogPage']:
 sidebar = (STUDIO / 'studio' / 'StudioSidebar.tsx').read_text(encoding='utf-8')
 for marker in ['groupCatalog', 'ScrollView', 'SearchField', 'ListSection', 'ListItem', 'updateCatalogRoute']:
     if marker not in sidebar:
-        errors.append(f'generated Studio sidebar is missing @oxs/ui/catalog marker: {marker}')
+        errors.append(f'generated Studio sidebar is missing @ontologyx/ui/catalog marker: {marker}')
 
 catalog_page = (STUDIO / 'catalog' / 'CatalogPage.tsx').read_text(encoding='utf-8')
 for marker in ['StudioSidebar', 'StudioEnvironmentToolbar', 'Tabs', 'TabPanel', 'CatalogPlayground', 'filterCatalog']:

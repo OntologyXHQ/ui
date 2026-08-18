@@ -374,7 +374,7 @@ function moduleAliasForDocs(file, srcRoot) {
     .relative(srcRoot, file)
     .replaceAll(path.sep, '/')
     .replace(/\.tsx$/, '');
-  return `@oxs/ui-docs/${relative}`;
+  return `@ontologyx/ui-docs/${relative}`;
 }
 
 function isNonSdkDocsFile(file, srcRoot) {
@@ -507,7 +507,7 @@ export function writeCatalog({ uiRoot, studioRoot, check = false }) {
     }
     if (stale.length > 0) {
       throw new Error(
-        `Generated UI catalog is stale. Run pnpm --filter @oxs/ui docs:generate\n${stale.join('\n')}`,
+        `Generated UI catalog is stale. Run pnpm --filter @ontologyx/ui docs:generate\n${stale.join('\n')}`,
       );
     }
   } else {

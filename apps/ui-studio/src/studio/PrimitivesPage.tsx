@@ -18,7 +18,7 @@ import {
   UiRoot,
   Wrap,
   defineUiIcon,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import { StudioNav } from './StudioNav';
 
 const spark = defineUiIcon({ paths: ['m12 3 1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7Z'] });
@@ -59,7 +59,7 @@ export function PrimitivesPage() {
   return (
     <UiRoot>
       <main className="ui-studio-page">
-        <ScrollView className="ui-studio-page__scroll" ariaLabel="OXS UI primitive layer">
+        <ScrollView className="ui-studio-page__scroll" ariaLabel="OntologyX UI primitive layer">
           <Stack className="ui-studio-page__content" gap="xl">
             <StudioNav current="primitives" />
 

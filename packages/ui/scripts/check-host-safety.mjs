@@ -7,10 +7,10 @@ const importedStyleNames = [...indexCss.matchAll(/@import\s+[\'"]\.\/([^\'"]+\.c
   .map((match) => match[1]);
 
 if (!importedStyleNames.length) {
-  throw new Error('OXS UI host-safety failed: production style index has no local CSS imports to inspect.');
+  throw new Error('OntologyX UI host-safety failed: production style index has no local CSS imports to inspect.');
 }
 if (new Set(importedStyleNames).size !== importedStyleNames.length) {
-  throw new Error('OXS UI host-safety failed: production style index contains duplicate CSS imports.');
+  throw new Error('OntologyX UI host-safety failed: production style index contains duplicate CSS imports.');
 }
 
 const importedStyles = new Map(importedStyleNames.map((name) => [name, readStyle(name)]));
@@ -19,17 +19,17 @@ const componentsCss = importedStyles.get('components.css');
 
 const documentOwnerPattern = /(^|[,{\n]\s*)(?:html|body|#root|:root)(?:\s|,|\{|$)/m;
 if (documentOwnerPattern.test(productionCss)) {
-  throw new Error('OXS UI host-safety failed: production UI CSS claims html/body/#root/:root ownership.');
+  throw new Error('OntologyX UI host-safety failed: production UI CSS claims html/body/#root/:root ownership.');
 }
 
 if (!componentsCss) {
-  throw new Error('OXS UI host-safety failed: production style index no longer includes components.css.');
+  throw new Error('OntologyX UI host-safety failed: production style index no longer includes components.css.');
 }
 if (!componentsCss.includes('container-name: oxs-navigation')) {
-  throw new Error('OXS UI host-safety failed: AdaptiveNavigation is missing its local oxs-navigation container.');
+  throw new Error('OntologyX UI host-safety failed: AdaptiveNavigation is missing its local oxs-navigation container.');
 }
 if (!componentsCss.includes('@container oxs-navigation')) {
-  throw new Error('OXS UI host-safety failed: AdaptiveNavigation queries are not scoped to oxs-navigation.');
+  throw new Error('OntologyX UI host-safety failed: AdaptiveNavigation queries are not scoped to oxs-navigation.');
 }
 
-console.log(`OXS UI host-safety CSS check passed (${importedStyleNames.length} production styles scanned).`);
+console.log(`OntologyX UI host-safety CSS check passed (${importedStyleNames.length} production styles scanned).`);

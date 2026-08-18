@@ -11,7 +11,7 @@ import {
   Surface,
   Text,
   UiRoot,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import {
   useUiEnvironment,
   type UiDensity,
@@ -19,8 +19,8 @@ import {
   type UiModalityPreference,
   type UiPointerPrecisionPreference,
   type UiTheme,
-} from '@oxs/ui/advanced';
-import type { MotionPreference } from '@oxs/ui/advanced';
+} from '@ontologyx/ui/advanced';
+import type { MotionPreference } from '@ontologyx/ui/advanced';
 import { StudioNav } from './StudioNav';
 
 const themes: readonly UiTheme[] = ['system', 'dark', 'light', 'custom'];
@@ -177,7 +177,7 @@ export function FoundationsPage() {
       tokens={customTokens}
     >
       <main className="ui-studio-page">
-        <ScrollView className="ui-studio-page__scroll" ariaLabel="OXS UI foundations playground">
+        <ScrollView className="ui-studio-page__scroll" ariaLabel="OntologyX UI foundations playground">
           <Stack className="ui-studio-page__content" gap="xl">
             <StudioNav current="foundations" />
 

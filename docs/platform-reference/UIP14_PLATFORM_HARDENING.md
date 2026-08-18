@@ -1,4 +1,4 @@
-# OXS UI Platform — UIP14 First-stage cleanup + measured hardening
+# OntologyX UI Platform — UIP14 First-stage cleanup + measured hardening
 
 Status: implemented; real-workspace TypeScript/Vitest/Vite validation and visible Studio acceptance remain the delivery proof.
 
@@ -6,7 +6,7 @@ Status: implemented; real-workspace TypeScript/Vitest/Vite validation and visibl
 
 The first self-hosted Studio build proved the ownership boundary but exposed two acceptance defects: the environment toolbar could compress Select fields until their text overlapped, and the generated Playground could show a technically mounted export without making the actual component legible/useful. UIP14 starts by fixing those defects rather than hardening an unreadable workbench.
 
-Every catalog page now presents a **Live component** surface on Overview and a larger interactive preview in Playground. The preview always renders the real canonical `@oxs/ui` export when required props can be safely generated. Complex exports use source-owned fixture metadata or the first colocated canonical example. No public export is allowed to fall back to a text-only “cannot preview” state. Controlled `value/query/checked/pressed/selected/open` seams are rebound to Studio state so the preview remains interactive rather than frozen.
+Every catalog page now presents a **Live component** surface on Overview and a larger interactive preview in Playground. The preview always renders the real canonical `@ontologyx/ui` export when required props can be safely generated. Complex exports use source-owned fixture metadata or the first colocated canonical example. No public export is allowed to fall back to a text-only “cannot preview” state. Controlled `value/query/checked/pressed/selected/open` seams are rebound to Studio state so the preview remains interactive rather than frozen.
 
 The environment controls now use a responsive grid of real UI Kit `Select` Components. They never collapse into overlapping labels; the layout moves 3 → 2 → 1 columns by available Studio width.
 
@@ -28,7 +28,7 @@ Accessibility guidance remains source-owned and mandatory for Component/System c
 
 `docs/ui-platform/UIP14_BUDGETS.json` freezes first-stage ceilings for production TS module count/bytes, CSS count/bytes, runtime dependencies, peer dependencies, Studio leakage and legacy subpaths. `scripts/check-ui-budgets.py` enforces:
 
-- no direct runtime dependencies in `@oxs/ui`;
+- no direct runtime dependencies in `@ontologyx/ui`;
 - React/ReactDOM remain peers and match the Studio development versions;
 - JS remains tree-shakeable via CSS-only `sideEffects`;
 - UI Studio cannot enter production UI source;
@@ -39,7 +39,7 @@ Accessibility guidance remains source-owned and mandatory for Component/System c
 
 The Shell already consumes `SystemLauncher` and `SystemWorkspace`; canonical `ApplicationItem` already replaced AppTile. UIP14 therefore removes the completed compatibility layer instead of carrying dead wrappers to UIP22:
 
-- `@oxs/ui/legacy` export removed;
+- `@ontologyx/ui/legacy` export removed;
 - `AppTile` wrapper/docs removed;
 - Pattern forwarding directory removed;
 - the one remaining responsive tile CSS rule moved into Component CSS;
@@ -51,7 +51,7 @@ Historical evidence text is not rewritten as if history used the new names.
 
 After this patch the intended frontier is:
 
-1. one production package: `@oxs/ui` plus the intentional `@oxs/ui/advanced` engineering/integration subpath;
+1. one production package: `@ontologyx/ui` plus the intentional `@ontologyx/ui/advanced` engineering/integration subpath;
 2. one dev-only self-hosting UI Studio;
 3. generated canonical catalog + deterministic fixture matrix;
 4. no completed Pattern/AppTile compatibility path;

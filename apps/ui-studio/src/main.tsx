@@ -7,7 +7,7 @@ import './styles/studio.css';
 const rootElement = document.getElementById('root');
 
 if (!rootElement) {
-  throw new Error('OXS UI Studio root element was not found.');
+  throw new Error('OntologyX UI Studio root element was not found.');
 }
 
 ReactDOM.createRoot(rootElement).render(

@@ -30,7 +30,7 @@ import {
   Tooltip,
   tabRelationshipIds,
   UiRoot,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import { useState } from 'react';
 import { StudioNav } from './StudioNav';
 
@@ -208,8 +208,8 @@ export function ComponentAuditRepairPage() {
                 description="Runtime plumbing and compatibility aliases no longer masquerade as ordinary UI Kit components in the root package/catalog."
               >
                 <List label="Package surfaces" divided>
-                  <ListItem primary="@oxs/ui" secondary="Canonical developer + System visual SDK" trailing={<Badge tone="success">Catalog</Badge>} />
-                  <ListItem primary="@oxs/ui/advanced" secondary="Runtime diagnostics and platform integration" trailing={<Badge>Explicit</Badge>} />
+                  <ListItem primary="@ontologyx/ui" secondary="Canonical developer + System visual SDK" trailing={<Badge tone="success">Catalog</Badge>} />
+                  <ListItem primary="@ontologyx/ui/advanced" secondary="Runtime diagnostics and platform integration" trailing={<Badge>Explicit</Badge>} />
                   <ListItem primary="Legacy compatibility" secondary="Removed at UIP14; canonical System/Component owners only" trailing={<Badge tone="success">Removed</Badge>} />
                 </List>
               </Card>
@@ -245,7 +245,7 @@ export function ComponentAuditRepairPage() {
                     activeValue={manualTab}
                     labelledBy={tabRelationshipIds('audit', manualTab).tabId}
                   >
-                    {manualTab === 'runtime' ? 'Arrow focus can move without changing this panel until activation.' : 'The canonical catalog comes only from @oxs/ui.'}
+                    {manualTab === 'runtime' ? 'Arrow focus can move without changing this panel until activation.' : 'The canonical catalog comes only from @ontologyx/ui.'}
                   </TabPanel>
                 </Stack>
               </Card>

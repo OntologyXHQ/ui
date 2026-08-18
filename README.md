@@ -1,12 +1,12 @@
-# OXS UI
+# OntologyX UI
 
-Standalone workspace for the `@oxs/ui` platform package and its self-hosted Studio. This repository was extracted at the UIP15 frontier so UI can evolve, build and release independently from the OXS compositor/product repository.
+Standalone workspace for the `@ontologyx/ui` platform package and its self-hosted Studio. This repository was extracted at the UIP15 frontier so UI can evolve, build and release independently from the OXS compositor/product repository.
 
 ## Workspace
 
 ```text
 apps/ui-studio/   self-hosted catalog, docs, examples and playground
-packages/ui/      publishable @oxs/ui package
+packages/ui/      publishable @ontologyx/ui package
 docs/             canonical boundaries, release contract, roadmap/reference
 scripts/          standalone quality, package and release checks
 ```
@@ -39,7 +39,7 @@ Production direction is `Foundations → Primitives → Components → System UI
 
 ## Publication safety
 
-`@oxs/ui` is structurally publishable but starts as `UNLICENSED`. Public npm publication is guarded by `NPM_PUBLISH_ENABLED=true`; configure the npm scope, license and Trusted Publisher before enabling it.
+`@ontologyx/ui` is an MIT-licensed public package under the `ontologyx` npm organization. The first bootstrap publish is interactive; subsequent tagged releases use npm Trusted Publishing from `OntologyXHQ/ui` and remain guarded by `NPM_PUBLISH_ENABLED=true`.
 
 ## Next frontier
 

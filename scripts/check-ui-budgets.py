@@ -47,7 +47,7 @@ require_le('legacy public subpaths', len(legacy_subpaths), BUDGET['legacy_public
 studio_refs = 0
 for path in prod_ts:
     text = path.read_text(encoding='utf-8')
-    studio_refs += len(re.findall(r'apps/ui-studio|@oxs/ui-studio', text))
+    studio_refs += len(re.findall(r'apps/ui-studio|@ontologyx/ui-studio', text))
 require_le('Studio references in production UI', studio_refs, BUDGET['studio_imports_in_production_max'])
 
 studio_pkg = json.loads((ROOT / 'apps/ui-studio/package.json').read_text())
@@ -55,7 +55,7 @@ for dep in ('react', 'react-dom'):
     ui_version = PKG.get('peerDependencies', {}).get(dep)
     studio_version = studio_pkg.get('dependencies', {}).get(dep)
     if ui_version != studio_version:
-        issues.append(f'duplicate React risk: @oxs/ui {dep}={ui_version!r}, Studio {dep}={studio_version!r}')
+        issues.append(f'duplicate React risk: @ontologyx/ui {dep}={ui_version!r}, Studio {dep}={studio_version!r}')
 
 if issues:
     print('UI source budget gate failed:')

@@ -10,7 +10,7 @@ import {
   Stack,
   Surface,
   Text,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import { groupCatalog } from '../catalog/navigation';
 import { updateCatalogRoute } from '../catalog/routing';
 import type { UiCatalogEntry } from '../catalog/types';
@@ -45,7 +45,7 @@ export function StudioSidebar({
     <Surface className="ui-studio-sidebar" material="glass" radius="lg" elevation={1}>
       <Stack className="ui-studio-sidebar__header" gap="sm">
         <Stack gap="3xs">
-          <Label tone="accent" emphasis="strong">OXS UI Studio</Label>
+          <Label tone="accent" emphasis="strong">OntologyX UI Studio</Label>
           <Text tone="tertiary">Generated · self-hosted · UIP14</Text>
         </Stack>
         <SearchField

@@ -1,4 +1,4 @@
-import { Label, Row, Select, Surface, Toolbar } from '@oxs/ui';
+import { Label, Row, Select, Surface, Toolbar } from '@ontologyx/ui';
 import { useStudioEnvironment } from './StudioEnvironment';
 
 const themeOptions = [

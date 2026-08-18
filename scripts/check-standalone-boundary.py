@@ -16,7 +16,7 @@ for forbidden in ['apps/shell', 'crates', 'contracts', 'Cargo.toml', 'Cargo.lock
 
 pkg = json.loads((UI / 'package.json').read_text())
 if pkg.get('private') is True:
-    issues.append('@oxs/ui must be publishable, not private')
+    issues.append('@ontologyx/ui must be publishable, not private')
 for required in ['.', './advanced', './styles.css']:
     if required not in pkg.get('exports', {}):
         issues.append(f'missing production package export: {required}')
@@ -29,7 +29,7 @@ if pkg.get('files') != ['dist', 'README.md', 'LICENSE']:
 if set(pkg.get('peerDependencies', {})) != {'react', 'react-dom'}:
     issues.append('React/ReactDOM must be the only runtime peers')
 if pkg.get('dependencies'):
-    issues.append('@oxs/ui must keep zero runtime dependencies')
+    issues.append('@ontologyx/ui must keep zero runtime dependencies')
 
 source_re = re.compile(r"from\s+['\"]([^'\"]+)['\"]|import\s+['\"]([^'\"]+)['\"]")
 
@@ -43,7 +43,7 @@ prod_files = [
 allowed_external = {'react', 'react-dom', 'react-dom/client'}
 for path in prod_files:
     text = path.read_text()
-    if 'apps/ui-studio' in text or '@oxs/ui-studio' in text:
+    if 'apps/ui-studio' in text or '@ontologyx/ui-studio' in text:
         issues.append(f'production UI references Studio: {path.relative_to(ROOT)}')
     for source in import_sources(path):
         if source.startswith('@oxs/') or 'apps/shell' in source or 'crates/' in source:

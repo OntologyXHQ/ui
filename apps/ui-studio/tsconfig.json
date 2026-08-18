@@ -20,13 +20,13 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "paths": {
-      "@oxs/ui": [
+      "@ontologyx/ui": [
         "../../packages/ui/src/index.ts"
       ],
-      "@oxs/ui/advanced": [
+      "@ontologyx/ui/advanced": [
         "../../packages/ui/src/advanced.ts"
       ],
-      "@oxs/ui-docs/*": [
+      "@ontologyx/ui-docs/*": [
         "../../packages/ui/src/*"
       ]
     }

@@ -1,4 +1,4 @@
-import { AppBar, Button } from '@oxs/ui';
+import { AppBar, Button } from '@ontologyx/ui';
 
 export type StudioView =
   | 'catalog'
@@ -34,7 +34,7 @@ export function StudioNav({ current }: { current: StudioView }) {
   return (
     <AppBar
       className="ui-studio-nav"
-      title="OXS UI Studio"
+      title="OntologyX UI Studio"
       subtitle={`${current} · legacy diagnostic page`}
       actions={
         <Button size="sm" variant="soft" onClick={openWorkbench}>

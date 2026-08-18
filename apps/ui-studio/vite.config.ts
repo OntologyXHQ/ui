@@ -19,7 +19,7 @@ export default defineConfig({
     alias: [
       { find: /^@oxs\/ui$/, replacement: path.resolve(workspaceRoot, 'packages/ui/src/index.ts') },
       { find: /^@oxs\/ui\/advanced$/, replacement: path.resolve(workspaceRoot, 'packages/ui/src/advanced.ts') },
-      { find: '@oxs/ui-docs', replacement: path.resolve(workspaceRoot, 'packages/ui/src') },
+      { find: '@ontologyx/ui-docs', replacement: path.resolve(workspaceRoot, 'packages/ui/src') },
     ],
   },
   server: {

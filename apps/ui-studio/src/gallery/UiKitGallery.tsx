@@ -15,13 +15,13 @@ import {
   Text,
   TextField,
   UiRoot,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import {
   type FrameRateTarget,
   type MotionPreference,
   type UiDensity,
   type UiTheme,
-} from '@oxs/ui/advanced';
+} from '@ontologyx/ui/advanced';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { StudioNav } from '../studio/StudioNav';
@@ -119,7 +119,7 @@ export function UiKitGallery() {
       <main className="ui-kit-gallery">
         <ScrollView
           className="ui-kit-gallery__scroll"
-          ariaLabel="OXS UI Kit gallery"
+          ariaLabel="OntologyX UI Kit gallery"
           indicator="auto"
           overscroll="elastic"
         >
@@ -133,7 +133,7 @@ export function UiKitGallery() {
                 UI Runtime Controls
               </Heading>
               <Text tone="secondary" selectable>
-                This is the current production UI surface migrated into @oxs/ui. UIP01 replaces the
+                This is the current production UI surface migrated into @ontologyx/ui. UIP01 replaces the
                 hand-maintained gallery catalog with generated documentation and navigation.
               </Text>
             </Stack>

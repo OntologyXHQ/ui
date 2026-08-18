@@ -15,7 +15,7 @@ import {
   TextArea,
   TextField,
   UiRoot,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import { useState } from 'react';
 import { StudioNav } from './StudioNav';
 
@@ -34,7 +34,7 @@ export function FieldsFormsPage() {
   return (
     <UiRoot>
       <main className="ui-studio-page">
-        <ScrollView className="ui-studio-page__scroll" ariaLabel="OXS UI fields and forms Components">
+        <ScrollView className="ui-studio-page__scroll" ariaLabel="OntologyX UI fields and forms Components">
           <Stack className="ui-studio-page__content" gap="xl">
             <StudioNav current="fields" />
 

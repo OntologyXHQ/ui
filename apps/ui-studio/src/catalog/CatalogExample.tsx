@@ -1,4 +1,4 @@
-import { Label, Stack, Surface, Text } from '@oxs/ui';
+import { Label, Stack, Surface, Text } from '@ontologyx/ui';
 import { lazy, Suspense, useMemo } from 'react';
 import { CatalogErrorBoundary } from './CatalogErrorBoundary';
 import type { UiCatalogExample } from './types';

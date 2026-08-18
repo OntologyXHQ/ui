@@ -16,12 +16,12 @@ import {
   SystemWorkspace,
   Text,
   UiRoot,
-} from '@oxs/ui';
+} from '@ontologyx/ui';
 import { useMemo, useState } from 'react';
 import { StudioNav } from './StudioNav';
 
 const roadmap = [
-  ['UIP13', 'Studio self-hosting', 'Studio chrome migrates to the same @oxs/ui it documents.'],
+  ['UIP13', 'Studio self-hosting', 'Studio chrome migrates to the same @ontologyx/ui it documents.'],
   ['UIP15', 'System touch keyboard', 'Privileged System surface composed from Components.'],
   ['UIP16', 'Text input + IME', 'Native authority, secure input, physical keyboard policy and occlusion.'],
   ['UIP17', 'System cursor', 'Roles, theme, scale, hotspot and pointer-alignment acceptance.'],
@@ -43,7 +43,7 @@ export function SystemBoundaryPage() {
   return (
     <UiRoot>
       <main className="ui-studio-page">
-        <ScrollView className="ui-studio-page__scroll" ariaLabel="OXS UI System boundary">
+        <ScrollView className="ui-studio-page__scroll" ariaLabel="OntologyX UI System boundary">
           <Stack className="ui-studio-page__content" gap="xl">
             <StudioNav current="system" />
 

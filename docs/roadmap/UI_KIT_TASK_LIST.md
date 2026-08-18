@@ -3,7 +3,7 @@
 > This roadmap was carried out of the OXS product repository at the UIP15 frontier.
 > From UIP16 onward, reusable UI contracts/visuals/runtime-neutral behavior belong here; compositor, Wayland, native IME, physical-keyboard detection and other host implementations remain consumer-owned integrations. The canonical standalone gate is `pnpm quality`.
 
-# OXS UI Platform — Patch Delivery Task List
+# OntologyX UI Platform — Patch Delivery Task List
 
 > Standalone UI-only delivery roadmap. This file does not participate in the root OXS backlog, backend/runtime batches, hardware certification, or root planning/evidence gates. While this track is active, UI delivery is driven by the patch IDs `UIP00..UIP23` and atomic task IDs `OXUI-001..OXUI-144` in this document.
 
@@ -71,9 +71,9 @@ The presentation belongs to the same patch; do not defer it to `UIP13`. `UIP13` 
 UI patches use a deliberately small gate set that protects real code behavior without growing a patch-specific checklist:
 
 1. `pnpm quality` — stable architecture/ownership invariants only.
-2. `pnpm --filter @oxs/ui check` — TypeScript integrity of the production UI package.
-3. `pnpm --filter @oxs/ui test` — focused UI package behavior/regression tests.
-4. `pnpm --filter @oxs/ui-studio check` and `pnpm --filter @oxs/ui-studio build` — prove the mandatory Studio presentation compiles and bundles.
+2. `pnpm --filter @ontologyx/ui check` — TypeScript integrity of the production UI package.
+3. `pnpm --filter @ontologyx/ui test` — focused UI package behavior/regression tests.
+4. `pnpm --filter @ontologyx/ui-studio check` and `pnpm --filter @ontologyx/ui-studio build` — prove the mandatory Studio presentation compiles and bundles.
 5. `docs:generate` / `docs:check` only when a patch changes public visual exports, colocated docs, or catalog generation.
 
 Do not add root planning/evidence gates, formatter-only blockers, task-specific text/baseline guards, or one-off validation scripts to this chain. Gate failure never rolls back source changes; fix forward in place and rerun the same stable gates.
@@ -126,7 +126,7 @@ If System UI needs a generic capability, that capability belongs in Components f
 ## 3. Target repository shape
 
 ```text
-packages/ui/                         # @oxs/ui — production UI platform
+packages/ui/                         # @ontologyx/ui — production UI platform
 ├── src/
 │   ├── foundations/
 │   ├── primitives/
@@ -147,7 +147,7 @@ apps/ui-studio/                      # dev-only generated UI Studio
 └── package.json
 
 apps/shell/                          # product consumer
-└── imports public @oxs/ui APIs
+└── imports public @ontologyx/ui APIs
 ```
 
 The exact migration can be staged, but ownership is final. `pnpm dev ui` remains the stable UI development workflow and the Studio remains development-only.
@@ -170,7 +170,7 @@ Forbidden:
 system   -> primitives
 shell    -> primitives/internal
 shell    -> components/internal
-feature  -> raw reusable visual CSS/DOM when an @oxs/ui owner exists
+feature  -> raw reusable visual CSS/DOM when an @ontologyx/ui owner exists
 studio   -> production dependency graph
 ```
 
@@ -260,7 +260,7 @@ UIP23  UI Platform V1 closeout
 
 `UIP11..UIP12` are allowed to consume Components only. They are intentionally late so System UI does not force ad-hoc primitive bypasses.
 
-`UIP13` makes the Studio a real self-hosting consumer: all reusable visible Studio chrome and interactions must dogfood public `@oxs/ui` instead of maintaining a parallel control/style system.
+`UIP13` makes the Studio a real self-hosting consumer: all reusable visible Studio chrome and interactions must dogfood public `@ontologyx/ui` instead of maintaining a parallel control/style system.
 
 `UIP14` is a first hardening checkpoint, not V1 closeout. It removes only paths whose replacement is already complete and records budgets before privileged/system-surface expansion.
 
@@ -316,7 +316,7 @@ The checkpoint now includes the second from-scratch runtime/SDK audit and closes
 - non-nested trailing actions, real spatial TileGrid arrows and React-owned Disclosure/Accordion state;
 - root-scoped Motion shared-bounds, imperative style ownership and stable Toast timing/upsert semantics;
 - library-safe CSS scoped under UiRoot, local container-query ownership and shared environment/media/size observation;
-- explicit `@oxs/ui` canonical SDK and `@oxs/ui/advanced` infrastructure surfaces, with the former `@oxs/ui/legacy` compatibility surface removed at UIP14 and the public catalog generated only from the canonical root;
+- explicit `@ontologyx/ui` canonical SDK and `@ontologyx/ui/advanced` infrastructure surfaces, with the former `@ontologyx/ui/legacy` compatibility surface removed at UIP14 and the public catalog generated only from the canonical root;
 - developer/System semantic repairs including heading/landmark ownership, affix descriptions, opt-in live feedback, command filtering/navigation and overridable System copy;
 - reconciliation of current daily UI checker assumptions with the post-UIP12/package-subpath ownership model while preserving historical acceptance scripts as evidence.
 
@@ -339,7 +339,7 @@ The checkpoint now includes the second from-scratch runtime/SDK audit and closes
 - `OXUI-001` [DONE / P0] — **Freeze the four-layer architecture.** Canonicalize Foundations → Primitives → Components → System UI ownership, allowed dependency edges, public/internal support rules, and the System→Primitive prohibition.
 - `OXUI-002` [DONE / P0] — **Inventory and classify the current UI codebase.** Map every current foundation/adaptive/primitive/component/pattern/motion/scroll/gesture/cursor/editing/drag-drop/preview/style export to keep/move/merge/replace/remove; identify duplicates and mixed generic/system ownership.
 - `OXUI-003` [DONE / P0] — **Build the top-down capability demand map.** Inventory current Launcher, Workspace, system surfaces, settings/navigation needs, notification/quick-control needs, touch keyboard host needs, and ordinary developer-app needs; map each required capability to Foundations, Primitives, Components, or System UI before lower-layer APIs are frozen.
-- `OXUI-004` [DONE / P0] — **Create/stage the production `@oxs/ui` package boundary.** Reusable UI ownership moves out of Shell while preserving behavior; React is not duplicated and package output is tree-shakeable ESM.
+- `OXUI-004` [DONE / P0] — **Create/stage the production `@ontologyx/ui` package boundary.** Reusable UI ownership moves out of Shell while preserving behavior; React is not duplicated and package output is tree-shakeable ESM.
 - `OXUI-005` [DONE / P0] — **Separate the development-only UI Studio boundary.** Establish/stage `apps/ui-studio` while preserving `pnpm dev ui` and port `5174`; Studio code/dependencies must not enter the production shell graph.
 - `OXUI-006` [DONE / P0] — **Machine-enforce dependency ownership.** Add UI-only source checks/fixtures for forbidden deep imports, System→Primitive access, feature→internal access, production→Studio dependencies, and unowned reusable visual implementations.
 
@@ -535,16 +535,16 @@ The checkpoint now includes the second from-scratch runtime/SDK audit and closes
 
 **ZIP:** `oxs-uip13-studio-self-hosting.zip`
 
-**Purpose:** make the Studio a strict self-hosting consumer of `@oxs/ui` while completing the generated catalog/playground environment. Minimal Vite/React bootstrap may remain outside the UI Kit; reusable visible chrome may not.
+**Purpose:** make the Studio a strict self-hosting consumer of `@ontologyx/ui` while completing the generated catalog/playground environment. Minimal Vite/React bootstrap may remain outside the UI Kit; reusable visible chrome may not.
 
-- `OXUI-079` [DONE / P0] — **Generate Studio navigation/menu from catalog data using `@oxs/ui`.** Layers/categories/status/order come from source metadata; no hand-maintained component menu or parallel navigation controls remain.
-- `OXUI-080` [DONE / P0] — **Dogfood `@oxs/ui` for Studio chrome.** Navigation, search, tabs, lists, panels, forms, overlays, feedback, layout/compositions and reusable interactions all consume public UI Kit APIs; raw reusable controls/CSS are removed from Studio.
+- `OXUI-079` [DONE / P0] — **Generate Studio navigation/menu from catalog data using `@ontologyx/ui`.** Layers/categories/status/order come from source metadata; no hand-maintained component menu or parallel navigation controls remain.
+- `OXUI-080` [DONE / P0] — **Dogfood `@ontologyx/ui` for Studio chrome.** Navigation, search, tabs, lists, panels, forms, overlays, feedback, layout/compositions and reusable interactions all consume public UI Kit APIs; raw reusable controls/CSS are removed from Studio.
 - `OXUI-081` [DONE / P0] — **Generate rich detail/prop pages.** Render guidance, import/API info, prop tables, types/defaults/JSDoc/deprecation, accessibility/RTL/touch/responsive notes and examples from the generated catalog.
 - `OXUI-082` [DONE / P0] — **Create live playground + canonical state matrices.** Auto-generate safe controls for simple prop types, allow explicit custom controls for complex props, and show applicable rest/hover/pressed/focus/disabled/loading/selected/error states.
 - `OXUI-083` [DONE / P0] — **Create the global environment toolbar.** Switch theme/custom theme, LTR/RTL, density, reduced motion, fine/coarse pointer/touch simulation, viewport/container presets and safe-area/occlusion values without changing examples.
 - `OXUI-084` [DONE / P0] — **Add search, stable deep links and coverage UX.** Search components/props/docs, route directly to pages/examples/states, surface missing coverage, and preserve fault isolation so one broken example cannot blank Studio.
 
-**Acceptance:** adding a documented public Component automatically creates a searchable, navigable, deep-linkable Studio page with props/examples and no manual menu/page registration; all reusable visible Studio chrome is rendered through public `@oxs/ui`, leaving only minimal app/bootstrap/dev-tool code outside the kit.
+**Acceptance:** adding a documented public Component automatically creates a searchable, navigable, deep-linkable Studio page with props/examples and no manual menu/page registration; all reusable visible Studio chrome is rendered through public `@ontologyx/ui`, leaving only minimal app/bootstrap/dev-tool code outside the kit.
 
 ## UIP14 — First-stage cleanup + measured hardening
 
@@ -559,7 +559,7 @@ The checkpoint now includes the second from-scratch runtime/SDK audit and closes
 - `OXUI-089` [DONE / P0] — **Remove already-migrated parallel UI paths and compatibility adapters.** Delete Component-era pattern/preview/style duplication and temporary bridges whose consumers are already migrated; System feature adapters still required by UIP15..UIP20 are removed only in UIP22.
 - `OXUI-090` [DONE / P0] — **Freeze the pre-privileged-surface checkpoint.** Reconcile docs/source boundaries, public API policy, generated catalog, Studio self-hosting status and measured budgets before UIP15; do not claim UI Platform V1 closeout here.
 
-**Acceptance:** one production `@oxs/ui` package + one self-hosting dev-only Studio remain; completed lower-layer compatibility paths are removed; measured quality/bundle gates pass; explicit remaining System/input work is carried forward to UIP15..UIP23 rather than mislabeled as debt.
+**Acceptance:** one production `@ontologyx/ui` package + one self-hosting dev-only Studio remain; completed lower-layer compatibility paths are removed; measured quality/bundle gates pass; explicit remaining System/input work is carried forward to UIP15..UIP23 rather than mislabeled as debt.
 
 ---
 
@@ -679,7 +679,7 @@ The checkpoint now includes the second from-scratch runtime/SDK audit and closes
 - `OXUI-135` [TODO / P0] — **Complete Studio parallel-UI deletion.** No reusable raw button/input/select/textarea/navigation/panel/overlay/feedback implementation remains in Studio outside minimal bootstrap/dev tooling.
 - `OXUI-136` [TODO / P0] — **Reconcile generated docs/catalog after cleanup.** No deprecated entry or moved owner leaves stale catalog metadata, duplicate docs or manual navigation state.
 - `OXUI-137` [TODO / P0] — **Enforce final JS/CSS/dependency budgets.** Measure tree-shaking, production CSS, runtime dependency cost, duplicate React risk and prove Studio-only code/dependencies are excluded.
-- `OXUI-138` [TODO / P0] — **Run final architecture drift audit.** Prove System→Components, Shell→public System/Components, Studio→public `@oxs/ui`, centralized runtime ownership and logical CSS across the actual workspace.
+- `OXUI-138` [TODO / P0] — **Run final architecture drift audit.** Prove System→Components, Shell→public System/Components, Studio→public `@ontologyx/ui`, centralized runtime ownership and logical CSS across the actual workspace.
 
 **Acceptance:** only intentional production APIs/owners remain; Studio is a pure consumer; bundle/dependency budgets are recorded and no dual UI architecture survives.
 
@@ -689,14 +689,14 @@ The checkpoint now includes the second from-scratch runtime/SDK audit and closes
 
 **Purpose:** close V1 only after the UI Platform can build itself, System surfaces consume it, and privileged input/cursor dependencies have real acceptance.
 
-- `OXUI-139` [TODO / P0] — **Prove Studio self-hosting end to end.** All reusable visible Studio UI comes from the same production `@oxs/ui` public surface it documents; bootstrap-only exceptions are enumerated.
+- `OXUI-139` [TODO / P0] — **Prove Studio self-hosting end to end.** All reusable visible Studio UI comes from the same production `@ontologyx/ui` public surface it documents; bootstrap-only exceptions are enumerated.
 - `OXUI-140` [TODO / P0] — **Prove System→Component-only end state.** Launcher/workspace/bars/settings/notifications/keyboard/System overlays contain no Primitive/runtime/legacy Pattern bypass.
 - `OXUI-141` [TODO / P0] — **Close touch-keyboard/text-input dependencies.** Physical-keyboard-aware auto-show, IME composition, secure input and occlusion have runtime evidence; unresolved native work blocks V1 UI closeout rather than becoming hidden debt.
 - `OXUI-142` [TODO / P0] — **Close cursor/pointer dependencies.** Cursor role/theme/scale/hotspot and pointer hit alignment pass required nested/output resize/scale acceptance; the fixed-scale development workaround cannot be treated as final architecture.
 - `OXUI-143` [TODO / P0] — **Run final generated/visual/accessibility/performance suite.** Catalog, Studio state matrices, deterministic layouts, accessibility assertions and measured production budgets all pass on the final public surface.
 - `OXUI-144` [TODO / P0] — **Freeze UI Platform V1.** Reconcile architecture/docs/task ledger/public API, remove completed temporary debt and record only explicitly accepted post-V1 work with owners and rationale.
 
-**Acceptance:** OXS UI Platform V1 is self-hosting, System-owned above Components, includes the privileged touch-keyboard/input and cursor requirements with real runtime acceptance, and has no hidden parallel UI implementation.
+**Acceptance:** OntologyX UI Platform V1 is self-hosting, System-owned above Components, includes the privileged touch-keyboard/input and cursor requirements with real runtime acceptance, and has no hidden parallel UI implementation.
 
 ---
 
