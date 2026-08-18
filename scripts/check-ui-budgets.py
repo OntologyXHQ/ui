@@ -37,8 +37,8 @@ if unexpected_peers:
     issues.append(f'unreviewed peer dependencies: {unexpected_peers}')
 
 side_effects = PKG.get('sideEffects')
-if side_effects != ['./src/styles/*.css', './dist/styles.css']:
-    issues.append('package sideEffects must remain limited to source/dist CSS')
+if side_effects != ['./dist/styles.css']:
+    issues.append('package sideEffects must remain limited to the published stylesheet export')
 
 exports = PKG.get('exports', {})
 legacy_subpaths = [name for name in exports if 'legacy' in name]
