@@ -8,7 +8,7 @@ export const uiDocs = defineUiDocsGroup([
     summary: 'Backdrop surface for modal and transient layered UI.',
     usage:
       'Use behind an owned overlay; overlay lifecycle/focus ownership is centralized in UIP03.',
-    status: 'provisional',
+    status: 'candidate',
     accessibility: 'Decorative by default; interaction semantics belong to the owning overlay.',
     rtl: 'Covers logical viewport bounds identically in LTR and RTL.',
     touch: 'Pointer dismissal behavior belongs to the overlay owner, not the scrim itself.',

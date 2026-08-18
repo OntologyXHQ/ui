@@ -4,7 +4,7 @@ import { defineUiDocsGroup } from '../docs/defineUiDocs';
 const common = {
   layer: 'primitives' as const,
   category: 'Typography', order: 20,
-  status: 'stable' as const,
+  status: 'candidate' as const,
   accessibility: 'Uses real text/heading/code semantics and preserves selection policy.',
   rtl: 'Inherits bidi direction; wrapping and truncation are direction-neutral.',
   touch: 'Selectable text remains available to touch selection.',

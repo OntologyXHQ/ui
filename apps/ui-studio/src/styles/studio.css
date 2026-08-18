@@ -842,7 +842,7 @@ body { overflow: hidden; background: #091019; color-scheme: dark light; }
   }
 }
 
-/* UIP13 · self-hosted generated Studio workbench */
+/* Self-hosted generated Studio workbench */
 .ui-studio-stage {
   width: 100%;
   height: 100%;
@@ -1210,7 +1210,7 @@ body { overflow: hidden; background: #091019; color-scheme: dark light; }
   gap: var(--oxs-space-sm);
 }
 
-/* UIP13 visual acceptance follow-up + UIP14 fixture presentation */
+/* Generated Studio workbench presentation */
 .ui-studio-environment__row {
   align-items: flex-start;
 }

@@ -11,19 +11,26 @@
   "scripts": {
     "dev": "pnpm catalog:generate && pnpm --filter @ontologyx/ui-studio dev",
     "build": "pnpm --filter @ontologyx/ui build && pnpm --filter @ontologyx/ui-studio build",
-    "check": "pnpm check:boundaries && pnpm --filter @ontologyx/ui check && pnpm --filter @ontologyx/ui-studio check",
+    "check": "pnpm gate:architecture && pnpm gate:types",
     "test": "pnpm --filter @ontologyx/ui test && pnpm --filter @ontologyx/ui docs:test",
-    "quality": "pnpm catalog:check && pnpm check:boundaries && pnpm --filter @ontologyx/ui check && pnpm --filter @ontologyx/ui test && pnpm --filter @ontologyx/ui build && pnpm --filter @ontologyx/ui pack:check && pnpm --filter @ontologyx/ui-studio check && pnpm --filter @ontologyx/ui-studio build",
+    "quality": "pnpm gate:architecture && pnpm gate:catalog && pnpm gate:types && pnpm gate:behavior",
+    "verify": "pnpm quality && pnpm gate:studio && pnpm gate:build",
+    "release:check": "pnpm verify && node scripts/check-studio-production.mjs && pnpm package:smoke",
+    "gate:architecture": "python3 scripts/gates/check-architecture.py",
+    "gate:catalog": "pnpm catalog:check && node scripts/gates/check-catalog-acceptance.mjs",
+    "gate:types": "pnpm --filter @ontologyx/ui check && pnpm --filter @ontologyx/ui-studio check",
+    "gate:behavior": "pnpm --filter @ontologyx/ui test && pnpm --filter @ontologyx/ui docs:test",
+    "gate:studio": "python3 scripts/gates/check-studio.py",
+    "gate:build": "pnpm --filter @ontologyx/ui build && pnpm --filter @ontologyx/ui pack:check && pnpm --filter @ontologyx/ui-studio build",
     "lint": "biome check .",
     "format": "biome format --write .",
-    "catalog:generate": "pnpm --filter @ontologyx/ui docs:generate && python3 scripts/generate-fixture-matrix.py",
-    "catalog:check": "pnpm --filter @ontologyx/ui docs:check && python3 scripts/generate-fixture-matrix.py --check",
-    "check:boundaries": "python3 scripts/check-standalone-boundary.py && python3 scripts/check-studio-self-hosting.py && python3 scripts/check-platform-hardening.py && python3 scripts/check-system-keyboard.py",
+    "catalog:generate": "pnpm --filter @ontologyx/ui docs:generate",
+    "catalog:check": "pnpm --filter @ontologyx/ui docs:check",
     "package:smoke": "node scripts/package-smoke.mjs",
     "package:tarball": "node scripts/create-tarball.mjs",
-    "release:check": "pnpm quality && node scripts/check-studio-production.mjs && pnpm package:smoke",
     "studio:build": "pnpm catalog:generate && pnpm --filter @ontologyx/ui-studio build && node scripts/check-studio-production.mjs",
-    "studio:preview": "pnpm --filter @ontologyx/ui-studio preview"
+    "studio:preview": "pnpm --filter @ontologyx/ui-studio preview",
+    "snapshot": "node scripts/create-snapshot.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.7"

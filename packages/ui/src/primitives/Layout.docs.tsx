@@ -4,7 +4,7 @@ import { Box, Container, Grid, Inset, Row, SafeArea, Spacer, Stack, Surface, Tex
 const common = {
   layer: 'primitives' as const,
   category: 'Layout', order: 10,
-  status: 'stable' as const,
+  status: 'candidate' as const,
   accessibility: 'Preserves the semantics of its children and adds no interaction semantics.',
   rtl: 'Uses logical flow, alignment and spacing semantics.',
   touch: 'Layout-only; touch behavior belongs to Components.',

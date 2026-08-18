@@ -23,7 +23,7 @@ const layerLabels = {
 } as const;
 
 function statusTone(status: UiCatalogEntry['status']) {
-  if (status === 'stable') return 'success' as const;
+  if (status === 'accepted') return 'success' as const;
   if (status === 'deprecated') return 'danger' as const;
   if (status === 'experimental') return 'warning' as const;
   return 'neutral' as const;
@@ -46,7 +46,7 @@ export function StudioSidebar({
       <Stack className="ui-studio-sidebar__header" gap="sm">
         <Stack gap="3xs">
           <Label tone="accent" emphasis="strong">OntologyX UI Studio</Label>
-          <Text tone="tertiary">Generated · self-hosted · UIP14</Text>
+          <Text tone="tertiary">Generated · self-hosted · rebaseline</Text>
         </Stack>
         <SearchField
           value={query}

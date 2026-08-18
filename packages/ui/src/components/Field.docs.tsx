@@ -9,7 +9,7 @@ export const uiDocs = defineUiDocsGroup([
     summary: 'Accessible grouping for related developer-facing form controls.',
     usage:
       'Use when several fields form one logical choice or data-entry group; it owns group labeling, not individual field chrome.',
-    status: 'provisional',
+    status: 'candidate',
     accessibility: 'Connects group label and description to a semantic group relationship.',
     rtl: 'Uses logical layout and inherits the scoped UI direction.',
     touch: 'Adds no private interaction layer; child Components own their touch contracts.',
@@ -22,7 +22,7 @@ export const uiDocs = defineUiDocsGroup([
     summary: 'Section-level form composition with title, description and an optional action region.',
     usage:
       'Use for meaningful form sections such as profile, connectivity or account details; avoid using it as generic surface chrome.',
-    status: 'provisional',
+    status: 'candidate',
     accessibility: 'Uses a real section with an explicit labelled-by relationship.',
     rtl: 'Header/action composition is logical-direction safe.',
     touch: 'Action ownership remains with child Components.',

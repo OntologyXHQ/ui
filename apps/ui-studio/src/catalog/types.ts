@@ -1,7 +1,7 @@
 import type { ComponentType } from 'react';
 
 export type UiCatalogLayer = 'foundations' | 'primitives' | 'components' | 'system';
-export type UiCatalogStatus = 'stable' | 'provisional' | 'experimental' | 'deprecated';
+export type UiCatalogStatus = 'candidate' | 'accepted' | 'experimental' | 'deprecated';
 
 export type UiCatalogProp = {
   name: string;

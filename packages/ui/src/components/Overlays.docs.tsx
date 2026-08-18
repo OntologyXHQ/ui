@@ -7,7 +7,7 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'Dialog', layer: 'components', category: 'Overlays', order: 70,
     summary: 'Modal or non-modal task surface on the shared overlay lifecycle.',
-    usage: 'Use for focused transient tasks without product-specific shell semantics.', status: 'stable',
+    usage: 'Use for focused transient tasks without product-specific shell semantics.', status: 'candidate',
     accessibility: 'Owns dialog semantics, focus containment/restoration, Escape policy and title/description wiring.',
     rtl: 'Content and actions use logical flow.', touch: 'Actions inherit shared touch targets and outside dismissal is explicit.',
     responsive: 'Size variants clamp to available space; fullscreen remains opt-in.',
@@ -16,7 +16,7 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'AlertDialog', layer: 'components', category: 'Overlays', order: 70,
     summary: 'Confirmation dialog with explicit cancel/confirm semantics.',
-    usage: 'Use for consequential confirmation; outside press is intentionally disabled.', status: 'stable',
+    usage: 'Use for consequential confirmation; outside press is intentionally disabled.', status: 'candidate',
     accessibility: 'Uses alertdialog semantics and the same modal focus lifecycle as Dialog.',
     rtl: 'Action order follows semantic source order and logical layout.', touch: 'Confirmation actions keep the shared coarse-pointer target floor.',
     responsive: 'Uses Dialog sizing and containment rules.',
@@ -25,7 +25,7 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'Sheet', layer: 'components', category: 'Overlays', order: 70,
     summary: 'Adaptive transient task surface using shared overlay and safe-area services.',
-    usage: 'Use for layered supporting tasks; auto placement adapts without OXS-specific layout assumptions.', status: 'stable',
+    usage: 'Use for layered supporting tasks; auto placement adapts without OXS-specific layout assumptions.', status: 'candidate',
     accessibility: 'Provides dialog semantics, focus containment/restoration and Escape handling.',
     rtl: 'Content follows logical direction while bottom is a physical edge.', touch: 'Optional drag ownership is delegated to the shared gesture arena.',
     responsive: 'Auto placement resolves to bottom on narrow containers and centered presentation on wider containers.',
@@ -34,7 +34,7 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'BottomSheet', layer: 'components', category: 'Overlays', order: 70,
     summary: 'Touch-first bottom-edge Sheet with gesture-arena drag interaction.',
-    usage: 'Use for transient tasks whose physical bottom-edge presentation is intentional.', status: 'stable',
+    usage: 'Use for transient tasks whose physical bottom-edge presentation is intentional.', status: 'candidate',
     accessibility: 'Inherits Sheet dialog and focus semantics.', rtl: 'Bottom edge does not mirror; content remains bidi-aware.',
     touch: 'Drag gesture is first-class and competes through the shared gesture arena.', responsive: 'Height and safe-area padding adapt to available space.',
     examples: [{ id: 'preview', title: 'Bottom sheet interaction', component: 'BottomSheetPreviewExample' }],
@@ -42,7 +42,7 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'Popover', layer: 'components', category: 'Overlays', order: 70,
     summary: 'Anchored floating surface on shared collision, observation and dismissal services.',
-    usage: 'Use for lightweight anchored content.', status: 'stable',
+    usage: 'Use for lightweight anchored content.', status: 'candidate',
     accessibility: 'Supports dialog/menu roles, Escape dismissal and optional modal focus containment.',
     rtl: 'Logical start/end placements resolve with writing direction.', touch: 'Outside press works across coarse and fine pointers.',
     responsive: 'Collision/flip and geometry observation respond to available viewport space.',
@@ -55,7 +55,7 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'Menu', layer: 'components', category: 'Overlays', order: 70,
     summary: 'Keyboard-navigable action menu hosted by the shared Popover implementation.',
-    usage: 'Use for a concise set of commands rather than generic content.', status: 'stable',
+    usage: 'Use for a concise set of commands rather than generic content.', status: 'candidate',
     accessibility: 'Owns menu role, initial focus and vertical roving navigation.', rtl: 'Placement is logical and command content follows writing direction.',
     touch: 'Menu targets honor coarse-pointer sizing.', responsive: 'Floating placement responds to available space.',
     playground: {
@@ -66,25 +66,25 @@ export const uiDocs = defineUiDocsGroup([
   },
   {
     exportName: 'MenuItem', layer: 'components', category: 'Overlays', order: 70, summary: 'Action row inside Menu.',
-    usage: 'Use only inside Menu for command-like actions.', status: 'stable', accessibility: 'Uses native button plus menuitem semantics.',
+    usage: 'Use only inside Menu for command-like actions.', status: 'candidate', accessibility: 'Uses native button plus menuitem semantics.',
     rtl: 'Content uses logical flow.', touch: 'Target sizing follows shared Component tokens.', responsive: 'Width follows the owning Menu surface.',
   },
   {
     exportName: 'MenuSeparator', layer: 'components', category: 'Overlays', order: 70, summary: 'Semantic separator inside Menu.',
-    usage: 'Use sparingly to group related commands.', status: 'stable', accessibility: 'Rendered as a native separator.',
+    usage: 'Use sparingly to group related commands.', status: 'candidate', accessibility: 'Rendered as a native separator.',
     rtl: 'Direction-neutral.', touch: 'Non-interactive.', responsive: 'Fills the Menu inline size.',
   },
   {
     exportName: 'ContextMenu', layer: 'components', category: 'Overlays', order: 70,
     summary: 'Contextual Menu invoked from pointer position, keyboard or long press.',
-    usage: 'Use for actions whose meaning is tied to a target context.', status: 'stable', accessibility: 'Supports ContextMenu/Shift+F10 and Menu semantics.',
+    usage: 'Use for actions whose meaning is tied to a target context.', status: 'candidate', accessibility: 'Supports ContextMenu/Shift+F10 and Menu semantics.',
     rtl: 'Floating placement and command flow are writing-direction aware.', touch: 'Long press uses the shared press/gesture path.',
     responsive: 'Placement responds to viewport collision.',
     examples: [{ id: 'preview', title: 'Context actions', component: 'ContextMenuPreviewExample' }],
   },
   {
     exportName: 'Tooltip', layer: 'components', category: 'Overlays', order: 70, summary: 'Supplemental delayed description associated with a trigger.',
-    usage: 'Use only for supplemental help; essential information must remain available without hover.', status: 'stable',
+    usage: 'Use only for supplemental help; essential information must remain available without hover.', status: 'candidate',
     accessibility: 'Trigger owns aria-describedby while Tooltip participates in shared Escape/stack lifecycle without stealing focus.',
     rtl: 'Placement uses logical alignment.', touch: 'Touch hover activation is intentionally suppressed.', responsive: 'Floating placement adapts around viewport edges.',
     examples: [{ id: 'preview', title: 'Supplemental help', component: 'TooltipPreviewExample' }],

@@ -1,14 +1,16 @@
-# Roadmap
+# OntologyX UI roadmap
 
-Current extraction frontier: **UIP15 implementation**, including the final known Studio `SystemKeyboardHost` contract repair.
+The UI roadmap was reset from zero on 2026-08-19 against Git baseline `fa05bb1a829851ac83df6a956dbce091cc128819`.
 
-The detailed carried roadmap is `docs/roadmap/UI_KIT_TASK_LIST.md`.
+The previous UIP00..UIP23 roadmap is no longer an active completion record. It remains historical extraction context only. Existing implementation is treated as candidate material and must be reaccepted under the new gate model.
 
-## Next
+Canonical plan: [`docs/roadmap/UI_TASK_LIST.md`](docs/roadmap/UI_TASK_LIST.md)
+Canonical gate contract: [`docs/quality/QUALITY_GATES.md`](docs/quality/QUALITY_GATES.md)
 
-**UIP16 — text input / IME / secure input / occlusion** is split by ownership:
+## Frontier
 
-- this repository: reusable contracts, UI state/visual behavior, host-neutral adapters, Studio acceptance;
-- host/product repositories: Wayland/compositor/native IME lifecycle, physical-keyboard detection, native occlusion source, process/surface integration.
+- `UIR00` — Rebaseline, truth reset and gate constitution: **DONE**
+- `UIR01` — Real browser acceptance harness: **NEXT**
+- `UIR02+` — Foundations → Primitives → Components → System UI reacceptance: **TODO**
 
-Do not move host implementations back into `@ontologyx/ui` merely to make the standalone package self-sufficient.
+No public visual export is considered accepted merely because it existed before this reset.

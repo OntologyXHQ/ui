@@ -13,3 +13,6 @@ apps/*/.vite/
 .env.*
 !.env.example
 *.zip
+
+__pycache__/
+*.py[cod]

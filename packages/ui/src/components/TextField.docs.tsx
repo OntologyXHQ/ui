@@ -10,7 +10,7 @@ export const uiDocs = defineUiDocsGroup([
     summary: 'Single-line field built on the shared field frame and editable-text runtime.',
     usage:
       'Use for generic text entry; label, support/error relationships, affixes, actions and editing-state publication stay inside the shared field contract.',
-    status: 'provisional',
+    status: 'candidate',
     accessibility: 'Native input semantics with protected required/read-only/invalid relationships; meaningful affixes join aria-describedby, and secure fields block copy/cut from both keyboard and context-menu paths.',
     rtl: 'Field chrome uses logical edges while text content can independently use auto, LTR or RTL bidi direction.',
     touch: 'Uses the shared editable-text session and touch-safe field target sizing.',
@@ -31,7 +31,7 @@ export const uiDocs = defineUiDocsGroup([
     summary: 'Search-specialized TextField with clear behavior and an optional suggestions-request seam.',
     usage:
       'Use for search/filter entry; suggestions are requested through a callback so the field does not own a second popup engine.',
-    status: 'provisional',
+    status: 'candidate',
     accessibility: 'Carries searchbox semantics, an accessible default label and labelled clear/suggestions actions.',
     rtl: 'Search text and affordances preserve logical ordering and bidi behavior.',
     touch: 'Clear and suggestions actions use the shared IconButton hit-target policy.',
@@ -49,7 +49,7 @@ export const uiDocs = defineUiDocsGroup([
     summary: 'Multiline field sharing the same editing, validation and field-frame contracts.',
     usage:
       'Use for multiline text. Resize policy is explicit and optional character guidance is owned by the field support region.',
-    status: 'provisional',
+    status: 'candidate',
     accessibility: 'Native textarea semantics with protected label/description/error relationships; optional character count stays visible without announcing every keystroke.',
     rtl: 'Supports content bidi direction independently of logical field chrome.',
     touch: 'Selection/composition flows through the shared editable-text runtime.',

@@ -8,7 +8,7 @@ export const uiDocs = defineUiDocsGroup([
     summary: 'Shared-bounds transition helper for related visual elements.',
     usage:
       'Use for continuity between related source and destination surfaces, not as generic layout.',
-    status: 'provisional',
+    status: 'candidate',
     accessibility: 'Motion is supplementary and respects reduced-motion policy.',
     rtl: 'Geometry is physical, while content direction remains logical.',
     touch: 'Transitions must remain interruptible under direct touch interaction.',

@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { buildCatalog } from './catalog-lib.mjs';
 
-const root = fs.mkdtempSync(path.join(os.tmpdir(), 'oxs-ui-catalog-'));
+const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ontologyx-ui-catalog-'));
 const src = path.join(root, 'src');
 fs.mkdirSync(path.join(src, 'components'), { recursive: true });
 fs.mkdirSync(path.join(src, 'docs'), { recursive: true });
@@ -72,11 +72,6 @@ if (forbiddenCanonicalEntries.length > 0) {
 const invalidOrder = realCatalog.filter((entry) => !Number.isFinite(entry.order));
 if (invalidOrder.length > 0) {
   throw new Error(`Canonical catalog entries missing source-owned order: ${invalidOrder.map((entry) => entry.exportName).join(', ')}`);
-}
-const staleCategories = new Set(['Forms', 'Data display', 'Collection', 'Scrolling', 'Pointer', 'Gestures', 'Motion', 'System foundations', 'System surfaces', 'System layouts', 'System chrome', 'Transient System UI', 'Privileged System UI']);
-const staleCategoryEntries = realCatalog.filter((entry) => staleCategories.has(entry.category));
-if (staleCategoryEntries.length > 0) {
-  throw new Error(`Canonical catalog leaked pre-UIP13 taxonomy: ${staleCategoryEntries.map((entry) => `${entry.exportName}:${entry.category}`).join(', ')}`);
 }
 console.log(
   `OntologyX UI canonical catalog boundary passed: ${realCatalog.length} SDK visual entries with no runtime providers or legacy patterns.`,

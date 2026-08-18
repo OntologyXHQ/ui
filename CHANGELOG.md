@@ -1,5 +1,14 @@
 # Changelog
 
+
+## Unreleased — UI rebaseline
+
+- Reset the active UI roadmap from zero; pre-reset implementation is candidate material, not accepted completion.
+- Replaced legacy `stable`/`provisional` catalog maturity claims with `candidate`.
+- Introduced stable architecture/catalog/type/behavior/Studio/build/release gate ownership.
+- Removed unreachable legacy Studio pages/galleries and the synthetic fixture-matrix gate.
+- Added `pnpm verify` and a fast `pnpm snapshot` tracked-source handoff command.
+
 ## 0.1.0-beta.1 — OntologyX public beta
 
 - Published the standalone UI platform as `@ontologyx/ui` under the OntologyX npm organization.

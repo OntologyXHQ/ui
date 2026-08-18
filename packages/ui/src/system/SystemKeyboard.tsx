@@ -206,7 +206,7 @@ function nextLanguage(current: SystemKeyboardLanguage, available: readonly Syste
 
 /**
  * Privileged visual keyboard surface. Visibility/session/device policy is input-only here;
- * UIP16 routes emitted commands through the native text-input/IME authority.
+ * Hosts route emitted commands through their native text-input/IME authority.
  */
 export function SystemKeyboardHost({
   state,

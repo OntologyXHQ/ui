@@ -1,5 +1,5 @@
 export type UiDocsLayer = 'foundations' | 'primitives' | 'components' | 'system';
-export type UiDocsStatus = 'stable' | 'provisional' | 'experimental' | 'deprecated';
+export type UiDocsStatus = 'candidate' | 'accepted' | 'experimental' | 'deprecated';
 
 export type UiDocsExample = {
   id: string;

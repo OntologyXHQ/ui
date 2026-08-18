@@ -10,7 +10,7 @@ export const uiDocs = defineUiDocsGroup([
       'Reusable scroll owner with inertia, overscroll, snapping, indicators and keyboard support.',
     usage:
       'Use where OXS scroll behavior is required instead of feature-owned overflow/gesture engines.',
-    status: 'stable',
+    status: 'candidate',
     accessibility: 'Focusable keyboard scrolling can be enabled and labelled.',
     rtl: 'Horizontal motion is normalized to a logical inline position before drag, keyboard, momentum, indicator and snap calculations, insulating callers from browser RTL scrollLeft models.',
     touch:
@@ -31,7 +31,7 @@ export const uiDocs = defineUiDocsGroup([
     category: 'Interaction', order: 80,
     summary: 'Child marker that contributes real start/center/end snap alignment to ScrollView.',
     usage: 'Use only as a direct/owned ScrollView child when snap behavior is needed.',
-    status: 'stable',
+    status: 'candidate',
     accessibility: 'Does not alter child accessibility semantics.',
     rtl: 'Start/end snap alignment is interpreted logically by the scroll service.',
     touch: 'Does not own touch input independently of ScrollView.',

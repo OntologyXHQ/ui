@@ -38,11 +38,6 @@ function selectedEntry(requested: string | null) {
   return uiCatalog.find((entry) => entry.id === requested) ?? uiCatalog[0];
 }
 
-function isInteractiveEntry(entry: UiCatalogEntry) {
-  return ['Actions', 'Selection', 'Fields', 'Navigation', 'Data & collection', 'Overlays', 'Interaction', 'Surfaces', 'Layouts', 'Chrome', 'Privileged']
-    .includes(entry.category);
-}
-
 function coverage(entry: UiCatalogEntry) {
   const missing: string[] = [];
   if (!entry.examples.length && !entry.playground) missing.push('preview fixture/example');
@@ -53,22 +48,6 @@ function coverage(entry: UiCatalogEntry) {
   if (!entry.responsive.trim()) missing.push('responsive guidance');
   return missing;
 }
-
-function coverageAxes(entry: UiCatalogEntry) {
-  const interactive = isInteractiveEntry(entry);
-  const preview = Boolean(entry.playground || entry.examples.length || entry.props.length === 0);
-  return [
-    { label: 'Theme', status: 'covered', detail: 'UiRoot token/theme inheritance' },
-    { label: 'RTL', status: entry.rtl.trim() ? 'covered' : 'missing', detail: entry.rtl },
-    { label: 'Responsive', status: entry.responsive.trim() ? 'covered' : 'missing', detail: entry.responsive },
-    { label: 'Touch', status: entry.touch.trim() ? 'covered' : 'missing', detail: entry.touch },
-    { label: 'Mouse', status: interactive ? (preview ? 'covered' : 'missing') : 'n/a', detail: interactive ? 'Real Studio fixture is pointer-interactive.' : 'Non-interactive export.' },
-    { label: 'Keyboard / focus', status: interactive ? (entry.accessibility.trim() && preview ? 'covered' : 'missing') : 'n/a', detail: entry.accessibility },
-    { label: 'Reduced motion', status: 'covered', detail: 'UiRoot motion preference is inherited by the public export.' },
-    { label: 'States', status: interactive ? (preview ? 'covered' : 'missing') : 'n/a', detail: interactive ? 'Generated real-export state matrix.' : 'No interactive state matrix applies.' },
-  ] as const;
-}
-
 
 function GuidanceGrid({ entry }: { entry: UiCatalogEntry }) {
   return (
@@ -98,7 +77,7 @@ function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
         <Row gap="sm" className="ui-studio-entry-badges">
           <Badge tone="accent">{entry.layer}</Badge>
           <Badge>{entry.category}</Badge>
-          <Badge tone={entry.status === 'stable' ? 'success' : entry.status === 'deprecated' ? 'danger' : 'warning'}>{entry.status}</Badge>
+          <Badge tone={entry.status === 'accepted' ? 'success' : entry.status === 'deprecated' ? 'danger' : 'warning'}>{entry.status}</Badge>
         </Row>
         <Heading level={1} size="display">{entry.exportName}</Heading>
         <Text className="ui-studio-entry-summary" tone="secondary" selectable>{entry.summary}</Text>
@@ -115,33 +94,6 @@ function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
       </Surface>
 
       <GuidanceGrid entry={entry} />
-
-      <Surface material="subtle" radius="lg" className="ui-studio-coverage-card">
-        <Stack gap="md">
-          <Row justify="between" align="center" gap="sm">
-            <Stack gap="3xs">
-              <Label emphasis="strong">UIP14 coverage matrix</Label>
-              <Text tone="tertiary">Public export × environment/input/state axes.</Text>
-            </Stack>
-            <Badge tone={coverageAxes(entry).some((axis) => axis.status === 'missing') ? 'warning' : 'success'}>
-              {coverageAxes(entry).some((axis) => axis.status === 'missing') ? 'review' : 'covered'}
-            </Badge>
-          </Row>
-          <Grid min="card" gap="sm" className="ui-studio-coverage-matrix">
-            {coverageAxes(entry).map((axis) => (
-              <Surface key={axis.label} material="glass" radius="md" className="ui-studio-coverage-axis">
-                <Stack gap="2xs">
-                  <Row justify="between" align="center" gap="sm">
-                    <Label emphasis="strong">{axis.label}</Label>
-                    <Badge size="sm" tone={axis.status === 'covered' ? 'success' : axis.status === 'missing' ? 'danger' : 'neutral'}>{axis.status}</Badge>
-                  </Row>
-                  <Text tone="tertiary">{axis.detail}</Text>
-                </Stack>
-              </Surface>
-            ))}
-          </Grid>
-        </Stack>
-      </Surface>
 
       <Surface material="subtle" radius="lg" className="ui-studio-coverage-card">
         <Stack gap="sm">
@@ -167,7 +119,7 @@ function ApiPanel({ entry }: { entry: UiCatalogEntry }) {
         <Label tone="accent" emphasis="strong">Generated API</Label>
         <Heading level={2} size="title">Props from TypeScript</Heading>
         <Text tone="tertiary">
-          OXS-owned props only. Native DOM props stay native instead of flooding the generated reference.
+          OntologyX UI-owned props only. Native DOM props stay native instead of flooding the generated reference.
         </Text>
       </Stack>
       {entry.props.length ? (
@@ -196,7 +148,7 @@ function ApiPanel({ entry }: { entry: UiCatalogEntry }) {
             </tbody>
           </table>
         </Box>
-      ) : <Text tone="tertiary">No OXS-owned public props were extracted for this export.</Text>}
+      ) : <Text tone="tertiary">No OntologyX UI-owned public props were extracted for this export.</Text>}
     </Stack>
   );
 }

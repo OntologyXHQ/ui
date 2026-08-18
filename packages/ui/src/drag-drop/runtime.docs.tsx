@@ -8,7 +8,7 @@ export const uiDocs = defineUiDocsGroup([
     summary: 'Shared drag/drop session owner for reusable UI interactions.',
     usage:
       'Wrap a surface that contains drag sources and drop targets; backend data transfer remains outside this visual contract.',
-    status: 'provisional',
+    status: 'candidate',
     accessibility:
       'Drag state must expose an accessible alternative before the component layer is closed.',
     rtl: 'Geometry and operation semantics must remain logical-direction safe.',

@@ -7,7 +7,7 @@ export const uiDocs = defineUiDocsGroup([
     category: 'Environment', order: 10,
     summary: 'Provides cursor theme, scale, modality and visibility state to UI consumers.',
     usage: 'Normally owned by UiRoot; use directly only for isolated runtime fixtures.',
-    status: 'provisional',
+    status: 'candidate',
     accessibility: 'Cursor state supplements but never replaces focus or accessible labels.',
     rtl: 'Directional cursor roles are resolved semantically.',
     touch: 'Tracks pointer modality without making hover a required interaction.',

@@ -9,7 +9,7 @@ export const uiDocs = defineUiDocs({
   summary: 'Choice field using the shared field frame plus the common floating, overlay and roving-focus services.',
   usage:
     'Use for a bounded option set. Searchable combobox behavior is intentionally not bundled into Select until a capability demand requires it.',
-  status: 'provisional',
+  status: 'candidate',
   accessibility: 'Trigger exposes listbox state; options use selected/disabled semantics and keyboard selection.',
   rtl: 'Floating placement and trigger geometry resolve through the shared direction-aware services.',
   touch: 'Trigger and options use touch-safe Component sizing without a private pointer engine.',

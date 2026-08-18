@@ -8,7 +8,7 @@ export const uiDocs = defineUiDocsGroup([
     category: 'Actions', order: 10,
     summary: 'Compact icon-only action in the Button family, including optional controlled/uncontrolled toggle state.',
     usage: 'Use when the icon is the primary visual label; provide label and use pressed state only for genuine toggle actions.',
-    status: 'stable',
+    status: 'candidate',
     accessibility: 'Requires an explicit accessible label; toggle mode adds aria-pressed and keeps native button keyboard semantics.',
     rtl: 'Directional icons mirror semantically through the shared Icon primitive.',
     touch: 'Keeps the same minimum target policy as Button even when the visible glyph is compact.',

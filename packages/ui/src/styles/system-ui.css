@@ -486,7 +486,7 @@
   }
 }
 
-/* UIP15 · privileged System touch keyboard */
+/* Privileged System touch keyboard */
 .ui-system-keyboard-host {
   position: absolute;
   inset-inline: 0;

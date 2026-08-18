@@ -3,7 +3,7 @@ import { defineUiIcon, Icon, Row } from '../index';
 
 export const uiDocs = defineUiDocsGroup([
   {
-    exportName: 'Icon', layer: 'primitives', category: 'Iconography', order: 40, status: 'stable',
+    exportName: 'Icon', layer: 'primitives', category: 'Iconography', order: 40, status: 'candidate',
     summary: 'Lightweight current-color SVG icon primitive with a shared glyph contract.',
     usage: 'Use built-in semantic glyphs or defineUiIcon path data; icons never own action semantics.',
     accessibility: 'Decorative by default; pass label only when the glyph itself conveys standalone meaning.',

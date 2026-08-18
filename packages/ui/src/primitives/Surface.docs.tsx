@@ -3,13 +3,13 @@ import { defineUiDocsGroup } from '../docs/defineUiDocs';
 
 export const uiDocs = defineUiDocsGroup([
   {
-    exportName: 'Surface', layer: 'primitives', category: 'Surfaces', order: 30, status: 'stable',
+    exportName: 'Surface', layer: 'primitives', category: 'Surfaces', order: 30, status: 'candidate',
     summary: 'Token-driven material/elevation/shape surface.', usage: 'Use for visual layering only; card/dialog/system semantics belong above Primitives.',
     accessibility: 'Adds no role or focus behavior by itself.', rtl: 'Direction-neutral material with logical sizing.', touch: 'Visual-only; Components own targets.', responsive: 'Sizes only within its container.',
     examples: [{ id: 'overview', title: 'Surface vocabulary', component: 'SurfaceMaterialsExample' }],
   },
   {
-    exportName: 'Divider', layer: 'primitives', category: 'Surfaces', order: 30, status: 'stable',
+    exportName: 'Divider', layer: 'primitives', category: 'Surfaces', order: 30, status: 'candidate',
     summary: 'Semantic horizontal/vertical separator.', usage: 'Use to separate adjacent regions without inventing feature-local border CSS.',
     accessibility: 'Exposes separator semantics and orientation.', rtl: 'Inset start/end are logical.', touch: 'Non-interactive.', responsive: 'Stretches within its containing layout.',
   },
