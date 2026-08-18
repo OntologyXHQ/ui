@@ -1,10 +1,25 @@
 import { useState } from 'react';
 import { defineUiDocsGroup } from '../docs/defineUiDocs';
-import { Icon } from '../primitives';
-import { Button } from './Button';
-import { Badge, EmptyState, Progress, Skeleton, Spinner, StatusIndicator } from './Feedback';
-import { List, ListItem, ListSection } from './DataList';
-import { ActionGroup, AdaptiveNavigation, AppBar, tabRelationshipIds, TabPanel, Tabs, Toolbar } from './Navigation';
+import {
+  ActionGroup,
+  AdaptiveNavigation,
+  AppBar,
+  Badge,
+  Button,
+  EmptyState,
+  Icon,
+  List,
+  ListItem,
+  ListSection,
+  Progress,
+  Skeleton,
+  Spinner,
+  StatusIndicator,
+  tabRelationshipIds,
+  TabPanel,
+  Tabs,
+  Toolbar,
+} from '@ontologyx/ui';
 
 export const uiDocs = defineUiDocsGroup([
   {

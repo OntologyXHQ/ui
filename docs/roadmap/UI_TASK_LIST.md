@@ -63,7 +63,7 @@ Acceptance: `pnpm quality`, `pnpm gate:studio`, typechecks/tests/build on the us
 
 ---
 
-## UIR01 — Real browser acceptance harness — NEXT
+## UIR01 — Real browser acceptance harness — DONE
 
 Purpose: create the evidence system required before any visual API can be accepted.
 
@@ -76,11 +76,11 @@ Purpose: create the evidence system required before any visual API can be accept
 - `UI-0107` Make Studio component routes directly addressable and deterministic for browser fixtures.
 - `UI-0108` Add browser gate to `pnpm verify`; accepted status remains impossible unless required browser evidence exists.
 
-Acceptance: intentionally broken fixtures prove each browser gate can fail for the reason it claims to protect.
+Acceptance: real production-Studio browser journeys emit source-bound G6 evidence; intentionally broken ephemeral fixtures prove the harness rejects axe blockers, invisible focus, global overflow, environment drift and missing deterministic routes. Generic harness journeys do not certify candidate components.
 
 ---
 
-## UIR02 — Foundations from first principles — TODO
+## UIR02 — Foundations from first principles — NEXT
 
 Purpose: freeze the semantic substrate before visual APIs are redesigned.
 

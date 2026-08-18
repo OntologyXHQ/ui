@@ -19,7 +19,8 @@ Protects repository and package ownership:
 - four public visual layers: Foundations → Primitives → Components → System UI;
 - internal engines may support Components but may not depend on Primitives, Components, or System UI;
 - System UI may consume Components but not Primitives directly;
-- production source cannot depend on Studio or OXS/product internals.
+- production source cannot depend on Studio or OXS/product internals;
+- G6 uses pinned `playwright-core` + `axe-core` and an installed system Chrome/Chromium; browser-downloading Playwright packages are not part of the repository contract.
 
 ### G1 — catalog acceptance
 
@@ -56,6 +57,7 @@ The Studio is a real consumer, not a second component library:
 
 - every TS/TSX module must be reachable from `main.tsx` unless it is an ambient declaration;
 - reusable controls must come from `@ontologyx/ui`;
+- because package JS is stylesheet-neutral, the Studio browser host must import `@ontologyx/ui/styles.css` exactly once before Studio-local CSS;
 - raw `<button>`, `<input>`, `<select>`, and `<textarea>` are forbidden in Studio source;
 - product/host internals and source deep-imports are forbidden;
 - the Studio may orchestrate state/data but may not own a parallel visual SDK.
@@ -66,35 +68,43 @@ The Studio is a real consumer, not a second component library:
 
 Builds the publishable package and production Studio and validates the packed package surface. This proves emitted JS/types/CSS and package exports, not only source compilation.
 
-### G6 — browser acceptance
+### G6 — real browser acceptance
 
-Introduced in `UIR01` before the first public visual export can become `accepted`.
+`pnpm gate:browser`
 
-It will exercise real browser behavior across applicable axes:
+G6 is production-artifact-backed. The command first runs G5, starts the built Studio on an ephemeral loopback port, then drives an installed Google Chrome/Chromium with `playwright-core`. It never downloads a browser. `ONTOLOGYX_UI_BROWSER=/absolute/path` is the explicit escape hatch when a supported browser is installed outside normal platform locations.
 
-- keyboard and focus;
-- pointer and touch;
-- RTL/LTR;
-- narrow/medium/wide containers;
-- light/dark/custom theme scopes;
-- reduced motion;
-- zoom/reflow and accessibility scanning;
-- overlay/focus restoration and form semantics where applicable.
+The current harness proves the evidence system itself across real browser journeys:
 
-Until G6 exists, public visual exports remain `candidate` even if unit tests pass.
+- deterministic Studio deep links and environment projection;
+- serious/critical `axe-core` violations are blocking;
+- keyboard sequential navigation, visible focus, roving focus and activation;
+- modal isolation, Escape dismissal and focus restoration;
+- pointer cancellation and normal pointer activation;
+- coarse-pointer/touch long press through Chrome's touch input pipeline, with deterministic example deep links, a non-collapsed mobile documentation viewport, explicit target centering across nested scroll containers, and hit-test ownership before dispatch;
+- RTL/LTR, theme, density, reduced-motion, viewport/container and safe-area inputs;
+- narrow/reflow geometry without screenshot/pixel assertions;
+- browser console/page errors are blocking in product journeys.
+
+G6 writes machine-readable diagnostic evidence to `artifacts/browser-acceptance/latest.json` plus a timestamped sibling. Evidence contains the source fingerprint, Git HEAD when available, browser/version, axes, scenario results and axe summaries. Screenshots are not acceptance evidence and pixel snapshots are not used.
+
+The harness also executes intentionally broken or adversarial ephemeral browser fixtures. Those self-tests must demonstrate that axe blockers, invisible focus, global horizontal overflow, environment drift, missing deterministic routes, a missing public UI stylesheet, a collapsed mobile documentation viewport, release-only long press, nested-scroll touch targeting, and targets initially covered by sticky/floating UI are actually rejected or correctly repositioned and observed. Broken self-test fixtures never count as component evidence.
+
+**Component promotion rule:** generic harness journeys do not certify the candidate components they happen to exercise. Every future `accepted` export must be named by a component-specific G6 scenario. `pnpm verify` fails if an accepted export has no such evidence owner.
 
 ### G7 — release
 
 `pnpm release:check`
 
-Extends the full repository verification with production Studio artifact checks and a fresh packed-tarball consumer install/typecheck/Node-import/Vite-build smoke. Release checks must operate on the artifact users receive.
+Extends G0..G6 with production Studio artifact checks and a fresh packed-tarball consumer install/typecheck/Node-import/Vite-build smoke. Release checks operate on the artifact users receive.
 
 ## Canonical commands
 
 ```bash
 pnpm quality        # G0..G3: fast canonical development gate
-pnpm verify         # G0..G5: full repository acceptance
-pnpm release:check  # G0..G5 + release artifact/consumer proof
+pnpm verify         # G0..G6: full repository acceptance
+pnpm release:check  # G0..G7: release artifact/consumer proof
+pnpm gate:browser   # focused G5 + G6 production browser acceptance
 ```
 
 Focused gates may be rerun while debugging, but a part cannot close on a focused rerun alone.
@@ -111,3 +121,7 @@ Focused gates may be rerun while debugging, but a part cannot close on a focused
 8. **No release from source-only confidence.** Packed-artifact consumer proof is mandatory.
 9. **Fix forward.** Failed validation preserves the working state for diagnosis; automated rollback is not part of the delivery flow.
 10. **One definition of done.** A task is complete only when its code, tests, docs, Studio representation, applicable browser axes, and package boundary agree.
+11. **No browser-evidence laundering.** Harness smoke touching a component does not certify that component; promotion requires an explicit component-owned scenario.
+12. **No downloaded-browser assumption.** Local/CI acceptance must run against an installed Chrome/Chromium or fail with an actionable browser-path requirement.
+
+- G6 semantic contrast contract: readable tertiary/supporting text must satisfy WCAG AA in supported themes.

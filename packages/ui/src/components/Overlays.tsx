@@ -26,8 +26,8 @@ import {
 } from 'react';
 import { usePanGesture } from '../gestures';
 import { useUiPortalHost, viewportPointToPortalHost } from '../foundations/portal';
-import type { FloatingAnchor, FloatingGeometryRect, FloatingPlacement } from '../interaction';
-import { focusRelativeTo, useFloatingPosition, useOverlayLifecycle, usePress, useRovingFocus } from '../interaction';
+import type { FloatingAnchor, FloatingGeometryRect, FloatingPlacement, PressActivation } from '../interaction';
+import { focusRelativeTo, useFloatingPosition, useOverlayLifecycle, useRovingFocus } from '../interaction';
 import type { InteractiveTransitionController } from '../motion';
 import { useInteractiveTransition } from '../motion';
 import { SafeArea, Surface } from '../primitives';
@@ -466,13 +466,11 @@ export type ContextMenuAction = {
 
 type ContextMenuTriggerProps = {
   onContextMenu?: MouseEventHandler<HTMLElement>;
-  onClickCapture?: MouseEventHandler<HTMLElement>;
   onKeyDown?: KeyboardEventHandler<HTMLElement>;
   onPointerDown?: PointerEventHandler<HTMLElement>;
-  onPointerMove?: PointerEventHandler<HTMLElement>;
-  onPointerUp?: PointerEventHandler<HTMLElement>;
-  onPointerCancel?: PointerEventHandler<HTMLElement>;
-  onLostPointerCapture?: PointerEventHandler<HTMLElement>;
+  /** Shared press-kernel long-press contract implemented by OntologyX controls such as Button. */
+  onLongPress?: (activation: PressActivation) => void;
+  longPressDelay?: number;
 };
 
 export type ContextMenuProps = {
@@ -495,20 +493,7 @@ export function ContextMenu({
   const openAt = useCallback((next: { x: number; y: number }) => {
     if (!disabled) setPoint(next);
   }, [disabled]);
-  const press = usePress({
-    disabled,
-    longPressDelay: longPressDelayMs,
-    onLongPress: (activation) => {
-      if (activation.clientX === undefined || activation.clientY === undefined) return;
-      openAt({ x: activation.clientX, y: activation.clientY });
-    },
-  });
-
   const trigger = cloneElement(children, {
-    onClickCapture: (event: ReactMouseEvent<HTMLElement>) => {
-      press.pressProps.onClickCapture?.(event);
-      if (!event.defaultPrevented) children.props.onClickCapture?.(event);
-    },
     onContextMenu: (event: ReactMouseEvent<HTMLElement>) => {
       children.props.onContextMenu?.(event);
       triggerRef.current = event.currentTarget;
@@ -534,24 +519,13 @@ export function ContextMenu({
     onPointerDown: (event: ReactPointerEvent<HTMLElement>) => {
       children.props.onPointerDown?.(event);
       triggerRef.current = event.currentTarget;
-      if (!event.defaultPrevented) press.pressProps.onPointerDown?.(event);
     },
-    onPointerMove: (event: ReactPointerEvent<HTMLElement>) => {
-      children.props.onPointerMove?.(event);
-      if (!event.defaultPrevented) press.pressProps.onPointerMove?.(event);
+    onLongPress: (activation: PressActivation) => {
+      children.props.onLongPress?.(activation);
+      if (disabled || activation.clientX === undefined || activation.clientY === undefined) return;
+      openAt({ x: activation.clientX, y: activation.clientY });
     },
-    onPointerUp: (event: ReactPointerEvent<HTMLElement>) => {
-      children.props.onPointerUp?.(event);
-      press.pressProps.onPointerUp?.(event);
-    },
-    onPointerCancel: (event: ReactPointerEvent<HTMLElement>) => {
-      children.props.onPointerCancel?.(event);
-      press.pressProps.onPointerCancel?.(event);
-    },
-    onLostPointerCapture: (event: ReactPointerEvent<HTMLElement>) => {
-      children.props.onLostPointerCapture?.(event);
-      press.pressProps.onLostPointerCapture?.(event);
-    },
+    longPressDelay: longPressDelayMs,
   });
 
   const anchorRect: FloatingGeometryRect = point

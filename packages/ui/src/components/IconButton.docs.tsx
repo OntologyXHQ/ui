@@ -1,5 +1,5 @@
 import { defineUiDocsGroup } from '../docs/defineUiDocs';
-import { IconButton, Row } from '../index';
+import { IconButton, Row } from '@ontologyx/ui';
 
 export const uiDocs = defineUiDocsGroup([
   {

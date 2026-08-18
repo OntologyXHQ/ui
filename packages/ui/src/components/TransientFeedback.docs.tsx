@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { defineUiDocsGroup } from '../docs/defineUiDocs';
-import { Button, Stack } from '../index';
-import { Banner, Snackbar, ToastHost, useToastQueue } from './TransientFeedback';
+import { Banner, Button, Snackbar, Stack, ToastHost, useToastQueue } from '@ontologyx/ui';
 
 export const uiDocs = defineUiDocsGroup([
   {

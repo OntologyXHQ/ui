@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { defineUiDocsGroup } from '../docs/defineUiDocs';
-import { SearchField, Stack, TextArea, TextField } from '../index';
+import { SearchField, Stack, TextArea, TextField } from '@ontologyx/ui';
 
 export const uiDocs = defineUiDocsGroup([
   {

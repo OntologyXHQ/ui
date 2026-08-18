@@ -1,4 +1,4 @@
-import { Code, Heading, Label, Stack, Text } from '../index';
+import { Code, Heading, Label, Stack, Text } from '@ontologyx/ui';
 import { defineUiDocsGroup } from '../docs/defineUiDocs';
 
 const common = {

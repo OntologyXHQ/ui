@@ -1,5 +1,5 @@
 import { defineUiDocsGroup } from '../docs/defineUiDocs';
-import { FieldGroup, FieldSection, TextField } from '../index';
+import { FieldGroup, FieldSection, TextField } from '@ontologyx/ui';
 
 export const uiDocs = defineUiDocsGroup([
   {

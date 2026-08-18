@@ -4,14 +4,17 @@ import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { UiRoot } from '../../adaptive';
+import { gestureArena } from '../../gestures/arena';
 import {
   AlertDialog,
   Banner,
+  ContextMenu,
   Dialog,
   Menu,
   MenuItem,
   ToastHost,
   Tooltip,
+  Button,
   useToastQueue,
 } from '../index';
 
@@ -145,6 +148,47 @@ describe('overlay and transient feedback components', () => {
     fireEvent.focus(screen.getByRole('button', { name: 'Help' }));
     act(() => vi.advanceTimersByTime(20));
     expect(screen.getByRole('tooltip')).toHaveTextContent('Keyboard help');
+  });
+
+  it('routes ContextMenu long-press through one shared trigger press candidate', () => {
+    vi.useFakeTimers();
+    const register = vi.spyOn(gestureArena, 'register');
+    try {
+      wrap(
+        <ContextMenu
+          ariaLabel="File actions"
+          longPressDelayMs={40}
+          actions={[{ id: 'open', label: 'Open', onSelect: () => {} }]}
+        >
+          <Button variant="soft">File target</Button>
+        </ContextMenu>,
+      );
+      const trigger = screen.getByRole('button', { name: 'File target' });
+      fireEvent.pointerDown(trigger, {
+        pointerId: 31,
+        pointerType: 'touch',
+        button: 0,
+        isPrimary: true,
+        clientX: 24,
+        clientY: 24,
+      });
+
+      expect(register).toHaveBeenCalledTimes(1);
+      act(() => vi.advanceTimersByTime(50));
+      expect(screen.getByRole('menu', { name: 'File actions' })).toBeInTheDocument();
+
+      fireEvent.pointerUp(trigger, {
+        pointerId: 31,
+        pointerType: 'touch',
+        button: 0,
+        isPrimary: true,
+        clientX: 24,
+        clientY: 24,
+      });
+      expect(screen.getByRole('menu', { name: 'File actions' })).toBeInTheDocument();
+    } finally {
+      register.mockRestore();
+    }
   });
 
   it('supports menu typeahead without creating a private menu runtime', async () => {

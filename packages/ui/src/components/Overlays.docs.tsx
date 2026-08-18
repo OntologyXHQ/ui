@@ -1,7 +1,20 @@
 import { useRef, useState } from 'react';
 import { defineUiDocsGroup } from '../docs/defineUiDocs';
-import { Button, Row, Stack, Text } from '../index';
-import { AlertDialog, BottomSheet, ContextMenu, Dialog, Menu, MenuItem, Popover, Sheet, Tooltip } from './Overlays';
+import {
+  AlertDialog,
+  BottomSheet,
+  Button,
+  ContextMenu,
+  Dialog,
+  Menu,
+  MenuItem,
+  Popover,
+  Row,
+  Sheet,
+  Stack,
+  Text,
+  Tooltip,
+} from '@ontologyx/ui';
 
 export const uiDocs = defineUiDocsGroup([
   {

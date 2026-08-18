@@ -1,5 +1,5 @@
 import { defineUiDocsGroup } from '../docs/defineUiDocs';
-import { ScrollView, Stack, Surface, Text } from '../index';
+import { ScrollView, Stack, Surface, Text } from '@ontologyx/ui';
 
 export const uiDocs = defineUiDocsGroup([
   {

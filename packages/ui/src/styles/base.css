@@ -5,14 +5,11 @@
   box-sizing: border-box;
 }
 
-.ui-root button,
-.ui-root input,
-.ui-root textarea,
-.ui-root select {
+.ui-root :where(button, input, textarea, select) {
   font: inherit;
 }
 
-.ui-root button {
+.ui-root :where(button) {
   color: inherit;
 }
 

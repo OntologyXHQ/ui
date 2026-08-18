@@ -1,4 +1,4 @@
-import { Divider, Grid, Stack, Surface, Text } from '../index';
+import { Divider, Grid, Stack, Surface, Text } from '@ontologyx/ui';
 import { defineUiDocsGroup } from '../docs/defineUiDocs';
 
 export const uiDocs = defineUiDocsGroup([

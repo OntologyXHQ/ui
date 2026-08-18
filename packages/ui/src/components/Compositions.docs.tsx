@@ -1,19 +1,19 @@
 import { useState } from 'react';
 import { defineUiDocsGroup } from '../docs/defineUiDocs';
-import { Icon } from '../primitives';
-import { Badge } from './Feedback';
-import { Button } from './Button';
 import {
   Accordion,
   ApplicationItem,
+  Badge,
+  Button,
   Card,
   ContentState,
   Disclosure,
+  Icon,
   PageScaffold,
+  ScrollView,
   Tile,
   TileGrid,
-} from './Compositions';
-import { ScrollView } from './ScrollView';
+} from '@ontologyx/ui';
 
 export const uiDocs = defineUiDocsGroup([
   {

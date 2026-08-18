@@ -11,6 +11,7 @@ SRC = UI / 'src'
 STUDIO = ROOT / 'apps' / 'ui-studio'
 issues: list[str] = []
 
+root_pkg = json.loads((ROOT / 'package.json').read_text(encoding='utf-8'))
 pkg = json.loads((UI / 'package.json').read_text(encoding='utf-8'))
 studio_pkg = json.loads((STUDIO / 'package.json').read_text(encoding='utf-8'))
 
@@ -49,6 +50,22 @@ for peer in ('react', 'react-dom'):
         issues.append(f'Studio/{peer} version must match @ontologyx/ui peer version exactly')
 if studio_pkg.get('dependencies', {}).get('@ontologyx/ui') != 'workspace:*':
     issues.append('Studio must consume @ontologyx/ui through the workspace package boundary')
+
+studio_vite = (STUDIO / 'vite.config.ts').read_text(encoding='utf-8')
+if '@oxs/ui' in studio_vite:
+    issues.append('Studio Vite config still contains stale pre-rename @oxs/ui aliases')
+
+# Browser acceptance tooling must stay browser-download-free. The repository drives an installed
+# system Chrome/Chromium through playwright-core and injects axe-core into that real document.
+root_dev = root_pkg.get('devDependencies', {})
+exact_semver = re.compile(r'^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$')
+for browser_dev_dependency in ('playwright-core', 'axe-core'):
+    value = root_dev.get(browser_dev_dependency)
+    if not isinstance(value, str) or not exact_semver.fullmatch(value):
+        issues.append(f'G6 dependency {browser_dev_dependency} must be present and exact-pinned, got {value!r}')
+for forbidden_browser_package in ('playwright', '@playwright/test'):
+    if forbidden_browser_package in root_dev:
+        issues.append(f'G6 must not depend on browser-downloading package {forbidden_browser_package}; use playwright-core + system browser')
 
 # Source dependency zones. Internal engines are infrastructure, not a fifth public visual layer.
 zone_by_dir = {
@@ -140,4 +157,4 @@ if issues:
         print(f' - {issue}')
     raise SystemExit(1)
 
-print('G0 architecture gate passed: package boundary · zero runtime deps · explicit CSS · source-zone dependency direction · host isolation.')
+print('G0 architecture gate passed: package boundary · zero runtime deps · explicit CSS · source-zone dependency direction · host isolation · system-browser G6 tooling.')

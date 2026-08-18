@@ -3,21 +3,31 @@ import {
   Badge,
   Button,
   Card,
+  DesktopShellLayout,
+  Select,
   Slider,
   StatusIndicator,
-  Select,
   Switch,
-} from '../components';
+  SystemApplicationBrowser,
+  SystemBar,
+  SystemChromeGroup,
+  SystemCommandSurface,
+  SystemDock,
+  SystemKeyboardHost,
+  SystemLauncher,
+  SystemLockLayout,
+  SystemNotificationCenter,
+  SystemOsd,
+  SystemPanel,
+  SystemQuickSettings,
+  SystemScaffold,
+  SystemSettingsLayout,
+  SystemSurface,
+  SystemWorkspace,
+  type SystemKeyboardCommand,
+  type SystemKeyboardSurfaceState,
+} from '@ontologyx/ui';
 import { defineUiDocsGroup } from '../docs/defineUiDocs';
-import { DesktopShellLayout, SystemBar, SystemChromeGroup, SystemDock, SystemPanel } from './DesktopShellLayout';
-import { SystemApplicationBrowser } from './SystemApplicationBrowser';
-import { SystemNotificationCenter, SystemQuickSettings } from './SystemCenters';
-import { SystemSettingsLayout } from './SystemSettingsLayout';
-import { SystemCommandSurface, SystemLockLayout, SystemOsd } from './SystemTransientLayouts';
-import { SystemKeyboardHost, type SystemKeyboardCommand, type SystemKeyboardSurfaceState } from './SystemKeyboard';
-import { SystemLauncher } from './SystemLauncher';
-import { SystemScaffold, SystemSurface } from './SystemScaffold';
-import { SystemWorkspace } from './SystemWorkspace';
 
 export const uiDocs = defineUiDocsGroup([
   {

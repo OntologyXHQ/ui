@@ -1290,12 +1290,28 @@ body { overflow: hidden; background: #091019; color-scheme: dark light; }
 
 @media (max-width: 58rem) {
   .ui-studio-environment__row {
-    align-items: stretch;
-    flex-direction: column;
+    align-items: center;
+    flex-direction: row;
   }
 
   .ui-studio-environment__toolbar .ui-toolbar__content {
-    grid-template-columns: minmax(0, 1fr);
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-inline: contain;
+  }
+
+  .ui-studio-environment__toolbar .ui-select-field {
+    flex: 0 0 10.5rem;
+    width: 10.5rem;
+    min-width: 10.5rem;
+  }
+
+  .ui-studio-environment__toolbar .ui-select-trigger {
+    width: 100%;
+    min-width: 0;
   }
 }
 

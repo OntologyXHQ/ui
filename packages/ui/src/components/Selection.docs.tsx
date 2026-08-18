@@ -9,7 +9,7 @@ import {
   Stack,
   Switch,
   ToggleGroup,
-} from '../index';
+} from '@ontologyx/ui';
 
 export const uiDocs = defineUiDocsGroup([
   {

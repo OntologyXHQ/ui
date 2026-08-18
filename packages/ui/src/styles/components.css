@@ -85,7 +85,7 @@
 }
 
 .ui-button--tone-danger {
-  color: var(--oxs-color-danger);
+  color: var(--oxs-color-danger-text);
 }
 
 .ui-button--tone-danger.ui-button--soft {
@@ -193,7 +193,7 @@
 }
 
 .ui-field__required {
-  color: var(--oxs-color-danger);
+  color: var(--oxs-color-danger-text);
 }
 
 .ui-field__optional {
@@ -322,7 +322,7 @@
 }
 
 .ui-field__support--error {
-  color: var(--oxs-color-danger);
+  color: var(--oxs-color-danger-text);
 }
 
 .ui-field__support-action {
@@ -1224,7 +1224,7 @@
 }
 
 .ui-tabs__tab[data-selected='true'] {
-  color: var(--oxs-color-accent);
+  color: var(--oxs-color-accent-text);
   background: var(--oxs-color-accent-soft);
   box-shadow: inset 0 -2px 0 var(--oxs-color-accent);
 }
@@ -1268,7 +1268,7 @@
 }
 
 .ui-navigation__item[data-selected='true'] {
-  color: var(--oxs-color-accent);
+  color: var(--oxs-color-accent-text);
   background: var(--oxs-color-accent-soft);
 }
 
@@ -1422,10 +1422,10 @@
   font-size: var(--oxs-type-caption-size);
 }
 
-.ui-badge--accent { background: var(--oxs-color-accent-soft); color: var(--oxs-color-accent); }
-.ui-badge--success { color: var(--oxs-color-success); }
-.ui-badge--warning { color: var(--oxs-color-warning); }
-.ui-badge--danger { background: var(--oxs-color-danger-soft); color: var(--oxs-color-danger); }
+.ui-badge--accent { background: var(--oxs-color-accent-soft); color: var(--oxs-color-accent-text); }
+.ui-badge--success { color: var(--oxs-color-success-text); }
+.ui-badge--warning { color: var(--oxs-color-warning-text); }
+.ui-badge--danger { background: var(--oxs-color-danger-soft); color: var(--oxs-color-danger-text); }
 
 .ui-status-indicator {
   gap: var(--oxs-space-2xs);
@@ -1667,7 +1667,7 @@
 }
 
 .ui-menu-item[data-destructive='true'] {
-  color: var(--oxs-color-danger);
+  color: var(--oxs-color-danger-text);
 }
 
 .ui-menu-separator {
@@ -2202,7 +2202,7 @@
 
 .ui-content-state--error .ui-content-state__visual,
 .ui-content-state--error .ui-content-state__title {
-  color: var(--oxs-color-danger);
+  color: var(--oxs-color-danger-text);
 }
 
 .ui-content-state__copy {

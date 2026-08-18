@@ -17,8 +17,6 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: [
-      { find: /^@oxs\/ui$/, replacement: path.resolve(workspaceRoot, 'packages/ui/src/index.ts') },
-      { find: /^@oxs\/ui\/advanced$/, replacement: path.resolve(workspaceRoot, 'packages/ui/src/advanced.ts') },
       { find: '@ontologyx/ui-docs', replacement: path.resolve(workspaceRoot, 'packages/ui/src') },
     ],
   },

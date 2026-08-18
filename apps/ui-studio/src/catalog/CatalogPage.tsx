@@ -176,7 +176,14 @@ function ExamplesPanel({ entry, requestedExample }: { entry: UiCatalogEntry; req
 function EntryWorkbench({ entry, tab, requestedExample }: { entry: UiCatalogEntry; tab: CatalogTab; requestedExample: string | null }) {
   const baseId = `studio-${entry.id}`;
   return (
-    <Surface className="ui-studio-detail" material="glass" elevation={1} radius="lg">
+    <Surface
+      className="ui-studio-detail"
+      material="glass"
+      elevation={1}
+      radius="lg"
+      data-studio-entry={entry.id}
+      data-studio-tab={tab}
+    >
       <Stack gap="lg">
         <Tabs
           label={`${entry.exportName} documentation sections`}
@@ -219,6 +226,12 @@ export function CatalogPage() {
   const visible = useMemo(() => filterCatalog(uiCatalog, query), [query]);
   const propCount = useMemo(() => uiCatalog.reduce((total, entry) => total + entry.props.length, 0), []);
   const exampleCount = useMemo(() => uiCatalog.reduce((total, entry) => total + entry.examples.length, 0), []);
+
+  useEffect(() => {
+    if (active && route.entry !== active.id) {
+      updateCatalogRoute({ entry: active.id }, 'replace');
+    }
+  }, [active, route.entry]);
 
   useEffect(() => {
     if (!active) return;

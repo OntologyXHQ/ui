@@ -1,5 +1,5 @@
 import { defineUiDocsGroup } from '../docs/defineUiDocs';
-import { Box, Container, Grid, Inset, Row, SafeArea, Spacer, Stack, Surface, Text, Wrap } from '../index';
+import { Box, Container, Grid, Inset, Row, SafeArea, Spacer, Stack, Surface, Text, Wrap } from '@ontologyx/ui';
 
 const common = {
   layer: 'primitives' as const,

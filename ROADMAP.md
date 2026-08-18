@@ -10,7 +10,8 @@ Canonical gate contract: [`docs/quality/QUALITY_GATES.md`](docs/quality/QUALITY_
 ## Frontier
 
 - `UIR00` — Rebaseline, truth reset and gate constitution: **DONE**
-- `UIR01` — Real browser acceptance harness: **NEXT**
-- `UIR02+` — Foundations → Primitives → Components → System UI reacceptance: **TODO**
+- `UIR01` — Real browser acceptance harness: **DONE**
+- `UIR02` — Foundations reacceptance: **NEXT**
+- `UIR03+` — Primitives → Components → System UI reacceptance: **TODO**
 
 No public visual export is considered accepted merely because it existed before this reset.

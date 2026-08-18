@@ -69,15 +69,15 @@
 }
 
 .ui-text--accent {
-  color: var(--oxs-color-accent);
+  color: var(--oxs-color-accent-text);
 }
 
 .ui-text--danger {
-  color: var(--oxs-color-danger);
+  color: var(--oxs-color-danger-text);
 }
 
 .ui-text--success {
-  color: var(--oxs-color-success);
+  color: var(--oxs-color-success-text);
 }
 
 .ui-text--truncate {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { defineUiDocs } from '../docs/defineUiDocs';
-import { Select } from '../index';
+import { Select } from '@ontologyx/ui';
 
 export const uiDocs = defineUiDocs({
   exportName: 'Select',
