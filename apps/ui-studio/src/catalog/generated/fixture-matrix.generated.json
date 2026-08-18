@@ -1,0 +1,2678 @@
+{
+  "schema": 1,
+  "fixtures": [
+    {
+      "id": "Accordion",
+      "mode": "playground",
+      "preferredWidth": "medium",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "ActionGroup",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "AdaptiveNavigation",
+      "mode": "playground",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "AlertDialog",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "AppBar",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "ApplicationItem",
+      "mode": "canonical-example",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed",
+        "disabled",
+        "loading",
+        "selected"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Badge",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Banner",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "BottomSheet",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Box",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Button",
+      "mode": "playground",
+      "preferredWidth": "medium",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed",
+        "loading"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Card",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Checkbox",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed",
+        "selected",
+        "read-only"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Code",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "CollapseTransition",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Container",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "ContentState",
+      "mode": "canonical-example",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "ContextMenu",
+      "mode": "canonical-example",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed",
+        "disabled"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "CursorRegion",
+      "mode": "playground",
+      "preferredWidth": "medium",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "DesktopShellLayout",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Dialog",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Disclosure",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "disabled"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Divider",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "EmptyState",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "FadeTransition",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "FieldGroup",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "FieldSection",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "GestureRevealHandle",
+      "mode": "playground",
+      "preferredWidth": "narrow",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Grid",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Heading",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Icon",
+      "mode": "canonical-example",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "IconButton",
+      "mode": "canonical-example",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed",
+        "loading",
+        "selected"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Inset",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Label",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "List",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "ListItem",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed",
+        "disabled",
+        "selected"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "ListSection",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "ListSeparator",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Menu",
+      "mode": "playground",
+      "preferredWidth": "medium",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "MenuItem",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "MenuSeparator",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "MotionTransition",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "PageScaffold",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Popover",
+      "mode": "playground",
+      "preferredWidth": "medium",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Progress",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Radio",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "RadioGroup",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed",
+        "disabled",
+        "read-only"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "ReplaceTransition",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "RevealTransition",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Row",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SafeArea",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "ScaleTransition",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Scrim",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "ScrollSnapItem",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "ScrollView",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SearchField",
+      "mode": "playground",
+      "preferredWidth": "medium",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed",
+        "disabled",
+        "error",
+        "read-only"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SegmentedControl",
+      "mode": "playground",
+      "preferredWidth": "medium",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed",
+        "disabled"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Select",
+      "mode": "playground",
+      "preferredWidth": "medium",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed",
+        "disabled",
+        "error",
+        "read-only"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SharedBounds",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Sheet",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Skeleton",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Slider",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed",
+        "disabled",
+        "read-only"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SlideTransition",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Snackbar",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Spacer",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Spinner",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Stack",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "StatusIndicator",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Surface",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Switch",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed",
+        "selected",
+        "read-only"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SystemApplicationBrowser",
+      "mode": "playground",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SystemBar",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SystemChromeGroup",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SystemCommandSurface",
+      "mode": "playground",
+      "preferredWidth": "medium",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SystemDock",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SystemKeyboardHost",
+      "mode": "playground",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SystemLauncher",
+      "mode": "canonical-example",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SystemLockLayout",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SystemNotificationCenter",
+      "mode": "playground",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SystemOsd",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SystemPanel",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SystemQuickSettings",
+      "mode": "playground",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SystemScaffold",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SystemSettingsLayout",
+      "mode": "canonical-example",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SystemSurface",
+      "mode": "playground",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "SystemWorkspace",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "TabPanel",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Tabs",
+      "mode": "playground",
+      "preferredWidth": "medium",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Text",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "TextArea",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed",
+        "disabled",
+        "error",
+        "read-only"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "TextField",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed",
+        "disabled",
+        "error",
+        "read-only"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Tile",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed",
+        "disabled",
+        "loading",
+        "selected"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "TileGrid",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "ToastHost",
+      "mode": "canonical-example",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "ToggleButton",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed",
+        "loading",
+        "selected"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "ToggleGroup",
+      "mode": "playground",
+      "preferredWidth": "medium",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed",
+        "disabled"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Toolbar",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Tooltip",
+      "mode": "canonical-example",
+      "preferredWidth": "wide",
+      "states": [
+        "rest",
+        "hover",
+        "focus",
+        "pressed",
+        "disabled"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "full"
+        },
+        {
+          "theme": "light",
+          "dir": "rtl",
+          "viewport": "tablet",
+          "motion": "reduced"
+        },
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "phone",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "UiRoot",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    },
+    {
+      "id": "Wrap",
+      "mode": "generated",
+      "preferredWidth": "wide",
+      "states": [
+        "rest"
+      ],
+      "captures": [
+        {
+          "theme": "dark",
+          "dir": "ltr",
+          "viewport": "desktop",
+          "motion": "reduced"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+/**
+ * Advanced infrastructure surface for UI Studio diagnostics and platform integration.
+ * Product UI should prefer the canonical `@oxs/ui` Components/Primitives/System surface.
+ */
+export * from './cursor';
+export * from './drag-drop';
+export * from './editing';
+export * from './foundations';
+export * from './gestures';
+export * from './interaction';
+export * from './motion';
+export * from './scroll';

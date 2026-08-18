@@ -1,0 +1,15 @@
+node_modules/
+.pnpm-store/
+artifacts/
+packages/*/dist/
+apps/*/dist/
+apps/*/.vite/
+.cache/
+*.log
+.DS_Store
+.idea/
+.vscode/
+.env
+.env.*
+!.env.example
+*.zip

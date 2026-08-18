@@ -1,0 +1,121 @@
+.ui-root,
+.ui-root *,
+.ui-root *::before,
+.ui-root *::after {
+  box-sizing: border-box;
+}
+
+.ui-root button,
+.ui-root input,
+.ui-root textarea,
+.ui-root select {
+  font: inherit;
+}
+
+.ui-root button {
+  color: inherit;
+}
+
+.ui-root ::selection {
+  background: var(--oxs-color-accent-soft);
+  color: var(--oxs-color-text-primary);
+}
+
+.ui-root {
+  position: relative;
+  font-family: var(--oxs-font-sans);
+  font-size: var(--oxs-type-body-size);
+  line-height: var(--oxs-type-body-line);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 20% 10%, var(--oxs-color-accent-glow), transparent 30%),
+    radial-gradient(circle at 80% 75%, rgba(83, 222, 190, 0.1), transparent 32%),
+    var(--oxs-color-canvas);
+  color: var(--oxs-color-text-primary);
+}
+
+.ui-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+.ui-root[data-oxs-motion='reduced'] {
+  --oxs-motion-instant: var(--oxs-motion-reduced);
+  --oxs-motion-fast: var(--oxs-motion-reduced);
+  --oxs-motion-normal: var(--oxs-motion-reduced);
+  --oxs-motion-slow: var(--oxs-motion-reduced);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-root[data-oxs-motion='system'] {
+    --oxs-motion-instant: var(--oxs-motion-reduced);
+    --oxs-motion-fast: var(--oxs-motion-reduced);
+    --oxs-motion-normal: var(--oxs-motion-reduced);
+    --oxs-motion-slow: var(--oxs-motion-reduced);
+  }
+}
+
+@media (forced-colors: active) {
+  .ui-root {
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .ui-root ::selection {
+    background: Highlight;
+    color: HighlightText;
+  }
+}
+
+/* UIP02: every UI environment is a container-first scope. */
+.ui-root {
+  container-name: oxs-ui;
+  container-type: inline-size;
+}
+
+.ui-root[data-oxs-scope='nested'] {
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+}
+
+.ui-root:dir(rtl) {
+  --oxs-safe-inline-start: var(--oxs-safe-physical-right);
+  --oxs-safe-inline-end: var(--oxs-safe-physical-left);
+}
+
+.ui-root[data-oxs-modality='keyboard'] {
+  --oxs-input-focus-visible: 1;
+}
+
+.ui-root:not([data-oxs-modality='keyboard']) {
+  --oxs-input-focus-visible: 0;
+}
+
+/* Shared portal layer for overlays/drag previews. It stays inside the active UiRoot so
+   direction, tokens, theme and nested-root isolation are preserved. */
+.ui-portal-root {
+  position: fixed;
+  inset: 0;
+  z-index: var(--oxs-z-overlay);
+  pointer-events: none;
+  overflow: visible;
+}
+
+.ui-portal-root > * {
+  pointer-events: auto;
+}

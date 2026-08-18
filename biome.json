@@ -1,0 +1,45 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.7/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "includes": [
+      "package.json",
+      "biome.json",
+      "scripts/**/*.mjs",
+      "apps/ui-studio/package.json",
+      "apps/ui-studio/vite.config.ts",
+      "apps/ui-studio/src/**/*.ts",
+      "apps/ui-studio/src/**/*.tsx",
+      "apps/ui-studio/src/**/*.json",
+      "packages/ui/package.json",
+      "packages/ui/vite.config.ts",
+      "packages/ui/vitest.config.ts",
+      "packages/ui/scripts/**/*.mjs",
+      "packages/ui/src/**/*.ts",
+      "packages/ui/src/**/*.tsx"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended"
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "semicolons": "always",
+      "trailingCommas": "all"
+    }
+  }
+}

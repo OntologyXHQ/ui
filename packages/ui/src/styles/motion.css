@@ -1,0 +1,30 @@
+.ui-motion-transition {
+  will-change: transform, opacity, clip-path;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.ui-motion-transition[data-present='false'] {
+  pointer-events: none;
+}
+
+.ui-motion-transition[data-hidden='true'] {
+  visibility: hidden;
+}
+
+.ui-shared-bounds {
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.ui-root[data-oxs-motion='reduced'] .ui-motion-transition,
+.ui-root[data-oxs-motion='reduced'] .ui-shared-bounds {
+  will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-root[data-oxs-motion='system'] .ui-motion-transition,
+  .ui-root[data-oxs-motion='system'] .ui-shared-bounds {
+    will-change: auto;
+  }
+}

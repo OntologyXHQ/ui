@@ -1,0 +1,31 @@
+{
+  "name": "oxs-ui-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.15.0",
+  "engines": {
+    "node": ">=22.13.0",
+    "pnpm": "10.15.0"
+  },
+  "scripts": {
+    "dev": "pnpm catalog:generate && pnpm --filter @oxs/ui-studio dev",
+    "build": "pnpm --filter @oxs/ui build && pnpm --filter @oxs/ui-studio build",
+    "check": "pnpm check:boundaries && pnpm --filter @oxs/ui check && pnpm --filter @oxs/ui-studio check",
+    "test": "pnpm --filter @oxs/ui test && pnpm --filter @oxs/ui docs:test",
+    "quality": "pnpm catalog:check && pnpm check:boundaries && pnpm --filter @oxs/ui check && pnpm --filter @oxs/ui test && pnpm --filter @oxs/ui build && pnpm --filter @oxs/ui pack:check && pnpm --filter @oxs/ui-studio check && pnpm --filter @oxs/ui-studio build",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "catalog:generate": "pnpm --filter @oxs/ui docs:generate && python3 scripts/generate-fixture-matrix.py",
+    "catalog:check": "pnpm --filter @oxs/ui docs:check && python3 scripts/generate-fixture-matrix.py --check",
+    "check:boundaries": "python3 scripts/check-standalone-boundary.py && python3 scripts/check-studio-self-hosting.py && python3 scripts/check-platform-hardening.py && python3 scripts/check-system-keyboard.py",
+    "package:smoke": "node scripts/package-smoke.mjs",
+    "package:tarball": "node scripts/create-tarball.mjs",
+    "release:check": "pnpm quality && node scripts/check-studio-production.mjs && pnpm package:smoke",
+    "studio:build": "pnpm catalog:generate && pnpm --filter @oxs/ui-studio build && node scripts/check-studio-production.mjs",
+    "studio:preview": "pnpm --filter @oxs/ui-studio preview"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.7"
+  }
+}

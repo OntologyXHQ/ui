@@ -1,0 +1,44 @@
+/* Cursor presentation is centralized here for browser/Servo preview.
+ * The native compositor maps the same semantic roles to client/system cursor state later.
+ */
+.ui-root[data-oxs-pointer-visible='false'],
+.ui-root[data-oxs-pointer-visible='false'] * {
+  cursor: none !important;
+}
+
+[data-oxs-cursor-role='default'] { cursor: default; }
+[data-oxs-cursor-role='pointer'] { cursor: pointer; }
+[data-oxs-cursor-role='text'] { cursor: text; }
+[data-oxs-cursor-role='vertical-text'] { cursor: vertical-text; }
+[data-oxs-cursor-role='crosshair'] { cursor: crosshair; }
+[data-oxs-cursor-role='grab'] { cursor: grab; }
+[data-oxs-cursor-role='grabbing'] { cursor: grabbing; }
+[data-oxs-cursor-role='move'] { cursor: move; }
+[data-oxs-cursor-role='not-allowed'] { cursor: not-allowed; }
+[data-oxs-cursor-role='progress'] { cursor: progress; }
+[data-oxs-cursor-role='wait'] { cursor: wait; }
+[data-oxs-cursor-role='n-resize'] { cursor: n-resize; }
+[data-oxs-cursor-role='s-resize'] { cursor: s-resize; }
+[data-oxs-cursor-role='e-resize'] { cursor: e-resize; }
+[data-oxs-cursor-role='w-resize'] { cursor: w-resize; }
+[data-oxs-cursor-role='ne-resize'] { cursor: ne-resize; }
+[data-oxs-cursor-role='nw-resize'] { cursor: nw-resize; }
+[data-oxs-cursor-role='se-resize'] { cursor: se-resize; }
+[data-oxs-cursor-role='sw-resize'] { cursor: sw-resize; }
+[data-oxs-cursor-role='col-resize'] { cursor: col-resize; }
+[data-oxs-cursor-role='row-resize'] { cursor: row-resize; }
+[data-oxs-cursor-role='drag-copy'] { cursor: copy; }
+[data-oxs-cursor-role='drag-move'] { cursor: move; }
+[data-oxs-cursor-role='no-drop'] { cursor: no-drop; }
+[data-oxs-cursor-role='hidden'] { cursor: none; }
+
+.ui-cursor-region { display: contents; }
+
+/* Active drag operation owns cursor feedback across the whole gesture, including
+ * pointer movement outside the source element. */
+.ui-drag-drop-runtime[data-oxs-drag-cursor-role='drag-copy'],
+.ui-drag-drop-runtime[data-oxs-drag-cursor-role='drag-copy'] * { cursor: copy !important; }
+.ui-drag-drop-runtime[data-oxs-drag-cursor-role='drag-move'],
+.ui-drag-drop-runtime[data-oxs-drag-cursor-role='drag-move'] * { cursor: move !important; }
+.ui-drag-drop-runtime[data-oxs-drag-cursor-role='no-drop'],
+.ui-drag-drop-runtime[data-oxs-drag-cursor-role='no-drop'] * { cursor: no-drop !important; }

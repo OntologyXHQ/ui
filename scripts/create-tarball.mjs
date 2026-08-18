@@ -1,0 +1,12 @@
+import { mkdir, readdir } from 'node:fs/promises';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+const root = process.cwd();
+const artifacts = path.join(root, 'artifacts');
+await mkdir(artifacts, { recursive: true });
+const pnpm = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
+const result = spawnSync(pnpm, ['--dir', 'packages/ui', 'pack', '--pack-destination', '../../artifacts'], { cwd: root, stdio: 'inherit' });
+if (result.status !== 0) process.exit(result.status ?? 1);
+const tgz = (await readdir(artifacts)).filter((name) => name.endsWith('.tgz')).sort().at(-1);
+if (!tgz) throw new Error('pnpm pack completed without a tarball');
+console.log(path.join(artifacts, tgz));
