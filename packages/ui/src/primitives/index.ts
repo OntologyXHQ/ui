@@ -6,13 +6,21 @@ export type {
   BoxProps,
   ContainerProps,
   GridProps,
+  GridSpan,
   InsetProps,
   Justify,
+  LayoutAlignSelf,
+  LayoutFlex,
   LayoutGap,
+  LayoutMinSize,
+  LayoutOverflow,
+  RowProps,
   SafeAreaEdge,
   SafeAreaProps,
   SpacerAxis,
   SpacerProps,
+  StackProps,
+  WrapProps,
 } from './Layout';
 export { Box, Container, Grid, Inset, Row, SafeArea, Spacer, Stack, Wrap } from './Layout';
 export type { DividerProps, SurfaceProps } from './Surface';

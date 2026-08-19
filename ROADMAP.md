@@ -11,7 +11,13 @@ Canonical gate contract: [`docs/quality/QUALITY_GATES.md`](docs/quality/QUALITY_
 
 - `UIR00` — Rebaseline, truth reset and gate constitution: **DONE**
 - `UIR01` — Real browser acceptance harness: **DONE**
-- `UIR02` — Foundations reacceptance: **NEXT**
-- `UIR03+` — Primitives → Components → System UI reacceptance: **TODO**
+- `UIR02` — Foundations reacceptance: **DONE**
+  - `UIR02-A` — Semantic token architecture: **DONE**
+  - `UIR02-B` — Environment semantics: **DONE**
+  - `UIR02-C` — UiRoot certification: **DONE**
+- `UIR03` — Layout primitives redesign: **ACTIVE**
+  - `UIR03-A` — Core structural flow (`Box`, `Stack`, `Row`, `Wrap`): **DONE**
+  - `UIR03-B` — Grid/Container/Inset/SafeArea/Spacer: **NEXT**
+- `UIR04+` — Visual Primitives → Components → System UI reacceptance: **TODO**
 
 No public visual export is considered accepted merely because it existed before this reset.

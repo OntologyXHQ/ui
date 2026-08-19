@@ -11,14 +11,18 @@ export type {
   UiColorScheme,
   UiDensity,
   UiDirection,
+  UiEnvironmentLength,
   UiInputModality,
+  UiLogicalInsets,
   UiModalityPreference,
+  UiOcclusionInsets,
   UiPointerPrecision,
   UiPointerPrecisionPreference,
   UiSafeAreaInsets,
   UiTheme,
 } from './foundations/environment';
-export type { UiCustomizableToken, UiTokenOverrides, UiTokenValue } from './foundations/tokens';
+export type { UiCustomizableToken, UiTokenGroup, UiTokenOverrides, UiTokenValue } from './foundations/tokens';
+export { UI_CUSTOMIZABLE_TOKENS, UI_TOKEN_GROUPS } from './foundations/tokens';
 export type { FrameRateTarget, MotionPreference, SpringPreset } from './motion';
 export type {
   CursorAnimationPreference,

@@ -1,5 +1,33 @@
 # Changelog
 
+## Unreleased — UIR03 layout primitives redesign
+
+- Closed UIR03-A core structural flow: `Box`, `Stack`, `Row`, and `Wrap` now expose typed intrinsic polymorphism plus a finite logical boundary contract for overflow, min-size, flex-child participation, self-alignment and Grid span; arbitrary inline style/color serialization and visual order reversal remain outside the Primitive API.
+- Replaced the old shared Layout vocabulary demo with dedicated Box/Stack/Row/Wrap Studio examples and added a stable G0 layout gate that rejects physical/freeform escape hatches and shared certification fixtures.
+- Added `layout-core.test.tsx` type/behavior ownership and component-owned G6 certification for semantic polymorphism, nested overflow/min-size safety, RTL logical Row ordering and intrinsic Wrap reflow.
+- Promoted Box, Stack, Row and Wrap from `candidate` to `accepted`; Grid/Container/Inset/SafeArea/Spacer remain candidate until UIR03-B.
+
+## Unreleased — UIR02 foundations reacceptance
+
+- Closed UIR02-C and promoted `UiRoot` as the first post-reset `accepted` visual export. Nested roots are inferred automatically instead of exposing a diagnostic `scope` prop, inherit environment/token state by default, and keep portal/overlay runtime ownership local to the nearest root.
+- Added SSR/hydration and multi-Window/Document realm certification: media queries, modality, direction, reduced motion and ResizeObserver ownership now follow the concrete root realm after mount while server output retains deterministic fallbacks.
+- Added `docs/quality/CERTIFICATIONS.json`; accepted exports must bind behavior-test owners, named G6 scenarios and required acceptance axes, and G1/G6 reject stale or incomplete certification records.
+- Added a public Studio nested-root certification example and G6 journey proving environment inheritance/override, root-local portal ownership, modal isolation, focus restoration and axe-clean behavior.
+
+- Closed UIR02-B environment semantics: UiRoot now separates preferences from resolved color-scheme/direction/density/modality/pointer/motion runtime state, auto density resolves from pointer precision without device names, and adaptive bands derive from measured container inline size.
+- Split persistent logical safe-area inputs from transient host occlusion, added combined environment inset variables for reachable Component overlays/feedback, and changed inset values to explicit CSS lengths rather than guessed numeric pixels.
+- Unified reduced-motion projection so CSS consumes the same resolved `full | reduced` state as the motion runtime instead of maintaining a second `system` media branch.
+- Scoped media-query/modality/document-direction observation to concrete browser realms and added G0 environment checks against device sniffing, viewport-size responsive media queries, unresolved auto/system CSS state, and physical inline box properties.
+- Strengthened G6 environment/reflow evidence with resolved/preference attributes, adaptive-band assertions, separate occlusion projection, and keyboard-occlusion vs safe-area coverage.
+
+- UIR02-A follow-up: replaced the browser-console-dependent focused `aria-hidden` self-test with a DOM-semantic invariant that directly rejects focus retained inside `aria-hidden`/`inert` ancestors; real browser warnings remain captured as diagnostics, but certification no longer depends on Chromium exposing implementation warnings through Playwright console events.
+- Closed UIR02-A semantic token architecture: public theme overrides are grouped and finite, semantic emphasis tones split fill/text/on-fill/soft/border roles, override values are explicit CSS strings, and raw package color literals outside `tokens.css` are gated; stale semantic color references in the package or self-hosted Studio are rejected.
+- Removed the ornamental root accent-gradient/glow from the foundation substrate; `UiRoot` now paints the semantic canvas only.
+- Added complete light/dark semantic roles for accent/danger/success/warning and corrected filled-danger/on-fill plus success/warning badge usage.
+- Added a real Studio semantic-token example and exported machine-readable token groups for developer tooling.
+- Repaired modal overlay focus ordering so focus enters a committed modal Popover/Dialog surface before sibling `inert` + `aria-hidden` isolation; browser diagnostics now block Chrome's focused-descendant `aria-hidden` warning and G6 has a dedicated modal Popover regression journey.
+- Marked the G6 evidence system as established for future component promotion; `pnpm verify` still reruns G6 on every full acceptance.
+
 ## Unreleased — UIR01 browser acceptance
 - UIR01 follow-up: fixed the real phone Studio layout collapse exposed by browser hit-testing: the nine environment selectors now stay in one horizontally scrollable public Toolbar strip instead of consuming the workspace vertically, and G6 rejects a documentation viewport smaller than four 44px touch-target rows.
 - UIR01 follow-up: made CDP touch targeting distinguish intersection visibility from hit-test visibility by explicitly centering the real target in nested scroll containers before deriving coordinates; G6 now reports the concrete occluding element if ownership is still lost, and an adversarial fixture proves recovery from a fully-intersecting but center-occluded target.

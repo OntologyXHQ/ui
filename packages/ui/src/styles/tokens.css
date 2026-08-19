@@ -22,7 +22,7 @@
   --oxs-color-accent-text: #9db9ff;
   --oxs-color-on-accent: #101725;
   --oxs-color-accent-soft: rgba(157, 185, 255, 0.16);
-  --oxs-color-accent-glow: rgba(100, 138, 255, 0.18);
+  --oxs-color-accent-border: rgba(157, 185, 255, 0.5);
   --oxs-color-handle: rgba(244, 247, 251, 0.72);
   --oxs-color-handle-muted: rgba(244, 247, 251, 0.3);
   --oxs-color-scroll-indicator: rgba(244, 247, 251, 0.46);
@@ -32,13 +32,20 @@
   --oxs-color-scrim-strong: rgba(0, 0, 0, 0.58);
   --oxs-color-danger: #ff8f9a;
   --oxs-color-danger-text: #ff8f9a;
+  --oxs-color-on-danger: #101725;
   --oxs-color-danger-soft: rgba(255, 143, 154, 0.12);
   --oxs-color-danger-hover: rgba(255, 143, 154, 0.18);
   --oxs-color-danger-border: rgba(255, 143, 154, 0.54);
   --oxs-color-success: #75d9b0;
   --oxs-color-success-text: #75d9b0;
+  --oxs-color-on-success: #071b14;
+  --oxs-color-success-soft: rgba(117, 217, 176, 0.12);
+  --oxs-color-success-border: rgba(117, 217, 176, 0.5);
   --oxs-color-warning: #f3c878;
   --oxs-color-warning-text: #f3c878;
+  --oxs-color-on-warning: #211807;
+  --oxs-color-warning-soft: rgba(243, 200, 120, 0.14);
+  --oxs-color-warning-border: rgba(243, 200, 120, 0.52);
 
   /* Typography */
   --oxs-font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -126,6 +133,16 @@
   --oxs-safe-block-end: var(--oxs-safe-physical-bottom);
   --oxs-safe-inline-start: var(--oxs-safe-physical-left);
 
+  /* Host-neutral transient occlusion is separate from persistent safe area. */
+  --oxs-occlusion-block-start: 0px;
+  --oxs-occlusion-inline-end: 0px;
+  --oxs-occlusion-block-end: 0px;
+  --oxs-occlusion-inline-start: 0px;
+  --oxs-environment-inset-block-start: max(var(--oxs-safe-block-start), var(--oxs-occlusion-block-start));
+  --oxs-environment-inset-inline-end: max(var(--oxs-safe-inline-end), var(--oxs-occlusion-inline-end));
+  --oxs-environment-inset-block-end: max(var(--oxs-safe-block-end), var(--oxs-occlusion-block-end));
+  --oxs-environment-inset-inline-start: max(var(--oxs-safe-inline-start), var(--oxs-occlusion-inline-start));
+
   /* Motion */
   --oxs-motion-reduced: 1ms;
   --oxs-motion-instant: 80ms;
@@ -196,7 +213,7 @@
   --oxs-color-accent-text: #2f54bd;
   --oxs-color-on-accent: #ffffff;
   --oxs-color-accent-soft: rgba(65, 105, 216, 0.13);
-  --oxs-color-accent-glow: rgba(65, 105, 216, 0.12);
+  --oxs-color-accent-border: rgba(65, 105, 216, 0.46);
   --oxs-color-handle: rgba(16, 23, 34, 0.62);
   --oxs-color-handle-muted: rgba(16, 23, 34, 0.24);
   --oxs-color-scroll-indicator: rgba(16, 23, 34, 0.36);
@@ -206,13 +223,20 @@
   --oxs-color-scrim-strong: rgba(12, 17, 26, 0.44);
   --oxs-color-danger: #be2d40;
   --oxs-color-danger-text: #be2d40;
-  --oxs-color-success: #187259;
-  --oxs-color-success-text: #187259;
-  --oxs-color-warning: #7a5200;
-  --oxs-color-warning-text: #7a5200;
+  --oxs-color-on-danger: #ffffff;
   --oxs-color-danger-soft: rgba(190, 45, 64, 0.09);
   --oxs-color-danger-hover: rgba(190, 45, 64, 0.14);
   --oxs-color-danger-border: rgba(190, 45, 64, 0.42);
+  --oxs-color-success: #187259;
+  --oxs-color-success-text: #187259;
+  --oxs-color-on-success: #ffffff;
+  --oxs-color-success-soft: rgba(24, 114, 89, 0.1);
+  --oxs-color-success-border: rgba(24, 114, 89, 0.42);
+  --oxs-color-warning: #7a5200;
+  --oxs-color-warning-text: #7a5200;
+  --oxs-color-on-warning: #ffffff;
+  --oxs-color-warning-soft: rgba(122, 82, 0, 0.1);
+  --oxs-color-warning-border: rgba(122, 82, 0, 0.42);
   --oxs-elevation-1: 0 10px 30px rgba(23, 35, 52, 0.1);
   --oxs-elevation-2: 0 20px 54px rgba(23, 35, 52, 0.14);
   --oxs-elevation-3: 0 28px 86px rgba(23, 35, 52, 0.18);
@@ -233,7 +257,7 @@
     --oxs-color-text-secondary: rgba(16, 23, 34, 0.68);
     --oxs-color-text-tertiary: rgba(16, 23, 34, 0.62);
     --oxs-color-border-subtle: rgba(17, 31, 49, 0.075);
-  --oxs-color-border: rgba(17, 31, 49, 0.12);
+    --oxs-color-border: rgba(17, 31, 49, 0.12);
     --oxs-color-border-strong: rgba(17, 31, 49, 0.2);
     --oxs-color-accent: #4169d8;
     --oxs-color-accent-hover: #345bc8;
@@ -241,23 +265,30 @@
     --oxs-color-accent-text: #2f54bd;
     --oxs-color-on-accent: #ffffff;
     --oxs-color-accent-soft: rgba(65, 105, 216, 0.13);
-    --oxs-color-accent-glow: rgba(65, 105, 216, 0.12);
+    --oxs-color-accent-border: rgba(65, 105, 216, 0.46);
     --oxs-color-handle: rgba(16, 23, 34, 0.62);
     --oxs-color-handle-muted: rgba(16, 23, 34, 0.24);
-  --oxs-color-scroll-indicator: rgba(16, 23, 34, 0.36);
+    --oxs-color-scroll-indicator: rgba(16, 23, 34, 0.36);
     --oxs-color-field-bg: rgba(255, 255, 255, 0.68);
     --oxs-color-focus: rgba(65, 105, 216, 0.68);
     --oxs-color-scrim: rgba(12, 17, 26, 0.26);
     --oxs-color-scrim-strong: rgba(12, 17, 26, 0.44);
     --oxs-color-danger: #be2d40;
     --oxs-color-danger-text: #be2d40;
-    --oxs-color-success: #187259;
-    --oxs-color-success-text: #187259;
-    --oxs-color-warning: #7a5200;
-    --oxs-color-warning-text: #7a5200;
+    --oxs-color-on-danger: #ffffff;
     --oxs-color-danger-soft: rgba(190, 45, 64, 0.09);
     --oxs-color-danger-hover: rgba(190, 45, 64, 0.14);
     --oxs-color-danger-border: rgba(190, 45, 64, 0.42);
+    --oxs-color-success: #187259;
+    --oxs-color-success-text: #187259;
+    --oxs-color-on-success: #ffffff;
+    --oxs-color-success-soft: rgba(24, 114, 89, 0.1);
+    --oxs-color-success-border: rgba(24, 114, 89, 0.42);
+    --oxs-color-warning: #7a5200;
+    --oxs-color-warning-text: #7a5200;
+    --oxs-color-on-warning: #ffffff;
+    --oxs-color-warning-soft: rgba(122, 82, 0, 0.1);
+    --oxs-color-warning-border: rgba(122, 82, 0, 0.42);
     --oxs-elevation-1: 0 10px 30px rgba(23, 35, 52, 0.1);
     --oxs-elevation-2: 0 20px 54px rgba(23, 35, 52, 0.14);
     --oxs-elevation-3: 0 28px 86px rgba(23, 35, 52, 0.18);
@@ -277,14 +308,6 @@
   --oxs-control-height-sm: 2.125rem;
   --oxs-control-height-md: 2.875rem;
   --oxs-control-height-lg: 3.375rem;
-}
-
-[data-oxs-pointer-precision='coarse'][data-oxs-density='auto'] {
-  --oxs-density-scale: 1.08;
-  --oxs-control-height-sm: 2.25rem;
-  --oxs-control-height-md: 3rem;
-  --oxs-control-height-lg: 3.5rem;
-  --oxs-touch-target-min: var(--oxs-touch-target-coarse);
 }
 
 [data-oxs-pointer-precision='coarse'] {

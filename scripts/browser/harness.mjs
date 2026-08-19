@@ -202,7 +202,9 @@ export function routeUrl(baseUrl, {
   pointer = 'fine',
   viewport = 'fit',
   container = 'auto',
-  safe = 'none',
+  insets = 'none',
+  example = null,
+  state = null,
 } = {}) {
   const url = new URL('/', baseUrl);
   const values = {
@@ -218,22 +220,59 @@ export function routeUrl(baseUrl, {
     pointer,
     viewport,
     container,
-    safe,
+    insets,
+    example,
+    state,
   };
-  for (const [key, value] of Object.entries(values)) url.searchParams.set(key, value);
+  for (const [key, value] of Object.entries(values)) {
+    if (value !== null && value !== undefined && value !== '') url.searchParams.set(key, value);
+  }
   return url.toString();
+}
+
+export async function assertNoFocusedIsolationConflict(page, label = 'browser surface') {
+  const conflict = await page.evaluate(() => {
+    const active = document.activeElement;
+    if (!(active instanceof HTMLElement) || active === document.body) return null;
+    const isolated = active.closest('[aria-hidden="true"], [inert]');
+    if (!(isolated instanceof HTMLElement)) return null;
+
+    const describe = (element) => ({
+      tag: element.tagName.toLowerCase(),
+      id: element.id || null,
+      className: element.className || null,
+      role: element.getAttribute('role'),
+      ariaHidden: element.getAttribute('aria-hidden'),
+      inert: element.hasAttribute('inert'),
+    });
+
+    return {
+      focused: describe(active),
+      isolatedAncestor: describe(isolated),
+    };
+  });
+
+  assert.equal(
+    conflict,
+    null,
+    `${label} retained focus inside an aria-hidden/inert ancestor: ${JSON.stringify(conflict)}`,
+  );
 }
 
 export function attachRuntimeDiagnostics(page) {
   const errors = [];
   page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`));
   page.on('console', (message) => {
-    if (message.type() !== 'error') return;
+    const type = message.type();
+    const text = message.text();
+    const accessibilityWarning =
+      type === 'warning' && /blocked aria-hidden|descendant retained focus|focus must not be hidden/i.test(text);
+    if (type !== 'error' && !accessibilityWarning) return;
     const location = message.location();
     const source = location.url
       ? ` @ ${location.url}${Number.isInteger(location.lineNumber) ? `:${location.lineNumber + 1}` : ''}`
       : '';
-    errors.push(`console.error: ${message.text()}${source}`);
+    errors.push(`console.${type}: ${text}${source}`);
   });
   page.on('response', (response) => {
     if (response.status() >= 400) errors.push(`http ${response.status()}: ${response.url()}`);
@@ -255,8 +294,18 @@ export async function gotoCatalog(page, baseUrl, options = {}) {
   const tab = options.tab ?? 'overview';
   const workbench = page.locator(`[data-studio-entry="${entry}"][data-studio-tab="${tab}"]`);
   await workbench.waitFor({ state: 'visible' });
-  assert.equal(new URL(page.url()).searchParams.get('entry'), entry, 'Studio route did not preserve the requested entry.');
-  assert.equal(new URL(page.url()).searchParams.get('tab'), tab, 'Studio route did not preserve the requested tab.');
+  const route = new URL(page.url()).searchParams;
+  assert.equal(route.get('entry'), entry, 'Studio route did not preserve the requested entry.');
+  assert.equal(route.get('tab'), tab, 'Studio route did not preserve the requested tab.');
+  if (options.example) {
+    assert.equal(route.get('example'), options.example, 'Studio route did not preserve the requested example.');
+    const requested = page.locator(`#example-${options.example}`);
+    await requested.waitFor({ state: 'visible' });
+    assert.equal(await requested.getAttribute('data-active'), 'true', 'Studio did not activate the requested example deep link.');
+  }
+  if (options.state) {
+    assert.equal(route.get('state'), options.state, 'Studio route did not preserve the requested playground state.');
+  }
   return workbench;
 }
 
@@ -303,19 +352,57 @@ export async function assertEnvironment(page, expected) {
   // makes adversarial projection fixtures fail for the wrong reason when the root
   // is intentionally empty. Attachment is the correct prerequisite for reading it.
   await root.waitFor({ state: 'attached' });
+  if (expected.adaptiveBand !== undefined) {
+    await page.waitForFunction(
+      (band) => document.querySelector('.ui-root')?.getAttribute('data-oxs-adaptive-band') === band,
+      expected.adaptiveBand,
+    );
+  }
   const actual = await root.evaluate((element) => {
     const style = getComputedStyle(element);
+    const insetProbe = document.createElement('div');
+    insetProbe.style.cssText = [
+      'position:absolute',
+      'visibility:hidden',
+      'pointer-events:none',
+      'padding-block-start:var(--oxs-environment-inset-block-start)',
+      'padding-inline-end:var(--oxs-environment-inset-inline-end)',
+      'padding-block-end:var(--oxs-environment-inset-block-end)',
+      'padding-inline-start:var(--oxs-environment-inset-inline-start)',
+    ].join(';');
+    element.append(insetProbe);
+    const insetStyle = getComputedStyle(insetProbe);
+    const environmentInsets = {
+      insetBlockStart: insetStyle.paddingBlockStart,
+      insetInlineEnd: insetStyle.paddingInlineEnd,
+      insetBlockEnd: insetStyle.paddingBlockEnd,
+      insetInlineStart: insetStyle.paddingInlineStart,
+    };
+    insetProbe.remove();
     return {
       dir: element.getAttribute('dir'),
       theme: element.getAttribute('data-oxs-theme'),
+      colorScheme: element.getAttribute('data-oxs-color-scheme'),
+      colorSchemePreference: element.getAttribute('data-oxs-color-scheme-preference'),
       density: element.getAttribute('data-oxs-density'),
+      densityPreference: element.getAttribute('data-oxs-density-preference'),
+      directionPreference: element.getAttribute('data-oxs-direction-preference'),
       motion: element.getAttribute('data-oxs-motion'),
+      motionPreference: element.getAttribute('data-oxs-motion-preference'),
       modality: element.getAttribute('data-oxs-modality'),
+      modalityPreference: element.getAttribute('data-oxs-modality-preference'),
       pointer: element.getAttribute('data-oxs-pointer-precision'),
+      pointerPreference: element.getAttribute('data-oxs-pointer-precision-preference'),
+      adaptiveBand: element.getAttribute('data-oxs-adaptive-band'),
       safeBlockStart: style.getPropertyValue('--oxs-safe-block-start').trim(),
       safeInlineEnd: style.getPropertyValue('--oxs-safe-inline-end').trim(),
       safeBlockEnd: style.getPropertyValue('--oxs-safe-block-end').trim(),
       safeInlineStart: style.getPropertyValue('--oxs-safe-inline-start').trim(),
+      occlusionBlockStart: style.getPropertyValue('--oxs-occlusion-block-start').trim(),
+      occlusionInlineEnd: style.getPropertyValue('--oxs-occlusion-inline-end').trim(),
+      occlusionBlockEnd: style.getPropertyValue('--oxs-occlusion-block-end').trim(),
+      occlusionInlineStart: style.getPropertyValue('--oxs-occlusion-inline-start').trim(),
+      ...environmentInsets,
     };
   });
   const viewport = await page.locator('.ui-studio-viewport').evaluate((element) => ({
@@ -324,17 +411,38 @@ export async function assertEnvironment(page, expected) {
     containerWidth: element.style.getPropertyValue('--ui-studio-content-width').trim(),
   }));
 
-  for (const key of ['dir', 'theme', 'density', 'motion', 'modality', 'pointer']) {
+  for (const key of [
+    'dir',
+    'theme',
+    'colorScheme',
+    'colorSchemePreference',
+    'density',
+    'densityPreference',
+    'directionPreference',
+    'motion',
+    'motionPreference',
+    'modality',
+    'modalityPreference',
+    'pointer',
+    'pointerPreference',
+    'adaptiveBand',
+  ]) {
     if (expected[key] !== undefined) assert.equal(actual[key], expected[key], `Environment mismatch for ${key}.`);
   }
   if (expected.viewport !== undefined) assert.equal(viewport.preset, expected.viewport, 'Viewport preset mismatch.');
   if (expected.viewportWidth !== undefined) assert.equal(viewport.width, expected.viewportWidth, 'Viewport width projection mismatch.');
   if (expected.containerWidth !== undefined) assert.equal(viewport.containerWidth, expected.containerWidth, 'Container width projection mismatch.');
-  if (expected.safeArea) {
-    for (const [key, value] of Object.entries(expected.safeArea)) {
-      assert.equal(actual[key], value, `Safe-area projection mismatch for ${key}.`);
+  for (const [label, projection] of [
+    ['Safe-area', expected.safeArea],
+    ['Occlusion', expected.occlusion],
+    ['Environment inset', expected.environmentInset],
+  ]) {
+    if (!projection) continue;
+    for (const [key, value] of Object.entries(projection)) {
+      assert.equal(actual[key], value, `${label} projection mismatch for ${key}.`);
     }
   }
+  return { actual, viewport };
 }
 
 export async function runAxe(page, label) {

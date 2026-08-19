@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {
   assertEnvironment,
+  assertNoFocusedIsolationConflict,
   assertMinimumBlockSize,
   assertPublicUiStylesLoaded,
   assertNoGlobalHorizontalOverflow,
@@ -45,6 +46,23 @@ export async function runHarnessSelfTests(browser) {
         'axe-color-contrast-blocker',
         () => runAxe(page, 'broken color contrast fixture'),
         /color-contrast/,
+      ));
+    } finally {
+      await context.close();
+    }
+  }
+
+  {
+    const context = await browser.newContext({ viewport: { width: 800, height: 600 } });
+    const page = await context.newPage();
+    try {
+      await page.setContent('<div id="background"><button id="focused">Focused background</button></div><div role="dialog">Modal</div>');
+      await page.locator('#focused').focus();
+      await page.locator('#background').evaluate((element) => element.setAttribute('aria-hidden', 'true'));
+      results.push(await expectFailure(
+        'focused-isolation-invariant-detector',
+        () => assertNoFocusedIsolationConflict(page, 'broken focused isolation fixture'),
+        /retained focus inside an aria-hidden\/inert ancestor/i,
       ));
     } finally {
       await context.close();
@@ -264,6 +282,6 @@ export async function runHarnessSelfTests(browser) {
     }
   }
 
-  assert.equal(results.length, 12, 'Browser harness self-test matrix is incomplete.');
+  assert.equal(results.length, 13, 'Browser harness self-test matrix is incomplete.');
   return results;
 }

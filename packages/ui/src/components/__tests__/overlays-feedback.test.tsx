@@ -12,6 +12,7 @@ import {
   Dialog,
   Menu,
   MenuItem,
+  Popover,
   ToastHost,
   Tooltip,
   Button,
@@ -66,6 +67,41 @@ describe('overlay and transient feedback components', () => {
     expect(outside.closest('.ui-drag-drop-runtime')).toHaveAttribute('inert');
   });
 
+
+  it('moves focus into a modal Popover before isolating its focused background', async () => {
+    const user = userEvent.setup();
+    function Harness() {
+      const anchorRef = useRef<HTMLButtonElement>(null);
+      const [open, setOpen] = useState(false);
+      return (
+        <>
+          <Button ref={anchorRef} onClick={() => setOpen(true)}>Open modal popover</Button>
+          <Popover
+            open={open}
+            onOpenChange={setOpen}
+            anchorRef={anchorRef}
+            ariaLabel="Modal popover"
+            modal
+            autoFocus={false}
+          >
+            Modal content
+          </Popover>
+        </>
+      );
+    }
+
+    wrap(<Harness />);
+    const trigger = screen.getByRole('button', { name: 'Open modal popover' });
+    await user.click(trigger);
+    const popover = screen.getByRole('dialog', { name: 'Modal popover' });
+    const backgroundRuntime = trigger.closest<HTMLElement>('.ui-drag-drop-runtime');
+
+    expect(popover).toHaveAttribute('tabindex', '-1');
+    expect(document.activeElement).toBe(popover);
+    expect(backgroundRuntime).toHaveAttribute('inert');
+    expect(backgroundRuntime).toHaveAttribute('aria-hidden', 'true');
+    expect(backgroundRuntime?.contains(document.activeElement)).toBe(false);
+  });
 
   it('keeps modal lock and isolation correct when a lower modal closes out of order', () => {
     function Harness() {

@@ -132,8 +132,8 @@ export function StudioEnvironmentToolbar() {
             hideLabel
             fieldSize="sm"
             options={safeAreaOptions}
-            value={environment.safeAreaPreset}
-            onValueChange={(value) => update('safeAreaPreset', value as typeof environment.safeAreaPreset)}
+            value={environment.insetPreset}
+            onValueChange={(value) => update('insetPreset', value as typeof environment.insetPreset)}
           />
         </Toolbar>
       </Row>

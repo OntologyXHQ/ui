@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "exports": {
+    "UiRoot": {
+      "owner": "UIR02-C",
+      "behaviorTests": [
+        "packages/ui/src/adaptive/__tests__/ui-root-certification.test.tsx"
+      ],
+      "browserScenarios": [
+        "uiroot-nested-runtime-certification"
+      ],
+      "requiredAxes": [
+        "foundations",
+        "uiroot",
+        "nested-roots",
+        "inheritance",
+        "portal",
+        "modal-isolation",
+        "focus",
+        "a11y"
+      ]
+    },
+    "Box": {
+      "owner": "UIR03-A",
+      "behaviorTests": [
+        "packages/ui/src/primitives/__tests__/layout-core.test.tsx"
+      ],
+      "browserScenarios": [
+        "box-layout-boundary-certification"
+      ],
+      "requiredAxes": [
+        "layout",
+        "polymorphism",
+        "overflow",
+        "min-size",
+        "flex-child",
+        "grid-span",
+        "rtl",
+        "a11y"
+      ]
+    },
+    "Stack": {
+      "owner": "UIR03-A",
+      "behaviorTests": [
+        "packages/ui/src/primitives/__tests__/layout-core.test.tsx"
+      ],
+      "browserScenarios": [
+        "logical-flow-layout-certification"
+      ],
+      "requiredAxes": [
+        "layout",
+        "stack",
+        "polymorphism",
+        "logical-order",
+        "reflow",
+        "a11y"
+      ]
+    },
+    "Row": {
+      "owner": "UIR03-A",
+      "behaviorTests": [
+        "packages/ui/src/primitives/__tests__/layout-core.test.tsx"
+      ],
+      "browserScenarios": [
+        "logical-flow-layout-certification"
+      ],
+      "requiredAxes": [
+        "layout",
+        "row",
+        "polymorphism",
+        "rtl",
+        "logical-order",
+        "reflow",
+        "a11y"
+      ]
+    },
+    "Wrap": {
+      "owner": "UIR03-A",
+      "behaviorTests": [
+        "packages/ui/src/primitives/__tests__/layout-core.test.tsx"
+      ],
+      "browserScenarios": [
+        "logical-flow-layout-certification"
+      ],
+      "requiredAxes": [
+        "layout",
+        "wrap",
+        "polymorphism",
+        "responsive",
+        "reflow",
+        "a11y"
+      ]
+    }
+  }
+}

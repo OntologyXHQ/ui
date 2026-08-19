@@ -21,6 +21,10 @@ Protects repository and package ownership:
 - System UI may consume Components but not Primitives directly;
 - production source cannot depend on Studio or OXS/product internals;
 - G6 uses pinned `playwright-core` + `axe-core` and an installed system Chrome/Chromium; browser-downloading Playwright packages are not part of the repository contract.
+- the public theme-token registry must resolve to real CSS defaults, semantic emphasis tones keep separate fill/text/on-fill/soft/border roles, package CSS cannot bypass the token substrate with raw color literals outside `tokens.css`, and package/Studio semantic color references must resolve to a canonical token definition.
+- environment preferences and resolved runtime state stay distinct; responsive layout is container-first, device sniffing and viewport-size media-query adaptation are forbidden, CSS consumes resolved density/motion, and public box layout uses logical inline properties.
+- persistent safe area and transient host occlusion are separate explicit-unit logical inputs; Components that must avoid blocked regions consume their combined environment inset rather than abusing safe area for keyboard occlusion.
+- accepted Layout primitives use finite logical props and intrinsic native polymorphism; inline style/color serialization, physical directional spacing props, reverse/order APIs, and shared family demos masquerading as per-export certification are rejected by the layout gate.
 
 ### G1 — catalog acceptance
 
@@ -33,7 +37,7 @@ The generated catalog is source-derived and must be fresh. Every public visual e
 - `experimental` — intentionally unstable exploration;
 - `deprecated` — scheduled for removal.
 
-An `accepted` export must have complete usage/accessibility/RTL/touch/responsive guidance, documented public props, and a real render path through an example or explicit playground fixture. Old `stable` / `provisional` claims are forbidden.
+An `accepted` export must have complete usage/accessibility/RTL/touch/responsive guidance, documented public props, a real render path through an example or explicit playground fixture, and a `docs/quality/CERTIFICATIONS.json` record that binds its roadmap owner to concrete behavior-test files, named G6 scenarios, and required browser acceptance axes. Old `stable` / `provisional` claims are forbidden.
 
 The catalog gate is intentionally strict only for `accepted` exports. This is not a waiver system: the reset starts with zero accepted visual exports, and each later part promotes exports only after its complete acceptance matrix passes.
 
@@ -76,21 +80,23 @@ G6 is production-artifact-backed. The command first runs G5, starts the built St
 
 The current harness proves the evidence system itself across real browser journeys:
 
-- deterministic Studio deep links and environment projection;
+- deterministic Studio entry/tab/example deep links and environment projection;
+- the Foundations semantic-token substrate resolves across dark/light/custom themes without ornamental root imagery;
 - serious/critical `axe-core` violations are blocking;
 - keyboard sequential navigation, visible focus, roving focus and activation;
-- modal isolation, Escape dismissal and focus restoration;
+- modal isolation, Escape dismissal and focus restoration, including focus-before-isolation for modal Popovers;
 - pointer cancellation and normal pointer activation;
 - coarse-pointer/touch long press through Chrome's touch input pipeline, with deterministic example deep links, a non-collapsed mobile documentation viewport, explicit target centering across nested scroll containers, and hit-test ownership before dispatch;
-- RTL/LTR, theme, density, reduced-motion, viewport/container and safe-area inputs;
+- RTL/LTR, theme/color-scheme, density, reduced-motion, modality/pointer precision and preference-vs-resolved environment projection;
+- measured container adaptive bands plus separate safe-area, transient occlusion and combined environment-inset inputs;
 - narrow/reflow geometry without screenshot/pixel assertions;
-- browser console/page errors are blocking in product journeys.
+- browser console/page errors are blocking in product journeys; focused content inside `aria-hidden`/`inert` ancestry is checked as a direct DOM-semantic invariant rather than relying on browser warning transport.
 
 G6 writes machine-readable diagnostic evidence to `artifacts/browser-acceptance/latest.json` plus a timestamped sibling. Evidence contains the source fingerprint, Git HEAD when available, browser/version, axes, scenario results and axe summaries. Screenshots are not acceptance evidence and pixel snapshots are not used.
 
-The harness also executes intentionally broken or adversarial ephemeral browser fixtures. Those self-tests must demonstrate that axe blockers, invisible focus, global horizontal overflow, environment drift, missing deterministic routes, a missing public UI stylesheet, a collapsed mobile documentation viewport, release-only long press, nested-scroll touch targeting, and targets initially covered by sticky/floating UI are actually rejected or correctly repositioned and observed. Broken self-test fixtures never count as component evidence.
+The harness also executes intentionally broken or adversarial ephemeral browser fixtures. Those self-tests must demonstrate that axe blockers, focused-content `aria-hidden`/`inert` isolation invariants, invisible focus, global horizontal overflow, environment drift, missing deterministic routes, a missing public UI stylesheet, a collapsed mobile documentation viewport, release-only long press, nested-scroll touch targeting, and targets initially covered by sticky/floating UI are actually rejected or correctly repositioned and observed. Broken self-test fixtures never count as component evidence.
 
-**Component promotion rule:** generic harness journeys do not certify the candidate components they happen to exercise. Every future `accepted` export must be named by a component-specific G6 scenario. `pnpm verify` fails if an accepted export has no such evidence owner.
+**Component promotion rule:** generic harness journeys do not certify the candidate components they happen to exercise. Every `accepted` export must have a machine-readable certification record. G1 verifies the declared behavior-test owners exist; G6 verifies every declared browser scenario exists, explicitly claims the export, passes, and collectively covers all required axes. Stale certification records for non-accepted exports are forbidden.
 
 ### G7 — release
 
@@ -121,7 +127,7 @@ Focused gates may be rerun while debugging, but a part cannot close on a focused
 8. **No release from source-only confidence.** Packed-artifact consumer proof is mandatory.
 9. **Fix forward.** Failed validation preserves the working state for diagnosis; automated rollback is not part of the delivery flow.
 10. **One definition of done.** A task is complete only when its code, tests, docs, Studio representation, applicable browser axes, and package boundary agree.
-11. **No browser-evidence laundering.** Harness smoke touching a component does not certify that component; promotion requires an explicit component-owned scenario.
+11. **No browser-evidence laundering.** Harness smoke touching a component does not certify that component; promotion requires a certification record binding behavior tests, explicit component-owned G6 scenarios and required axes.
 12. **No downloaded-browser assumption.** Local/CI acceptance must run against an installed Chrome/Chromium or fail with an actionable browser-path requirement.
 
 - G6 semantic contrast contract: readable tertiary/supporting text must satisfy WCAG AA in supported themes.

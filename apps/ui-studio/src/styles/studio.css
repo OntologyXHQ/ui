@@ -639,7 +639,7 @@ body { overflow: hidden; background: #091019; color-scheme: dark light; }
 .ui-data-hero {
   background:
     radial-gradient(circle at 88% 18%, color-mix(in srgb, var(--oxs-color-success) 16%, transparent), transparent 32%),
-    radial-gradient(circle at 10% 84%, var(--oxs-color-accent-glow), transparent 38%),
+    radial-gradient(circle at 10% 84%, var(--oxs-color-accent-soft), transparent 38%),
     var(--oxs-color-surface-subtle);
 }
 
@@ -954,7 +954,7 @@ body { overflow: hidden; background: #091019; color-scheme: dark light; }
 .ui-studio-appbar {
   min-width: 0;
   border-radius: var(--oxs-radius-lg);
-  background: var(--oxs-color-surface-raised);
+  background: var(--oxs-color-surface-strong);
   border: var(--oxs-border-hairline) solid var(--oxs-color-border-subtle);
 }
 
@@ -1078,7 +1078,7 @@ body { overflow: hidden; background: #091019; color-scheme: dark light; }
   position: sticky;
   inset-block-start: 0;
   z-index: 1;
-  background: var(--oxs-color-surface-raised);
+  background: var(--oxs-color-surface-strong);
   color: var(--oxs-color-text-secondary);
 }
 

@@ -3,6 +3,7 @@ import type {
   UiDensity,
   UiDirection,
   UiModalityPreference,
+  UiOcclusionInsets,
   UiPointerPrecisionPreference,
   UiSafeAreaInsets,
   UiTheme,
@@ -12,7 +13,7 @@ import { UiRoot } from '@ontologyx/ui';
 import { createContext, type CSSProperties, type PropsWithChildren, useContext, useMemo, useState } from 'react';
 
 export type StudioViewport = 'fit' | 'phone' | 'tablet' | 'desktop' | 'ultrawide';
-export type StudioSafeAreaPreset = 'none' | 'notch' | 'gesture' | 'keyboard';
+export type StudioEnvironmentInsetPreset = 'none' | 'notch' | 'gesture' | 'keyboard';
 export type StudioContainerPreset = 'auto' | 'compact' | 'content' | 'wide';
 
 export type StudioEnvironmentState = {
@@ -24,7 +25,7 @@ export type StudioEnvironmentState = {
   pointerPrecision: UiPointerPrecisionPreference;
   viewport: StudioViewport;
   container: StudioContainerPreset;
-  safeAreaPreset: StudioSafeAreaPreset;
+  insetPreset: StudioEnvironmentInsetPreset;
 };
 
 type StudioEnvironmentContextValue = {
@@ -49,17 +50,30 @@ const containerWidths: Record<StudioContainerPreset, string> = {
   wide: '104rem',
 };
 
-const safeAreaPresets: Record<StudioSafeAreaPreset, UiSafeAreaInsets> = {
-  none: { blockStart: 0, inlineEnd: 0, blockEnd: 0, inlineStart: 0 },
-  notch: { blockStart: 32, inlineEnd: 12, blockEnd: 12, inlineStart: 12 },
-  gesture: { blockStart: 0, inlineEnd: 0, blockEnd: 28, inlineStart: 0 },
-  keyboard: { blockStart: 0, inlineEnd: 0, blockEnd: 280, inlineStart: 0 },
+type StudioEnvironmentInsets = {
+  safeArea?: UiSafeAreaInsets;
+  occlusion?: UiOcclusionInsets;
+};
+
+const environmentInsetPresets: Record<StudioEnvironmentInsetPreset, StudioEnvironmentInsets> = {
+  none: {
+    safeArea: { blockStart: '0px', inlineEnd: '0px', blockEnd: '0px', inlineStart: '0px' },
+    occlusion: { blockStart: '0px', inlineEnd: '0px', blockEnd: '0px', inlineStart: '0px' },
+  },
+  notch: { safeArea: { blockStart: '32px', inlineEnd: '12px', blockEnd: '12px', inlineStart: '12px' } },
+  gesture: { safeArea: { blockStart: '0px', inlineEnd: '0px', blockEnd: '28px', inlineStart: '0px' } },
+  keyboard: { occlusion: { blockStart: '0px', inlineEnd: '0px', blockEnd: '280px', inlineStart: '0px' } },
 };
 
 const customTokens: UiTokenOverrides = {
   'color-accent': '#7c8cff',
   'color-accent-hover': '#94a0ff',
   'color-accent-pressed': '#6676ed',
+  'color-accent-text': '#aeb7ff',
+  'color-on-accent': '#090d18',
+  'color-accent-soft': 'rgba(124, 140, 255, 0.16)',
+  'color-accent-border': 'rgba(174, 183, 255, 0.5)',
+  'color-focus': '#aeb7ff',
   'color-canvas': '#0a0d16',
   'color-canvas-raised': '#121827',
   'color-surface': '#111827',
@@ -80,7 +94,7 @@ function initialEnvironment(): StudioEnvironmentState {
     pointerPrecision: pick('pointer', ['auto', 'fine', 'coarse'] as const, 'auto'),
     viewport: pick('viewport', ['fit', 'phone', 'tablet', 'desktop', 'ultrawide'] as const, 'fit'),
     container: pick('container', ['auto', 'compact', 'content', 'wide'] as const, 'auto'),
-    safeAreaPreset: pick('safe', ['none', 'notch', 'gesture', 'keyboard'] as const, 'none'),
+    insetPreset: pick('insets', ['none', 'notch', 'gesture', 'keyboard'] as const, 'none'),
   };
 }
 
@@ -92,13 +106,22 @@ export function StudioEnvironmentProvider({ children }: PropsWithChildren) {
       update: (key, next) => {
         setEnvironment((current) => ({ ...current, [key]: next }));
         const url = new URL(window.location.href);
-        const param = key === 'direction' ? 'dir' : key === 'pointerPrecision' ? 'pointer' : key === 'safeAreaPreset' ? 'safe' : key;
+        const param =
+          key === 'direction'
+            ? 'dir'
+            : key === 'pointerPrecision'
+              ? 'pointer'
+              : key === 'insetPreset'
+                ? 'insets'
+                : key;
         url.searchParams.set(param, String(next));
         window.history.replaceState(null, '', url);
       },
     }),
     [environment],
   );
+
+  const insets = environmentInsetPresets[environment.insetPreset];
 
   return (
     <StudioEnvironmentContext.Provider value={value}>
@@ -119,7 +142,8 @@ export function StudioEnvironmentProvider({ children }: PropsWithChildren) {
             direction={environment.direction}
             modality={environment.modality}
             pointerPrecision={environment.pointerPrecision}
-            safeArea={safeAreaPresets[environment.safeAreaPreset]}
+            safeArea={insets.safeArea}
+            occlusion={insets.occlusion}
             tokens={environment.theme === 'custom' ? customTokens : undefined}
             motion={environment.motion}
             className="ui-studio-root"

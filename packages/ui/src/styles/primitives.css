@@ -228,15 +228,166 @@
   border-radius: var(--oxs-radius-full);
 }
 
-.ui-box {
-  min-inline-size: 0;
-}
-
 .ui-stack,
 .ui-row,
 .ui-wrap {
   display: flex;
+}
+
+.ui-overflow-visible {
+  overflow: visible;
+}
+
+.ui-overflow-clip {
+  overflow: clip;
+}
+
+.ui-overflow-hidden {
+  overflow: hidden;
+}
+
+.ui-overflow-auto {
+  overflow: auto;
+}
+
+.ui-overflow-inline-visible {
+  overflow-inline: visible;
+}
+
+.ui-overflow-inline-clip {
+  overflow-inline: clip;
+}
+
+.ui-overflow-inline-hidden {
+  overflow-inline: hidden;
+}
+
+.ui-overflow-inline-auto {
+  overflow-inline: auto;
+}
+
+.ui-overflow-block-visible {
+  overflow-block: visible;
+}
+
+.ui-overflow-block-clip {
+  overflow-block: clip;
+}
+
+.ui-overflow-block-hidden {
+  overflow-block: hidden;
+}
+
+.ui-overflow-block-auto {
+  overflow-block: auto;
+}
+
+.ui-min-inline-zero {
   min-inline-size: 0;
+}
+
+.ui-min-inline-auto {
+  min-inline-size: auto;
+}
+
+.ui-min-block-zero {
+  min-block-size: 0;
+}
+
+.ui-min-block-auto {
+  min-block-size: auto;
+}
+
+.ui-flex-initial {
+  flex: 0 1 auto;
+}
+
+.ui-flex-none {
+  flex: 0 0 auto;
+}
+
+.ui-flex-auto {
+  flex: 1 1 auto;
+}
+
+.ui-flex-grow {
+  flex: 1 1 0%;
+}
+
+.ui-align-self-auto {
+  align-self: auto;
+}
+
+.ui-align-self-start {
+  align-self: flex-start;
+}
+
+.ui-align-self-center {
+  align-self: center;
+}
+
+.ui-align-self-end {
+  align-self: flex-end;
+}
+
+.ui-align-self-stretch {
+  align-self: stretch;
+}
+
+.ui-grid-span-auto {
+  grid-column: auto;
+}
+
+.ui-grid-span-full {
+  grid-column: 1 / -1;
+}
+
+.ui-grid-span-1 {
+  grid-column: span 1 / span 1;
+}
+
+.ui-grid-span-2 {
+  grid-column: span 2 / span 2;
+}
+
+.ui-grid-span-3 {
+  grid-column: span 3 / span 3;
+}
+
+.ui-grid-span-4 {
+  grid-column: span 4 / span 4;
+}
+
+.ui-grid-span-5 {
+  grid-column: span 5 / span 5;
+}
+
+.ui-grid-span-6 {
+  grid-column: span 6 / span 6;
+}
+
+.ui-grid-span-7 {
+  grid-column: span 7 / span 7;
+}
+
+.ui-grid-span-8 {
+  grid-column: span 8 / span 8;
+}
+
+.ui-grid-span-9 {
+  grid-column: span 9 / span 9;
+}
+
+.ui-grid-span-10 {
+  grid-column: span 10 / span 10;
+}
+
+.ui-grid-span-11 {
+  grid-column: span 11 / span 11;
+}
+
+.ui-grid-span-12 {
+  grid-column: span 12 / span 12;
 }
 
 .ui-stack {
@@ -322,6 +473,14 @@
 
 .ui-justify-between {
   justify-content: space-between;
+}
+
+.ui-justify-around {
+  justify-content: space-around;
+}
+
+.ui-justify-evenly {
+  justify-content: space-evenly;
 }
 
 .ui-grid {

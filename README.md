@@ -45,7 +45,7 @@ Production direction is `Foundations → Primitives → Components → System UI
 
 ## Active rebuild frontier
 
-The canonical plan is `docs/roadmap/UI_TASK_LIST.md`. `UIR00` reset completion truth and quality gates; `UIR01` now provides production-Studio browser acceptance on an installed Chrome/Chromium before any public visual export can be promoted from `candidate` to `accepted`. `UIR02` is the current Foundations reacceptance frontier. Native Wayland/compositor/IME implementations stay in OXS or another host consumer.
+The canonical plan is `docs/roadmap/UI_TASK_LIST.md`. `UIR00` reset completion truth and quality gates; `UIR01` now provides production-Studio browser acceptance on an installed Chrome/Chromium before any public visual export can be promoted from `candidate` to `accepted`. `UIR02` Foundations reacceptance is now closed: semantic tokens, environment semantics and `UiRoot` nesting/SSR/realm ownership are certified, making `UiRoot` the first post-reset `accepted` export. `UIR03` is active. UIR03-A has reaccepted `Box`, `Stack`, `Row`, and `Wrap` with typed polymorphism, finite logical layout escape hatches, dedicated Studio examples, behavior tests and component-owned G6 evidence. UIR03-B is next for `Grid`, `Container`, `Inset`, `SafeArea`, and `Spacer`. Native Wayland/compositor/IME implementations stay in OXS or another host consumer.
 
 ## Studio deployment
 

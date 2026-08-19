@@ -63,7 +63,10 @@ export const uiDocs = defineUiDocsGroup([
       preferredWidth: 'medium',
       fixture: { anchorRect: { top: 120, right: 260, bottom: 164, left: 120, width: 140, height: 44 }, ariaLabel: 'Preview overlay', open: true },
     },
-    examples: [{ id: 'preview', title: 'Anchored popover', component: 'PopoverPreviewExample' }],
+    examples: [
+      { id: 'preview', title: 'Anchored popover', component: 'PopoverPreviewExample' },
+      { id: 'modal-focus', title: 'Modal focus isolation', component: 'PopoverModalFocusExample' },
+    ],
   },
   {
     exportName: 'Menu', layer: 'components', category: 'Overlays', order: 70,
@@ -175,6 +178,29 @@ export function PopoverPreviewExample() {
     <>
       <Button ref={anchorRef} variant="soft" onClick={() => setOpen((value) => !value)}>Toggle popover</Button>
       <Popover open={open} onOpenChange={setOpen} anchorRef={anchorRef} ariaLabel="Preview popover"><Text>Anchored public Popover.</Text></Popover>
+    </>
+  );
+}
+
+export function PopoverModalFocusExample() {
+  const anchorRef = useRef<HTMLButtonElement>(null);
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button ref={anchorRef} variant="soft" onClick={() => setOpen(true)}>Open modal popover</Button>
+      <Popover
+        open={open}
+        onOpenChange={setOpen}
+        anchorRef={anchorRef}
+        ariaLabel="Modal popover example"
+        modal
+        autoFocus={false}
+      >
+        <Stack gap="xs">
+          <Text>Focus enters the modal surface before background isolation is applied.</Text>
+          <Button onClick={() => setOpen(false)}>Close</Button>
+        </Stack>
+      </Popover>
     </>
   );
 }

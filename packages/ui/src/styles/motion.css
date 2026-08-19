@@ -21,10 +21,3 @@
 .ui-root[data-oxs-motion='reduced'] .ui-shared-bounds {
   will-change: auto;
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .ui-root[data-oxs-motion='system'] .ui-motion-transition,
-  .ui-root[data-oxs-motion='system'] .ui-shared-bounds {
-    will-change: auto;
-  }
-}

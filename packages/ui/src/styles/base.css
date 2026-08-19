@@ -29,10 +29,7 @@
   height: 100%;
   overflow: hidden;
   isolation: isolate;
-  background:
-    radial-gradient(circle at 20% 10%, var(--oxs-color-accent-glow), transparent 30%),
-    radial-gradient(circle at 80% 75%, rgba(83, 222, 190, 0.1), transparent 32%),
-    var(--oxs-color-canvas);
+  background: var(--oxs-color-canvas);
   color: var(--oxs-color-text-primary);
 }
 
@@ -56,15 +53,6 @@
   --oxs-motion-slow: var(--oxs-motion-reduced);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ui-root[data-oxs-motion='system'] {
-    --oxs-motion-instant: var(--oxs-motion-reduced);
-    --oxs-motion-fast: var(--oxs-motion-reduced);
-    --oxs-motion-normal: var(--oxs-motion-reduced);
-    --oxs-motion-slow: var(--oxs-motion-reduced);
-  }
-}
-
 @media (forced-colors: active) {
   .ui-root {
     background: Canvas;
@@ -77,7 +65,7 @@
   }
 }
 
-/* UIP02: every UI environment is a container-first scope. */
+/* Every UI environment is a container-first scope; adaptive state derives from its measured inline size. */
 .ui-root {
   container-name: oxs-ui;
   container-type: inline-size;

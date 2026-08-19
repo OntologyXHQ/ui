@@ -40,6 +40,7 @@ Components are the primary developer-facing SDK. System UI is privileged composi
 ## Status legend
 
 - `DONE` — implemented and accepted under the new gate model.
+- `ACTIVE` — part is open; completed and pending slices are recorded underneath.
 - `NEXT` — immediate frontier.
 - `TODO` — planned but not started.
 - `BLOCKED` — cannot proceed until the named dependency is closed.
@@ -80,33 +81,74 @@ Acceptance: real production-Studio browser journeys emit source-bound G6 evidenc
 
 ---
 
-## UIR02 — Foundations from first principles — NEXT
+## UIR02 — Foundations from first principles — DONE
 
 Purpose: freeze the semantic substrate before visual APIs are redesigned.
 
-- `UI-0201` Audit and redesign semantic color/material/elevation/shape/spacing/typography tokens; remove ornamental or duplicate tokens.
+### UIR02-A — Semantic token architecture — DONE
+
+- `UI-0201` Audit and redesign semantic color/material/elevation/shape/spacing/typography tokens; remove ornamental or duplicate roles.
+  - public customization is a finite grouped semantic registry, not every internal CSS variable;
+  - emphasis tones have independent fill/text/on-fill/soft/border roles;
+  - token override values are explicit CSS strings rather than unit-guessing numbers;
+  - `UiRoot` no longer paints ornamental brand gradients;
+  - package CSS cannot bypass semantic colors with raw color literals outside `tokens.css`.
+
+### UIR02-B — Environment semantics — DONE
+
 - `UI-0202` Define scoped theme inheritance/customization with SSR-safe static CSS variables and typed token overrides.
+  - preference and resolved color-scheme state are distinct; system/custom resolution cannot silently disagree with native control color scheme.
 - `UI-0203` Define direction contract and logical-property policy; eliminate physical left/right assumptions from public styling.
+  - auto direction resolves from the enclosing/document direction; box layout uses logical properties while physical viewport geometry remains engine-owned.
 - `UI-0204` Define density, target-size and modality vocabulary without device sniffing.
+  - auto density resolves from pointer precision; coarse-pointer target floors stay independent of visual density; modality remains interaction state.
 - `UI-0205` Define viewport/container/adaptive semantics and centralize environment observation.
+  - every root is measured as a container; adaptive bands derive from inline size and media-query stores are isolated per Window realm.
 - `UI-0206` Define safe-area/occlusion contracts that accept host-neutral inputs.
+  - persistent safe area and transient occlusion are separate logical explicit-unit inputs; Components avoid their combined environment inset.
 - `UI-0207` Define reduced-motion/motion-preference behavior and semantic timing tokens.
+  - system motion resolves through the shared runtime; CSS consumes only resolved full/reduced state so timing and lifecycle cannot drift.
+
+### UIR02-C — UiRoot certification — DONE
+
 - `UI-0208` Reaccept `UiRoot` only after nested roots, theme scopes, direction, environment and SSR behavior pass G0..G6.
+  - nested roots are detected automatically; the public diagnostic `scope` prop was removed rather than preserved as a meaningless caller knob;
+  - nested roots inherit environment/token values and can override them without sharing portal/overlay/runtime ownership;
+  - media-query, modality, direction and resize observation resolve against the concrete owning Window/Document realm after mount;
+  - server render uses deterministic fallbacks and hydration may reconcile real system capabilities without a recoverable mismatch;
+  - accepted exports now require a machine-readable certification record that binds behavior-test ownership, named G6 scenarios and explicit acceptance axes;
+  - `UiRoot` is the first post-reset visual export promoted from `candidate` to `accepted`.
+
+Acceptance: dedicated behavior tests cover nested inheritance, independent portal hosts, SSR/hydration and multi-realm environment resolution; the production Studio G6 scenario proves nested modal ownership, focus restoration and accessibility from the public package. `UiRoot` remains accepted only while `docs/quality/CERTIFICATIONS.json`, G1, G3 and G6 agree.
 
 ---
 
-## UIR03 — Layout primitives redesign — TODO
+## UIR03 — Layout primitives redesign — ACTIVE
 
 Purpose: make layout APIs genuinely useful instead of thin class wrappers.
 
+### UIR03-A — Core structural flow — DONE
+
 - `UI-0301` Redesign `Box` polymorphism and native-prop typing; define the intentional styling/escape-hatch contract.
+  - `as` preserves intrinsic native prop typing while `style`/`color` are excluded from the Primitive escape hatch;
+  - finite logical boundary props cover overflow, min-size, flex-child participation, self-alignment and Grid span without arbitrary CSS serialization;
+  - `className` remains the explicit structural integration escape hatch and visual values stay token/prop-owned.
 - `UI-0302` Redesign `Stack`/`Row`/`Wrap` around typed semantic gap/alignment/distribution behavior.
+  - all three are polymorphic, use one logical flow vocabulary, add `around`/`evenly` distribution, and intentionally expose no reverse/order API that could diverge from accessibility order.
+- `UI-0306` Define overflow/min-size/flex-child behavior needed by real nested app layouts.
+  - core flow primitives share the same finite logical boundary contract; `minInlineSize=zero` is the safe default for nested flex/grid ownership.
+- `UI-0307` Give every primitive a dedicated Studio page/example; family-wide demos cannot masquerade as component examples.
+  - Box/Stack/Row/Wrap now have independent source-owned examples and G0 rejects shared certification examples.
+- `UI-0308` Promote only individually certified layout primitives to `accepted`.
+  - Box, Stack, Row and Wrap are accepted only through `layout-core.test.tsx`, machine-readable certification records and dedicated G6 layout journeys.
+
+### UIR03-B — Grid and spacing boundaries — NEXT
+
 - `UI-0303` Redesign `Grid` for real column/minmax/auto-fit/span use cases without turning props into arbitrary CSS serialization.
 - `UI-0304` Redesign `Container` for semantic max-width/readable/content/full-width composition.
 - `UI-0305` Redesign `Inset`/`Spacer` around logical spacing and axis semantics.
-- `UI-0306` Define overflow/min-size/flex-child behavior needed by real nested app layouts.
-- `UI-0307` Give every primitive a dedicated Studio page/example; family-wide demos cannot masquerade as component examples.
-- `UI-0308` Promote only individually certified layout primitives to `accepted`.
+- Complete `SafeArea` logical edge ownership against the UIR02 environment contract.
+- Give Grid/Container/Inset/SafeArea/Spacer independent examples, tests, G6 evidence and accepted certification before closing UIR03.
 
 ---
 

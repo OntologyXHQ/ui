@@ -9,9 +9,14 @@ export type UiObservedSize = {
 };
 
 type SizeListener = (size: UiObservedSize) => void;
+type RealmWindow = Window & typeof globalThis;
 
 const listeners = new WeakMap<Element, Set<SizeListener>>();
-let sharedResizeObserver: ResizeObserver | null = null;
+const resizeObservers = new WeakMap<Window, ResizeObserver>();
+
+function ownerWindow(element: Element): RealmWindow | null {
+  return element.ownerDocument.defaultView;
+}
 
 function readSize(element: Element): UiObservedSize {
   const rect = element.getBoundingClientRect();
@@ -23,10 +28,14 @@ function readSize(element: Element): UiObservedSize {
   };
 }
 
-function observer() {
-  if (typeof ResizeObserver === 'undefined') return null;
-  if (!sharedResizeObserver) {
-    sharedResizeObserver = new ResizeObserver((entries) => {
+function observerFor(element: Element) {
+  const realmWindow = ownerWindow(element);
+  const ResizeObserverConstructor = (realmWindow as (Window & typeof globalThis) | null)?.ResizeObserver;
+  if (!realmWindow || typeof ResizeObserverConstructor !== 'function') return null;
+
+  let observer = resizeObservers.get(realmWindow);
+  if (!observer) {
+    observer = new ResizeObserverConstructor((entries) => {
       for (const entry of entries) {
         const elementListeners = listeners.get(entry.target);
         if (!elementListeners?.size) continue;
@@ -42,8 +51,9 @@ function observer() {
         for (const listener of elementListeners) listener(size);
       }
     });
+    resizeObservers.set(realmWindow, observer);
   }
-  return sharedResizeObserver;
+  return observer;
 }
 
 export function observeElementSize(element: Element, listener: SizeListener) {
@@ -51,7 +61,7 @@ export function observeElementSize(element: Element, listener: SizeListener) {
   if (!elementListeners) {
     elementListeners = new Set();
     listeners.set(element, elementListeners);
-    observer()?.observe(element);
+    observerFor(element)?.observe(element);
   }
   elementListeners.add(listener);
   listener(readSize(element));
@@ -61,25 +71,33 @@ export function observeElementSize(element: Element, listener: SizeListener) {
     if (!current) return;
     current.delete(listener);
     if (!current.size) {
-      observer()?.unobserve(element);
+      observerFor(element)?.unobserve(element);
       listeners.delete(element);
     }
   };
 }
 
-export function observeElementGeometry(elements: readonly (Element | null | undefined)[], listener: () => void) {
+export function observeElementGeometry(
+  elements: readonly (Element | null | undefined)[],
+  listener: () => void,
+) {
   const live = elements.filter((element): element is Element => Boolean(element));
   const cleanups = live.map((element) => observeElementSize(element, listener));
-  if (typeof window !== 'undefined') {
-    window.addEventListener('resize', listener);
-    window.addEventListener('scroll', listener, true);
+  const windows = new Set<RealmWindow>();
+  for (const element of live) {
+    const realmWindow = ownerWindow(element);
+    if (realmWindow) windows.add(realmWindow);
+  }
+  for (const realmWindow of windows) {
+    realmWindow.addEventListener('resize', listener);
+    realmWindow.addEventListener('scroll', listener, true);
   }
   listener();
   return () => {
     for (const cleanup of cleanups) cleanup();
-    if (typeof window !== 'undefined') {
-      window.removeEventListener('resize', listener);
-      window.removeEventListener('scroll', listener, true);
+    for (const realmWindow of windows) {
+      realmWindow.removeEventListener('resize', listener);
+      realmWindow.removeEventListener('scroll', listener, true);
     }
   };
 }
@@ -135,42 +153,57 @@ type MediaQueryStore = {
   onChange: () => void;
 };
 
-const mediaQueryStores = new Map<string, MediaQueryStore>();
+// A UI package can render into multiple Window realms (Studio previews, iframes,
+// tests). Media-query state therefore belongs to the concrete Window, never to
+// one module-global query cache shared across documents.
+const mediaQueryStores = new WeakMap<Window, Map<string, MediaQueryStore>>();
 
-function mediaQueryStore(query: string) {
-  if (typeof matchMedia === 'undefined') return null;
-  let store = mediaQueryStores.get(query);
+function mediaQueryStore(query: string, realmWindow: Window | null | undefined) {
+  if (!realmWindow || typeof realmWindow.matchMedia !== 'function') return null;
+  let stores = mediaQueryStores.get(realmWindow);
+  if (!stores) {
+    stores = new Map();
+    mediaQueryStores.set(realmWindow, stores);
+  }
+  let store = stores.get(query);
   if (store) return store;
-  const media = matchMedia(query);
+  const media = realmWindow.matchMedia(query);
   store = {
     media,
     listeners: new Set(),
     onChange: () => {
-      const current = mediaQueryStores.get(query);
+      const current = mediaQueryStores.get(realmWindow)?.get(query);
       if (!current) return;
       for (const listener of current.listeners) listener();
     },
   };
   media.addEventListener('change', store.onChange);
-  mediaQueryStores.set(query, store);
+  stores.set(query, store);
   return store;
 }
 
-export function useMediaQuery(query: string, fallback = false) {
+export function useMediaQuery(
+  query: string,
+  fallback = false,
+  realmWindow: Window | null | undefined = typeof window === 'undefined' ? null : window,
+) {
   return useSyncExternalStore(
     (listener) => {
-      const store = mediaQueryStore(query);
+      const store = mediaQueryStore(query, realmWindow);
       if (!store) return () => {};
       store.listeners.add(listener);
       return () => {
         store.listeners.delete(listener);
-        if (!store.listeners.size && mediaQueryStores.get(query) === store) {
-          store.media.removeEventListener('change', store.onChange);
-          mediaQueryStores.delete(query);
+        if (!store.listeners.size && realmWindow) {
+          const stores = mediaQueryStores.get(realmWindow);
+          if (stores?.get(query) === store) {
+            store.media.removeEventListener('change', store.onChange);
+            stores.delete(query);
+          }
         }
       };
     },
-    () => mediaQueryStore(query)?.media.matches ?? fallback,
+    () => mediaQueryStore(query, realmWindow)?.media.matches ?? fallback,
     () => fallback,
   );
 }

@@ -41,11 +41,20 @@ export function useOverlayLifecycle({
 
     const layer = layerRef?.current ?? surfaceRef.current;
     const restoreTarget = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const surface = surfaceRef.current;
+
+    // Modal isolation must never hide the currently focused background node from
+    // assistive technology. Move focus into the committed overlay surface before
+    // the coordinator applies inert + aria-hidden to sibling boundaries.
+    if (modal && surface && !surface.contains(document.activeElement)) {
+      if (autoFocus) focusFirstInteractive(surface);
+      else surface.focus({ preventScroll: true });
+    }
+
     setDepth(coordinator.register({ id, layer, modal, lockScroll, restoreFocus: restoreTarget }));
 
-    const surface = surfaceRef.current;
     const focusFrame =
-      autoFocus && surface
+      !modal && autoFocus && surface
         ? requestAnimationFrame(() => {
             if (coordinator.isEventTopMost(id)) focusFirstInteractive(surfaceRef.current);
           })

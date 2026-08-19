@@ -19,6 +19,8 @@ export type MotionRuntimeProviderProps = PropsWithChildren<{
   preference?: MotionPreference;
   targetFrameRate?: FrameRateTarget;
   instrumentPerformance?: boolean;
+  /** Internal owner Window used for system motion preference resolution. */
+  realmWindow?: Window | null;
 }>;
 
 const MotionRuntimeContext = createContext<MotionRuntime | null>(null);
@@ -28,8 +30,9 @@ export function MotionRuntimeProvider({
   preference = 'system',
   targetFrameRate = 60,
   instrumentPerformance = false,
+  realmWindow,
 }: MotionRuntimeProviderProps) {
-  const resolvedPreference = useResolvedMotionPreference(preference);
+  const resolvedPreference = useResolvedMotionPreference(preference, realmWindow);
 
   const runtime = useMemo<MotionRuntime>(() => {
     const clock = new MotionClock(targetFrameRate);
@@ -95,8 +98,9 @@ export function useFramePerformanceSnapshot() {
 
 function useResolvedMotionPreference(
   preference: MotionPreference,
+  realmWindow: Window | null | undefined,
 ): Exclude<MotionPreference, 'system'> {
-  const systemReduced = useMediaQuery('(prefers-reduced-motion: reduce)');
+  const systemReduced = useMediaQuery('(prefers-reduced-motion: reduce)', false, realmWindow);
 
   if (preference === 'reduced') return 'reduced';
   if (preference === 'full') return 'full';

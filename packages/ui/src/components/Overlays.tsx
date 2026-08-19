@@ -277,6 +277,7 @@ export function Popover({
       role={role}
       aria-label={ariaLabel}
       aria-modal={modal || undefined}
+      tabIndex={modal ? -1 : undefined}
       data-placement={position.placement}
       data-ready={position.ready}
       data-oxs-overlay-depth={overlay.depth}
