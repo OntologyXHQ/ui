@@ -513,6 +513,321 @@ export const browserScenarios = [
   ),
 
   scenario(
+    'grid-track-strategy-certification',
+    ['layout', 'grid', 'tracks', 'auto-fit', 'minmax', 'grid-span', 'responsive', 'polymorphism', 'a11y'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 1500, height: 900 }, colorScheme: 'dark' });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        await gotoCatalog(page, baseUrl, {
+          entry: 'Grid',
+          tab: 'examples',
+          example: 'track-strategies',
+          dir: 'ltr',
+          theme: 'dark',
+          viewport: 'phone',
+          container: 'compact',
+        });
+        const studioGeometry = await page.locator('.ui-studio-viewport').evaluate((viewport) => {
+          const rect = (selector) => {
+            const element = viewport.querySelector(selector);
+            if (!(element instanceof HTMLElement)) return null;
+            const box = element.getBoundingClientRect();
+            return { width: box.width, height: box.height };
+          };
+          const own = viewport.getBoundingClientRect();
+          return {
+            viewport: { width: own.width, height: own.height },
+            shell: rect('.ui-studio-shell'),
+            workspace: rect('.ui-studio-shell__workspace'),
+            exampleCanvas: rect('.ui-catalog-example__canvas'),
+          };
+        });
+        assert.ok(
+          studioGeometry.viewport.width >= 380 && studioGeometry.viewport.width <= 400,
+          `Studio phone preset did not resolve near 390px (${JSON.stringify(studioGeometry)}).`,
+        );
+        assert.ok(
+          (studioGeometry.workspace?.width ?? 0) > 200 && (studioGeometry.exampleCanvas?.width ?? 0) > 100,
+          `Studio simulated viewport collapsed the active example before Grid layout could be certified: ${JSON.stringify(studioGeometry)}`,
+        );
+        const intrinsic = page.getByRole('region', { name: 'Certified intrinsic Grid' });
+        await intrinsic.waitFor({ state: 'visible' });
+        const readIntrinsicState = (locator) => locator.evaluate((element) => {
+          const style = getComputedStyle(element);
+          const columns = style.gridTemplateColumns.split(/\s+/).filter(Boolean);
+          return {
+            tagName: element.tagName,
+            display: style.display,
+            columns,
+            minInlineSize: style.minInlineSize,
+          };
+        });
+        const phoneIntrinsicState = await readIntrinsicState(intrinsic);
+        assert.equal(phoneIntrinsicState.tagName, 'SECTION', 'Grid polymorphism did not preserve semantic section output.');
+        assert.equal(phoneIntrinsicState.display, 'grid', 'Grid did not reach browser Grid layout.');
+        assert.ok(phoneIntrinsicState.columns.length >= 1, 'auto-fit Grid did not form an intrinsic track in the compact container.');
+        assert.equal(phoneIntrinsicState.minInlineSize, '0px', 'Grid did not preserve nested-layout min-inline-size safety.');
+
+        const fixed = page.getByRole('region', { name: 'Certified fixed Grid' });
+        const fixedState = await fixed.evaluate((element) => ({
+          columns: getComputedStyle(element).gridTemplateColumns.split(/\s+/).filter(Boolean).length,
+          children: [...element.children].map((child) => child.textContent?.replace(/\s+/g, ' ').trim()),
+        }));
+        assert.equal(fixedState.columns, 4, 'Grid columns={4} did not produce exactly four finite tracks.');
+        assert.deepEqual(fixedState.children, ['Span 2', 'Peer A', 'Peer B'], 'Grid visual contract must preserve DOM/content order.');
+        const span = await page.getByLabel('Two-column Grid item').evaluate((element) => getComputedStyle(element).gridColumnEnd);
+        assert.match(span, /span\s+2/, 'Box gridSpan={2} did not participate in the fixed Grid track model.');
+        await assertNoGlobalHorizontalOverflow(page, 'Grid compact track strategies');
+
+        await gotoCatalog(page, baseUrl, {
+          entry: 'Grid',
+          tab: 'examples',
+          example: 'track-strategies',
+          dir: 'ltr',
+          theme: 'dark',
+          viewport: 'desktop',
+          container: 'wide',
+        });
+        const wideIntrinsic = page.getByRole('region', { name: 'Certified intrinsic Grid' });
+        await wideIntrinsic.waitFor({ state: 'visible' });
+        const wideIntrinsicState = await readIntrinsicState(wideIntrinsic);
+        assert.ok(
+          wideIntrinsicState.columns.length > phoneIntrinsicState.columns.length,
+          `auto-fit Grid did not add tracks when its containing space grew (compact=${phoneIntrinsicState.columns.length}, wide=${wideIntrinsicState.columns.length}).`,
+        );
+        await assertNoGlobalHorizontalOverflow(page, 'Grid wide track strategies');
+        const axe = await runAxe(page, 'Grid track strategy certification');
+        diagnostics.assertClean('Grid track strategy certification');
+        return {
+          axe,
+          compactIntrinsicTracks: phoneIntrinsicState.columns.length,
+          wideIntrinsicTracks: wideIntrinsicState.columns.length,
+          fixedTracks: fixedState.columns,
+          span,
+        };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['Grid'] },
+  ),
+
+  scenario(
+    'container-semantic-width-certification',
+    ['layout', 'container', 'semantic-width', 'readable', 'responsive', 'polymorphism', 'a11y'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 1720, height: 900 }, colorScheme: 'light' });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        await gotoCatalog(page, baseUrl, {
+          entry: 'Container',
+          tab: 'examples',
+          example: 'semantic-widths',
+          theme: 'light',
+          dir: 'ltr',
+          viewport: 'ultrawide',
+          container: 'wide',
+        });
+        const readable = page.getByRole('region', { name: 'Certified readable Container' });
+        const full = page.getByRole('region', { name: 'Certified full Container' });
+        await readable.waitFor({ state: 'visible' });
+        const geometry = await Promise.all([readable, full].map((locator) => locator.evaluate((element) => {
+          const style = getComputedStyle(element);
+          const rect = element.getBoundingClientRect();
+          return {
+            tagName: element.tagName,
+            width: rect.width,
+            maxInlineSize: style.maxInlineSize,
+            marginInlineStart: style.marginInlineStart,
+            marginInlineEnd: style.marginInlineEnd,
+          };
+        })));
+        assert.equal(geometry[0].tagName, 'SECTION', 'Container polymorphism did not preserve section semantics.');
+        assert.equal(geometry[0].maxInlineSize, '704px', 'Container width="readable" is not backed by the 44rem semantic token.');
+        assert.ok(geometry[1].width > geometry[0].width + 80, 'Full Container did not expand beyond the readable semantic tier.');
+        assert.ok(Number.parseFloat(geometry[0].marginInlineStart) > 0, 'Readable Container was not centered on the inline axis.');
+        assert.ok(Number.parseFloat(geometry[0].marginInlineEnd) > 0, 'Readable Container did not retain symmetric inline centering.');
+        await assertNoGlobalHorizontalOverflow(page, 'Container semantic widths');
+        const axe = await runAxe(page, 'Container semantic width certification');
+        diagnostics.assertClean('Container semantic width certification');
+        return { axe, readable: geometry[0], full: geometry[1] };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['Container'] },
+  ),
+
+  scenario(
+    'inset-logical-spacing-certification',
+    ['layout', 'inset', 'logical-spacing', 'precedence', 'rtl', 'polymorphism', 'a11y'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 900, height: 760 }, colorScheme: 'dark' });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        await gotoCatalog(page, baseUrl, {
+          entry: 'Inset',
+          tab: 'examples',
+          example: 'logical-spacing',
+          theme: 'dark',
+          dir: 'rtl',
+          viewport: 'fit',
+          container: 'compact',
+        });
+        const inset = page.getByRole('region', { name: 'Certified logical Inset' });
+        await inset.waitFor({ state: 'visible' });
+        const state = await inset.evaluate((element) => {
+          const style = getComputedStyle(element);
+          return {
+            tagName: element.tagName,
+            direction: style.direction,
+            inlineStart: style.paddingInlineStart,
+            inlineEnd: style.paddingInlineEnd,
+            blockStart: style.paddingBlockStart,
+            blockEnd: style.paddingBlockEnd,
+            physicalLeft: style.paddingLeft,
+            physicalRight: style.paddingRight,
+          };
+        });
+        assert.equal(state.tagName, 'SECTION', 'Inset polymorphism did not preserve section semantics.');
+        assert.equal(state.direction, 'rtl', 'Inset did not inherit the resolved RTL direction.');
+        assert.deepEqual(
+          { inlineStart: state.inlineStart, inlineEnd: state.inlineEnd, blockStart: state.blockStart, blockEnd: state.blockEnd },
+          { inlineStart: '48px', inlineEnd: '24px', blockStart: '8px', blockEnd: '0px' },
+          'Inset all → axis → edge precedence did not resolve to the expected token values.',
+        );
+        assert.equal(state.physicalRight, '48px', 'RTL logical inline-start did not map to the physical right edge in browser layout.');
+        assert.equal(state.physicalLeft, '24px', 'RTL logical inline-end did not map to the physical left edge in browser layout.');
+        const axe = await runAxe(page, 'Inset logical spacing certification');
+        diagnostics.assertClean('Inset logical spacing certification');
+        return { axe, state };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['Inset'] },
+  ),
+
+  scenario(
+    'safe-area-logical-edge-certification',
+    ['layout', 'safe-area', 'logical-edges', 'persistent-insets', 'occlusion-isolation', 'rtl', 'a11y'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 900, height: 760 }, colorScheme: 'dark' });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        await gotoCatalog(page, baseUrl, {
+          entry: 'SafeArea',
+          tab: 'examples',
+          example: 'logical-edges',
+          theme: 'dark',
+          dir: 'rtl',
+          insets: 'notch',
+          viewport: 'fit',
+          container: 'compact',
+        });
+        const safeArea = page.getByRole('region', { name: 'Certified SafeArea edges' });
+        await safeArea.waitFor({ state: 'visible' });
+        const notch = await safeArea.evaluate((element) => {
+          const style = getComputedStyle(element);
+          return {
+            direction: style.direction,
+            blockStart: style.paddingBlockStart,
+            inlineEnd: style.paddingInlineEnd,
+            blockEnd: style.paddingBlockEnd,
+            inlineStart: style.paddingInlineStart,
+          };
+        });
+        assert.deepEqual(
+          notch,
+          { direction: 'rtl', blockStart: '0px', inlineEnd: '0px', blockEnd: '12px', inlineStart: '12px' },
+          'SafeArea consumed edges outside its explicit logical ownership set.',
+        );
+
+        await gotoCatalog(page, baseUrl, {
+          entry: 'SafeArea',
+          tab: 'examples',
+          example: 'logical-edges',
+          theme: 'dark',
+          dir: 'rtl',
+          insets: 'keyboard',
+          viewport: 'fit',
+          container: 'compact',
+        });
+        const keyboardSafeArea = page.getByRole('region', { name: 'Certified SafeArea edges' });
+        const keyboard = await keyboardSafeArea.evaluate((element) => {
+          const root = element.closest('.ui-root');
+          const style = getComputedStyle(element);
+          const rootStyle = root ? getComputedStyle(root) : null;
+          return {
+            blockEnd: style.paddingBlockEnd,
+            safeBlockEnd: rootStyle?.getPropertyValue('--oxs-safe-block-end').trim() ?? null,
+            occlusionBlockEnd: rootStyle?.getPropertyValue('--oxs-occlusion-block-end').trim() ?? null,
+          };
+        });
+        assert.equal(keyboard.safeBlockEnd, '0px', 'Keyboard preset unexpectedly changed the persistent safe-area input.');
+        assert.equal(keyboard.occlusionBlockEnd, '280px', 'Keyboard preset did not project transient occlusion.');
+        assert.equal(keyboard.blockEnd, '0px', 'SafeArea incorrectly consumed transient keyboard occlusion.');
+        const axe = await runAxe(page, 'SafeArea logical edge certification');
+        diagnostics.assertClean('SafeArea logical edge certification');
+        return { axe, notch, keyboard };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['SafeArea'] },
+  ),
+
+  scenario(
+    'spacer-logical-axis-certification',
+    ['layout', 'spacer', 'logical-axis', 'decorative', 'a11y'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 900, height: 760 }, colorScheme: 'light' });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        await gotoCatalog(page, baseUrl, {
+          entry: 'Spacer',
+          tab: 'examples',
+          example: 'logical-axis',
+          theme: 'light',
+          dir: 'ltr',
+          viewport: 'fit',
+          container: 'compact',
+        });
+        const inlineSpacer = page.locator('.ui-doc-spacer-inline');
+        const blockSpacer = page.locator('.ui-doc-spacer-block');
+        await inlineSpacer.waitFor({ state: 'attached' });
+        const inline = await inlineSpacer.evaluate((element) => {
+          const style = getComputedStyle(element);
+          return {
+            inlineSize: style.inlineSize,
+            blockSize: style.blockSize,
+            ariaHidden: element.getAttribute('aria-hidden'),
+            tabIndex: element.tabIndex,
+          };
+        });
+        const block = await blockSpacer.evaluate((element) => {
+          const style = getComputedStyle(element);
+          return { inlineSize: style.inlineSize, blockSize: style.blockSize };
+        });
+        assert.deepEqual(inline, { inlineSize: '48px', blockSize: '0px', ariaHidden: 'true', tabIndex: -1 }, 'Inline Spacer geometry/accessibility invariant failed.');
+        assert.deepEqual(block, { inlineSize: '0px', blockSize: '24px' }, 'Block Spacer geometry invariant failed.');
+        const axe = await runAxe(page, 'Spacer logical axis certification');
+        diagnostics.assertClean('Spacer logical axis certification');
+        return { axe, inline, block };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['Spacer'] },
+  ),
+
+  scenario(
     'pointer-cancellation-and-activation',
     ['pointer', 'cancellation', 'activation'],
     async ({ browser, baseUrl }) => {

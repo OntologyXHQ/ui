@@ -18,7 +18,7 @@ export const uiDocs = defineUiDocsGroup([
 export function SurfaceMaterialsExample() {
   return (
     <Stack gap="md">
-      <Grid min="tile" gap="sm">
+      <Grid columns="auto-fit" minColumn="tile" gap="sm">
         {(['clear', 'subtle', 'glass', 'solid'] as const).map((material) => (
           <Surface key={material} material={material} elevation={material === 'clear' ? 0 : 1} radius="lg" className="ui-doc-example-surface">
             <Text>{material}</Text>

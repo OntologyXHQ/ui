@@ -303,7 +303,7 @@ export function CatalogPlayground({ entry }: { entry: UiCatalogEntry }) {
 
   return (
     <Stack gap="xl">
-      <Grid min="wide" gap="lg" className="ui-studio-playground">
+      <Grid columns="auto-fit" minColumn="wide" gap="lg" className="ui-studio-playground">
         <Surface material="subtle" radius="lg" className="ui-studio-playground__canvas">
           <Stack gap="md">
             <Row justify="between" align="center" gap="sm">
@@ -339,7 +339,7 @@ export function CatalogPlayground({ entry }: { entry: UiCatalogEntry }) {
             Every cell renders the real public export. Controlled states are materialized directly; hover, pressed and focus remain live interaction targets.
           </Text>
         </Stack>
-        <Grid min="card" gap="md" className="ui-studio-state-matrix">
+        <Grid columns="auto-fit" minColumn="card" gap="md" className="ui-studio-state-matrix">
           {states.map((state) => (
             <Surface
               key={state}

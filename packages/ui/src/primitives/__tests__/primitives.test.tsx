@@ -16,7 +16,7 @@ describe('Primitive layer contract', () => {
     );
     expect(screen.getByRole('region', { name: 'Primitive scope' })).toBeInTheDocument();
     expect(screen.getByText('const x = 1').tagName).toBe('CODE');
-    expect(screen.getByTestId('safe')).toHaveClass('ui-safe-area--inline');
+    expect(screen.getByTestId('safe')).toHaveClass('ui-safe-area-edge-inline-start', 'ui-safe-area-edge-inline-end');
     expect(screen.getByTestId('divider')).toHaveAttribute('role', 'separator');
   });
 

@@ -117,6 +117,7 @@
   --oxs-density-scale: 1;
   --oxs-layout-gutter: clamp(0.75rem, 2.2vw, 1.5rem);
   --oxs-layout-gap: clamp(0.625rem, 1.4vw, 1.125rem);
+  --oxs-layout-readable: 44rem;
   --oxs-layout-content: 70rem;
   --oxs-layout-wide: 88rem;
   --oxs-grid-tile-min: 7.25rem;

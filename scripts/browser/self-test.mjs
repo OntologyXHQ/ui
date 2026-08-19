@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {
+  assertActiveCatalogDeepTarget,
   assertEnvironment,
   assertNoFocusedIsolationConflict,
   assertMinimumBlockSize,
@@ -113,6 +114,36 @@ export async function runHarnessSelfTests(browser) {
       results.push(await expectFailure('deterministic-route-detector', async () => {
         await missing.waitFor({ state: 'visible', timeout: 150 });
       }, /Timeout/));
+    } finally {
+      await context.close();
+    }
+  }
+
+  {
+    const context = await browser.newContext({ viewport: { width: 800, height: 600 } });
+    const page = await context.newPage();
+    try {
+      await page.setContent('<div role="tabpanel"><section id="deep-target" data-active="true" style="width:0;height:0"></section></div>');
+      const target = page.locator('#deep-target');
+      const state = await assertActiveCatalogDeepTarget(target, 'zero-box deep-link fixture');
+      assert.equal(state.active, 'true');
+      assert.equal(state.panelHidden, false);
+      results.push({ id: 'deep-link-zero-box-activation', active: state.active });
+    } finally {
+      await context.close();
+    }
+  }
+
+  {
+    const context = await browser.newContext({ viewport: { width: 800, height: 600 } });
+    const page = await context.newPage();
+    try {
+      await page.setContent('<div role="tabpanel" hidden><section id="hidden-deep-target" data-active="true"></section></div>');
+      results.push(await expectFailure(
+        'deep-link-hidden-panel-detector',
+        () => assertActiveCatalogDeepTarget(page.locator('#hidden-deep-target'), 'hidden deep-link fixture'),
+        /hidden tab panel/,
+      ));
     } finally {
       await context.close();
     }
@@ -282,6 +313,6 @@ export async function runHarnessSelfTests(browser) {
     }
   }
 
-  assert.equal(results.length, 13, 'Browser harness self-test matrix is incomplete.');
+  assert.equal(results.length, 15, 'Browser harness self-test matrix is incomplete.');
   return results;
 }

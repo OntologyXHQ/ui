@@ -51,7 +51,7 @@ function coverage(entry: UiCatalogEntry) {
 
 function GuidanceGrid({ entry }: { entry: UiCatalogEntry }) {
   return (
-    <Grid min="wide" gap="md" className="ui-studio-guidance-grid">
+    <Grid columns="auto-fit" minColumn="wide" gap="md" className="ui-studio-guidance-grid">
       {[
         ['Accessibility', entry.accessibility],
         ['RTL', entry.rtl],

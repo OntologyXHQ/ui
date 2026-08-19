@@ -287,6 +287,20 @@ export function attachRuntimeDiagnostics(page) {
   };
 }
 
+export async function assertActiveCatalogDeepTarget(target, label = 'Studio deep link') {
+  await target.waitFor({ state: 'attached' });
+  const state = await target.evaluate((element) => {
+    const panel = element.closest('[role="tabpanel"]');
+    return {
+      active: element.getAttribute('data-active'),
+      panelHidden: panel instanceof HTMLElement ? panel.hidden : null,
+    };
+  });
+  assert.equal(state.active, 'true', `${label} was attached but not marked active.`);
+  assert.notEqual(state.panelHidden, true, `${label} remained inside a hidden tab panel.`);
+  return state;
+}
+
 export async function gotoCatalog(page, baseUrl, options = {}) {
   const url = routeUrl(baseUrl, options);
   await page.goto(url, { waitUntil: 'networkidle' });
@@ -300,8 +314,7 @@ export async function gotoCatalog(page, baseUrl, options = {}) {
   if (options.example) {
     assert.equal(route.get('example'), options.example, 'Studio route did not preserve the requested example.');
     const requested = page.locator(`#example-${options.example}`);
-    await requested.waitFor({ state: 'visible' });
-    assert.equal(await requested.getAttribute('data-active'), 'true', 'Studio did not activate the requested example deep link.');
+    await assertActiveCatalogDeepTarget(requested, `Studio example deep link ${options.example}`);
   }
   if (options.state) {
     assert.equal(route.get('state'), options.state, 'Studio route did not preserve the requested playground state.');

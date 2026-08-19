@@ -20,6 +20,25 @@ issues: list[str] = []
 entry_text = ENTRY.read_text(encoding='utf-8')
 public_styles_import = "import '@ontologyx/ui/styles.css';"
 studio_styles_import = "import './styles/studio.css';"
+studio_css_path = STUDIO / 'styles' / 'studio.css'
+studio_css = studio_css_path.read_text(encoding='utf-8')
+workbench_marker = '/* Self-hosted generated Studio workbench */'
+if workbench_marker not in studio_css:
+    issues.append('Studio stylesheet must retain the self-hosted workbench boundary marker')
+else:
+    workbench_css = studio_css.split(workbench_marker, 1)[1]
+    if re.search(r'@media\s*\(', workbench_css):
+        issues.append('self-hosted Studio workbench must adapt to its UiRoot container; browser viewport @media queries are forbidden')
+    required_container_breakpoints = {'68rem', '52rem', '32rem', '76rem', '58rem'}
+    present_container_breakpoints = set(
+        re.findall(r'@container\s+oxs-ui\s*\(max-width:\s*([^\)]+)\)', workbench_css)
+    )
+    missing_container_breakpoints = required_container_breakpoints - present_container_breakpoints
+    if missing_container_breakpoints:
+        issues.append(
+            'self-hosted Studio workbench is missing container-first breakpoints: ' + ', '.join(sorted(missing_container_breakpoints))
+        )
+
 if entry_text.count(public_styles_import) != 1:
     issues.append('Studio browser host must import @ontologyx/ui/styles.css exactly once from main.tsx')
 if entry_text.count(studio_styles_import) != 1:

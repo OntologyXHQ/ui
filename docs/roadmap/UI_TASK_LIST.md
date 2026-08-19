@@ -123,7 +123,7 @@ Acceptance: dedicated behavior tests cover nested inheritance, independent porta
 
 ---
 
-## UIR03 — Layout primitives redesign — ACTIVE
+## UIR03 — Layout primitives redesign — DONE
 
 Purpose: make layout APIs genuinely useful instead of thin class wrappers.
 
@@ -142,17 +142,27 @@ Purpose: make layout APIs genuinely useful instead of thin class wrappers.
 - `UI-0308` Promote only individually certified layout primitives to `accepted`.
   - Box, Stack, Row and Wrap are accepted only through `layout-core.test.tsx`, machine-readable certification records and dedicated G6 layout journeys.
 
-### UIR03-B — Grid and spacing boundaries — NEXT
+### UIR03-B — Grid and spacing boundaries — DONE
 
 - `UI-0303` Redesign `Grid` for real column/minmax/auto-fit/span use cases without turning props into arbitrary CSS serialization.
+  - fixed finite track counts `1..12` and intrinsic `auto-fit` share one API; semantic `tile | card | wide` minima feed bounded `minmax()` tracks;
+  - Grid is polymorphic, inherits the common logical boundary contract, and child spanning stays explicitly owned by `Box.gridSpan` rather than arbitrary track strings or dense visual reordering.
 - `UI-0304` Redesign `Container` for semantic max-width/readable/content/full-width composition.
+  - `readable | content | wide | full` replaces ambiguous `compact`; the new `layout-readable` semantic Foundation token gives prose-width ownership a themeable/documented source rather than a Primitive hardcode;
+  - Container is centered with logical inline sizing and remains bounded by its containing block.
 - `UI-0305` Redesign `Inset`/`Spacer` around logical spacing and axis semantics.
+  - Inset composes tokenized `space → inline/block → logical edge` precedence without physical direction props or arbitrary values;
+  - Spacer reserves exactly one logical axis, is permanently `aria-hidden`, exposes no DOM prop bag, and cannot be made focusable/semantic accidentally.
 - Complete `SafeArea` logical edge ownership against the UIR02 environment contract.
+  - `block-start | inline-end | block-end | inline-start` can be selected independently or through logical shorthands; SafeArea consumes only persistent `--oxs-safe-*` inputs and never transient keyboard/occlusion variables.
 - Give Grid/Container/Inset/SafeArea/Spacer independent examples, tests, G6 evidence and accepted certification before closing UIR03.
+  - each export has its own Studio example, behavior owner, named browser scenario, required axes and certification record; all nine Layout exports are now `accepted`.
+
+Acceptance: G0 rejects freeform/physical layout escape hatches, legacy pre-certification selectors, unsafe Spacer DOM props and SafeArea occlusion consumption. G1/G3/G4/G6 bind all nine Layout exports to dedicated source tests/examples/browser evidence. UIR03 is closed; UIR04 is the next frontier.
 
 ---
 
-## UIR04 — Visual primitives: type, icon, surface — TODO
+## UIR04 — Visual primitives: type, icon, surface — NEXT
 
 - `UI-0401` Rebuild Text/Heading/Label/Code semantics, truncation/wrapping, selectable text and bidi behavior.
 - `UI-0402` Rebuild Icon contract: sizing, mirroring, decorative vs labeled semantics, current-color behavior and custom glyph integration.

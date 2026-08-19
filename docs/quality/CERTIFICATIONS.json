@@ -90,6 +90,96 @@
         "reflow",
         "a11y"
       ]
+    },
+    "Grid": {
+      "owner": "UIR03-B",
+      "behaviorTests": [
+        "packages/ui/src/primitives/__tests__/layout-boundaries.test.tsx"
+      ],
+      "browserScenarios": [
+        "grid-track-strategy-certification"
+      ],
+      "requiredAxes": [
+        "layout",
+        "grid",
+        "tracks",
+        "auto-fit",
+        "minmax",
+        "grid-span",
+        "responsive",
+        "polymorphism",
+        "a11y"
+      ]
+    },
+    "Container": {
+      "owner": "UIR03-B",
+      "behaviorTests": [
+        "packages/ui/src/primitives/__tests__/layout-boundaries.test.tsx"
+      ],
+      "browserScenarios": [
+        "container-semantic-width-certification"
+      ],
+      "requiredAxes": [
+        "layout",
+        "container",
+        "semantic-width",
+        "readable",
+        "responsive",
+        "polymorphism",
+        "a11y"
+      ]
+    },
+    "Inset": {
+      "owner": "UIR03-B",
+      "behaviorTests": [
+        "packages/ui/src/primitives/__tests__/layout-boundaries.test.tsx"
+      ],
+      "browserScenarios": [
+        "inset-logical-spacing-certification"
+      ],
+      "requiredAxes": [
+        "layout",
+        "inset",
+        "logical-spacing",
+        "precedence",
+        "rtl",
+        "polymorphism",
+        "a11y"
+      ]
+    },
+    "SafeArea": {
+      "owner": "UIR03-B",
+      "behaviorTests": [
+        "packages/ui/src/primitives/__tests__/layout-boundaries.test.tsx"
+      ],
+      "browserScenarios": [
+        "safe-area-logical-edge-certification"
+      ],
+      "requiredAxes": [
+        "layout",
+        "safe-area",
+        "logical-edges",
+        "persistent-insets",
+        "occlusion-isolation",
+        "rtl",
+        "a11y"
+      ]
+    },
+    "Spacer": {
+      "owner": "UIR03-B",
+      "behaviorTests": [
+        "packages/ui/src/primitives/__tests__/layout-boundaries.test.tsx"
+      ],
+      "browserScenarios": [
+        "spacer-logical-axis-certification"
+      ],
+      "requiredAxes": [
+        "layout",
+        "spacer",
+        "logical-axis",
+        "decorative",
+        "a11y"
+      ]
     }
   }
 }

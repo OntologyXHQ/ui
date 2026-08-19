@@ -90,6 +90,7 @@ export const UI_TOKEN_GROUPS = {
   layout: [
     'layout-gutter',
     'layout-gap',
+    'layout-readable',
     'layout-content',
     'layout-wide',
   ],

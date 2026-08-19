@@ -2,10 +2,19 @@
 
 ## Unreleased — UIR03 layout primitives redesign
 
+- UIR03-B browser follow-up: corrected the shared catalog deep-link harness so route activation is certified by attached target + `data-active` + active tab-panel ownership, while component/example visibility remains the responsibility of each semantic G6 assertion; a zero-layout diagnostic wrapper can no longer create a false product failure.
+- Studio simulated viewport presets now drive the self-hosted workbench through `@container oxs-ui`; browser-width media queries can no longer collapse phone examples inside a desktop acceptance context.
+- Closed UIR03-B and UIR03 as a whole: `Grid`, `Container`, `Inset`, `SafeArea`, and `Spacer` now join Box/Stack/Row/Wrap as individually certified `accepted` Layout primitives.
+- Rebuilt Grid around finite `1..12` tracks or intrinsic `auto-fit` + semantic minmax minima; arbitrary CSS track strings, dense/reverse ordering and style serialization remain outside the public contract.
+- Replaced ambiguous Container `compact` with semantic `readable | content | wide | full` tiers and added the public `layout-readable` Foundation token so readable width is token-owned rather than hard-coded inside a Primitive.
+- Rebuilt Inset around deterministic tokenized all → axis → logical-edge precedence and completed SafeArea with four logical edges plus explicit combinations while keeping transient occlusion out of SafeArea ownership.
+- Tightened Spacer into a permanently `aria-hidden`, non-focusable one-axis decorative primitive with no native DOM prop bag; parent `gap` remains preferred when sibling relationships own spacing.
+- Added independent Studio fixtures, behavior tests, certification records and five dedicated G6 journeys for Grid tracks/span/reflow, Container width tiers, RTL Inset precedence, SafeArea persistent-vs-occlusion isolation and Spacer geometry/accessibility.
+
 - Closed UIR03-A core structural flow: `Box`, `Stack`, `Row`, and `Wrap` now expose typed intrinsic polymorphism plus a finite logical boundary contract for overflow, min-size, flex-child participation, self-alignment and Grid span; arbitrary inline style/color serialization and visual order reversal remain outside the Primitive API.
 - Replaced the old shared Layout vocabulary demo with dedicated Box/Stack/Row/Wrap Studio examples and added a stable G0 layout gate that rejects physical/freeform escape hatches and shared certification fixtures.
 - Added `layout-core.test.tsx` type/behavior ownership and component-owned G6 certification for semantic polymorphism, nested overflow/min-size safety, RTL logical Row ordering and intrinsic Wrap reflow.
-- Promoted Box, Stack, Row and Wrap from `candidate` to `accepted`; Grid/Container/Inset/SafeArea/Spacer remain candidate until UIR03-B.
+- Promoted Box, Stack, Row and Wrap from `candidate` to `accepted` as the first UIR03-A slice; UIR03-B now completes the remaining Layout family.
 
 ## Unreleased — UIR02 foundations reacceptance
 

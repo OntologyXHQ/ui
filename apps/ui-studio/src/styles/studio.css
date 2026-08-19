@@ -1153,7 +1153,7 @@ body { overflow: hidden; background: #091019; color-scheme: dark light; }
   transform: translateY(1px) scale(0.995);
 }
 
-@media (max-width: 68rem) {
+@container oxs-ui (max-width: 68rem) {
   .ui-studio-shell {
     grid-template-columns: minmax(15rem, 17rem) minmax(0, 1fr);
     gap: var(--oxs-space-sm);
@@ -1169,7 +1169,7 @@ body { overflow: hidden; background: #091019; color-scheme: dark light; }
   }
 }
 
-@media (max-width: 52rem) {
+@container oxs-ui (max-width: 52rem) {
   .ui-studio-shell {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(13rem, 38dvh) minmax(0, 1fr);
@@ -1188,7 +1188,7 @@ body { overflow: hidden; background: #091019; color-scheme: dark light; }
   }
 }
 
-@media (max-width: 32rem) {
+@container oxs-ui (max-width: 32rem) {
   .ui-studio-shell {
     padding: var(--oxs-space-xs);
     gap: var(--oxs-space-xs);
@@ -1282,13 +1282,13 @@ body { overflow: hidden; background: #091019; color-scheme: dark light; }
   min-height: 10rem;
 }
 
-@media (max-width: 76rem) {
+@container oxs-ui (max-width: 76rem) {
   .ui-studio-environment__toolbar .ui-toolbar__content {
     grid-template-columns: repeat(2, minmax(10rem, 1fr));
   }
 }
 
-@media (max-width: 58rem) {
+@container oxs-ui (max-width: 58rem) {
   .ui-studio-environment__row {
     align-items: center;
     flex-direction: row;

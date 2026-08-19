@@ -13,7 +13,7 @@ import {
   Wrap,
 } from '@ontologyx/ui';
 
-const acceptedCore = {
+const acceptedLayout = {
   layer: 'primitives' as const,
   category: 'Layout',
   order: 10,
@@ -26,21 +26,10 @@ const acceptedCore = {
     'Intrinsic and container-first; overflow/min-size controls prevent nested layouts from forcing viewport overflow.',
 };
 
-const candidate = {
-  layer: 'primitives' as const,
-  category: 'Layout',
-  order: 10,
-  status: 'candidate' as const,
-  accessibility: 'Preserves the semantics of its children and adds no interaction semantics.',
-  rtl: 'Uses logical flow, alignment and spacing semantics.',
-  touch: 'Layout-only; touch behavior belongs to Components.',
-  responsive: 'Container-first and intrinsic; no device-name branching.',
-};
-
 export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'Box',
-    ...acceptedCore,
+    ...acceptedLayout,
     summary:
       'Polymorphic structural boundary with typed overflow, min-size, flex-child, self-alignment and grid-span controls.',
     usage:
@@ -57,7 +46,7 @@ export const uiDocs = defineUiDocsGroup([
   },
   {
     exportName: 'Stack',
-    ...acceptedCore,
+    ...acceptedLayout,
     summary: 'Polymorphic block-axis flex composition with semantic gap, alignment and distribution.',
     usage:
       'Use for vertical one-dimensional composition; choose a semantic `as` element when the group carries document structure.',
@@ -72,7 +61,7 @@ export const uiDocs = defineUiDocsGroup([
   },
   {
     exportName: 'Row',
-    ...acceptedCore,
+    ...acceptedLayout,
     summary: 'Polymorphic inline-axis flex composition that follows the resolved writing direction.',
     usage:
       'Use when peers must remain on one logical row; use Wrap instead when contraction is allowed to create additional lines.',
@@ -87,7 +76,7 @@ export const uiDocs = defineUiDocsGroup([
   },
   {
     exportName: 'Wrap',
-    ...acceptedCore,
+    ...acceptedLayout,
     summary: 'Polymorphic wrapping inline-axis flex composition for intrinsic responsive groups.',
     usage:
       'Use for peer controls/chips that should wrap naturally as their container contracts instead of branching on viewport/device names.',
@@ -102,33 +91,83 @@ export const uiDocs = defineUiDocsGroup([
   },
   {
     exportName: 'Grid',
-    ...candidate,
-    summary: 'Intrinsic responsive grid.',
-    usage: 'Candidate pending UIR03-B redesign for explicit columns, minmax/auto-fit and span semantics.',
+    ...acceptedLayout,
+    summary:
+      'Polymorphic finite-track grid with fixed column counts or intrinsic auto-fit/minmax tracks and Box-owned span participation.',
+    usage:
+      'Use fixed `columns` when track count is structural; use `columns="auto-fit"` with a semantic `minColumn` when available container space should determine the count. Wrap spanning children in Box and use `gridSpan`.',
+    examples: [
+      {
+        id: 'track-strategies',
+        title: 'Track strategies',
+        description:
+          'Intrinsic auto-fit tracks and an explicit four-column span grid share one finite, token-backed API.',
+        component: 'GridTracksExample',
+      },
+    ],
   },
   {
     exportName: 'Container',
-    ...candidate,
-    summary: 'Readable width constraint.',
-    usage: 'Candidate pending UIR03-B redesign for semantic readable/content/wide/full composition.',
+    ...acceptedLayout,
+    summary: 'Polymorphic centered inline-size boundary with readable, content, wide and full semantic width tiers.',
+    usage:
+      'Use to constrain a content region by meaning rather than viewport/device names. Pair with Inset when the region also owns internal padding.',
+    examples: [
+      {
+        id: 'semantic-widths',
+        title: 'Semantic width tiers',
+        description: 'Readable and full-width regions remain centered and bounded by their containing block.',
+        component: 'ContainerWidthsExample',
+      },
+    ],
   },
   {
     exportName: 'Inset',
-    ...candidate,
-    summary: 'Tokenized logical padding wrapper.',
-    usage: 'Candidate pending UIR03-B redesign for all/inline/block/edge-specific logical spacing.',
+    ...acceptedLayout,
+    summary:
+      'Polymorphic logical padding boundary with tokenized all/axis/edge overrides and deterministic edge precedence.',
+    usage:
+      'Use when a region owns padding. Start with `space`, then override `inline`/`block` or a specific logical edge; never encode left/right spacing.',
+    examples: [
+      {
+        id: 'logical-spacing',
+        title: 'Logical spacing precedence',
+        description: 'All → axis → edge precedence stays tokenized and follows logical writing direction.',
+        component: 'InsetLogicalExample',
+      },
+    ],
   },
   {
     exportName: 'SafeArea',
-    ...candidate,
-    summary: 'Logical persistent safe-area wrapper.',
-    usage: 'Candidate pending UIR03-B completion of logical edge ownership and environment integration.',
+    ...acceptedLayout,
+    summary: 'Polymorphic persistent safe-area consumer with explicit logical edge ownership.',
+    usage:
+      'Use only for persistent display/system-chrome safe area supplied by UiRoot. Transient keyboard/occlusion avoidance belongs to environment-aware Components/System surfaces, not SafeArea.',
+    examples: [
+      {
+        id: 'logical-edges',
+        title: 'Persistent logical edges',
+        description: 'Explicit edge combinations consume only persistent UiRoot safe-area variables.',
+        component: 'SafeAreaEdgesExample',
+      },
+    ],
   },
   {
     exportName: 'Spacer',
-    ...candidate,
-    summary: 'Non-semantic token-sized spacer.',
-    usage: 'Candidate pending UIR03-B axis cleanup; prefer parent gap or Inset whenever they express the structure.',
+    ...acceptedLayout,
+    accessibility:
+      'Always aria-hidden and non-focusable with no public DOM-prop escape hatch; use parent gap whenever spacing belongs to a relationship between siblings.',
+    summary: 'Strictly decorative token-sized spacer on exactly one logical axis.',
+    usage:
+      'Prefer parent `gap` or Inset. Use Spacer only when one explicit empty extent is structurally necessary; choose `inline` or `block` rather than physical width/height.',
+    examples: [
+      {
+        id: 'logical-axis',
+        title: 'Logical axis extent',
+        description: 'Inline and block spacers reserve only the selected logical dimension and remain permanently hidden from accessibility APIs.',
+        component: 'SpacerAxisExample',
+      },
+    ],
   },
 ] as const);
 
@@ -166,7 +205,7 @@ export function BoxBoundaryExample() {
           <DemoTile label="Fixed peer" />
         </Box>
       </Row>
-      <Grid min="tile" gap="xs" aria-label="Box grid span host">
+      <Grid columns="auto-fit" minColumn="tile" gap="xs" aria-label="Box grid span host">
         <Box gridSpan="full" aria-label="Full-span Box">
           <DemoTile label="Full grid span" />
         </Box>
@@ -206,5 +245,83 @@ export function WrapFlowExample() {
         </Box>
       ))}
     </Wrap>
+  );
+}
+
+export function GridTracksExample() {
+  return (
+    <Stack gap="lg">
+      <Grid
+        as="section"
+        aria-label="Certified intrinsic Grid"
+        columns="auto-fit"
+        minColumn="tile"
+        gap="xs"
+      >
+        {['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon'].map((label) => <DemoTile key={label} label={label} />)}
+      </Grid>
+      <Grid as="section" aria-label="Certified fixed Grid" columns={4} minColumn="tile" gap="xs">
+        <Box gridSpan={2} aria-label="Two-column Grid item"><DemoTile label="Span 2" /></Box>
+        <Box><DemoTile label="Peer A" /></Box>
+        <Box><DemoTile label="Peer B" /></Box>
+      </Grid>
+    </Stack>
+  );
+}
+
+export function ContainerWidthsExample() {
+  return (
+    <Stack gap="sm">
+      <Container as="section" width="readable" aria-label="Certified readable Container">
+        <DemoTile label="Readable prose boundary" />
+      </Container>
+      <Container as="section" width="full" aria-label="Certified full Container">
+        <DemoTile label="Full containing-block width" />
+      </Container>
+    </Stack>
+  );
+}
+
+export function InsetLogicalExample() {
+  return (
+    <Inset
+      as="section"
+      aria-label="Certified logical Inset"
+      space="xs"
+      inline="lg"
+      inlineStart="2xl"
+      blockEnd="none"
+    >
+      <DemoTile label="All → axis → edge" />
+    </Inset>
+  );
+}
+
+export function SafeAreaEdgesExample() {
+  return (
+    <SafeArea
+      as="section"
+      aria-label="Certified SafeArea edges"
+      edges={['inline-start', 'block-end']}
+    >
+      <DemoTile label="inline-start + block-end safe area" />
+    </SafeArea>
+  );
+}
+
+export function SpacerAxisExample() {
+  return (
+    <Stack gap="sm">
+      <Row gap="none" align="center" aria-label="Inline Spacer example">
+        <DemoTile label="Start" />
+        <Spacer axis="inline" size="2xl" className="ui-doc-spacer-inline" />
+        <DemoTile label="End" />
+      </Row>
+      <Stack gap="none" aria-label="Block Spacer example">
+        <DemoTile label="Before" />
+        <Spacer axis="block" size="lg" className="ui-doc-spacer-block" />
+        <DemoTile label="After" />
+      </Stack>
+    </Stack>
   );
 }

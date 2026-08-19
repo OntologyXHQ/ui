@@ -2363,7 +2363,7 @@
 }
 
 @container oxs-ui (max-width: 30rem) {
-  .ui-grid--tile {
+  .ui-grid-min-tile {
     --oxs-grid-tile-min: 8.25rem;
   }
 }

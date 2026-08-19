@@ -1,7 +1,6 @@
 import type { ComponentPropsWithoutRef, PropsWithChildren, ReactNode } from 'react';
 import { createElement } from 'react';
 import type { SpaceToken } from '../foundations';
-import type { PrimitiveHtmlProps } from './PrimitiveProps';
 
 export type LayoutGap = SpaceToken;
 export type Align = 'start' | 'center' | 'end' | 'stretch' | 'baseline';
@@ -11,6 +10,10 @@ export type LayoutMinSize = 'auto' | 'zero';
 export type LayoutFlex = 'initial' | 'none' | 'auto' | 'grow';
 export type LayoutAlignSelf = 'auto' | 'start' | 'center' | 'end' | 'stretch';
 export type GridSpan = 'auto' | 'full' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+export type GridColumnCount = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+export type GridColumns = 'auto-fit' | GridColumnCount;
+export type GridMinColumn = 'tile' | 'card' | 'wide';
+export type ContainerWidth = 'readable' | 'content' | 'wide' | 'full';
 export type BoxElement =
   | 'div'
   | 'section'
@@ -62,6 +65,10 @@ type PolymorphicLayoutBaseProps<T extends BoxElement, OwnKeys extends PropertyKe
     OwnKeys | keyof LayoutBoundaryProps | 'as' | 'children' | 'className' | 'style' | 'color'
   >;
 
+type BoundaryValues = Required<
+  Pick<LayoutBoundaryProps, 'overflow' | 'minInlineSize' | 'minBlockSize' | 'flex' | 'alignSelf' | 'gridSpan'>
+> & Pick<LayoutBoundaryProps, 'overflowInline' | 'overflowBlock'>;
+
 function boundaryClasses({
   overflow,
   overflowInline,
@@ -71,8 +78,7 @@ function boundaryClasses({
   flex,
   alignSelf,
   gridSpan,
-}: Required<Pick<LayoutBoundaryProps, 'overflow' | 'minInlineSize' | 'minBlockSize' | 'flex' | 'alignSelf' | 'gridSpan'>> &
-  Pick<LayoutBoundaryProps, 'overflowInline' | 'overflowBlock'>) {
+}: BoundaryValues) {
   return [
     `ui-overflow-${overflow}`,
     overflowInline ? `ui-overflow-inline-${overflowInline}` : '',
@@ -90,7 +96,7 @@ function layoutClasses(
   gap: LayoutGap,
   align: Align,
   justify: Justify,
-  boundary: Parameters<typeof boundaryClasses>[0],
+  boundary: BoundaryValues,
   className: string,
 ) {
   return [
@@ -254,81 +260,244 @@ export function Wrap<T extends BoxElement = 'div'>({
   return renderElement(as, classes, props as Record<string, unknown>, children);
 }
 
-export type GridProps = PropsWithChildren<
-  PrimitiveHtmlProps<HTMLDivElement> & {
-    gap?: LayoutGap;
-    min?: 'tile' | 'card' | 'wide';
-  }
+type GridOwnProps = {
+  /** Semantic spacing token between grid tracks. @default md */
+  gap?: LayoutGap;
+  /** Uses a fixed finite track count or intrinsic `auto-fit` tracks. @default auto-fit */
+  columns?: GridColumns;
+  /** Minimum semantic track size used by `columns="auto-fit"`. @default card */
+  minColumn?: GridMinColumn;
+  /** Aligns grid items on the logical block/cross axis. @default stretch */
+  align?: Align;
+};
+
+export type GridProps<T extends BoxElement = 'div'> = PropsWithChildren<
+  GridOwnProps & PolymorphicLayoutBaseProps<T, keyof GridOwnProps>
 >;
 
-export function Grid({ children, gap = 'md', min = 'card', className = '', ...props }: GridProps) {
-  return (
-    <div className={`ui-grid ui-grid--${min} ui-gap-${gap} ${className}`.trim()} {...props}>
-      {children}
-    </div>
-  );
+export function Grid<T extends BoxElement = 'div'>({
+  as = 'div' as T,
+  children,
+  gap = 'md',
+  columns = 'auto-fit',
+  minColumn = 'card',
+  align = 'stretch',
+  className = '',
+  overflow = 'visible',
+  overflowInline,
+  overflowBlock,
+  minInlineSize = 'zero',
+  minBlockSize = 'auto',
+  flex = 'initial',
+  alignSelf = 'auto',
+  gridSpan = 'auto',
+  ...props
+}: GridProps<T>) {
+  const classes = [
+    'ui-grid',
+    `ui-grid-columns-${columns}`,
+    `ui-grid-min-${minColumn}`,
+    `ui-gap-${gap}`,
+    `ui-align-${align}`,
+    ...boundaryClasses({
+      overflow,
+      overflowInline,
+      overflowBlock,
+      minInlineSize,
+      minBlockSize,
+      flex,
+      alignSelf,
+      gridSpan,
+    }),
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
+  return renderElement(as, classes, props as Record<string, unknown>, children);
 }
 
-export type ContainerProps = PropsWithChildren<
-  PrimitiveHtmlProps<HTMLDivElement> & {
-    width?: 'compact' | 'content' | 'wide' | 'full';
-  }
+type ContainerOwnProps = {
+  /** Semantic maximum inline-size tier. `full` remains constrained by the containing block. @default content */
+  width?: ContainerWidth;
+};
+
+export type ContainerProps<T extends BoxElement = 'div'> = PropsWithChildren<
+  ContainerOwnProps & PolymorphicLayoutBaseProps<T, keyof ContainerOwnProps>
 >;
 
-export function Container({
+export function Container<T extends BoxElement = 'div'>({
+  as = 'div' as T,
   children,
   width = 'content',
   className = '',
+  overflow = 'visible',
+  overflowInline,
+  overflowBlock,
+  minInlineSize = 'zero',
+  minBlockSize = 'auto',
+  flex = 'initial',
+  alignSelf = 'auto',
+  gridSpan = 'auto',
   ...props
-}: ContainerProps) {
-  return (
-    <div className={`ui-container ui-container--${width} ${className}`.trim()} {...props}>
-      {children}
-    </div>
-  );
+}: ContainerProps<T>) {
+  const classes = [
+    'ui-container',
+    `ui-container-width-${width}`,
+    ...boundaryClasses({
+      overflow,
+      overflowInline,
+      overflowBlock,
+      minInlineSize,
+      minBlockSize,
+      flex,
+      alignSelf,
+      gridSpan,
+    }),
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
+  return renderElement(as, classes, props as Record<string, unknown>, children);
 }
 
-export type InsetProps = PropsWithChildren<
-  PrimitiveHtmlProps<HTMLDivElement> & {
-    space?: SpaceToken;
-  }
->;
-
-export function Inset({ children, space = 'md', className = '', ...props }: InsetProps) {
-  return (
-    <div className={`ui-inset ui-inset--${space} ${className}`.trim()} {...props}>
-      {children}
-    </div>
-  );
-}
-
-export type SafeAreaEdge = 'all' | 'inline' | 'block' | 'block-start' | 'block-end';
-export type SafeAreaProps = PropsWithChildren<
-  PrimitiveHtmlProps<HTMLDivElement> & {
-    edges?: SafeAreaEdge;
-  }
->;
-
-export function SafeArea({ children, edges = 'all', className = '', ...props }: SafeAreaProps) {
-  return (
-    <div className={`ui-safe-area ui-safe-area--${edges} ${className}`.trim()} {...props}>
-      {children}
-    </div>
-  );
-}
-
-export type SpacerAxis = 'both' | 'inline' | 'block';
-export type SpacerProps = PrimitiveHtmlProps<HTMLSpanElement> & {
-  size?: SpaceToken;
-  axis?: SpacerAxis;
+type InsetOwnProps = {
+  /** Base logical padding on every edge. Axis/edge props override only their owned edges. @default md */
+  space?: SpaceToken;
+  /** Overrides padding on both logical inline edges. */
+  inline?: SpaceToken;
+  /** Overrides padding on both logical block edges. */
+  block?: SpaceToken;
+  /** Overrides padding on the logical inline-start edge. */
+  inlineStart?: SpaceToken;
+  /** Overrides padding on the logical inline-end edge. */
+  inlineEnd?: SpaceToken;
+  /** Overrides padding on the logical block-start edge. */
+  blockStart?: SpaceToken;
+  /** Overrides padding on the logical block-end edge. */
+  blockEnd?: SpaceToken;
 };
 
-export function Spacer({ size = 'md', axis = 'both', className = '', ...props }: SpacerProps) {
+export type InsetProps<T extends BoxElement = 'div'> = PropsWithChildren<
+  InsetOwnProps & PolymorphicLayoutBaseProps<T, keyof InsetOwnProps>
+>;
+
+export function Inset<T extends BoxElement = 'div'>({
+  as = 'div' as T,
+  children,
+  space = 'md',
+  inline,
+  block,
+  inlineStart,
+  inlineEnd,
+  blockStart,
+  blockEnd,
+  className = '',
+  overflow = 'visible',
+  overflowInline,
+  overflowBlock,
+  minInlineSize = 'zero',
+  minBlockSize = 'auto',
+  flex = 'initial',
+  alignSelf = 'auto',
+  gridSpan = 'auto',
+  ...props
+}: InsetProps<T>) {
+  const classes = [
+    'ui-inset',
+    `ui-inset-all-${space}`,
+    inline ? `ui-inset-inline-${inline}` : '',
+    block ? `ui-inset-block-${block}` : '',
+    inlineStart ? `ui-inset-inline-start-${inlineStart}` : '',
+    inlineEnd ? `ui-inset-inline-end-${inlineEnd}` : '',
+    blockStart ? `ui-inset-block-start-${blockStart}` : '',
+    blockEnd ? `ui-inset-block-end-${blockEnd}` : '',
+    ...boundaryClasses({
+      overflow,
+      overflowInline,
+      overflowBlock,
+      minInlineSize,
+      minBlockSize,
+      flex,
+      alignSelf,
+      gridSpan,
+    }),
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
+  return renderElement(as, classes, props as Record<string, unknown>, children);
+}
+
+export type SafeAreaEdge = 'block-start' | 'inline-end' | 'block-end' | 'inline-start';
+export type SafeAreaEdges = 'all' | 'inline' | 'block' | SafeAreaEdge | readonly SafeAreaEdge[];
+
+type SafeAreaOwnProps = {
+  /** Persistent safe-area edges to consume. Arrays allow explicit logical combinations. @default all */
+  edges?: SafeAreaEdges;
+};
+
+export type SafeAreaProps<T extends BoxElement = 'div'> = PropsWithChildren<
+  SafeAreaOwnProps & PolymorphicLayoutBaseProps<T, keyof SafeAreaOwnProps>
+>;
+
+function normalizedSafeAreaEdges(edges: SafeAreaEdges): readonly SafeAreaEdge[] {
+  if (typeof edges !== 'string') return [...new Set(edges)];
+  if (edges === 'all') return ['block-start', 'inline-end', 'block-end', 'inline-start'];
+  if (edges === 'inline') return ['inline-start', 'inline-end'];
+  if (edges === 'block') return ['block-start', 'block-end'];
+  return [edges];
+}
+
+export function SafeArea<T extends BoxElement = 'div'>({
+  as = 'div' as T,
+  children,
+  edges = 'all',
+  className = '',
+  overflow = 'visible',
+  overflowInline,
+  overflowBlock,
+  minInlineSize = 'zero',
+  minBlockSize = 'auto',
+  flex = 'initial',
+  alignSelf = 'auto',
+  gridSpan = 'auto',
+  ...props
+}: SafeAreaProps<T>) {
+  const classes = [
+    'ui-safe-area',
+    ...normalizedSafeAreaEdges(edges).map((edge) => `ui-safe-area-edge-${edge}`),
+    ...boundaryClasses({
+      overflow,
+      overflowInline,
+      overflowBlock,
+      minInlineSize,
+      minBlockSize,
+      flex,
+      alignSelf,
+      gridSpan,
+    }),
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
+  return renderElement(as, classes, props as Record<string, unknown>, children);
+}
+
+export type SpacerAxis = 'inline' | 'block';
+export type SpacerProps = {
+  /** Tokenized spacer extent on its selected logical axis. @default md */
+  size?: SpaceToken;
+  /** Logical axis that receives the spacer extent. @default block */
+  axis?: SpacerAxis;
+  /** Structural selector hook; Spacer remains permanently non-semantic and aria-hidden. */
+  className?: string;
+};
+
+export function Spacer({ size = 'md', axis = 'block', className = '' }: SpacerProps) {
   return (
     <span
-      {...props}
-      className={`ui-spacer ui-spacer--${size} ui-spacer--axis-${axis} ${className}`.trim()}
-      aria-hidden
+      className={`ui-spacer ui-spacer-size-${size} ui-spacer-axis-${axis} ${className}`.trim()}
+      aria-hidden="true"
     />
   );
 }

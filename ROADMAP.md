@@ -15,9 +15,10 @@ Canonical gate contract: [`docs/quality/QUALITY_GATES.md`](docs/quality/QUALITY_
   - `UIR02-A` — Semantic token architecture: **DONE**
   - `UIR02-B` — Environment semantics: **DONE**
   - `UIR02-C` — UiRoot certification: **DONE**
-- `UIR03` — Layout primitives redesign: **ACTIVE**
+- `UIR03` — Layout primitives redesign: **DONE**
   - `UIR03-A` — Core structural flow (`Box`, `Stack`, `Row`, `Wrap`): **DONE**
-  - `UIR03-B` — Grid/Container/Inset/SafeArea/Spacer: **NEXT**
-- `UIR04+` — Visual Primitives → Components → System UI reacceptance: **TODO**
+  - `UIR03-B` — Grid/Container/Inset/SafeArea/Spacer: **DONE**
+- `UIR04` — Visual primitives (`Text`, `Heading`, `Label`, `Code`, `Icon`, `Surface`, `Divider`): **NEXT**
+- `UIR05+` — Runtime kernel → Components → System UI reacceptance: **TODO**
 
 No public visual export is considered accepted merely because it existed before this reset.
