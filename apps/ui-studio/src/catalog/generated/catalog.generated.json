@@ -5629,14 +5629,32 @@
     "layer": "components",
     "category": "Feedback",
     "order": 60,
-    "summary": "Small reduced-motion-aware indeterminate activity indicator.",
-    "usage": "Use for local transient activity where a full Progress track would be excessive.",
+    "summary": "OntologyX O+X indeterminate activity mark with inline through hero-scale presentation and reduced-motion settlement.",
+    "usage": "Use sm/md/lg for local transient activity and hero for first-entry or boot loading; the shared OX mark is also used by loading controls so product surfaces do not invent parallel spinners.",
     "status": "candidate",
     "accessibility": "Decorative/static activity is hidden from the accessibility tree by default; set announce to expose a polite loading status when the owning region needs it.",
     "rtl": "Direction-neutral.",
     "touch": "Non-interactive.",
-    "responsive": "Intrinsic.",
-    "playground": null,
+    "responsive": "Intrinsic; hero keeps the same brand geometry with a stronger display-scale stroke treatment.",
+    "playground": {
+      "preferredWidth": "wide",
+      "controls": [
+        "size",
+        "announce"
+      ],
+      "options": {
+        "size": [
+          "sm",
+          "md",
+          "lg",
+          "hero"
+        ]
+      },
+      "fixture": {
+        "size": "hero",
+        "label": "Starting OntologyX"
+      }
+    },
     "props": [
       {
         "name": "announce",
@@ -5656,14 +5674,20 @@
       },
       {
         "name": "size",
-        "type": "'sm' | 'md' | 'lg'",
+        "type": "'sm' | 'md' | 'lg' | 'hero'",
         "optional": true,
         "description": "",
         "deprecated": false,
         "default": "'md'"
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "ox-loading",
+        "title": "OX boot loading choreography",
+        "component": "SpinnerExample"
+      }
+    ]
   },
   {
     "id": "Stack",

@@ -1,5 +1,6 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 import { Heading } from '../primitives';
+import { OxLoadingMark } from './OxLoadingMark';
 
 export type BadgeTone = 'neutral' | 'accent' | 'success' | 'warning' | 'danger';
 export type BadgeProps = HTMLAttributes<HTMLSpanElement> & {
@@ -76,7 +77,7 @@ export function Progress({
 
 export type SpinnerProps = HTMLAttributes<HTMLSpanElement> & {
   label?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'hero';
   announce?: boolean;
 };
 
@@ -88,7 +89,9 @@ export function Spinner({ announce = false, className = '', label = 'Loading', s
       role={announce ? 'status' : undefined}
       aria-label={announce ? label : undefined}
       aria-hidden={announce ? undefined : true}
-    />
+    >
+      <OxLoadingMark />
+    </span>
   );
 }
 

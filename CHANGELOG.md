@@ -1,5 +1,15 @@
 # Changelog
 
+## OX loading presentation follow-up
+
+- Spinner now exposes a `hero` size for first-entry/boot loading with stronger O/X/echo stroke weights while preserving the same heartbeat choreography and reduced-motion behavior.
+- The Spinner Studio example now shows one canonical OX mark in a wide boot-stage presentation instead of duplicating the mark through a loading Button.
+- Browser certification now rejects duplicate Spinner example marks and verifies hero-scale geometry/stroke weight before sampling the heartbeat motion.
+
+- OX heartbeat seam-evidence follow-up: corrected G6 to distinguish authored keyframe endpoints from the wrapped `currentTime === duration` state of an infinite CSS animation; certification now proves 0→-100 pathLength endpoint equivalence, pre-seam modular convergence, and exact wrapped restart without weakening the visual continuity requirement.
+- OX heartbeat loading motion: evolved the applied orbital-breathe loader into a written-mark choreography—two independently drawn X strokes using the refined OX geometry, an indeterminate O-ring that closes around the mark, a strong two-beat heartbeat with paired echo rings, then a release/unwrite phase whose terminal dash phase is equivalent to the next loop start; reduced motion remains a static complete OX mark.
+- Brand loading-motion refinement: rebuilt the OX loader as a seamless non-linear orbital-breathe cycle with a dynamically expanding/contracting O arc, synchronized X choreography, matched static/loading geometry and no linear rotation reset at the loop boundary.
+- Brand loading-mark follow-up: added a reusable OntologyX O+X mark to the optional icon pack and replaced the duplicate generic Button/Spinner rings with one shared O-ring + orbit + X loader; continuous motion uses semantic motion tokens and resolves to a static branded mark under UiRoot reduced-motion policy.
 - UIR05-A input authority: root-scoped GestureArena ownership, disabled press/pan cancellation, realm-local focus and pointer continuation, shared Unicode typeahead and single-selection normalization, adversarial tests, G0 contract and dedicated browser evidence.
   - Menu now owns enabled MenuItem activation closure: native mouse/Enter/Space activation runs item callbacks first, then closes through the canonical `requestOpenChange(false)` path so focus restoration cannot be bypassed by consumer-local state setters; `preventDefault()` can intentionally keep the menu open.
   - G6 shared-typeahead evidence is scoped to the active catalog workbench, so duplicate accessible names in the global Studio environment toolbar cannot contaminate component certification.

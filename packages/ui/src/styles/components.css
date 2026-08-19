@@ -124,21 +124,6 @@
   border-color: var(--oxs-color-accent);
 }
 
-.ui-control-spinner {
-  width: 1rem;
-  height: 1rem;
-  border: 2px solid currentColor;
-  border-inline-end-color: transparent;
-  border-radius: var(--oxs-radius-full);
-  animation: ui-control-spin var(--oxs-motion-spinner-period) linear infinite;
-}
-
-@keyframes ui-control-spin {
-  to {
-    transform: rotate(1turn);
-  }
-}
-
 .ui-icon-button {
   width: max(var(--oxs-control-height-md), var(--oxs-touch-target-min));
   min-width: max(var(--oxs-control-height-md), var(--oxs-touch-target-min));
@@ -626,11 +611,6 @@
     transform: none;
   }
 
-  .ui-control-spinner {
-    animation: none;
-    border-inline-end-color: currentColor;
-    opacity: 0.55;
-  }
 }
 
 .ui-root[data-oxs-motion='reduced'] .ui-button,
@@ -645,11 +625,6 @@
   transform: none;
 }
 
-.ui-root[data-oxs-motion='reduced'] .ui-control-spinner {
-  animation: none;
-  border-inline-end-color: currentColor;
-  opacity: 0.55;
-}
 
 @media (forced-colors: active) {
   .ui-button,
@@ -1465,24 +1440,178 @@
 }
 
 .ui-spinner {
-  display: inline-block;
+  display: inline-grid;
+  place-items: center;
   inline-size: 1.25rem;
   block-size: 1.25rem;
-  border: 2px solid var(--oxs-color-border-strong);
-  border-block-start-color: var(--oxs-color-accent);
-  border-radius: var(--oxs-radius-full);
-  animation: oxs-component-spin var(--oxs-motion-spinner-period) linear infinite;
+  color: var(--oxs-color-accent);
 }
 
 .ui-spinner--sm { inline-size: 0.9rem; block-size: 0.9rem; }
 .ui-spinner--lg { inline-size: 1.75rem; block-size: 1.75rem; }
+.ui-spinner--hero {
+  inline-size: 8rem;
+  block-size: 8rem;
+}
 
-@keyframes oxs-component-spin {
-  to { transform: rotate(1turn); }
+.ui-ox-loading-mark {
+  --oxs-ox-track-stroke: 1.35;
+  --oxs-ox-orbit-stroke: 1.95;
+  --oxs-ox-cross-stroke: 1.9;
+  --oxs-ox-echo-stroke: 1.25;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  color: currentColor;
+}
+
+.ui-spinner--hero .ui-ox-loading-mark {
+  --oxs-ox-track-stroke: 1.6;
+  --oxs-ox-orbit-stroke: 2.45;
+  --oxs-ox-cross-stroke: 2.35;
+  --oxs-ox-echo-stroke: 1.55;
+}
+
+.ui-ox-loading-mark.ui-control-spinner {
+  width: 1rem;
+  height: 1rem;
+}
+
+.ui-ox-loading-mark__track,
+.ui-ox-loading-mark__orbit,
+.ui-ox-loading-mark__echo,
+.ui-ox-loading-mark__cross-stroke {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ui-ox-loading-mark__track {
+  stroke-width: var(--oxs-ox-track-stroke);
+  opacity: 0.13;
+}
+
+.ui-ox-loading-mark__orbit {
+  stroke-width: var(--oxs-ox-orbit-stroke);
+  stroke-dasharray: 7 93;
+  stroke-dashoffset: 0;
+  transform-box: view-box;
+  transform-origin: center;
+  transform: rotate(-90deg);
+  animation: oxs-ox-loading-orbit var(--oxs-motion-spinner-period) infinite;
+}
+
+.ui-ox-loading-mark__cross {
+  transform-box: view-box;
+  transform-origin: center;
+  animation: oxs-ox-loading-heartbeat var(--oxs-motion-spinner-period) infinite;
+}
+
+.ui-ox-loading-mark__cross-stroke {
+  stroke-width: var(--oxs-ox-cross-stroke);
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+}
+
+.ui-ox-loading-mark__cross-stroke--a {
+  animation: oxs-ox-loading-write-a var(--oxs-motion-spinner-period) infinite;
+}
+
+.ui-ox-loading-mark__cross-stroke--b {
+  animation: oxs-ox-loading-write-b var(--oxs-motion-spinner-period) infinite;
+}
+
+.ui-ox-loading-mark__echo {
+  stroke-width: var(--oxs-ox-echo-stroke);
+  opacity: 0;
+  transform-box: view-box;
+  transform-origin: center;
+}
+
+.ui-ox-loading-mark__echo--primary {
+  animation: oxs-ox-loading-echo-primary var(--oxs-motion-spinner-period) infinite;
+}
+
+.ui-ox-loading-mark__echo--secondary {
+  animation: oxs-ox-loading-echo-secondary var(--oxs-motion-spinner-period) infinite;
+}
+
+@keyframes oxs-ox-loading-orbit {
+  0% { stroke-dasharray: 7 93; stroke-dashoffset: 0; animation-timing-function: cubic-bezier(0.28, 0.02, 0.18, 1); }
+  14% { stroke-dasharray: 22 78; stroke-dashoffset: -7; animation-timing-function: cubic-bezier(0.18, 0.78, 0.18, 1); }
+  32% { stroke-dasharray: 72 28; stroke-dashoffset: -29; animation-timing-function: cubic-bezier(0.16, 0.84, 0.2, 1); }
+  39% { stroke-dasharray: 96 4; stroke-dashoffset: -40; }
+  57% { stroke-dasharray: 94 6; stroke-dashoffset: -55; animation-timing-function: cubic-bezier(0.36, 0, 0.24, 1); }
+  74% { stroke-dasharray: 42 58; stroke-dashoffset: -77; animation-timing-function: cubic-bezier(0.28, 0.06, 0.68, 0.2); }
+  91% { stroke-dasharray: 14 86; stroke-dashoffset: -94; }
+  100% { stroke-dasharray: 7 93; stroke-dashoffset: -100; }
+}
+
+@keyframes oxs-ox-loading-write-a {
+  0%, 8% { stroke-dashoffset: 1; }
+  29%, 72% { stroke-dashoffset: 0; }
+  94%, 100% { stroke-dashoffset: -1; }
+}
+
+@keyframes oxs-ox-loading-write-b {
+  0%, 17% { stroke-dashoffset: 1; }
+  36%, 69% { stroke-dashoffset: 0; }
+  90%, 100% { stroke-dashoffset: -1; }
+}
+
+@keyframes oxs-ox-loading-heartbeat {
+  0%, 38% { transform: scale(1); }
+  42% { transform: scale(1.13); animation-timing-function: cubic-bezier(0.12, 0.86, 0.18, 1); }
+  45% { transform: scale(0.965); }
+  49% { transform: scale(1.075); animation-timing-function: cubic-bezier(0.18, 0.8, 0.22, 1); }
+  53%, 100% { transform: scale(1); }
+}
+
+@keyframes oxs-ox-loading-echo-primary {
+  0%, 39% { opacity: 0; transform: scale(0.9); }
+  42% { opacity: 0.34; transform: scale(0.94); }
+  48%, 100% { opacity: 0; transform: scale(1.22); }
+}
+
+@keyframes oxs-ox-loading-echo-secondary {
+  0%, 46% { opacity: 0; transform: scale(0.94); }
+  49% { opacity: 0.2; transform: scale(0.97); }
+  55%, 100% { opacity: 0; transform: scale(1.14); }
+}
+
+.ui-root[data-oxs-motion='reduced'] .ui-ox-loading-mark__orbit,
+.ui-root[data-oxs-motion='reduced'] .ui-ox-loading-mark__cross,
+.ui-root[data-oxs-motion='reduced'] .ui-ox-loading-mark__cross-stroke,
+.ui-root[data-oxs-motion='reduced'] .ui-ox-loading-mark__echo {
+  animation: none;
+}
+
+.ui-root[data-oxs-motion='reduced'] .ui-ox-loading-mark__track {
+  opacity: 0;
+}
+
+.ui-root[data-oxs-motion='reduced'] .ui-ox-loading-mark__orbit {
+  stroke-dasharray: 100 0;
+  stroke-dashoffset: 0;
+  transform: rotate(-90deg);
+}
+
+.ui-root[data-oxs-motion='reduced'] .ui-ox-loading-mark__cross {
+  transform: none;
+}
+
+.ui-root[data-oxs-motion='reduced'] .ui-ox-loading-mark__cross-stroke {
+  stroke-dashoffset: 0;
+}
+
+.ui-root[data-oxs-motion='reduced'] .ui-ox-loading-mark__echo {
+  opacity: 0;
+  transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ui-spinner { animation-duration: calc(var(--oxs-motion-spinner-period) * 2.5); }
   .ui-skeleton { animation: none; }
 }
 

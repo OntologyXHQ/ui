@@ -10,6 +10,7 @@ import { forwardRef } from 'react';
 import type { PressActivation } from '../interaction';
 import { usePress } from '../interaction';
 import { useControllableState } from './controlState';
+import { OxLoadingMark } from './OxLoadingMark';
 
 export type ControlSize = 'sm' | 'md' | 'lg';
 export type ButtonVariant = 'ghost' | 'soft' | 'filled';
@@ -123,7 +124,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       </span>
       {loading ? (
         <span className="ui-button__loading" aria-hidden>
-          <span className="ui-control-spinner" />
+          <OxLoadingMark className="ui-control-spinner" />
         </span>
       ) : null}
       {loading ? <span className="ui-visually-hidden">{loadingLabel}</span> : null}

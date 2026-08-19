@@ -116,8 +116,10 @@ export const uiDocs = defineUiDocsGroup([
   },
   {
     exportName: 'Spinner', layer: 'components', category: 'Feedback', order: 60,
-    summary: 'Small reduced-motion-aware indeterminate activity indicator.', usage: 'Use for local transient activity where a full Progress track would be excessive.',
-    status: 'candidate', accessibility: 'Decorative/static activity is hidden from the accessibility tree by default; set announce to expose a polite loading status when the owning region needs it.', rtl: 'Direction-neutral.', touch: 'Non-interactive.', responsive: 'Intrinsic.',
+    summary: 'OntologyX O+X indeterminate activity mark with inline through hero-scale presentation and reduced-motion settlement.', usage: 'Use sm/md/lg for local transient activity and hero for first-entry or boot loading; the shared OX mark is also used by loading controls so product surfaces do not invent parallel spinners.',
+    status: 'candidate', accessibility: 'Decorative/static activity is hidden from the accessibility tree by default; set announce to expose a polite loading status when the owning region needs it.', rtl: 'Direction-neutral.', touch: 'Non-interactive.', responsive: 'Intrinsic; hero keeps the same brand geometry with a stronger display-scale stroke treatment.',
+    playground: { preferredWidth: 'wide', controls: ['size', 'announce'], options: { size: ['sm', 'md', 'lg', 'hero'] }, fixture: { size: 'hero', label: 'Starting OntologyX' } },
+    examples: [{ id: 'ox-loading', title: 'OX boot loading choreography', component: 'SpinnerExample' }],
   },
   {
     exportName: 'Skeleton', layer: 'components', category: 'Feedback', order: 60,
@@ -184,6 +186,19 @@ export function FeedbackExample() {
       <Spinner label="Refreshing" />
       <Skeleton width="medium" />
       <EmptyState title="Nothing here yet" description="Create an item when you are ready." action={<Button size="sm">Create</Button>} />
+    </div>
+  );
+}
+
+export function SpinnerExample() {
+  return (
+    <div className="ui-doc-spinner-boot" data-oxs-spinner-example="heartbeat">
+      <Spinner
+        data-oxs-spinner-purpose="boot"
+        label="Starting OntologyX"
+        announce
+        size="hero"
+      />
     </div>
   );
 }

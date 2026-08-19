@@ -14,6 +14,7 @@ import {
   LockStateGlyph,
   MailGlyph,
   MapPinGlyph,
+  OxMarkGlyph,
   PlaybackGlyph,
   RocketGlyph,
   SearchGlyph,
@@ -111,6 +112,7 @@ export function IconStaticContractExample() {
 }
 
 const staticPackSamples = [
+  ['OX mark', OxMarkGlyph],
   ['Home', HomeGlyph],
   ['Search', SearchGlyph],
   ['Settings', SettingsGlyph],
@@ -129,7 +131,12 @@ const staticPackSamples = [
 export function IconPackExample() {
   const [active, setActive] = useState(false);
   return (
-    <Stack gap="md" data-visual-cert="icon-pack">
+    <Stack
+      gap="md"
+      data-visual-cert="icon-pack"
+      data-icon-pack-static-count={STATIC_ICON_PACK_COUNT}
+      data-icon-pack-animated-count={ANIMATED_ICON_FAMILY_COUNT}
+    >
       <Text variant="body-strong">
         <Code>{STATIC_ICON_PACK_COUNT}</Code> static exports · <Code>{ANIMATED_ICON_FAMILY_COUNT}</Code> animated state families
       </Text>

@@ -153,6 +153,7 @@ export const ThumbUpGlyph = /* @__PURE__ */ staticGlyph(['M7 10v10H3V10z', 'M7 1
 export const ThumbDownGlyph = /* @__PURE__ */ staticGlyph(['M7 4v10H3V4z', 'M7 14l4 7 2-1-1-6h6a2 2 0 0 0 2-2l-2-8H7'], false);
 export const SmileGlyph = /* @__PURE__ */ staticGlyph(['M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z', 'M8 10h.01M16 10h.01', 'M8 14a5 5 0 0 0 8 0'], false);
 export const CircleGlyph = /* @__PURE__ */ staticGlyph(['M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z'], false);
+export const OxMarkGlyph = /* @__PURE__ */ staticGlyph(['M12 3.75a8.25 8.25 0 1 0 0 16.5 8.25 8.25 0 0 0 0-16.5Z', 'M8.4 8.4 15.6 15.6M15.6 8.4 8.4 15.6'], false);
 export const SquareGlyph = /* @__PURE__ */ staticGlyph(['M4 4h16v16H4z'], false);
 export const TriangleGlyph = /* @__PURE__ */ staticGlyph(['M12 4 21 20H3z'], false);
 export const DiamondGlyph = /* @__PURE__ */ staticGlyph(['m12 3 9 9-9 9-9-9z'], false);
@@ -248,5 +249,5 @@ export const CollapseGlyph = MinimizeGlyph;
 export const UploadCloudGlyph = UploadGlyph;
 export const DownloadCloudGlyph = DownloadGlyph;
 
-export const STATIC_ICON_PACK_COUNT = 244 as const;
+export const STATIC_ICON_PACK_COUNT = 245 as const;
 export type StaticIconGlyph = typeof HomeGlyph;

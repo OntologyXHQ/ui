@@ -663,6 +663,20 @@ body { overflow: hidden; background: #091019; color-scheme: dark light; }
   align-items: center;
 }
 
+.ui-doc-spinner-boot {
+  min-inline-size: 0;
+  inline-size: 100%;
+  min-block-size: 18rem;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--oxs-color-border-subtle);
+  border-radius: var(--oxs-radius-xl);
+  background:
+    radial-gradient(circle at 50% 50%, var(--oxs-color-accent-soft), transparent 42%),
+    var(--oxs-color-surface-subtle);
+}
+
 /* UIP09 overlays + feedback */
 .ui-overlays-hero { padding-block: clamp(var(--oxs-space-lg), 5cqi, 4.5rem) var(--oxs-space-md); }
 .ui-overlays-card { min-width: 0; padding: clamp(var(--oxs-space-md), 2.4cqi, var(--oxs-space-xl)); }

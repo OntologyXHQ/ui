@@ -119,6 +119,7 @@ describe('data and navigation components', () => {
         <StatusIndicator label="Sync changed" announce />
         <Spinner label="Refreshing" />
         <Spinner label="Loading results" announce />
+        <Spinner label="Starting OntologyX" size="hero" />
       </>,
     );
     const indicators = container.querySelectorAll('.ui-status-indicator');
@@ -129,6 +130,15 @@ describe('data and navigation components', () => {
     expect(spinners[0]).not.toHaveAttribute('role');
     expect(spinners[1]).toHaveAttribute('role', 'status');
     expect(spinners[1]).toHaveAttribute('aria-label', 'Loading results');
+    expect(spinners[2]).toHaveClass('ui-spinner--hero');
+    expect(spinners[2]).toHaveAttribute('aria-hidden', 'true');
+    expect(spinners[0].querySelector('[data-oxs-loading-mark=\"ox\"]')).toBeInTheDocument();
+    expect(spinners[0].querySelector('.ui-ox-loading-mark__track')).toBeInTheDocument();
+    expect(spinners[0].querySelector('.ui-ox-loading-mark__orbit')).toBeInTheDocument();
+    expect(spinners[0].querySelector('.ui-ox-loading-mark__cross')).toBeInTheDocument();
+    expect(spinners[0].querySelectorAll('.ui-ox-loading-mark__cross-stroke')).toHaveLength(2);
+    expect(spinners[0].querySelectorAll('.ui-ox-loading-mark__echo')).toHaveLength(2);
+    expect(spinners[0].querySelector('[data-oxs-loading-choreography="write-heartbeat-release"]')).toBeInTheDocument();
   });
 
   it('normalizes invalid progress maxima instead of emitting NaN semantics', () => {

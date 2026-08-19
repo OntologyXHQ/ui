@@ -150,7 +150,7 @@
   --oxs-motion-fast: 150ms;
   --oxs-motion-normal: 240ms;
   --oxs-motion-slow: 360ms;
-  --oxs-motion-spinner-period: 720ms;
+  --oxs-motion-spinner-period: 1900ms;
   --oxs-ease-standard: cubic-bezier(0.2, 0.75, 0.2, 1);
   --oxs-ease-emphasized: cubic-bezier(0.16, 0.82, 0.2, 1);
   --oxs-spring-rest-speed: 0.002;

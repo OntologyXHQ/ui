@@ -13,6 +13,7 @@ import * as StaticIcons from '../static';
 import {
   ChevronStartGlyph,
   HomeGlyph,
+  OxMarkGlyph,
   STATIC_ICON_PACK_COUNT,
 } from '../static';
 
@@ -31,6 +32,7 @@ describe('optional OntologyX icon pack', () => {
     render(
       <UiRoot direction="rtl">
         <Icon glyph={HomeGlyph} label="Home pack glyph" />
+        <Icon glyph={OxMarkGlyph} label="OntologyX mark glyph" />
         <Icon glyph={ChevronStartGlyph} label="Directional pack glyph" />
         <Icon glyph={PlaybackGlyph} state="pause" label="Playback pack glyph" />
         <Icon glyph={ActivityStateGlyph} state="active" label="Activity pack glyph" />
@@ -38,6 +40,7 @@ describe('optional OntologyX icon pack', () => {
     );
 
     expect(screen.getByRole('img', { name: 'Home pack glyph' })).toHaveAttribute('data-oxs-icon-state', 'default');
+    expect(screen.getByRole('img', { name: 'OntologyX mark glyph' })).toHaveAttribute('data-oxs-icon-state', 'default');
     expect(screen.getByRole('img', { name: 'Directional pack glyph' })).toHaveClass('ui-icon--mirror-rtl');
     expect(screen.getByRole('img', { name: 'Playback pack glyph' })).toHaveAttribute('data-oxs-icon-state', 'pause');
     expect(screen.getByRole('img', { name: 'Activity pack glyph' })).toHaveAttribute('data-oxs-icon-state', 'active');

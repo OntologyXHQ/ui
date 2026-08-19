@@ -17,6 +17,7 @@ describe('UI controls', () => {
     expect(button).toBeDisabled();
     expect(button).toHaveAttribute('aria-busy', 'true');
     expect(button).toHaveAttribute('data-oxs-cursor-role', 'progress');
+    expect(button.querySelector('[data-oxs-loading-mark=\"ox\"]')).toBeInTheDocument();
   });
 
   it('tracks keyboard pressed state without replacing native button activation', () => {

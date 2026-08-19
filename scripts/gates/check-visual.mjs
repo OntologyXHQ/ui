@@ -14,11 +14,18 @@ const staticIconPackSource = fs.readFileSync(path.join(UI_ROOT, 'src/icons/stati
 const animatedIconPackSource = fs.readFileSync(path.join(UI_ROOT, 'src/icons/animated.ts'), 'utf8');
 const packageJson = JSON.parse(fs.readFileSync(path.join(UI_ROOT, 'package.json'), 'utf8'));
 const css = fs.readFileSync(path.join(UI_ROOT, 'src/styles/primitives.css'), 'utf8');
+const componentCss = fs.readFileSync(path.join(UI_ROOT, 'src/styles/components.css'), 'utf8');
+const tokenCss = fs.readFileSync(path.join(UI_ROOT, 'src/styles/tokens.css'), 'utf8');
+const buttonSource = fs.readFileSync(path.join(UI_ROOT, 'src/components/Button.tsx'), 'utf8');
+const feedbackSource = fs.readFileSync(path.join(UI_ROOT, 'src/components/Feedback.tsx'), 'utf8');
+const loadingMarkSource = fs.readFileSync(path.join(UI_ROOT, 'src/components/OxLoadingMark.tsx'), 'utf8');
+const browserScenarioSource = fs.readFileSync(path.join(ROOT, 'scripts/browser/scenarios.mjs'), 'utf8');
 const catalog = buildCatalog({ uiRoot: UI_ROOT });
 const issues = [];
 
 const visualNames = new Set(['Text', 'Heading', 'Label', 'Code', 'Icon', 'Surface', 'Divider']);
 const acceptedVisual = catalog.filter((entry) => visualNames.has(entry.exportName) && entry.status === 'accepted');
+const spinnerCatalogEntry = catalog.find((entry) => entry.exportName === 'Spinner');
 for (const exportName of visualNames) {
   const entry = acceptedVisual.find((candidate) => candidate.exportName === exportName);
   if (!entry) {
@@ -137,6 +144,70 @@ for (const [fileName, source] of [['static', staticIconPackSource], ['animated',
   }
 }
 
+if (!staticIconPackSource.includes('export const OxMarkGlyph =')) {
+  issues.push('The optional icon pack must retain the static OntologyX O+X brand mark');
+}
+if (!spinnerCatalogEntry?.examples?.some((example) => example.id === 'ox-loading' && example.component === 'SpinnerExample')) {
+  issues.push('Spinner must retain its dedicated ox-loading Studio example so branded loading-motion certification never relies on another component entry');
+}
+if (!loadingMarkSource.includes('data-oxs-loading-mark="ox"') || !loadingMarkSource.includes('data-oxs-loading-choreography="write-heartbeat-release"') || !loadingMarkSource.includes('ui-ox-loading-mark__orbit') || !loadingMarkSource.includes('ui-ox-loading-mark__cross')) {
+  issues.push('The shared OntologyX loading mark must retain explicit O-ring/orbit/X write-heartbeat-release structure');
+}
+if ((loadingMarkSource.match(/ui-ox-loading-mark__cross-stroke/g) ?? []).length < 2 || (loadingMarkSource.match(/ui-ox-loading-mark__echo/g) ?? []).length < 2) {
+  issues.push('OntologyX loading choreography must keep independently drawable X strokes and a two-beat echo pair');
+}
+if (!buttonSource.includes('<OxLoadingMark className="ui-control-spinner" />') || !feedbackSource.includes('<OxLoadingMark />')) {
+  issues.push('Button loading and Spinner must consume the one shared OntologyX loading mark');
+}
+for (const legacySpinner of ['@keyframes ui-control-spin', '@keyframes oxs-component-spin']) {
+  if (componentCss.includes(legacySpinner)) issues.push(`Legacy generic spinner animation must not return: ${legacySpinner}`);
+}
+for (const keyframe of [
+  'oxs-ox-loading-orbit',
+  'oxs-ox-loading-write-a',
+  'oxs-ox-loading-write-b',
+  'oxs-ox-loading-heartbeat',
+  'oxs-ox-loading-echo-primary',
+  'oxs-ox-loading-echo-secondary',
+]) {
+  if (!componentCss.includes(`@keyframes ${keyframe}`)) issues.push(`OntologyX loading choreography is missing ${keyframe}`);
+}
+if (/ui-ox-loading-mark[^}]*animation:[^;]*\blinear\b/s.test(componentCss)) {
+  issues.push('OntologyX loading choreography must not fall back to linear timing');
+}
+if (!componentCss.includes('stroke-dasharray: 96 4') || !componentCss.includes('stroke-dasharray: 7 93') || !componentCss.includes('stroke-dashoffset: -100')) {
+  issues.push('OntologyX O-ring must visibly close, release and return through a seam-equivalent dash phase');
+}
+if (!browserScenarioSource.includes('orbitAnimation.effect.getKeyframes()') || !browserScenarioSource.includes('circularDistance(motion.preSeam.orbitDashoffset') || browserScenarioSource.includes('Math.abs(Math.abs(motion.seam.orbitDashoffset')) {
+  issues.push('OX heartbeat G6 must certify authored endpoint equivalence plus pre-seam modular continuity instead of sampling an infinite animation exactly at the wrapped iteration boundary');
+}
+if (!componentCss.includes('transform: scale(1.13)') || !componentCss.includes('transform: scale(1.075)')) {
+  issues.push('OntologyX loading mark must retain its strong two-beat heartbeat choreography');
+}
+const spinnerPeriod = Number(tokenCss.match(/--oxs-motion-spinner-period:\s*(\d+)ms/)?.[1] ?? 0);
+if (spinnerPeriod < 1600 || spinnerPeriod > 2400) {
+  issues.push(`OntologyX loading heartbeat period must stay in the expressive 1.6–2.4s range; saw ${spinnerPeriod}ms`);
+}
+if (!componentCss.includes(".ui-root[data-oxs-motion='reduced'] .ui-ox-loading-mark__orbit") || !componentCss.includes(".ui-root[data-oxs-motion='reduced'] .ui-ox-loading-mark__cross")) {
+  issues.push('OntologyX loading mark must settle through resolved UiRoot reduced-motion policy');
+}
+
+if (!feedbackSource.includes("size?: 'sm' | 'md' | 'lg' | 'hero'")) {
+  issues.push('Spinner must preserve the hero size contract for first-entry/boot loading.');
+}
+if (spinnerCatalogEntry?.playground?.fixture?.size !== 'hero') {
+  issues.push('Spinner Studio preview must default to the hero loading presentation so branded choreography is inspectable.');
+}
+for (const required of ['.ui-spinner--hero', '--oxs-ox-orbit-stroke: 2.45', '--oxs-ox-cross-stroke: 2.35']) {
+  if (!componentCss.includes(required)) issues.push(`OX hero loading treatment is missing ${required}`);
+}
+if (!browserScenarioSource.includes("Spinner canonical example must show one OX loading mark")) {
+  issues.push('OX browser certification must reject duplicate loading marks in the canonical Spinner example.');
+}
+if (!browserScenarioSource.includes('Boot OX loader is too small')) {
+  issues.push('OX browser certification must enforce an inspectable hero-scale first-entry loading presentation.');
+}
+
 for (const forbidden of ['hovered?:', 'pressed?:', 'selected?:', 'interactive?:']) {
   if (surfaceSource.includes(forbidden)) {
     issues.push(`Surface must not own Component interaction state: ${forbidden.replace('?:', '')}`);
@@ -168,5 +239,5 @@ if (issues.length) {
 }
 
 console.log(
-  `G0 visual primitive contract passed: ${acceptedVisual.length} accepted visual primitive(s) · semantic typography/reflow · multi-state transient Icon motion · optional 240+ static / 20+ animated icon pack · local-direction mirroring · static Surface boundary · logical tokenized Divider.`,
+  `G0 visual primitive contract passed: ${acceptedVisual.length} accepted visual primitive(s) · semantic typography/reflow · multi-state transient Icon motion · optional 240+ static / 20+ animated icon pack · OX brand loading mark · local-direction mirroring · static Surface boundary · logical tokenized Divider.`,
 );

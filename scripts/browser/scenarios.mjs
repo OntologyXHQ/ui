@@ -1093,8 +1093,18 @@ export const browserScenarios = [
         const animatedSamples = pack.locator('[data-icon-pack-animated]');
         assert.ok(await staticSamples.count() >= 12, 'Icon pack Studio evidence did not render a broad static sample.');
         assert.ok(await animatedSamples.count() >= 6, 'Icon pack Studio evidence did not render multiple animated families.');
-        await page.getByText('244 static exports', { exact: false }).waitFor({ state: 'visible' });
-        await page.getByText('22 animated state families', { exact: false }).waitFor({ state: 'visible' });
+        const reportedStaticCount = Number(await pack.getAttribute('data-icon-pack-static-count'));
+        const reportedAnimatedCount = Number(await pack.getAttribute('data-icon-pack-animated-count'));
+        assert.ok(
+          Number.isInteger(reportedStaticCount) && reportedStaticCount >= 240,
+          `Icon pack reported an invalid static export count: ${reportedStaticCount}.`,
+        );
+        assert.ok(
+          Number.isInteger(reportedAnimatedCount) && reportedAnimatedCount >= 20,
+          `Icon pack reported an invalid animated-family count: ${reportedAnimatedCount}.`,
+        );
+        await pack.getByText(`${reportedStaticCount} static exports`, { exact: false }).waitFor({ state: 'visible' });
+        await pack.getByText(`${reportedAnimatedCount} animated state families`, { exact: false }).waitFor({ state: 'visible' });
 
         const playback = pack.locator('[data-icon-pack-animated="playback"]');
         assert.equal(await playback.getAttribute('data-oxs-icon-state'), 'play', 'Pack playback family did not expose its initial stable state.');
@@ -1225,6 +1235,160 @@ export const browserScenarios = [
       }
     },
     { accepts: ['Surface', 'Divider'] },
+  ),
+
+  scenario(
+    'ox-loading-heartbeat-motion-certification',
+    ['visual', 'brand', 'loading', 'motion', 'heartbeat', 'reduced-motion'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 920, height: 720 }, reducedMotion: 'no-preference' });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const workbench = await gotoCatalog(page, baseUrl, { entry: 'Spinner', tab: 'examples', example: 'ox-loading', motion: 'full' });
+        const marks = workbench.locator('[data-oxs-loading-mark="ox"]');
+        assert.equal(await marks.count(), 1, 'Spinner canonical example must show one OX loading mark, not duplicate the control-loading treatment.');
+        const mark = marks.first();
+        await mark.waitFor({ state: 'visible' });
+        const bootSpinner = workbench.locator('[data-oxs-spinner-purpose="boot"]');
+        await bootSpinner.waitFor({ state: 'visible' });
+        const bootGeometry = await bootSpinner.evaluate((element) => {
+          const orbit = element.querySelector('.ui-ox-loading-mark__orbit');
+          const rect = element.getBoundingClientRect();
+          return {
+            width: rect.width,
+            height: rect.height,
+            orbitStrokeWidth: orbit ? Number.parseFloat(getComputedStyle(orbit).strokeWidth) : Number.NaN,
+          };
+        });
+        assert.ok(bootGeometry.width >= 120 && bootGeometry.height >= 120, `Boot OX loader is too small (${bootGeometry.width}×${bootGeometry.height}).`);
+        assert.ok(bootGeometry.orbitStrokeWidth >= 2.3, `Boot OX loader lost its display-scale stroke weight (${bootGeometry.orbitStrokeWidth}).`);
+        assert.equal(await mark.getAttribute('data-oxs-loading-choreography'), 'write-heartbeat-release', 'OX loader lost its branded choreography identity.');
+        const motion = await mark.evaluate(async (element) => {
+          const orbit = element.querySelector('.ui-ox-loading-mark__orbit');
+          const strokeA = element.querySelector('.ui-ox-loading-mark__cross-stroke--a');
+          const strokeB = element.querySelector('.ui-ox-loading-mark__cross-stroke--b');
+          const cross = element.querySelector('.ui-ox-loading-mark__cross');
+          const primaryEcho = element.querySelector('.ui-ox-loading-mark__echo--primary');
+          if (!(orbit && strokeA && strokeB && cross && primaryEcho)) throw new Error('OX heartbeat fixture is incomplete.');
+          const animations = element.getAnimations({ subtree: true });
+          const orbitAnimation = orbit.getAnimations()[0];
+          if (!orbitAnimation?.effect || typeof orbitAnimation.effect.getKeyframes !== 'function') {
+            throw new Error('OX orbit animation does not expose inspectable keyframes.');
+          }
+          await Promise.all(animations.map((animation) => animation.ready));
+          animations.forEach((animation) => animation.pause());
+          const duration = Number(getComputedStyle(orbit).animationDuration.replace('s', '')) * 1000;
+          const parseDasharray = (value) => String(value)
+            .split(/[\s,]+/)
+            .map((part) => Number.parseFloat(part))
+            .filter(Number.isFinite);
+          const keyframes = orbitAnimation.effect.getKeyframes();
+          const firstKeyframe = keyframes[0];
+          const lastKeyframe = keyframes.at(-1);
+          const sample = async (time) => {
+            animations.forEach((animation) => { animation.currentTime = time; });
+            await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+            const orbitStyle = getComputedStyle(orbit);
+            return {
+              orbitDasharray: orbitStyle.strokeDasharray,
+              orbitDasharrayParts: parseDasharray(orbitStyle.strokeDasharray),
+              orbitDashoffset: Number.parseFloat(orbitStyle.strokeDashoffset),
+              timing: orbitStyle.animationTimingFunction,
+              strokeA: Number.parseFloat(getComputedStyle(strokeA).strokeDashoffset),
+              strokeB: Number.parseFloat(getComputedStyle(strokeB).strokeDashoffset),
+              crossTransform: getComputedStyle(cross).transform,
+              echoOpacity: Number.parseFloat(getComputedStyle(primaryEcho).opacity),
+            };
+          };
+          const start = await sample(0);
+          const preSeam = await sample(Math.max(0, duration - Math.min(16, duration * 0.008)));
+          const wrapped = await sample(duration);
+          return {
+            duration,
+            animationCount: animations.length,
+            keyframeSeam: {
+              startDasharray: parseDasharray(firstKeyframe?.strokeDasharray ?? ''),
+              endDasharray: parseDasharray(lastKeyframe?.strokeDasharray ?? ''),
+              startDashoffset: Number.parseFloat(String(firstKeyframe?.strokeDashoffset ?? 'NaN')),
+              endDashoffset: Number.parseFloat(String(lastKeyframe?.strokeDashoffset ?? 'NaN')),
+            },
+            start,
+            writing: await sample(duration * 0.24),
+            locked: await sample(duration * 0.39),
+            firstBeat: await sample(duration * 0.42),
+            secondBeat: await sample(duration * 0.49),
+            release: await sample(duration * 0.82),
+            preSeam,
+            wrapped,
+          };
+        });
+        assert.ok(motion.animationCount >= 6, `OX loader lost part of its choreography (${motion.animationCount} animations).`);
+        assert.ok(motion.duration >= 1600 && motion.duration <= 2400, `OX heartbeat period is outside the expressive range (${motion.duration}ms).`);
+        assert.notEqual(motion.start.timing, 'linear', 'OX loading motion regressed to linear timing.');
+        assert.ok(Math.abs(motion.writing.strokeA) < Math.abs(motion.start.strokeA), 'First X stroke did not visibly write into the mark.');
+        assert.ok(Math.abs(motion.locked.strokeA) < 0.05 && Math.abs(motion.locked.strokeB) < 0.05, 'OX mark did not reach a fully written lock phase.');
+        assert.notEqual(motion.firstBeat.crossTransform, motion.locked.crossTransform, 'Primary heartbeat did not deform the X mark.');
+        assert.notEqual(motion.secondBeat.crossTransform, motion.locked.crossTransform, 'Secondary heartbeat did not produce the dub beat.');
+        assert.ok(motion.firstBeat.echoOpacity > 0.1, 'Primary heartbeat did not emit the O-ring echo.');
+        assert.notEqual(motion.release.orbitDasharray, motion.locked.orbitDasharray, 'O-ring did not release after the heartbeat lock.');
+        const dashDistance = (left, right) => Math.max(
+          ...left.map((value, index) => Math.abs(value - (right[index] ?? Number.NaN))),
+        );
+        const circularDistance = (left, right, period) => {
+          const raw = Math.abs(left - right) % period;
+          return Math.min(raw, period - raw);
+        };
+        assert.ok(
+          motion.keyframeSeam.startDasharray.length === motion.keyframeSeam.endDasharray.length
+            && dashDistance(motion.keyframeSeam.startDasharray, motion.keyframeSeam.endDasharray) < 0.05,
+          'OX authored loop endpoints do not preserve the same orbit shape.',
+        );
+        assert.ok(
+          Math.abs(Math.abs(motion.keyframeSeam.endDashoffset - motion.keyframeSeam.startDashoffset) - 100) < 0.05,
+          'OX authored loop endpoints are not one pathLength-equivalent revolution apart.',
+        );
+        assert.ok(
+          motion.preSeam.orbitDasharrayParts.length === motion.start.orbitDasharrayParts.length
+            && dashDistance(motion.preSeam.orbitDasharrayParts, motion.start.orbitDasharrayParts) < 2.5,
+          'OX orbit shape does not converge smoothly into the loop boundary.',
+        );
+        assert.ok(
+          circularDistance(motion.preSeam.orbitDashoffset, motion.start.orbitDashoffset, 100) < 2.5,
+          'OX orbit phase does not converge smoothly into the loop boundary.',
+        );
+        assert.ok(
+          motion.wrapped.orbitDasharrayParts.length === motion.start.orbitDasharrayParts.length
+            && dashDistance(motion.wrapped.orbitDasharrayParts, motion.start.orbitDasharrayParts) < 0.05,
+          'OX wrapped iteration does not restart at the authored orbit shape.',
+        );
+        assert.ok(
+          circularDistance(motion.wrapped.orbitDashoffset, motion.start.orbitDashoffset, 100) < 0.05,
+          'OX wrapped iteration does not restart at the equivalent orbit phase.',
+        );
+
+        await page.emulateMedia({ reducedMotion: 'reduce' });
+        await page.locator('.ui-root').evaluate((root) => root.setAttribute('data-oxs-motion', 'reduced'));
+        const reduced = await mark.evaluate((element) => {
+          const orbit = element.querySelector('.ui-ox-loading-mark__orbit');
+          const strokes = [...element.querySelectorAll('.ui-ox-loading-mark__cross-stroke')];
+          const echoes = [...element.querySelectorAll('.ui-ox-loading-mark__echo')];
+          return {
+            animations: element.getAnimations({ subtree: true }).length,
+            orbitDasharray: getComputedStyle(orbit).strokeDasharray,
+            strokeOffsets: strokes.map((stroke) => Number.parseFloat(getComputedStyle(stroke).strokeDashoffset)),
+            echoOpacity: echoes.map((echo) => Number.parseFloat(getComputedStyle(echo).opacity)),
+          };
+        });
+        assert.equal(reduced.animations, 0, 'Reduced-motion OX mark retained active animations.');
+        assert.ok(reduced.strokeOffsets.every((offset) => Math.abs(offset) < 0.05), 'Reduced-motion OX mark did not settle to a fully written X.');
+        assert.ok(reduced.echoOpacity.every((opacity) => opacity === 0), 'Reduced-motion OX mark retained heartbeat echoes.');
+        diagnostics.assertClean('OX loading heartbeat motion');
+        return { motion, reduced };
+      } finally {
+        await context.close();
+      }
+    },
   ),
 
   scenario(
