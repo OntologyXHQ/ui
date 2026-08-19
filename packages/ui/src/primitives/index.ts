@@ -1,4 +1,14 @@
-export type { IconMirror, IconName, IconProps, IconSize, UiIconDefinition } from './Icon';
+export type {
+  IconMirror,
+  IconName,
+  IconProps,
+  IconSize,
+  IconStateFor,
+  IconTransitionMotion,
+  UiIconDefinition,
+  UiIconGlyphDefinition,
+  UiIconTransitionDefinition,
+} from './Icon';
 export { defineUiIcon, Icon } from './Icon';
 export type {
   Align,
@@ -28,13 +38,22 @@ export type {
   WrapProps,
 } from './Layout';
 export { Box, Container, Grid, Inset, Row, SafeArea, Spacer, Stack, Wrap } from './Layout';
-export type { DividerProps, SurfaceProps } from './Surface';
+export type {
+  DividerProps,
+  DividerThickness,
+  DividerTone,
+  SurfaceBorder,
+  SurfaceProps,
+} from './Surface';
 export { Divider, Surface } from './Surface';
 export type {
+  CodeElement,
   CodeProps,
   HeadingProps,
   HeadingSize,
   LabelProps,
+  TextElement,
+  TextOverflowWrap,
   TextProps,
   TextTone,
   TextVariant,

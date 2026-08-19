@@ -71,7 +71,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
         }
       }}
     >
-      <Icon name={icon} size={size === 'sm' ? 'sm' : 'md'} aria-hidden />
+      <Icon name={icon} size={size === 'sm' ? 'sm' : 'md'} />
     </Button>
   );
 });

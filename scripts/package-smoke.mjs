@@ -94,7 +94,8 @@ try {
   await writeFile(
     path.join(consumer, 'src/main.tsx'),
     `import '@ontologyx/ui/styles.css';
-import { Button, Stack, UiRoot, type SystemKeyboardSurfaceState } from '@ontologyx/ui';
+import { Button, Icon, Stack, UiRoot, type SystemKeyboardSurfaceState } from '@ontologyx/ui';
+import { HomeGlyph, PlaybackGlyph } from '@ontologyx/ui/icons';
 import { usePress } from '@ontologyx/ui/advanced';
 
 const state: SystemKeyboardSurfaceState = {
@@ -113,6 +114,8 @@ export const Smoke = () => (
   <UiRoot>
     <Stack>
       <Button>Smoke</Button>
+      <Icon glyph={HomeGlyph} />
+      <Icon glyph={PlaybackGlyph} state="pause" />
     </Stack>
   </UiRoot>
 );
@@ -120,10 +123,10 @@ export const Smoke = () => (
   );
 
   run(['install', '--prefer-offline', '--ignore-scripts', '--strict-peer-dependencies'], consumer);
-  runNode(['--input-type=module', '--eval', "await import('@ontologyx/ui'); await import('@ontologyx/ui/advanced');"], consumer);
+  runNode(['--input-type=module', '--eval', "await import('@ontologyx/ui'); await import('@ontologyx/ui/advanced'); await import('@ontologyx/ui/icons');"], consumer);
   run(['exec', 'tsc', '--noEmit', '-p', 'tsconfig.json', '--pretty', 'false'], consumer);
   run(['exec', 'vite', 'build'], consumer);
-  console.log('Published-tarball consumer smoke passed: install · Node import · types · explicit styles export · Vite build.');
+  console.log('Published-tarball consumer smoke passed: install · Node import (main/advanced/icons) · types · explicit styles export · Vite build.');
 } finally {
   await rm(temp, { recursive: true, force: true });
 }

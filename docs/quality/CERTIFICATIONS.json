@@ -180,6 +180,145 @@
         "decorative",
         "a11y"
       ]
+    },
+    "Text": {
+      "owner": "UIR04",
+      "behaviorTests": [
+        "packages/ui/src/primitives/__tests__/visual-primitives.test.tsx"
+      ],
+      "browserScenarios": [
+        "typography-semantic-bidi-reflow-certification"
+      ],
+      "requiredAxes": [
+        "visual",
+        "typography",
+        "semantics",
+        "bidi",
+        "rtl",
+        "font-fallback",
+        "long-string",
+        "zoom",
+        "reflow",
+        "selection",
+        "a11y"
+      ]
+    },
+    "Heading": {
+      "owner": "UIR04",
+      "behaviorTests": [
+        "packages/ui/src/primitives/__tests__/visual-primitives.test.tsx"
+      ],
+      "browserScenarios": [
+        "typography-semantic-bidi-reflow-certification"
+      ],
+      "requiredAxes": [
+        "visual",
+        "typography",
+        "semantics",
+        "bidi",
+        "rtl",
+        "zoom",
+        "reflow",
+        "a11y"
+      ]
+    },
+    "Label": {
+      "owner": "UIR04",
+      "behaviorTests": [
+        "packages/ui/src/primitives/__tests__/visual-primitives.test.tsx"
+      ],
+      "browserScenarios": [
+        "typography-semantic-bidi-reflow-certification"
+      ],
+      "requiredAxes": [
+        "visual",
+        "typography",
+        "semantics",
+        "rtl",
+        "reflow",
+        "a11y"
+      ]
+    },
+    "Code": {
+      "owner": "UIR04",
+      "behaviorTests": [
+        "packages/ui/src/primitives/__tests__/visual-primitives.test.tsx"
+      ],
+      "browserScenarios": [
+        "typography-semantic-bidi-reflow-certification"
+      ],
+      "requiredAxes": [
+        "visual",
+        "typography",
+        "semantics",
+        "bidi",
+        "rtl",
+        "font-fallback",
+        "long-string",
+        "reflow",
+        "a11y"
+      ]
+    },
+    "Icon": {
+      "owner": "UIR04",
+      "behaviorTests": [
+        "packages/ui/src/primitives/__tests__/visual-primitives.test.tsx",
+        "packages/ui/src/icons/__tests__/icon-pack.test.tsx"
+      ],
+      "browserScenarios": [
+        "icon-multistate-transition-certification",
+        "icon-pack-breadth-certification"
+      ],
+      "requiredAxes": [
+        "visual",
+        "icon",
+        "multi-state",
+        "transient-state",
+        "motion",
+        "reduced-motion",
+        "interruption",
+        "current-color",
+        "rtl",
+        "custom-glyph",
+        "a11y",
+        "icon-pack",
+        "static-pack",
+        "animated-pack"
+      ]
+    },
+    "Surface": {
+      "owner": "UIR04",
+      "behaviorTests": [
+        "packages/ui/src/primitives/__tests__/visual-primitives.test.tsx"
+      ],
+      "browserScenarios": [
+        "surface-divider-visual-boundary-certification"
+      ],
+      "requiredAxes": [
+        "visual",
+        "surface",
+        "material",
+        "elevation",
+        "border",
+        "static-state",
+        "a11y"
+      ]
+    },
+    "Divider": {
+      "owner": "UIR04",
+      "behaviorTests": [
+        "packages/ui/src/primitives/__tests__/visual-primitives.test.tsx"
+      ],
+      "browserScenarios": [
+        "surface-divider-visual-boundary-certification"
+      ],
+      "requiredAxes": [
+        "visual",
+        "divider",
+        "separator",
+        "logical-inset",
+        "a11y"
+      ]
     }
   }
 }

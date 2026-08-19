@@ -12,10 +12,10 @@ for (const [subpath, target] of Object.entries(pkg.exports ?? {})) {
   const values = typeof target === 'string' ? [target] : Object.values(target);
   for (const value of values) if (typeof value === 'string' && value.includes('/src/')) failures.push(`${subpath} leaks source export ${value}`);
 }
-for (const rel of ['dist/index.js', 'dist/advanced.js', 'dist/index.d.ts', 'dist/advanced.d.ts', 'dist/styles.css']) {
+for (const rel of ['dist/index.js', 'dist/advanced.js', 'dist/icons.js', 'dist/index.d.ts', 'dist/advanced.d.ts', 'dist/icons.d.ts', 'dist/styles.css']) {
   try { await access(path.join(root, rel)); } catch { failures.push(`missing ${rel}`); }
 }
-for (const rel of ['dist/index.js', 'dist/advanced.js']) {
+for (const rel of ['dist/index.js', 'dist/advanced.js', 'dist/icons.js']) {
   try {
     const javascript = await readFile(path.join(root, rel), 'utf8');
     if (/['"][^'"\n]+\.css['"]/.test(javascript)) {
@@ -23,6 +23,12 @@ for (const rel of ['dist/index.js', 'dist/advanced.js']) {
     }
   } catch {}
 }
+
+const iconsExport = pkg.exports?.['./icons'];
+if (!iconsExport || typeof iconsExport === 'string' || iconsExport.import !== './dist/icons.js' || iconsExport.types !== './dist/icons.d.ts') {
+  failures.push('package must expose ./icons as the optional built ESM/declaration icon-pack subpath');
+}
+
 if (pkg.exports?.['./styles.css'] !== './dist/styles.css') {
   failures.push('package must expose ./styles.css as the canonical explicit stylesheet export');
 }

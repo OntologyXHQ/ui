@@ -25,6 +25,7 @@ Protects repository and package ownership:
 - environment preferences and resolved runtime state stay distinct; responsive layout is container-first, device sniffing and viewport-size media-query adaptation are forbidden, CSS consumes resolved density/motion, and public box layout uses logical inline properties.
 - persistent safe area and transient host occlusion are separate explicit-unit logical inputs; Components that must avoid blocked regions consume their combined environment inset rather than abusing safe area for keyboard occlusion.
 - accepted Layout primitives use finite logical props and intrinsic native polymorphism; inline style/color serialization, physical directional spacing props, reverse/order APIs, and shared family demos masquerading as per-export certification are rejected by the layout gate.
+- accepted Visual primitives keep typography on bounded native semantics and explicit long-token reflow, replace generic Icon animation knobs with declared stable/transient state families that consume resolved reduced-motion, require local-direction Icon mirroring, keep the 240+ static / 20+ animated optional icon pack on a separate self-contained `@ontologyx/ui/icons` package subpath, keep Surface free of Component interaction-state ownership, and keep Divider tone/thickness/inset finite and token/logical-axis backed.
 
 ### G1 — catalog acceptance
 
@@ -90,6 +91,7 @@ The current harness proves the evidence system itself across real browser journe
 - RTL/LTR, theme/color-scheme, density, reduced-motion, modality/pointer precision and preference-vs-resolved environment projection;
 - measured container adaptive bands plus separate safe-area, transient occlusion and combined environment-inset inputs;
 - narrow/reflow geometry without screenshot/pixel assertions;
+- visual-primitive certification covers mixed Persian/English typography, missing-font fallback, long-token wrapping, browser page zoom, multi-state Icon transient/reduced-motion/interruption behavior, currentColor/local-direction RTL/custom glyphs, optional static+animated icon-pack breadth, and static Surface/Divider token/accessibility boundaries;
 - browser console/page errors are blocking in product journeys; focused content inside `aria-hidden`/`inert` ancestry is checked as a direct DOM-semantic invariant rather than relying on browser warning transport.
 
 G6 writes machine-readable diagnostic evidence to `artifacts/browser-acceptance/latest.json` plus a timestamped sibling. Evidence contains the source fingerprint, Git HEAD when available, browser/version, axes, scenario results and axe summaries. Screenshots are not acceptance evidence and pixel snapshots are not used.
@@ -131,3 +133,10 @@ Focused gates may be rerun while debugging, but a part cannot close on a focused
 12. **No downloaded-browser assumption.** Local/CI acceptance must run against an installed Chrome/Chromium or fail with an actionable browser-path requirement.
 
 - G6 semantic contrast contract: readable tertiary/supporting text must satisfy WCAG AA in supported themes.
+
+
+### UIR04 Icon completion invariant
+
+G0 Visual rejects an accepted multi-state Icon implementation that lacks both owner-node animation completion and bounded fallback settlement. This protects transient-state convergence when CSS animation events are cancelled or suppressed, while sequence identity protects retargeted transitions from stale completion.
+
+The same G0 gate also rejects root-coupled directional mirroring and icon-pack boundary drift: `@ontologyx/ui/icons` must remain a dedicated built subpath, the canonical package entry must not re-export the large vocabulary, declared static/animated counts must match source breadth, and pack sources may depend only on the canonical Icon definition contract.

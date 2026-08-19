@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased — UIR04 visual primitives reacceptance
+
+- UIR04 Icon-pack closeout: directional mirroring now resolves from the Icon element’s local `:dir(rtl)` state so nested RTL/LTR scopes do not depend on UiRoot direction. Added the optional `@ontologyx/ui/icons` entry with 160 distinct static glyph definitions exposed through 244 semantic exports/aliases plus 22 typed multi-state animated families, all self-contained on `defineUiIcon`; the canonical `@ontologyx/ui` entry does not re-export the pack. Added package/build/type boundaries, Studio breadth preview, unit/type coverage, G0 count/isolation invariants and a dedicated G6 pack journey.
+
+- UIR04 reduced-motion follow-up: desired Icon state now reconciles in a pre-paint layout effect so the prior stable state cannot leak across a committed state change; reduced-motion G6 convergence now waits for the exact requested stable semantic + visual state instead of accepting any stable phase. The Primitive remains layer-correct: reduced visual timing is still projected through UiRoot/CSS rather than importing the Motion engine into Primitives.
+
+- UIR04 follow-up: Icon transition completion is now deadlock-safe. The active transition node owns native `animationend`/`animationcancel` boundaries, while a realm-scoped watchdog derived from computed animation timing settles the same sequence if the browser suppresses or cancels the CSS event. Stale completion from interrupted transitions is ignored by sequence identity.
+
+- Closed UIR04 and promoted `Text`, `Heading`, `Label`, `Code`, `Icon`, `Surface`, and `Divider` to `accepted` with dedicated examples, behavior ownership and component-owned G6 certification.
+- Rebuilt typography around bounded native semantics, semantic tone/wrap/selection policy and explicit `overflowWrap="anywhere"` for long unbreakable content; removed the legacy display-heading content-width cap and added mixed Persian/English, font-fallback, narrow reflow and browser zoom evidence.
+- Replaced Icon's generic `animated` spin knob with immutable multi-state glyph families: stable semantic states, explicit transient transition-state identities, optional transient glyphs, finite motion treatments, interruption retargeting, current-color rendering and resolved UiRoot reduced-motion settlement are now part of the Icon contract.
+- Added the built-in `playback` family as the canonical stateful reference (`play → pausing → pause`, `pause → playing → play`) while preserving static `defineUiIcon({ paths })` shorthand and semantic RTL mirroring.
+- Reaccepted Surface as a static material/elevation/radius/border/clip boundary with no Primitive hover/pressed/selected state ownership; extended Divider with semantic border tone/thickness while keeping logical inset and semantic-vs-decorative separator behavior explicit.
+- Added the stable G0 visual-primitive gate plus three production-browser journeys covering typography/bidi/reflow, Icon multi-state/reduced-motion/interruption behavior, and Surface/Divider token/accessibility boundaries.
+
 ## Unreleased — UIR03 layout primitives redesign
 
 - UIR03-B browser follow-up: corrected the shared catalog deep-link harness so route activation is certified by attached target + `data-active` + active tab-panel ownership, while component/example visibility remains the responsibility of each semantic G6 assertion; a zero-layout diagnostic wrapper can no longer create a false product failure.

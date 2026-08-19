@@ -2,6 +2,8 @@
 .ui-heading,
 .ui-label,
 .ui-code {
+  min-inline-size: 0;
+  max-inline-size: 100%;
   margin: 0;
 }
 
@@ -38,7 +40,6 @@
 }
 
 .ui-heading--display {
-  max-width: 11ch;
   font-size: var(--oxs-type-display-size);
   line-height: var(--oxs-type-display-line);
   letter-spacing: var(--oxs-type-display-track);
@@ -80,6 +81,10 @@
   color: var(--oxs-color-success-text);
 }
 
+.ui-text--warning {
+  color: var(--oxs-color-warning-text);
+}
+
 .ui-text--truncate {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -104,6 +109,14 @@
 
 .ui-text--wrap-nowrap {
   white-space: nowrap;
+}
+
+.ui-text--overflow-wrap-normal {
+  overflow-wrap: normal;
+}
+
+.ui-text--overflow-wrap-anywhere {
+  overflow-wrap: anywhere;
 }
 
 .ui-code {
@@ -137,21 +150,117 @@
   height: 2rem;
 }
 
-.ui-icon--animated {
+.ui-icon__transition {
+  transform-box: view-box;
   transform-origin: center;
-  animation: oxs-icon-spin 1s linear infinite;
+  animation-duration: var(--oxs-motion-fast);
+  animation-timing-function: var(--oxs-ease-standard);
+  animation-fill-mode: both;
+  animation-name: oxs-icon-transition-clock;
 }
 
-@keyframes oxs-icon-spin {
-  to { rotate: 1turn; }
+.ui-icon__transition--pulse {
+  animation-name: oxs-icon-transition-pulse;
 }
 
-.ui-root[data-oxs-motion='reduced'] .ui-icon--animated {
+.ui-icon__transition--rotate {
+  animation-name: oxs-icon-transition-rotate;
+}
+
+.ui-icon__layer {
+  transform-box: view-box;
+  transform-origin: center;
+}
+
+.ui-icon__layer--from {
+  animation: oxs-icon-layer-from var(--oxs-motion-fast) var(--oxs-ease-standard) both;
+}
+
+.ui-icon__layer--transient {
+  animation: oxs-icon-layer-transient var(--oxs-motion-fast) var(--oxs-ease-standard) both;
+}
+
+.ui-icon__layer--to {
+  animation: oxs-icon-layer-to var(--oxs-motion-fast) var(--oxs-ease-standard) both;
+}
+
+@keyframes oxs-icon-transition-clock {
+  from { transform: translateZ(0); }
+  to { transform: translateZ(0); }
+}
+
+@keyframes oxs-icon-transition-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.82); }
+}
+
+@keyframes oxs-icon-transition-rotate {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(90deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes oxs-icon-layer-from {
+  0%, 28% { opacity: 1; }
+  64%, 100% { opacity: 0; }
+}
+
+@keyframes oxs-icon-layer-transient {
+  0%, 18% { opacity: 0; }
+  42%, 58% { opacity: 1; }
+  84%, 100% { opacity: 0; }
+}
+
+@keyframes oxs-icon-layer-to {
+  0%, 46% { opacity: 0; }
+  78%, 100% { opacity: 1; }
+}
+
+.ui-root[data-oxs-motion='reduced'] .ui-icon__transition {
+  animation-name: oxs-icon-transition-clock;
+  animation-duration: var(--oxs-motion-reduced);
+  transform: none;
+}
+
+.ui-root[data-oxs-motion='reduced'] .ui-icon__layer--from,
+.ui-root[data-oxs-motion='reduced'] .ui-icon__layer--transient {
   animation: none;
+  opacity: 0;
 }
 
-.ui-icon--mirror-always,
-.ui-root:dir(rtl) .ui-icon--mirror-rtl {
+.ui-root[data-oxs-motion='reduced'] .ui-icon__layer--to {
+  animation: none;
+  opacity: 1;
+}
+
+/* Logical icon mirroring is inherited from the nearest explicit direction boundary.
+ * Keep direction resolution on HTML/UiRoot boundaries rather than relying on :dir()
+ * matching SVG elements consistently across browser engines. */
+.ui-root[dir='ltr'],
+.ui-root [dir='ltr'] {
+  --oxs-icon-inline-transform: none;
+}
+
+.ui-root[dir='rtl'],
+.ui-root [dir='rtl'] {
+  --oxs-icon-inline-transform: scaleX(-1);
+}
+
+.ui-root[dir='auto']:dir(ltr),
+.ui-root [dir='auto']:dir(ltr) {
+  --oxs-icon-inline-transform: none;
+}
+
+.ui-root[dir='auto']:dir(rtl),
+.ui-root [dir='auto']:dir(rtl) {
+  --oxs-icon-inline-transform: scaleX(-1);
+}
+
+.ui-icon--mirror-rtl {
+  transform: var(--oxs-icon-inline-transform, none);
+}
+
+.ui-icon--mirror-always {
   transform: scaleX(-1);
 }
 
@@ -908,20 +1017,33 @@
 }
 
 .ui-divider {
+  --ui-divider-thickness: var(--oxs-border-hairline);
   flex: none;
   border: 0;
   margin: 0;
+  background: var(--oxs-color-border-subtle);
+}
+
+.ui-divider--tone-default {
   background: var(--oxs-color-border);
+}
+
+.ui-divider--tone-strong {
+  background: var(--oxs-color-border-strong);
+}
+
+.ui-divider--thickness-strong {
+  --ui-divider-thickness: var(--oxs-border-strong);
 }
 
 .ui-divider--horizontal {
   inline-size: 100%;
-  block-size: var(--oxs-border-hairline);
+  block-size: var(--ui-divider-thickness);
 }
 
 .ui-divider--vertical {
   align-self: stretch;
-  inline-size: var(--oxs-border-hairline);
+  inline-size: var(--ui-divider-thickness);
   min-block-size: 1em;
 }
 

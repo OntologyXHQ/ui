@@ -16,6 +16,7 @@ export default defineConfig({
       entry: {
         index: path.resolve(here, 'src/index.ts'),
         advanced: path.resolve(here, 'src/advanced.ts'),
+        icons: path.resolve(here, 'src/icons.ts'),
       },
       formats: ['es'],
       fileName: (_format, entryName) => `${entryName}.js`,

@@ -3,12 +3,21 @@ import { forwardRef } from 'react';
 import type { ElevationToken, MaterialToken, RadiusToken } from '../foundations';
 import type { PrimitiveHtmlProps } from './PrimitiveProps';
 
+export type SurfaceBorder = 'none' | 'subtle' | 'strong';
+export type DividerTone = 'subtle' | 'default' | 'strong';
+export type DividerThickness = 'hairline' | 'strong';
+
 export type SurfaceProps = PropsWithChildren<
   PrimitiveHtmlProps<HTMLDivElement> & {
+    /** Foundation material role only; interaction/selection state belongs to Components. @default glass */
     material?: MaterialToken;
+    /** Static Foundation elevation tier. Hover/press elevation is not a Primitive contract. @default 1 */
     elevation?: ElevationToken;
+    /** Foundation shape token. @default lg */
     radius?: RadiusToken;
-    border?: 'none' | 'subtle' | 'strong';
+    /** Static semantic border strength. @default subtle */
+    border?: SurfaceBorder;
+    /** Clips visual descendants to the selected surface radius. @default false */
     clip?: boolean;
   }
 >;
@@ -41,15 +50,27 @@ export const Surface = forwardRef<HTMLDivElement, SurfaceProps>(function Surface
   return <div ref={ref} className={classes} {...props}>{children}</div>;
 });
 
-export type DividerProps = PrimitiveHtmlProps<HTMLDivElement> & {
+export type DividerProps = Omit<
+  PrimitiveHtmlProps<HTMLDivElement>,
+  'role' | 'aria-hidden' | 'aria-orientation'
+> & {
+  /** Separator axis. @default horizontal */
   orientation?: 'horizontal' | 'vertical';
+  /** Logical-axis inset from the start/end/both edges. @default none */
   inset?: 'none' | 'start' | 'end' | 'both';
+  /** Semantic border color role. @default subtle */
+  tone?: DividerTone;
+  /** Foundation border thickness token. @default hairline */
+  thickness?: DividerThickness;
+  /** Removes separator semantics when the line is purely ornamental. @default false */
   decorative?: boolean;
 };
 
 export function Divider({
   orientation = 'horizontal',
   inset = 'none',
+  tone = 'subtle',
+  thickness = 'hairline',
   decorative = false,
   className = '',
   ...props
@@ -60,7 +81,14 @@ export function Divider({
       role={decorative ? 'none' : 'separator'}
       aria-hidden={decorative || undefined}
       aria-orientation={decorative ? undefined : orientation}
-      className={`ui-divider ui-divider--${orientation} ui-divider--inset-${inset} ${className}`.trim()}
+      className={[
+        'ui-divider',
+        `ui-divider--${orientation}`,
+        `ui-divider--inset-${inset}`,
+        `ui-divider--tone-${tone}`,
+        `ui-divider--thickness-${thickness}`,
+        className,
+      ].filter(Boolean).join(' ')}
     />
   );
 }

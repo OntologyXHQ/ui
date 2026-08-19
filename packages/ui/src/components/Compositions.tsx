@@ -111,7 +111,7 @@ export function Disclosure({
           <span className="ui-disclosure__title">{summary}</span>
           {description ? <span className="ui-disclosure__description" aria-hidden="true">{description}</span> : null}
         </span>
-        <Icon className="ui-disclosure__chevron" name="chevron-end" aria-hidden />
+        <Icon className="ui-disclosure__chevron" name="chevron-end" />
       </button>
       {description ? <span className="ui-visually-hidden" id={descriptionId}>{description}</span> : null}
       <div id={contentId} className="ui-disclosure__content" hidden={!current}>{children}</div>
@@ -190,7 +190,7 @@ export function Accordion({
                 <span className="ui-disclosure__title">{item.summary}</span>
                 {item.description ? <span className="ui-disclosure__description" aria-hidden="true">{item.description}</span> : null}
               </span>
-              <Icon className="ui-disclosure__chevron" name="chevron-end" aria-hidden />
+              <Icon className="ui-disclosure__chevron" name="chevron-end" />
             </button>
             {item.description ? <span className="ui-visually-hidden" id={descriptionId}>{item.description}</span> : null}
             <div id={contentId} className="ui-disclosure__content" hidden={!expanded}>{item.content}</div>
@@ -457,7 +457,7 @@ export function ApplicationItem({
   ...props
 }: ApplicationItemProps) {
   const graphic = typeof icon === 'string'
-    ? <Icon name={icon} size="lg" aria-hidden />
+    ? <Icon name={icon} size="lg" />
     : <img className="ui-application-item__image" src={icon.src} alt="" draggable={false} />;
   return (
     <Tile

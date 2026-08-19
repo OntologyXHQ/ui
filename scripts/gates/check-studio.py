@@ -88,7 +88,7 @@ while stack:
 for path in sorted(module_files - reachable):
     issues.append(f'unreachable Studio module: {path.relative_to(ROOT)}')
 
-allowed_external = {'react', 'react-dom', 'react-dom/client', '@ontologyx/ui', '@ontologyx/ui/styles.css'}
+allowed_external = {'react', 'react-dom', 'react-dom/client', '@ontologyx/ui', '@ontologyx/ui/icons', '@ontologyx/ui/styles.css'}
 for path in sorted(module_files):
     text = path.read_text(encoding='utf-8')
     if raw_control_re.search(text):
@@ -114,7 +114,7 @@ for path in sorted(DOCS_ROOT.rglob('*.docs.tsx')):
     text = path.read_text(encoding='utf-8')
     for match in import_re.finditer(text):
         specifier = match.group(1)
-        if specifier in {'react', '@ontologyx/ui', DOCS_HELPER}:
+        if specifier in {'react', '@ontologyx/ui', '@ontologyx/ui/icons', DOCS_HELPER}:
             continue
         if specifier.startswith('react/'):
             continue
@@ -128,4 +128,4 @@ if issues:
         print(f' - {issue}')
     raise SystemExit(1)
 
-print(f'G4 Studio integrity gate passed: {len(reachable)} reachable TS/TSX modules · no dead Studio modules · Studio/docs runtime uses public @ontologyx/ui only · no host/source deep imports.')
+print(f'G4 Studio integrity gate passed: {len(reachable)} reachable TS/TSX modules · no dead Studio modules · Studio/docs runtime uses public @ontologyx/ui package entries only · no host/source deep imports.')

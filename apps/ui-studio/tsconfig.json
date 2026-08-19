@@ -26,6 +26,9 @@
       "@ontologyx/ui/advanced": [
         "../../packages/ui/src/advanced.ts"
       ],
+      "@ontologyx/ui/icons": [
+        "../../packages/ui/src/icons.ts"
+      ],
       "@ontologyx/ui-docs/*": [
         "../../packages/ui/src/*"
       ]

@@ -828,6 +828,406 @@ export const browserScenarios = [
   ),
 
   scenario(
+    'typography-semantic-bidi-reflow-certification',
+    ['visual', 'typography', 'semantics', 'bidi', 'rtl', 'font-fallback', 'long-string', 'zoom', 'reflow', 'selection', 'a11y'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 980, height: 820 }, colorScheme: 'light' });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        await gotoCatalog(page, baseUrl, {
+          entry: 'Text',
+          tab: 'examples',
+          example: 'mixed-copy',
+          theme: 'light',
+          dir: 'rtl',
+          viewport: 'phone',
+          container: 'compact',
+        });
+        await page.locator('.ui-root').first().evaluate((root) => {
+          root.style.setProperty('--oxs-font-sans', '"Definitely Missing OntologyX Font", system-ui, sans-serif');
+        });
+        const text = page.locator('[data-visual-cert="text"]');
+        await text.waitFor({ state: 'visible' });
+        const textState = await text.evaluate((element) => {
+          const style = getComputedStyle(element);
+          const rect = element.getBoundingClientRect();
+          return {
+            tagName: element.tagName,
+            direction: style.direction,
+            overflowWrap: style.overflowWrap,
+            userSelect: style.userSelect,
+            fontFamily: style.fontFamily,
+            width: rect.width,
+            scrollWidth: element.scrollWidth,
+          };
+        });
+        assert.equal(textState.tagName, 'P', 'Text did not preserve paragraph semantics.');
+        assert.equal(textState.direction, 'rtl', 'dir="auto" did not resolve the Persian-first mixed copy to RTL.');
+        assert.equal(textState.overflowWrap, 'anywhere', 'Text long-token wrapping policy did not reach browser CSS.');
+        assert.equal(textState.userSelect, 'text', 'Text selectable policy did not reach browser selection behavior.');
+        assert.match(textState.fontFamily, /Definitely Missing OntologyX Font/, 'Text did not consume the overridden Foundation font stack.');
+        assert.ok(textState.width > 0 && textState.scrollWidth <= Math.ceil(textState.width) + 1, 'Mixed/long Text escaped its containing width.');
+        await assertNoGlobalHorizontalOverflow(page, 'Text mixed-script compact reflow');
+
+        const cdp = await context.newCDPSession(page);
+        await cdp.send('Emulation.setPageScaleFactor', { pageScaleFactor: 1.75 });
+        const zoomMetrics = await cdp.send('Page.getLayoutMetrics');
+        const zoom = zoomMetrics.cssVisualViewport?.scale ?? zoomMetrics.visualViewport?.scale ?? 1;
+        assert.ok(zoom >= 1.7, `Chrome page-scale emulation did not apply (scale=${zoom}).`);
+        await assertNoGlobalHorizontalOverflow(page, 'Text browser zoom reflow');
+        await cdp.send('Emulation.setPageScaleFactor', { pageScaleFactor: 1 });
+
+        await gotoCatalog(page, baseUrl, {
+          entry: 'Heading', tab: 'examples', example: 'semantic-rank', theme: 'light', dir: 'rtl', viewport: 'phone', container: 'compact',
+        });
+        const heading = page.locator('[data-visual-cert="heading"]');
+        const headingState = await heading.evaluate((element) => ({
+          tagName: element.tagName,
+          fontSize: getComputedStyle(element).fontSize,
+          maxInlineSize: getComputedStyle(element).maxInlineSize,
+        }));
+        assert.equal(headingState.tagName, 'H3', 'Heading visual size changed native semantic rank.');
+        assert.notEqual(headingState.maxInlineSize, '11ch', 'Display/heading typography still owns a legacy content-width cap.');
+
+        await gotoCatalog(page, baseUrl, {
+          entry: 'Label', tab: 'examples', example: 'metadata-label', theme: 'light', dir: 'rtl', viewport: 'phone', container: 'compact',
+        });
+        const label = page.locator('[data-visual-cert="label"]');
+        const labelState = await label.evaluate((element) => ({
+          tagName: element.tagName,
+          role: element.getAttribute('role'),
+          tabIndex: element.tabIndex,
+        }));
+        assert.deepEqual(labelState, { tagName: 'SPAN', role: null, tabIndex: -1 }, 'Label invented control/focus semantics.');
+
+        await gotoCatalog(page, baseUrl, {
+          entry: 'Code', tab: 'examples', example: 'native-code-semantics', theme: 'dark', dir: 'rtl', viewport: 'phone', container: 'compact',
+        });
+        const code = page.locator('[data-visual-cert="code"]');
+        const codeState = await code.evaluate((element) => {
+          const style = getComputedStyle(element);
+          return {
+            tagName: element.tagName,
+            direction: style.direction,
+            overflowWrap: style.overflowWrap,
+            fontFamily: style.fontFamily,
+          };
+        });
+        assert.equal(codeState.tagName, 'KBD', 'Code did not preserve native kbd semantics.');
+        assert.equal(codeState.direction, 'ltr', 'Code explicit native bidi override was lost inside RTL.');
+        assert.equal(codeState.overflowWrap, 'anywhere', 'Code long-token reflow was not explicit.');
+        assert.match(codeState.fontFamily, /SFMono-Regular|Cascadia Code|Roboto Mono|ui-monospace|monospace/, 'Code did not consume the Foundation monospace fallback stack.');
+        await assertNoGlobalHorizontalOverflow(page, 'Code compact reflow');
+        const axe = await runAxe(page, 'Typography semantic/bidi/reflow certification');
+        diagnostics.assertClean('Typography semantic/bidi/reflow certification');
+        return { axe, text: textState, heading: headingState, label: labelState, code: codeState, zoom };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['Text', 'Heading', 'Label', 'Code'] },
+  ),
+
+  scenario(
+    'icon-multistate-transition-certification',
+    ['visual', 'icon', 'multi-state', 'transient-state', 'motion', 'reduced-motion', 'interruption', 'current-color', 'rtl', 'custom-glyph', 'a11y'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 920, height: 760 }, colorScheme: 'dark' });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        await gotoCatalog(page, baseUrl, {
+          entry: 'Icon', tab: 'examples', example: 'state-transition', theme: 'dark', dir: 'ltr', motion: 'full', viewport: 'fit', container: 'compact',
+        });
+        const icon = page.locator('[data-visual-cert="stateful-icon"]');
+        const toggle = page.getByRole('button', { name: 'Toggle playback icon' });
+        await icon.waitFor({ state: 'visible' });
+        const initial = await icon.evaluate((element) => ({
+          state: element.getAttribute('data-oxs-icon-state'),
+          visual: element.getAttribute('data-oxs-icon-visual-state'),
+          phase: element.getAttribute('data-oxs-icon-phase'),
+          stroke: getComputedStyle(element).stroke,
+          color: getComputedStyle(element).color,
+          geometry: element.getBoundingClientRect().toJSON(),
+        }));
+        assert.deepEqual(
+          { state: initial.state, visual: initial.visual, phase: initial.phase },
+          { state: 'play', visual: 'play', phase: 'stable' },
+          'Playback Icon did not begin in its declared stable state.',
+        );
+        assert.equal(initial.stroke, initial.color, 'Icon stroke did not resolve through currentColor.');
+
+        await toggle.evaluate((button) => button.click());
+        await page.waitForFunction(
+          () => {
+            const target = document.querySelector('[data-visual-cert="stateful-icon"]');
+            return target?.getAttribute('data-oxs-icon-phase') === 'transitioning'
+              && target.getAttribute('data-oxs-icon-visual-state') === 'pausing';
+          },
+          undefined,
+          { timeout: 1000 },
+        );
+        const firstTransition = await icon.evaluate((target) => ({
+          state: target.getAttribute('data-oxs-icon-state'),
+          visual: target.getAttribute('data-oxs-icon-visual-state'),
+          phase: target.getAttribute('data-oxs-icon-phase'),
+          from: target.getAttribute('data-oxs-icon-from'),
+          to: target.getAttribute('data-oxs-icon-to'),
+          transient: target.querySelector('.ui-icon__transition')?.getAttribute('data-oxs-icon-transient') ?? null,
+        }));
+        assert.deepEqual(firstTransition, {
+          state: 'pause', visual: 'pausing', phase: 'transitioning', from: 'play', to: 'pause', transient: 'pausing',
+        }, 'Icon did not publish the explicit play → pausing → pause transition contract.');
+
+        await page.waitForFunction(
+          () => document.querySelector('[data-visual-cert="stateful-icon"]')?.getAttribute('data-oxs-icon-phase') === 'stable',
+          undefined,
+          { timeout: 1000 },
+        );
+        assert.equal(await icon.getAttribute('data-oxs-icon-visual-state'), 'pause', 'Icon did not settle on the destination stable state.');
+
+        await toggle.evaluate((button) => button.click());
+        await page.waitForFunction(
+          () => document.querySelector('[data-visual-cert="stateful-icon"]')?.getAttribute('data-oxs-icon-visual-state') === 'playing',
+          undefined,
+          { timeout: 1000 },
+        );
+        const interruptedFirst = await icon.getAttribute('data-oxs-icon-visual-state');
+        await toggle.evaluate((button) => button.click());
+        await page.waitForFunction(
+          () => {
+            const target = document.querySelector('[data-visual-cert="stateful-icon"]');
+            return target?.getAttribute('data-oxs-icon-phase') === 'transitioning'
+              && target.getAttribute('data-oxs-icon-visual-state') === 'pausing'
+              && target.getAttribute('data-oxs-icon-state') === 'pause';
+          },
+          undefined,
+          { timeout: 1000 },
+        );
+        const interrupted = {
+          first: interruptedFirst,
+          second: await icon.getAttribute('data-oxs-icon-visual-state'),
+          phase: await icon.getAttribute('data-oxs-icon-phase'),
+          destination: await icon.getAttribute('data-oxs-icon-state'),
+        };
+        assert.deepEqual(interrupted, { first: 'playing', second: 'pausing', phase: 'transitioning', destination: 'pause' }, 'Interrupted Icon transition did not retarget through declared transient states.');
+        await page.waitForFunction(
+          () => document.querySelector('[data-visual-cert="stateful-icon"]')?.getAttribute('data-oxs-icon-phase') === 'stable',
+          undefined,
+          { timeout: 1000 },
+        );
+        assert.equal(await icon.getAttribute('data-oxs-icon-state'), 'pause', 'Interrupted Icon did not settle at the newest semantic destination.');
+
+        await gotoCatalog(page, baseUrl, {
+          entry: 'Icon', tab: 'examples', example: 'state-transition', theme: 'dark', dir: 'ltr', motion: 'reduced', viewport: 'fit', container: 'compact',
+        });
+        const reducedIcon = page.locator('[data-visual-cert="stateful-icon"]');
+        const reducedToggle = page.getByRole('button', { name: 'Toggle playback icon' });
+        const reducedBefore = await reducedIcon.getAttribute('data-oxs-icon-state');
+        const reducedExpected = reducedBefore === 'play' ? 'pause' : 'play';
+        await reducedToggle.click();
+        await page.waitForFunction(
+          (expected) => {
+            const target = document.querySelector('[data-visual-cert="stateful-icon"]');
+            return target?.getAttribute('data-oxs-icon-phase') === 'stable'
+              && target.getAttribute('data-oxs-icon-state') === expected
+              && target.getAttribute('data-oxs-icon-visual-state') === expected;
+          },
+          reducedExpected,
+          { timeout: 1000 },
+        );
+        assert.equal(await reducedIcon.getAttribute('data-oxs-icon-state'), reducedExpected, 'Reduced-motion Icon did not settle at the requested stable state.');
+        assert.equal(await reducedIcon.getAttribute('data-oxs-icon-visual-state'), reducedExpected, 'Reduced-motion Icon leaked a persistent transient visual state.');
+
+        await gotoCatalog(page, baseUrl, {
+          entry: 'Icon', tab: 'examples', example: 'static-extension', theme: 'light', dir: 'ltr', motion: 'full', viewport: 'fit', container: 'compact',
+        });
+        const rtlIcon = page.locator('[data-visual-cert="rtl-icon"]');
+        const ltrIcon = page.locator('[data-visual-cert="ltr-icon"]');
+        const custom = page.locator('[data-visual-cert="custom-icon"]');
+        const staticState = await Promise.all([rtlIcon, ltrIcon, custom].map((locator) => locator.evaluate((element) => {
+          const style = getComputedStyle(element);
+          return {
+            transform: style.transform,
+            direction: style.direction,
+            inlineTransform: style.getPropertyValue('--oxs-icon-inline-transform').trim(),
+            paths: element.querySelectorAll('path').length,
+            role: element.getAttribute('role'),
+            focusable: element.getAttribute('focusable'),
+          };
+        })));
+        assert.equal(staticState[0].direction, 'rtl', 'Nested RTL fixture did not resolve RTL direction on the Icon itself.');
+        assert.equal(staticState[0].inlineTransform, 'scaleX(-1)', 'Nested RTL direction boundary did not publish the mirrored inline transform to Icon.');
+        assert.notEqual(staticState[0].transform, 'none', 'Directional Icon did not mirror from its nested local RTL direction.');
+        assert.equal(staticState[1].direction, 'ltr', 'Nested LTR fixture did not resolve LTR direction on the Icon itself.');
+        assert.equal(staticState[1].inlineTransform, 'none', 'Nested LTR direction boundary did not reset the inherited Icon inline transform.');
+        assert.equal(staticState[1].transform, 'none', 'Directional Icon leaked mirroring into a nested local LTR direction.');
+        assert.equal(staticState[2].paths, 1, 'Custom defineUiIcon path shorthand did not render through the shared glyph contract.');
+        assert.equal(staticState[2].role, 'img', 'Labeled custom Icon did not expose standalone image semantics.');
+        assert.equal(staticState[2].focusable, 'false', 'Icon became independently focusable.');
+        const axe = await runAxe(page, 'Icon multi-state transition certification');
+        diagnostics.assertClean('Icon multi-state transition certification');
+        return { axe, initial, firstTransition, interrupted, staticState };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['Icon'] },
+  ),
+
+  scenario(
+    'icon-pack-breadth-certification',
+    ['visual', 'icon', 'icon-pack', 'static-pack', 'animated-pack', 'multi-state', 'a11y'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 1040, height: 820 }, colorScheme: 'dark' });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        await gotoCatalog(page, baseUrl, {
+          entry: 'Icon', tab: 'examples', example: 'icon-pack', theme: 'dark', dir: 'ltr', motion: 'full', viewport: 'fit', container: 'wide',
+        });
+        const pack = page.locator('[data-visual-cert="icon-pack"]');
+        await pack.waitFor({ state: 'visible' });
+        const staticSamples = pack.locator('[data-icon-pack-static="true"]');
+        const animatedSamples = pack.locator('[data-icon-pack-animated]');
+        assert.ok(await staticSamples.count() >= 12, 'Icon pack Studio evidence did not render a broad static sample.');
+        assert.ok(await animatedSamples.count() >= 6, 'Icon pack Studio evidence did not render multiple animated families.');
+        await page.getByText('244 static exports', { exact: false }).waitFor({ state: 'visible' });
+        await page.getByText('22 animated state families', { exact: false }).waitFor({ state: 'visible' });
+
+        const playback = pack.locator('[data-icon-pack-animated="playback"]');
+        assert.equal(await playback.getAttribute('data-oxs-icon-state'), 'play', 'Pack playback family did not expose its initial stable state.');
+        await page.getByRole('button', { name: 'Toggle animated icon pack' }).click();
+        await page.waitForFunction(
+          () => {
+            const target = document.querySelector('[data-icon-pack-animated="playback"]');
+            return target?.getAttribute('data-oxs-icon-state') === 'pause'
+              && target.getAttribute('data-oxs-icon-phase') === 'stable'
+              && target.getAttribute('data-oxs-icon-visual-state') === 'pause';
+          },
+          undefined,
+          { timeout: 1000 },
+        );
+        await page.waitForFunction(
+          () => {
+            const expected = {
+              favorite: 'on',
+              lock: 'unlocked',
+              connectivity: 'online',
+              theme: 'dark',
+              activity: 'active',
+            };
+            return Object.entries(expected).every(([selector, state]) => {
+              const target = document.querySelector(`[data-icon-pack-animated="${selector}"]`);
+              return target?.getAttribute('data-oxs-icon-phase') === 'stable'
+                && target.getAttribute('data-oxs-icon-state') === state
+                && target.getAttribute('data-oxs-icon-visual-state') === state;
+            });
+          },
+          undefined,
+          { timeout: 1000 },
+        );
+        for (const [selector, expected] of [
+          ['favorite', 'on'],
+          ['lock', 'unlocked'],
+          ['connectivity', 'online'],
+          ['theme', 'dark'],
+          ['activity', 'active'],
+        ]) {
+          assert.equal(
+            await pack.locator(`[data-icon-pack-animated="${selector}"]`).getAttribute('data-oxs-icon-state'),
+            expected,
+            `Animated icon-pack family ${selector} did not converge to its requested stable state.`,
+          );
+        }
+        await assertNoGlobalHorizontalOverflow(page, 'Icon pack breadth');
+        const axe = await runAxe(page, 'Icon pack breadth certification');
+        diagnostics.assertClean('Icon pack breadth certification');
+        return { axe, staticSamples: await staticSamples.count(), animatedSamples: await animatedSamples.count() };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['Icon'] },
+  ),
+
+  scenario(
+    'surface-divider-visual-boundary-certification',
+    ['visual', 'surface', 'material', 'elevation', 'border', 'static-state', 'divider', 'separator', 'logical-inset', 'a11y'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 980, height: 780 }, colorScheme: 'dark' });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        await gotoCatalog(page, baseUrl, {
+          entry: 'Surface', tab: 'examples', example: 'material-boundary', theme: 'dark', dir: 'rtl', viewport: 'fit', container: 'compact',
+        });
+        const surface = page.locator('[data-visual-cert="surface"]');
+        await surface.waitFor({ state: 'visible' });
+        const surfaceState = await surface.evaluate((element) => {
+          const style = getComputedStyle(element);
+          return {
+            background: style.backgroundColor,
+            backdropFilter: style.backdropFilter,
+            boxShadow: style.boxShadow,
+            borderWidth: style.borderTopWidth,
+            borderColor: style.borderTopColor,
+            borderRadius: style.borderRadius,
+            overflow: style.overflow,
+            role: element.getAttribute('role'),
+            tabIndex: element.tabIndex,
+          };
+        });
+        assert.notEqual(surfaceState.background, 'rgba(0, 0, 0, 0)', 'Glass Surface did not resolve a semantic material background.');
+        assert.notEqual(surfaceState.backdropFilter, 'none', 'Glass Surface did not resolve its material blur/saturation token.');
+        assert.notEqual(surfaceState.boxShadow, 'none', 'Surface elevation=2 did not resolve Foundation elevation.');
+        assert.equal(surfaceState.borderWidth, '1px', 'Surface strong border did not remain token-backed hairline geometry.');
+        assert.equal(surfaceState.overflow, 'hidden', 'Surface clip did not clip visual descendants.');
+        assert.deepEqual({ role: surfaceState.role, tabIndex: surfaceState.tabIndex }, { role: null, tabIndex: -1 }, 'Surface invented interaction/accessibility semantics by default.');
+
+        await gotoCatalog(page, baseUrl, {
+          entry: 'Divider', tab: 'examples', example: 'separator-semantics', theme: 'dark', dir: 'rtl', viewport: 'fit', container: 'compact',
+        });
+        const horizontal = page.locator('[data-visual-cert="horizontal-divider"]');
+        const vertical = page.locator('[data-visual-cert="vertical-divider"]');
+        const decorative = page.locator('[data-visual-cert="decorative-divider"]');
+        const dividerState = await Promise.all([horizontal, vertical, decorative].map((locator) => locator.evaluate((element) => {
+          const style = getComputedStyle(element);
+          return {
+            role: element.getAttribute('role'),
+            ariaHidden: element.getAttribute('aria-hidden'),
+            orientation: element.getAttribute('aria-orientation'),
+            inlineSize: style.inlineSize,
+            blockSize: style.blockSize,
+            marginInlineStart: style.marginInlineStart,
+            marginInlineEnd: style.marginInlineEnd,
+            marginBlockStart: style.marginBlockStart,
+            marginBlockEnd: style.marginBlockEnd,
+            background: style.backgroundColor,
+          };
+        })));
+        assert.equal(dividerState[0].role, 'separator', 'Horizontal Divider lost separator semantics.');
+        assert.equal(dividerState[0].orientation, 'horizontal', 'Horizontal Divider lost aria-orientation.');
+        assert.equal(dividerState[0].marginInlineStart, '16px', 'Divider inset="start" did not use logical inline-start spacing under RTL.');
+        assert.equal(dividerState[1].orientation, 'vertical', 'Vertical Divider lost aria-orientation.');
+        assert.equal(dividerState[1].inlineSize, '2px', 'Strong vertical Divider did not resolve the strong border thickness token.');
+        assert.equal(dividerState[1].marginBlockStart, '16px', 'Vertical Divider inset did not use logical block-start spacing.');
+        assert.equal(dividerState[1].marginBlockEnd, '16px', 'Vertical Divider inset did not use logical block-end spacing.');
+        assert.equal(dividerState[2].role, 'none', 'Decorative Divider did not remove separator semantics.');
+        assert.equal(dividerState[2].ariaHidden, 'true', 'Decorative Divider was not hidden from accessibility APIs.');
+        await assertNoGlobalHorizontalOverflow(page, 'Surface/Divider visual boundary');
+        const axe = await runAxe(page, 'Surface and Divider visual boundary certification');
+        diagnostics.assertClean('Surface and Divider visual boundary certification');
+        return { axe, surface: surfaceState, dividers: dividerState };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['Surface', 'Divider'] },
+  ),
+
+  scenario(
     'pointer-cancellation-and-activation',
     ['pointer', 'cancellation', 'activation'],
     async ({ browser, baseUrl }) => {

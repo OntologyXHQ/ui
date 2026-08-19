@@ -18,6 +18,18 @@ export function Example() {
 
 Published JavaScript entries are stylesheet-neutral so Node, SSR, test runners, and other non-CSS hosts can import `@ontologyx/ui` safely. Browser/application hosts must import `@ontologyx/ui/styles.css` once at their composition entry. Advanced infrastructure intended for diagnostics/platform integration is available from `@ontologyx/ui/advanced`.
 
+The optional icon vocabulary is a separate package subpath so the canonical entry stays lean:
+
+```tsx
+import { Icon } from '@ontologyx/ui';
+import { HomeGlyph, PlaybackGlyph } from '@ontologyx/ui/icons';
+
+<Icon glyph={HomeGlyph} />
+<Icon glyph={PlaybackGlyph} state="pause" />
+```
+
+`@ontologyx/ui/icons` currently publishes 244 static semantic exports backed by 160 distinct glyph definitions plus 22 multi-state animated families. It has no third-party runtime icon dependency and uses the same `defineUiIcon` state/motion contract as custom glyphs.
+
 ## Package contract
 
 - ESM only.

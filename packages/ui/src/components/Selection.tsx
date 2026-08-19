@@ -595,7 +595,7 @@ export function SegmentedControl({
               if (!disabled && !option.disabled) setCurrent(option.value);
             }}
           >
-            {option.icon ? <Icon name={option.icon} size="sm" aria-hidden /> : null}
+            {option.icon ? <Icon name={option.icon} size="sm" /> : null}
             <span>{option.label}</span>
           </button>
         );
@@ -665,7 +665,7 @@ export function ToggleGroup({
             tabIndex={option.value === rovingValue ? 0 : -1}
             pressed={pressed}
             disabled={disabled || option.disabled}
-            leading={option.icon ? <Icon name={option.icon} size="sm" aria-hidden /> : undefined}
+            leading={option.icon ? <Icon name={option.icon} size="sm" /> : undefined}
             onFocus={() => setFocusValue(option.value)}
             onPressedChange={(next) => {
               setCurrent(

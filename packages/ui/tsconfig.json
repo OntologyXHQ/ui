@@ -25,6 +25,9 @@
       ],
       "@ontologyx/ui/advanced": [
         "./src/advanced.ts"
+      ],
+      "@ontologyx/ui/icons": [
+        "./src/icons.ts"
       ]
     }
   },

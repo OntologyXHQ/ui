@@ -162,18 +162,21 @@ Acceptance: G0 rejects freeform/physical layout escape hatches, legacy pre-certi
 
 ---
 
-## UIR04 — Visual primitives: type, icon, surface — NEXT
+## UIR04 — Visual primitives: type, icon, surface — DONE
 
 - `UI-0401` Rebuild Text/Heading/Label/Code semantics, truncation/wrapping, selectable text and bidi behavior.
-- `UI-0402` Rebuild Icon contract: sizing, mirroring, decorative vs labeled semantics, current-color behavior and custom glyph integration.
+- `UI-0402` Rebuild Icon contract: sizing, mirroring, decorative vs labeled semantics, current-color behavior, custom glyph integration, and first-class multi-state families with stable semantic states plus explicit transient transition states.
 - `UI-0403` Rebuild Surface/Divider material, border, elevation and interactive-state boundaries.
 - `UI-0404` Prove typography under font fallback, Persian/English mixed content, long strings and zoom/reflow.
 - `UI-0405` Document every custom primitive prop and remove ambiguous styling knobs.
 - `UI-0406` Reaccept visual primitives independently through G0..G6.
+- `UI-0407` Ship a broad optional `@ontologyx/ui/icons` vocabulary with static semantic glyphs and typed multi-state animated families, while keeping the canonical package entry lean and local-direction mirroring correct.
+
+Acceptance: Text/Heading/Label/Code expose bounded native semantics, tokenized type roles and explicit long-token reflow; Icon replaces generic spin with immutable state families, explicit transient transition states, interruption retargeting and resolved reduced-motion settlement; Surface stays a static visual boundary while Divider owns separator/decorative semantics, logical inset and tokenized tone/thickness. G0/G1/G3/G4/G6 bind all seven exports to dedicated examples, behavior ownership and browser evidence; the optional icon-pack subpath is additionally covered by breadth/package tests and a dedicated G6 Studio journey without becoming a new visual export. UIR04 is closed; UIR05 is the next frontier.
 
 ---
 
-## UIR05 — Interaction/runtime kernel — TODO
+## UIR05 — Interaction/runtime kernel — NEXT
 
 - `UI-0501` Re-audit press authority across keyboard/pointer/touch cancellation, capture and disabled transitions.
 - `UI-0502` Rebuild focus ownership, restoration, roving focus and nested-root behavior.

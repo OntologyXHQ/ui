@@ -24,6 +24,11 @@
       "import": "./dist/advanced.js",
       "default": "./dist/advanced.js"
     },
+    "./icons": {
+      "types": "./dist/icons.d.ts",
+      "import": "./dist/icons.js",
+      "default": "./dist/icons.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./package.json": "./package.json"
   },
