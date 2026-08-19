@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { Button, MotionTransition, Stack, Text, UiRoot } from '@ontologyx/ui';
 import { defineUiDocsGroup } from '../docs/defineUiDocs';
 
 export const uiDocs = defineUiDocsGroup([
@@ -14,6 +16,7 @@ export const uiDocs = defineUiDocsGroup([
     rtl: 'Directional slide behavior must use semantic direction where relevant.',
     touch: 'Transitions remain interruptible during direct interaction.',
     responsive: 'Animation derives from content state, not fixed viewport assumptions.',
+    examples: [{ id: 'authority', title: 'Motion runtime authority', component: 'MotionAuthorityExample' }],
   },
   {
     exportName: 'FadeTransition',
@@ -88,3 +91,30 @@ export const uiDocs = defineUiDocsGroup([
     responsive: 'Container-independent.',
   },
 ] as const);
+
+
+export function MotionAuthorityExample() {
+  return (
+    <Stack gap="sm">
+      <MotionRealmProbe label="Outer runtime" />
+      <UiRoot targetFrameRate={120} className="ui-doc-motion-nested-root">
+        <MotionRealmProbe label="Nested runtime" />
+      </UiRoot>
+    </Stack>
+  );
+}
+
+function MotionRealmProbe({ label }: { label: string }) {
+  const [present, setPresent] = useState(true);
+  return (
+    <div className="ui-doc-motion-authority-probe" data-motion-authority-probe={label}>
+      <Stack gap="xs">
+        <Text>{label}: realm scheduler + interruption + reduced-motion settlement.</Text>
+        <Button onClick={() => setPresent((value) => !value)}>Toggle motion</Button>
+        <MotionTransition present={present} kind="scale" spring="expressive" data-motion-probe-surface>
+          <div className="ui-doc-example-chip">Motion target</div>
+        </MotionTransition>
+      </Stack>
+    </div>
+  );
+}

@@ -53,11 +53,11 @@ export function readSpringSpec(
 ): SpringSpec {
   const fallback = FALLBACK_SPRINGS[preset];
 
-  if (!element || typeof getComputedStyle === 'undefined') {
-    return fallback;
-  }
+  if (!element) return fallback;
+  const ownerWindow = element.ownerDocument?.defaultView ?? null;
+  if (!ownerWindow?.getComputedStyle) return fallback;
 
-  const style = getComputedStyle(element);
+  const style = ownerWindow.getComputedStyle(element);
   const prefix = `--oxs-spring-${preset}`;
 
   return {

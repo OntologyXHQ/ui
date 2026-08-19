@@ -52,7 +52,7 @@ export function SharedBounds({
 
     if (runtime.preference === 'reduced' || nearlyEqualBounds(sourceBounds, destinationBounds)) {
       return () => {
-        stashSharedBounds(runtime.sharedBounds, transitionId, node.getBoundingClientRect());
+        stashSharedBounds(runtime, transitionId, node.getBoundingClientRect());
       };
     }
 
@@ -75,7 +75,7 @@ export function SharedBounds({
     return () => {
       unsubscribeRef.current?.();
       unsubscribeRef.current = null;
-      stashSharedBounds(runtime.sharedBounds, transitionId, node.getBoundingClientRect());
+      stashSharedBounds(runtime, transitionId, node.getBoundingClientRect());
     };
   }, [layoutKey, runtime, spring, transitionId]);
 
@@ -91,11 +91,14 @@ export function SharedBounds({
   );
 }
 
-function stashSharedBounds(store: Map<string, DOMRect>, transitionId: string, bounds: DOMRect) {
-  store.set(transitionId, bounds);
-  setTimeout(() => {
-    if (store.get(transitionId) === bounds) store.delete(transitionId);
+function stashSharedBounds(runtime: ReturnType<typeof useMotionRuntime>, transitionId: string, bounds: DOMRect) {
+  runtime.sharedBounds.set(transitionId, bounds);
+  runtime.clock.cancelTimeout(runtime.sharedBoundsExpiry.get(transitionId) ?? null);
+  const timeout = runtime.clock.scheduleTimeout(() => {
+    runtime.sharedBoundsExpiry.delete(transitionId);
+    if (runtime.sharedBounds.get(transitionId) === bounds) runtime.sharedBounds.delete(transitionId);
   }, 5000);
+  if (timeout !== null) runtime.sharedBoundsExpiry.set(transitionId, timeout);
 }
 
 function applySharedBoundsFrame(

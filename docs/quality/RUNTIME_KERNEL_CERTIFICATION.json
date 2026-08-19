@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "roadmap": "UIR05",
-  "status": "in-progress",
+  "status": "certified",
   "slices": {
     "input-authority": {
       "owner": "UIR05-A",
@@ -32,11 +32,52 @@
     },
     "overlay-authority": {
       "owner": "UIR05-B",
-      "status": "candidate"
+      "status": "certified",
+      "behaviorTests": [
+        "packages/ui/src/interaction/__tests__/overlay-runtime.test.ts",
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx",
+        "packages/ui/src/foundations/__tests__/portal.test.ts"
+      ],
+      "browserScenarios": [
+        "dialog-modal-focus-restoration",
+        "modal-popover-focus-isolation",
+        "overlay-authority-cross-root-certification"
+      ],
+      "requiredAxes": [
+        "overlay-kernel",
+        "overlay",
+        "portal",
+        "modal-isolation",
+        "focus",
+        "escape",
+        "nested-root",
+        "realm",
+        "a11y"
+      ]
     },
     "motion-authority": {
       "owner": "UIR05-C",
-      "status": "candidate"
+      "status": "certified",
+      "behaviorTests": [
+        "packages/ui/src/motion/__tests__/clock-realm.test.ts",
+        "packages/ui/src/motion/__tests__/motion.test.ts",
+        "packages/ui/src/motion/__tests__/runtime-scope.test.tsx"
+      ],
+      "browserScenarios": [
+        "motion-authority-realm-interruption-certification",
+        "icon-multistate-transition-certification",
+        "ox-loading-heartbeat-motion-certification"
+      ],
+      "requiredAxes": [
+        "motion-kernel",
+        "motion",
+        "realm",
+        "scheduler",
+        "interruption",
+        "reduced-motion",
+        "nested-root",
+        "frame-rate"
+      ]
     }
   }
 }

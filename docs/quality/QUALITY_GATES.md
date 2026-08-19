@@ -26,6 +26,7 @@ Protects repository and package ownership:
 - persistent safe area and transient host occlusion are separate explicit-unit logical inputs; Components that must avoid blocked regions consume their combined environment inset rather than abusing safe area for keyboard occlusion.
 - accepted Layout primitives use finite logical props and intrinsic native polymorphism; inline style/color serialization, physical directional spacing props, reverse/order APIs, and shared family demos masquerading as per-export certification are rejected by the layout gate.
 - accepted Visual primitives keep typography on bounded native semantics and explicit long-token reflow, replace generic Icon animation knobs with declared stable/transient state families that consume resolved reduced-motion, require local-direction Icon mirroring, keep the 240+ static / 20+ animated optional icon pack on a separate self-contained `@ontologyx/ui/icons` package subpath, keep Surface free of Component interaction-state ownership, and keep Divider tone/thickness/inset finite and token/logical-axis backed.
+- the interaction/runtime kernel keeps gesture/modal/motion state root-scoped; overlays sharing one Document arbitrate Escape/outside-pointer through one Document-realm broker while preserving UiRoot-local isolation/scroll/focus lineage; MotionClock/PerformanceObserver/timers/computed-style reads must resolve through the concrete owner Window realm rather than ambient globals.
 
 ### G1 — catalog acceptance
 
@@ -92,6 +93,7 @@ The current harness proves the evidence system itself across real browser journe
 - measured container adaptive bands plus separate safe-area, transient occlusion and combined environment-inset inputs;
 - narrow/reflow geometry without screenshot/pixel assertions;
 - visual-primitive certification covers mixed Persian/English typography, missing-font fallback, long-token wrapping, browser page zoom, multi-state Icon transient/reduced-motion/interruption behavior, currentColor/local-direction RTL/custom glyphs, optional static+animated icon-pack breadth, and static Surface/Divider token/accessibility boundaries;
+- runtime-kernel certification additionally proves cross-UiRoot portal ownership and top-most Escape ordering, plus nested MotionRuntime frame-rate ownership, interruption convergence and semantic reduced-motion settlement;
 - browser console/page errors are blocking in product journeys; focused content inside `aria-hidden`/`inert` ancestry is checked as a direct DOM-semantic invariant rather than relying on browser warning transport.
 
 G6 writes machine-readable diagnostic evidence to `artifacts/browser-acceptance/latest.json` plus a timestamped sibling. Evidence contains the source fingerprint, Git HEAD when available, browser/version, axes, scenario results and axe summaries. Screenshots are not acceptance evidence and pixel snapshots are not used.

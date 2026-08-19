@@ -15,6 +15,19 @@ function simulateSpring(frameRate: 60 | 90 | 120, durationMs = 900) {
 }
 
 describe('motion physics', () => {
+  it('reads spring tokens from the animated element owner realm', () => {
+    const iframe = document.createElement('iframe');
+    document.body.append(iframe);
+    const frameDocument = iframe.contentDocument;
+    expect(frameDocument).not.toBeNull();
+    if (!frameDocument) return;
+    const element = frameDocument.createElement('div');
+    element.style.setProperty('--oxs-spring-standard-stiffness', '777');
+    frameDocument.body.append(element);
+    expect(readSpringSpec(element, 'standard').stiffness).toBe(777);
+    iframe.remove();
+  });
+
   it('stays frame-rate independent across 60/90/120 Hz stepping', () => {
     const at60 = simulateSpring(60);
     const at90 = simulateSpring(90);

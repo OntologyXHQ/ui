@@ -1,3 +1,13 @@
+## Unreleased — UIR05 runtime authority closeout
+
+- UIR05-B/C browser follow-up: separated cross-root coexistence/visual-stacking evidence from outside-pointer dismissal semantics. The dedicated authority fixture now keeps both root-local modals open with `dismissOnOutsidePress={false}`, while runtime tests continue to prove document-top-most outside-pointer arbitration; G6 first proves modal A survives opening B before comparing independent portal hosts and Escape order.
+- UIR05-B/C TypeScript follow-up: realm iframe keyboard construction now preserves the concrete Window/global constructor type, fake frame-host iteration narrows empty queues before deleting frame handles, and FramePerformanceMonitor subscriptions expose cleanup functions that return void rather than leaking Set.delete booleans into React effect destructors.
+- Closed UIR05-B/C together after the input-authority slice: overlay modal/isolation/scroll state remains per-UiRoot, while Escape and outside-pointer arbitration is handled once per concrete Document realm instead of by per-overlay listeners.
+- Made overlay lifecycle realm-local end to end: activeElement, Node checks, autofocus scheduling and focus restoration derive from the committed layer/surface/anchor owner Document/Window; modal registration moved into layout lifecycle to avoid pre-isolation focus flashes.
+- Rebuilt MotionClock around an injected Window frame host; RAF, delayed cleanup timers, PerformanceObserver instrumentation and spring computed-style reads no longer borrow ambient globals from another realm. SharedBounds expiry is owned and cancelled by the root motion clock.
+- Added adversarial overlay broker tests across independent UiRoots and iframe Documents plus motion tests for realm-host scheduling, runtime replacement, delayed timer disposal and owner-realm spring token reads.
+- Added dedicated Studio/G6 authority fixtures proving cross-root portal isolation + Escape order and nested motion runtimes + interruption/reduced-motion convergence. Runtime kernel certification is now closed while visual catalog maturity remains accepted=17/candidate=83.
+
 # Changelog
 
 ## OX loading presentation follow-up

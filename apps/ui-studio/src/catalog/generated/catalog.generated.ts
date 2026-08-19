@@ -469,6 +469,12 @@ export const uiCatalog: readonly UiCatalogEntry[] = [
         description: "",
         load: () => import("@ontologyx/ui-docs/components/Overlays.docs").then((module) => ({ default: module["DialogExample"] })),
       },
+      {
+        id: "authority",
+        title: "Cross-root overlay authority",
+        description: "",
+        load: () => import("@ontologyx/ui-docs/components/Overlays.docs").then((module) => ({ default: module["OverlayAuthorityExample"] })),
+      },
     ],
   },
   {
@@ -919,6 +925,12 @@ export const uiCatalog: readonly UiCatalogEntry[] = [
     playground: null,
     props: [{"name":"distance","type":"number","optional":true,"description":"","deprecated":false,"default":"24"},{"name":"kind","type":"TransitionKind","optional":true,"description":"","deprecated":false,"default":"'fade'"},{"name":"onRest","type":"(present: boolean) => void","optional":true,"description":"","deprecated":false,"default":null},{"name":"present","type":"boolean","optional":false,"description":"","deprecated":false,"default":null},{"name":"spring","type":"SpringPreset","optional":true,"description":"","deprecated":false,"default":"'standard'"}],
     examples: [
+      {
+        id: "authority",
+        title: "Motion runtime authority",
+        description: "",
+        load: () => import("@ontologyx/ui-docs/motion/Transition.docs").then((module) => ({ default: module["MotionAuthorityExample"] })),
+      },
     ],
   },
   {

@@ -172,11 +172,11 @@ Acceptance: G0 rejects freeform/physical layout escape hatches, legacy pre-certi
 - `UI-0406` Reaccept visual primitives independently through G0..G6.
 - `UI-0407` Ship a broad optional `@ontologyx/ui/icons` vocabulary with static semantic glyphs and typed multi-state animated families, while keeping the canonical package entry lean and local-direction mirroring correct.
 
-Acceptance: Text/Heading/Label/Code expose bounded native semantics, tokenized type roles and explicit long-token reflow; Icon replaces generic spin with immutable state families, explicit transient transition states, interruption retargeting and resolved reduced-motion settlement; Surface stays a static visual boundary while Divider owns separator/decorative semantics, logical inset and tokenized tone/thickness. G0/G1/G3/G4/G6 bind all seven exports to dedicated examples, behavior ownership and browser evidence; the optional icon-pack subpath is additionally covered by breadth/package tests and a dedicated G6 Studio journey without becoming a new visual export. UIR04 is closed; UIR05-A input authority is now certified and UIR05-B overlay authority is the next frontier.
+Acceptance: Text/Heading/Label/Code expose bounded native semantics, tokenized type roles and explicit long-token reflow; Icon replaces generic spin with immutable state families, explicit transient transition states, interruption retargeting and resolved reduced-motion settlement; Surface stays a static visual boundary while Divider owns separator/decorative semantics, logical inset and tokenized tone/thickness. G0/G1/G3/G4/G6 bind all seven exports to dedicated examples, behavior ownership and browser evidence; the optional icon-pack subpath is additionally covered by breadth/package tests and a dedicated G6 Studio journey without becoming a new visual export. UIR04 is closed; the UIR05 runtime kernel is now fully certified across input, overlay and motion authority, and UIR06 Actions and command controls is the next frontier.
 
 ---
 
-## UIR05 — Interaction/runtime kernel — IN PROGRESS
+## UIR05 — Interaction/runtime kernel — DONE
 
 ### UIR05-A — Input authority — DONE
 
@@ -189,21 +189,23 @@ Acceptance: Text/Heading/Label/Code expose bounded native semantics, tokenized t
 
 Acceptance: each UiRoot owns an independent GestureArena while isolated fixtures retain a non-public fallback; Press and Pan cancel active transactions when disabled/unmounted; pointer continuation and focus inspection use the concrete owning Window/Document realm; Select and Menu consume one Unicode-normalized timestamp-driven TypeaheadController; Tabs/navigation consume shared single-selection normalization; G0 and dedicated G6 evidence bind cancellation, long-press and shared typeahead behavior. Public visual maturity remains accepted=17/candidate=83 because this slice certifies infrastructure, not Components.
 
-### UIR05-B — Overlay authority — NEXT
+### UIR05-B — Overlay authority — DONE
 
-- `UI-0503` Rebuild overlay coordination, portal ownership, inert/aria-hidden isolation and nested modal ordering.
-- `UI-0507B` Add adversarial overlay tests for unmount, reparent, nested roots/documents, delayed dismissal and restoration lineage.
-- `UI-0508B` Keep overlay coordination internal/advanced unless a public developer contract is clearly justified.
+- `UI-0503` Rebuild overlay coordination, portal ownership, inert/aria-hidden isolation and nested modal ordering. **DONE**
+- `UI-0507B` Add adversarial overlay tests for unmount, reparent, nested roots/documents, delayed dismissal and restoration lineage. **DONE**
+- `UI-0508B` Keep overlay coordination internal/advanced unless a public developer contract is clearly justified. **DONE**
 
-### UIR05-C — Motion authority + kernel closeout — TODO
+### UIR05-C — Motion authority + kernel closeout — DONE
 
-- `UI-0505` Rebuild central motion clock/scheduling and reduced-motion authority.
-- `UI-0507C` Add adversarial motion tests for realm scheduling, runtime replacement, delayed frames and interrupted transitions.
-- `UI-0508C` Close the kernel boundary and keep scheduling/physics engines internal/advanced unless a public contract is justified.
+- `UI-0505` Rebuild central motion clock/scheduling and reduced-motion authority. **DONE**
+- `UI-0507C` Add adversarial motion tests for realm scheduling, runtime replacement, delayed frames and interrupted transitions. **DONE**
+- `UI-0508C` Close the kernel boundary and keep scheduling/physics engines internal/advanced unless a public contract is justified. **DONE**
+
+Acceptance: UIR05 is closed as one runtime authority: each UiRoot owns input/gesture/modal/isolation state; overlays sharing a Document use exactly one realm-local broker for Escape/outside-pointer ordering without sharing modal stacks; focus/restoration and Node checks use the concrete owner realm; MotionRuntime owns its Window-bound RAF/timer/PerformanceObserver services, shared-bounds expiry, reduced-motion settlement and interruption convergence. Dedicated behavior and G6 evidence certify A/B/C without promoting candidate Components. Public visual maturity remains accepted=17/candidate=83; UIR06 Actions and command controls is next.
 
 ---
 
-## UIR06 — Actions and command controls — TODO
+## UIR06 — Actions and command controls — NEXT
 
 - `UI-0601` Rebuild Button API/state model including loading, disabled, press, leading/trailing content and form semantics.
 - `UI-0602` Rebuild IconButton labeling, tooltip relationship and target sizing.

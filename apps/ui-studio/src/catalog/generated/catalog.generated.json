@@ -1986,6 +1986,11 @@
         "id": "overview",
         "title": "Dialog lifecycle",
         "component": "DialogExample"
+      },
+      {
+        "id": "authority",
+        "title": "Cross-root overlay authority",
+        "component": "OverlayAuthorityExample"
       }
     ]
   },
@@ -3471,7 +3476,13 @@
         "default": "'standard'"
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "authority",
+        "title": "Motion runtime authority",
+        "component": "MotionAuthorityExample"
+      }
+    ]
   },
   {
     "id": "PageScaffold",

@@ -1,5 +1,5 @@
-export type { FrameRateTarget, MotionFrame, MotionFrameListener } from './clock';
-export { MotionClock } from './clock';
+export type { FrameRateTarget, MotionFrame, MotionFrameHost, MotionFrameListener } from './clock';
+export { motionFrameHost, MotionClock } from './clock';
 export type {
   FramePerformanceListener,
   FramePerformanceSnapshot,

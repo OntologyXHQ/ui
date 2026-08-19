@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useMediaQuery } from '../foundations/observation';
-import { type FrameRateTarget, MotionClock } from './clock';
+import { type FrameRateTarget, MotionClock, motionFrameHost } from './clock';
 import type { FramePerformanceSnapshot } from './performance';
 import { FramePerformanceMonitor } from './performance';
 
@@ -12,14 +12,16 @@ export type MotionRuntime = {
   performance: FramePerformanceMonitor;
   preference: Exclude<MotionPreference, 'system'>;
   targetFrameRate: FrameRateTarget;
+  realmWindow: Window | null;
   sharedBounds: Map<string, DOMRect>;
+  sharedBoundsExpiry: Map<string, number>;
 };
 
 export type MotionRuntimeProviderProps = PropsWithChildren<{
   preference?: MotionPreference;
   targetFrameRate?: FrameRateTarget;
   instrumentPerformance?: boolean;
-  /** Internal owner Window used for system motion preference resolution. */
+  /** Internal owner Window used for all scheduling, observation and system-motion resolution. */
   realmWindow?: Window | null;
 }>;
 
@@ -30,30 +32,32 @@ export function MotionRuntimeProvider({
   preference = 'system',
   targetFrameRate = 60,
   instrumentPerformance = false,
-  realmWindow,
+  realmWindow = null,
 }: MotionRuntimeProviderProps) {
   const resolvedPreference = useResolvedMotionPreference(preference, realmWindow);
 
   const runtime = useMemo<MotionRuntime>(() => {
-    const clock = new MotionClock(targetFrameRate);
+    const clock = new MotionClock(targetFrameRate, motionFrameHost(realmWindow));
 
     return {
       clock,
-      performance: new FramePerformanceMonitor(clock, targetFrameRate),
+      performance: new FramePerformanceMonitor(clock, targetFrameRate, realmWindow),
       preference: resolvedPreference,
       targetFrameRate,
+      realmWindow,
       sharedBounds: new Map<string, DOMRect>(),
+      sharedBoundsExpiry: new Map<string, number>(),
     };
-  }, [resolvedPreference, targetFrameRate]);
+  }, [realmWindow, resolvedPreference, targetFrameRate]);
 
   useEffect(() => {
-    if (instrumentPerformance) {
-      runtime.performance.start();
-    }
+    if (instrumentPerformance) runtime.performance.start();
 
     return () => {
       runtime.performance.stop();
       runtime.clock.dispose();
+      runtime.sharedBoundsExpiry.clear();
+      runtime.sharedBounds.clear();
     };
   }, [instrumentPerformance, runtime]);
 
@@ -62,11 +66,7 @@ export function MotionRuntimeProvider({
 
 export function useMotionRuntime() {
   const runtime = useContext(MotionRuntimeContext);
-
-  if (!runtime) {
-    throw new Error('OXS motion primitives must render inside UiRoot.');
-  }
-
+  if (!runtime) throw new Error('OXS motion primitives must render inside UiRoot.');
   return runtime;
 }
 
@@ -76,7 +76,6 @@ export function useReducedMotion() {
 
 export function useReactCommitProbe() {
   const runtime = useMotionRuntime();
-
   useLayoutEffect(() => {
     runtime.performance.markReactCommit();
   });
@@ -101,7 +100,6 @@ function useResolvedMotionPreference(
   realmWindow: Window | null | undefined,
 ): Exclude<MotionPreference, 'system'> {
   const systemReduced = useMediaQuery('(prefers-reduced-motion: reduce)', false, realmWindow);
-
   if (preference === 'reduced') return 'reduced';
   if (preference === 'full') return 'full';
   return systemReduced ? 'reduced' : 'full';

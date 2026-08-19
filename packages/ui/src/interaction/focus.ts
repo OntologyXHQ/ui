@@ -79,9 +79,12 @@ export function focusRelativeTo(reference: HTMLElement | null, backwards = false
     const ordered = backwards ? [...items].reverse() : items;
     target = ordered.find((candidate) => {
       const relation = reference.compareDocumentPosition(candidate);
+      const NodeCtor = reference.ownerDocument.defaultView?.Node;
+      const preceding = NodeCtor?.DOCUMENT_POSITION_PRECEDING ?? 2;
+      const following = NodeCtor?.DOCUMENT_POSITION_FOLLOWING ?? 4;
       return backwards
-        ? Boolean(relation & Node.DOCUMENT_POSITION_PRECEDING)
-        : Boolean(relation & Node.DOCUMENT_POSITION_FOLLOWING);
+        ? Boolean(relation & preceding)
+        : Boolean(relation & following);
     });
   }
   if (!target) return false;

@@ -33,13 +33,11 @@ export class FramePerformanceMonitor {
   constructor(
     private readonly clock: MotionClock,
     readonly targetFrameRate: FrameRateTarget,
+    private readonly realmWindow: Window | null = null,
   ) {}
 
   start() {
-    if (this.unsubscribeClock) {
-      return;
-    }
-
+    if (this.unsubscribeClock) return;
     this.unsubscribeClock = this.clock.subscribe(this.onFrame);
     this.installPerformanceObservers();
   }
@@ -47,18 +45,13 @@ export class FramePerformanceMonitor {
   stop() {
     this.unsubscribeClock?.();
     this.unsubscribeClock = null;
-
-    for (const observer of this.observers) {
-      observer.disconnect();
-    }
-
+    for (const observer of this.observers) observer.disconnect();
     this.observers = [];
   }
 
-  subscribe(listener: FramePerformanceListener) {
+  subscribe(listener: FramePerformanceListener): () => void {
     this.listeners.add(listener);
     listener(this.snapshot());
-
     return () => {
       this.listeners.delete(listener);
     };
@@ -90,25 +83,13 @@ export class FramePerformanceMonitor {
   }
 
   private readonly onFrame = (frame: MotionFrame) => {
-    if (frame.deltaMs <= 0) {
-      return;
-    }
-
+    if (frame.deltaMs <= 0) return;
     this.frameIntervals.push(frame.deltaMs);
-
-    if (this.frameIntervals.length > 240) {
-      this.frameIntervals.shift();
-    }
+    if (this.frameIntervals.length > 240) this.frameIntervals.shift();
 
     const frameBudget = 1000 / this.targetFrameRate;
-
-    if (frame.deltaMs > frameBudget * 1.25) {
-      this.budgetMisses += 1;
-    }
-
-    if (frame.deltaMs > Math.max(frameBudget * 2, 50)) {
-      this.longFrames += 1;
-    }
+    if (frame.deltaMs > frameBudget * 1.25) this.budgetMisses += 1;
+    if (frame.deltaMs > Math.max(frameBudget * 2, 50)) this.longFrames += 1;
 
     if (frame.nowMs - this.lastReportMs >= 500) {
       this.lastReportMs = frame.nowMs;
@@ -118,45 +99,33 @@ export class FramePerformanceMonitor {
 
   private emit() {
     const snapshot = this.snapshot();
-
-    for (const listener of this.listeners) {
-      listener(snapshot);
-    }
+    for (const listener of this.listeners) listener(snapshot);
   }
 
   private installPerformanceObservers() {
-    if (typeof PerformanceObserver === 'undefined') {
-      return;
-    }
-
-    const supported = new Set(PerformanceObserver.supportedEntryTypes ?? []);
-
-    this.observeType(supported, 'longtask', (entries) => {
+    const realmGlobal = this.realmWindow as (Window & typeof globalThis) | null;
+    const Observer = realmGlobal?.PerformanceObserver;
+    if (!Observer) return;
+    const supported = new Set(Observer.supportedEntryTypes ?? []);
+    this.observeType(Observer, supported, 'longtask', (entries) => {
       this.longTasks += entries.length;
     });
-
-    this.observeType(supported, 'layout-shift', (entries) => {
+    this.observeType(Observer, supported, 'layout-shift', (entries) => {
       this.layoutShifts += entries.length;
     });
-
-    this.observeType(supported, 'paint', (entries) => {
+    this.observeType(Observer, supported, 'paint', (entries) => {
       this.paintEntries += entries.length;
     });
   }
 
   private observeType(
+    Observer: typeof PerformanceObserver,
     supported: Set<string>,
     type: string,
     onEntries: (entries: PerformanceEntry[]) => void,
   ) {
-    if (!supported.has(type)) {
-      return;
-    }
-
-    const observer = new PerformanceObserver((list) => {
-      onEntries(list.getEntries());
-    });
-
+    if (!supported.has(type)) return;
+    const observer = new Observer((list) => onEntries(list.getEntries()));
     observer.observe({ type, buffered: true });
     this.observers.push(observer);
   }

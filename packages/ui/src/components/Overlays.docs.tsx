@@ -14,6 +14,8 @@ import {
   Stack,
   Text,
   Tooltip,
+  UiRoot,
+  Wrap,
 } from '@ontologyx/ui';
 
 export const uiDocs = defineUiDocsGroup([
@@ -24,7 +26,10 @@ export const uiDocs = defineUiDocsGroup([
     accessibility: 'Owns dialog semantics, focus containment/restoration, Escape policy and title/description wiring.',
     rtl: 'Content and actions use logical flow.', touch: 'Actions inherit shared touch targets and outside dismissal is explicit.',
     responsive: 'Size variants clamp to available space; fullscreen remains opt-in.',
-    examples: [{ id: 'overview', title: 'Dialog lifecycle', component: 'DialogExample' }],
+    examples: [
+      { id: 'overview', title: 'Dialog lifecycle', component: 'DialogExample' },
+      { id: 'authority', title: 'Cross-root overlay authority', component: 'OverlayAuthorityExample' },
+    ],
   },
   {
     exportName: 'AlertDialog', layer: 'components', category: 'Overlays', order: 70,
@@ -216,5 +221,41 @@ export function MenuPreviewExample() {
         <MenuItem>Duplicate</MenuItem>
       </Menu>
     </>
+  );
+}
+
+
+export function OverlayAuthorityExample() {
+  return (
+    <Stack gap="sm">
+      <Text>Independent UiRoots keep local modal isolation while one Document realm arbitrates top-most events. Outside dismissal is disabled in this fixture so both roots stay open long enough to certify cross-root portal stacking and Escape order; outside-pointer arbitration is covered independently by the runtime tests.</Text>
+      <Wrap gap="sm">
+        <OverlayAuthorityScope scope="A" />
+        <OverlayAuthorityScope scope="B" />
+      </Wrap>
+    </Stack>
+  );
+}
+
+function OverlayAuthorityScope({ scope }: { scope: 'A' | 'B' }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <UiRoot className={`ui-doc-overlay-authority-root ui-doc-overlay-authority-root--${scope.toLowerCase()}`}>
+      <Stack gap="xs">
+        <Text>Root {scope}</Text>
+        <Button onClick={() => setOpen(true)}>Open modal {scope}</Button>
+      </Stack>
+      <Dialog
+        open={open}
+        onOpenChange={setOpen}
+        title={`Authority modal ${scope}`}
+        dismissOnOutsidePress={false}
+      >
+        <Stack gap="xs">
+          <Text>Modal owned by root {scope}.</Text>
+          <Button onClick={() => setOpen(false)}>Close modal {scope}</Button>
+        </Stack>
+      </Dialog>
+    </UiRoot>
   );
 }

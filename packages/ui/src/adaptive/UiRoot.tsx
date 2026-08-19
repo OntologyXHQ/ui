@@ -183,6 +183,8 @@ function UiRootFrame({
         data-oxs-pointer-precision-preference={environment.pointerPrecisionPreference}
         data-oxs-motion={motion.preference}
         data-oxs-motion-preference={motionPreference}
+        data-oxs-motion-realm-ready={motion.realmWindow ? 'true' : 'false'}
+        data-oxs-motion-frame-host={motion.clock.hasFrameHost ? 'true' : 'false'}
         data-oxs-adaptive-band={adaptiveBand}
         data-oxs-frame-rate={targetFrameRate}
         data-oxs-cursor-theme={cursor.config.theme}

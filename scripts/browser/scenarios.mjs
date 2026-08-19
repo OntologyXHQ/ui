@@ -1392,6 +1392,152 @@ export const browserScenarios = [
   ),
 
   scenario(
+    'overlay-authority-cross-root-certification',
+    ['overlay-kernel', 'overlay', 'portal', 'modal-isolation', 'focus', 'escape', 'nested-root', 'realm', 'a11y'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 1180, height: 860 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const workbench = await gotoCatalog(page, baseUrl, { entry: 'Dialog', tab: 'examples', example: 'authority' });
+        const triggerA = workbench.getByRole('button', { name: 'Open modal A', exact: true });
+        const triggerB = workbench.getByRole('button', { name: 'Open modal B', exact: true });
+        await triggerA.click();
+        const dialogA = page.getByRole('dialog', { name: 'Authority modal A' });
+        await dialogA.waitFor({ state: 'visible' });
+
+        const firstScope = await page.evaluate(() => {
+          const triggerA = [...document.querySelectorAll('button')].find((element) => element.textContent?.trim() === 'Open modal A');
+          const triggerB = [...document.querySelectorAll('button')].find((element) => element.textContent?.trim() === 'Open modal B');
+          const dialogA = [...document.querySelectorAll('[role="dialog"]')].find((element) => element.getAttribute('aria-labelledby') && element.textContent?.includes('Modal owned by root A'));
+          const runtimeA = triggerA?.closest('.ui-root')?.querySelector('.ui-drag-drop-runtime');
+          const runtimeB = triggerB?.closest('.ui-root')?.querySelector('.ui-drag-drop-runtime');
+          const portalRoot = dialogA?.closest('[data-oxs-portal-root]');
+          return {
+            aBackgroundInert: runtimeA?.hasAttribute('inert') ?? false,
+            bBackgroundInert: runtimeB?.hasAttribute('inert') ?? false,
+            portalOwnedByA: Boolean(portalRoot?.parentElement?.classList.contains('ui-doc-overlay-authority-root--a')),
+          };
+        });
+        assert.deepEqual(firstScope, { aBackgroundInert: true, bBackgroundInert: false, portalOwnedByA: true }, 'Root A modal leaked isolation or portal ownership across UiRoot boundaries.');
+
+        await triggerB.click();
+        const dialogB = page.getByRole('dialog', { name: 'Authority modal B' });
+        await dialogB.waitFor({ state: 'visible' });
+        assert.equal(
+          await dialogA.isVisible(),
+          true,
+          'Cross-root stacking fixture lost modal A while opening modal B; outside dismissal must stay disabled for this coexistence certification.',
+        );
+        const aOwnership = await dialogA.evaluate((element) => {
+          const portal = element.closest('[data-oxs-portal-root]');
+          return {
+            ownerClass: portal?.parentElement?.className ?? '',
+            z: portal ? Number.parseInt(getComputedStyle(portal).zIndex, 10) : Number.NaN,
+          };
+        });
+        const bOwnership = await dialogB.evaluate((element) => {
+          const portal = element.closest('[data-oxs-portal-root]');
+          return {
+            ownerClass: portal?.parentElement?.className ?? '',
+            z: portal ? Number.parseInt(getComputedStyle(portal).zIndex, 10) : Number.NaN,
+          };
+        });
+        const portalOwnership = {
+          distinct: aOwnership.ownerClass !== '' && bOwnership.ownerClass !== '' && aOwnership.ownerClass !== bOwnership.ownerClass,
+          aRoot: aOwnership.ownerClass.includes('ui-doc-overlay-authority-root--a'),
+          bRoot: bOwnership.ownerClass.includes('ui-doc-overlay-authority-root--b'),
+          aZ: aOwnership.z,
+          bZ: bOwnership.z,
+        };
+        assert.equal(portalOwnership.distinct, true, 'Independent UiRoots did not retain independent portal hosts.');
+        assert.equal(portalOwnership.aRoot, true, 'Root A overlay escaped its own portal host.');
+        assert.equal(portalOwnership.bRoot, true, 'Root B overlay escaped its own portal host.');
+        assert.ok(Number.isFinite(portalOwnership.aZ) && Number.isFinite(portalOwnership.bZ) && portalOwnership.bZ > portalOwnership.aZ, 'Document overlay order did not project into cross-root visual stacking.');
+
+        await page.keyboard.press('Escape');
+        await dialogB.waitFor({ state: 'detached' });
+        assert.equal(await dialogA.isVisible(), true, 'Document-level Escape arbitration dismissed more than the top-most overlay.');
+        assert.equal(await triggerB.evaluate((element) => element.ownerDocument.activeElement === element), true, 'Top-most cross-root overlay did not restore focus to its own trigger.');
+
+        await page.keyboard.press('Escape');
+        await dialogA.waitFor({ state: 'detached' });
+        assert.equal(await triggerA.evaluate((element) => element.ownerDocument.activeElement === element), true, 'Lower overlay did not become event-top-most after upper-root dismissal.');
+        const axe = await runAxe(page, 'Overlay authority cross-root closeout');
+        diagnostics.assertClean('Overlay authority cross-root closeout');
+        return { portalOwnership, escapeOrder: ['B', 'A'], axe };
+      } finally {
+        await context.close();
+      }
+    },
+  ),
+
+  scenario(
+    'motion-authority-realm-interruption-certification',
+    ['motion-kernel', 'motion', 'realm', 'scheduler', 'interruption', 'reduced-motion', 'nested-root', 'frame-rate'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 1180, height: 860 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        let workbench = await gotoCatalog(page, baseUrl, { entry: 'MotionTransition', tab: 'examples', example: 'authority', motion: 'full' });
+        let probes = workbench.locator('[data-motion-authority-probe]');
+        await probes.first().waitFor({ state: 'visible' });
+        assert.equal(await probes.count(), 2, 'Motion authority fixture did not expose independent root runtimes.');
+        const fullState = await probes.evaluateAll((elements) => elements.map((element) => {
+          const root = element.closest('.ui-root');
+          return {
+            label: element.getAttribute('data-motion-authority-probe'),
+            realmReady: root?.getAttribute('data-oxs-motion-realm-ready'),
+            frameHost: root?.getAttribute('data-oxs-motion-frame-host'),
+            targetFrameRate: root?.getAttribute('data-oxs-frame-rate'),
+            preference: root?.getAttribute('data-oxs-motion'),
+          };
+        }));
+        assert.ok(fullState.every((state) => state.realmReady === 'true' && state.frameHost === 'true'), 'Motion runtime did not bind scheduling to the concrete owner Window.');
+        assert.deepEqual(fullState.map((state) => state.targetFrameRate), ['60', '120'], 'Nested UiRoot did not own an independent target frame-rate runtime.');
+        assert.ok(fullState.every((state) => state.preference === 'full'), 'Full-motion fixture did not resolve full preference.');
+
+        const outer = probes.filter({ hasText: 'Outer runtime:' });
+        const toggle = outer.getByRole('button', { name: 'Toggle motion', exact: true });
+        const surface = outer.locator('[data-motion-probe-surface]');
+        await toggle.click();
+        await page.waitForTimeout(35);
+        await toggle.click();
+        await page.waitForTimeout(35);
+        await toggle.click();
+        await page.waitForTimeout(35);
+        await toggle.click();
+        await page.waitForFunction(() => {
+          const probe = [...document.querySelectorAll('[data-motion-authority-probe]')].find((element) => element.getAttribute('data-motion-authority-probe') === 'Outer runtime');
+          const surface = probe?.querySelector('[data-motion-probe-surface]');
+          return surface?.getAttribute('data-present') === 'true' && surface?.getAttribute('data-hidden') === 'false';
+        }, null, { timeout: 1800 });
+        assert.equal(await surface.getAttribute('data-present'), 'true', 'Interrupted motion did not converge to the latest requested state.');
+        assert.equal(await surface.getAttribute('data-hidden'), 'false', 'Interrupted motion left the destination hidden.');
+
+        workbench = await gotoCatalog(page, baseUrl, { entry: 'MotionTransition', tab: 'examples', example: 'authority', motion: 'reduced' });
+        probes = workbench.locator('[data-motion-authority-probe]');
+        const reducedOuter = probes.filter({ hasText: 'Outer runtime:' });
+        const reducedToggle = reducedOuter.getByRole('button', { name: 'Toggle motion', exact: true });
+        const reducedSurface = reducedOuter.locator('[data-motion-probe-surface]');
+        assert.equal(await reducedOuter.evaluate((element) => element.closest('.ui-root')?.getAttribute('data-oxs-motion')), 'reduced', 'Reduced-motion route did not resolve through the motion runtime.');
+        await reducedToggle.click();
+        await page.waitForFunction(() => {
+          const probe = [...document.querySelectorAll('[data-motion-authority-probe]')].find((element) => element.getAttribute('data-motion-authority-probe') === 'Outer runtime');
+          const surface = probe?.querySelector('[data-motion-probe-surface]');
+          return surface?.getAttribute('data-present') === 'false' && surface?.getAttribute('data-hidden') === 'true';
+        }, null, { timeout: 250 });
+        assert.equal(await reducedSurface.getAttribute('data-hidden'), 'true', 'Reduced motion did not settle immediately to hidden semantics.');
+        diagnostics.assertClean('Motion authority runtime closeout');
+        return { fullState, interruptionConverged: true, reducedSettled: true };
+      } finally {
+        await context.close();
+      }
+    },
+  ),
+
+  scenario(
     'interaction-kernel-shared-typeahead',
     ['interaction-kernel', 'keyboard', 'typeahead', 'selection', 'focus'],
     async ({ browser, baseUrl }) => {

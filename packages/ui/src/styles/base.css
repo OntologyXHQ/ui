@@ -96,7 +96,7 @@
 .ui-portal-root {
   position: fixed;
   inset: 0;
-  z-index: var(--oxs-z-overlay);
+  z-index: calc(var(--oxs-z-overlay) + var(--oxs-overlay-document-depth, 0));
   pointer-events: none;
   overflow: visible;
 }

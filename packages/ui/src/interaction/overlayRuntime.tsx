@@ -1,47 +1,139 @@
 import type { PropsWithChildren } from 'react';
 import { createContext, useContext, useEffect, useRef } from 'react';
 
-type OverlayEntry = {
+export type OverlayEntry = {
   id: string;
   layer: HTMLElement | null;
   modal: boolean;
   lockScroll: boolean;
   restoreFocus: HTMLElement | null;
+  onKeyDown: (event: KeyboardEvent) => void;
+  onPointerDown: (event: PointerEvent) => void;
 };
 
-let overlayScopeSequence = 0;
-const documentOverlayOrder = new WeakMap<Document, string[]>();
+type DocumentOverlayRegistration = {
+  owner: OverlayCoordinator;
+  entry: OverlayEntry;
+};
 
-function registerDocumentOverlay(documentRef: Document | null, token: string) {
-  if (!documentRef) return;
-  const current = documentOverlayOrder.get(documentRef) ?? [];
-  documentOverlayOrder.set(documentRef, [...current.filter((candidate) => candidate !== token), token]);
+/**
+ * One event broker per concrete Document realm. UiRoots retain independent overlay
+ * stacks/isolation/scroll ownership, while Escape/outside-pointer arbitration is
+ * coordinated once for overlays that genuinely share the same browser Document.
+ */
+export class DocumentOverlayBroker {
+  private registrations: DocumentOverlayRegistration[] = [];
+  private listening = false;
+  private readonly rankedPortalRoots = new Set<HTMLElement>();
+
+  constructor(private readonly documentRef: Document) {}
+
+  register(owner: OverlayCoordinator, entry: OverlayEntry) {
+    this.registrations = [
+      ...this.registrations.filter(
+        (candidate) => !(candidate.owner === owner && candidate.entry.id === entry.id),
+      ),
+      { owner, entry },
+    ];
+    this.ensureListening();
+    this.recomputePortalRanks();
+  }
+
+  unregister(owner: OverlayCoordinator, id: string) {
+    this.registrations = this.registrations.filter(
+      (candidate) => !(candidate.owner === owner && candidate.entry.id === id),
+    );
+    if (this.registrations.length === 0) this.stopListening();
+    this.recomputePortalRanks();
+  }
+
+  isTopMost(owner: OverlayCoordinator, id: string) {
+    const top = this.registrations.at(-1);
+    return top?.owner === owner && top.entry.id === id;
+  }
+
+  registrationCount() {
+    return this.registrations.length;
+  }
+
+  disposeOwner(owner: OverlayCoordinator) {
+    this.registrations = this.registrations.filter((candidate) => candidate.owner !== owner);
+    if (this.registrations.length === 0) this.stopListening();
+    this.recomputePortalRanks();
+  }
+
+  private recomputePortalRanks() {
+    const next = new Map<HTMLElement, number>();
+    this.registrations.forEach((registration, index) => {
+      const portalRoot = registration.entry.layer?.closest<HTMLElement>('[data-oxs-portal-root]') ?? null;
+      if (portalRoot) next.set(portalRoot, index + 1);
+    });
+    for (const portalRoot of this.rankedPortalRoots) {
+      if (!next.has(portalRoot)) portalRoot.style.removeProperty('--oxs-overlay-document-depth');
+    }
+    for (const [portalRoot, rank] of next) {
+      portalRoot.style.setProperty('--oxs-overlay-document-depth', String(rank));
+      this.rankedPortalRoots.add(portalRoot);
+    }
+    for (const portalRoot of [...this.rankedPortalRoots]) {
+      if (!next.has(portalRoot)) this.rankedPortalRoots.delete(portalRoot);
+    }
+  }
+
+  private ensureListening() {
+    if (this.listening) return;
+    this.documentRef.addEventListener('keydown', this.onKeyDown, true);
+    this.documentRef.addEventListener('pointerdown', this.onPointerDown, true);
+    this.listening = true;
+  }
+
+  private stopListening() {
+    if (!this.listening) return;
+    this.documentRef.removeEventListener('keydown', this.onKeyDown, true);
+    this.documentRef.removeEventListener('pointerdown', this.onPointerDown, true);
+    this.listening = false;
+  }
+
+  private readonly onKeyDown = (event: KeyboardEvent) => {
+    this.registrations.at(-1)?.entry.onKeyDown(event);
+  };
+
+  private readonly onPointerDown = (event: PointerEvent) => {
+    this.registrations.at(-1)?.entry.onPointerDown(event);
+  };
 }
 
-function unregisterDocumentOverlay(documentRef: Document | null, token: string) {
-  if (!documentRef) return;
-  const current = documentOverlayOrder.get(documentRef) ?? [];
-  const next = current.filter((candidate) => candidate !== token);
-  if (next.length) documentOverlayOrder.set(documentRef, next);
-  else documentOverlayOrder.delete(documentRef);
-}
+const documentOverlayBrokers = new WeakMap<Document, DocumentOverlayBroker>();
 
-function isDocumentOverlayTopMost(documentRef: Document | null, token: string) {
-  if (!documentRef) return false;
-  return documentOverlayOrder.get(documentRef)?.at(-1) === token;
+export function documentOverlayBroker(documentRef: Document) {
+  let broker = documentOverlayBrokers.get(documentRef);
+  if (!broker) {
+    broker = new DocumentOverlayBroker(documentRef);
+    documentOverlayBrokers.set(documentRef, broker);
+  }
+  return broker;
 }
 
 export class OverlayCoordinator {
-  private readonly scopeId = `overlay-scope-${++overlayScopeSequence}`;
   private entries: OverlayEntry[] = [];
   private depthSequence = -1;
   private restoreIsolation: (() => void) | null = null;
   private lockedRoot: HTMLElement | null = null;
   private lockedRootOverflow = '';
+  private readonly documents = new Set<Document>();
 
   register(entry: OverlayEntry) {
+    const replaced = this.entries.find((candidate) => candidate.id === entry.id);
+    if (replaced?.layer?.ownerDocument && replaced.layer.ownerDocument !== entry.layer?.ownerDocument) {
+      documentOverlayBroker(replaced.layer.ownerDocument).unregister(this, entry.id);
+    }
+
     this.entries = [...this.entries.filter((candidate) => candidate.id !== entry.id), entry];
-    registerDocumentOverlay(entry.layer?.ownerDocument ?? null, this.documentToken(entry.id));
+    const documentRef = entry.layer?.ownerDocument ?? null;
+    if (documentRef) {
+      this.documents.add(documentRef);
+      documentOverlayBroker(documentRef).register(this, entry);
+    }
     this.recomputeModalState();
     this.depthSequence += 1;
     return this.depthSequence;
@@ -49,8 +141,10 @@ export class OverlayCoordinator {
 
   unregister(id: string) {
     const removedEntry = this.entries.find((entry) => entry.id === id);
-    unregisterDocumentOverlay(removedEntry?.layer?.ownerDocument ?? null, this.documentToken(id));
+    const documentRef = removedEntry?.layer?.ownerDocument ?? null;
+    if (documentRef) documentOverlayBroker(documentRef).unregister(this, id);
     if (!removedEntry) return null;
+
     this.entries = this.entries.filter((entry) => entry.id !== id);
     for (const entry of this.entries) {
       const restoreTarget = entry.restoreFocus;
@@ -69,19 +163,23 @@ export class OverlayCoordinator {
 
   isEventTopMost(id: string) {
     const entry = this.entries.find((candidate) => candidate.id === id);
-    return this.isTopMost(id) && isDocumentOverlayTopMost(entry?.layer?.ownerDocument ?? null, this.documentToken(id));
+    const documentRef = entry?.layer?.ownerDocument ?? null;
+    return Boolean(
+      documentRef &&
+        this.isTopMost(id) &&
+        documentOverlayBroker(documentRef).isTopMost(this, id),
+    );
   }
 
   dispose() {
-    for (const entry of this.entries) unregisterDocumentOverlay(entry.layer?.ownerDocument ?? null, this.documentToken(entry.id));
+    for (const documentRef of this.documents) {
+      documentOverlayBroker(documentRef).disposeOwner(this);
+    }
+    this.documents.clear();
     this.entries = [];
     this.restoreIsolation?.();
     this.restoreIsolation = null;
     this.restoreScrollLock();
-  }
-
-  private documentToken(id: string) {
-    return `${this.scopeId}:${id}`;
   }
 
   private recomputeModalState() {
@@ -136,17 +234,23 @@ export function useOverlayCoordinator() {
 function isolateLayerSiblings(layer: HTMLElement) {
   const targets = new Set<HTMLElement>();
   const portalRoot = layer.closest<HTMLElement>('[data-oxs-portal-root]');
+  const HTMLElementCtor = layer.ownerDocument.defaultView?.HTMLElement;
+  const asHtmlElement = (candidate: Element): HTMLElement | null =>
+    HTMLElementCtor && candidate instanceof HTMLElementCtor ? (candidate as HTMLElement) : null;
 
   if (portalRoot?.parentElement) {
     for (const child of portalRoot.parentElement.children) {
-      if (child instanceof HTMLElement && child !== portalRoot) targets.add(child);
+      const element = asHtmlElement(child);
+      if (element && element !== portalRoot) targets.add(element);
     }
     for (const child of portalRoot.children) {
-      if (child instanceof HTMLElement && child !== layer) targets.add(child);
+      const element = asHtmlElement(child);
+      if (element && element !== layer) targets.add(element);
     }
   } else if (layer.parentElement) {
     for (const child of layer.parentElement.children) {
-      if (child instanceof HTMLElement && child !== layer) targets.add(child);
+      const element = asHtmlElement(child);
+      if (element && element !== layer) targets.add(element);
     }
   }
 

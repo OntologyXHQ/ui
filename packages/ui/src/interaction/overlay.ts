@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import { useEffect, useId, useRef, useState } from 'react';
+import { useId, useLayoutEffect, useRef, useState } from 'react';
 import { focusFirstInteractive, keepFocusInside } from './focus';
 import { useOverlayCoordinator } from './overlayRuntime';
 
@@ -36,32 +36,28 @@ export function useOverlayLifecycle({
   const [depth, setDepth] = useState(0);
   dismissRef.current = onDismiss;
 
-  useEffect(() => {
-    if (!open || typeof document === 'undefined') return;
+  useLayoutEffect(() => {
+    if (!open) return;
 
     const layer = layerRef?.current ?? surfaceRef.current;
-    const restoreTarget = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const surface = surfaceRef.current;
+    const ownerDocument = layer?.ownerDocument ?? surface?.ownerDocument ?? anchorRef?.current?.ownerDocument ?? null;
+    const ownerWindow = ownerDocument?.defaultView ?? null;
+    if (!ownerDocument || !layer) return;
 
-    // Modal isolation must never hide the currently focused background node from
-    // assistive technology. Move focus into the committed overlay surface before
-    // the coordinator applies inert + aria-hidden to sibling boundaries.
-    if (modal && surface && !surface.contains(document.activeElement)) {
+    const activeElement = ownerDocument.activeElement;
+    const HTMLElementCtor = ownerWindow?.HTMLElement;
+    const restoreTarget = HTMLElementCtor && activeElement instanceof HTMLElementCtor
+      ? (activeElement as HTMLElement)
+      : null;
+
+    // Focus enters the concrete modal realm before inert/aria-hidden isolation is applied.
+    if (modal && surface && !surface.contains(ownerDocument.activeElement)) {
       if (autoFocus) focusFirstInteractive(surface);
       else surface.focus({ preventScroll: true });
     }
 
-    setDepth(coordinator.register({ id, layer, modal, lockScroll, restoreFocus: restoreTarget }));
-
-    const focusFrame =
-      !modal && autoFocus && surface
-        ? requestAnimationFrame(() => {
-            if (coordinator.isEventTopMost(id)) focusFirstInteractive(surfaceRef.current);
-          })
-        : null;
-
     const onKeyDown = (event: KeyboardEvent) => {
-      if (!coordinator.isEventTopMost(id)) return;
       if (modal) keepFocusInside(event, surfaceRef.current);
       if (escape && event.key === 'Escape') {
         event.preventDefault();
@@ -71,23 +67,41 @@ export function useOverlayLifecycle({
     };
 
     const onPointerDown = (event: PointerEvent) => {
-      if (!outsidePress || !coordinator.isEventTopMost(id) || !(event.target instanceof Node)) return;
-      if (surfaceRef.current?.contains(event.target) || anchorRef?.current?.contains(event.target)) return;
+      if (!outsidePress) return;
+      const target = event.target;
+      const NodeCtor = ownerWindow?.Node;
+      if (!target || (NodeCtor && !(target instanceof NodeCtor))) return;
+      const node = target as Node;
+      if (surfaceRef.current?.contains(node) || anchorRef?.current?.contains(node)) return;
       dismissRef.current();
     };
 
-    document.addEventListener('keydown', onKeyDown, true);
-    document.addEventListener('pointerdown', onPointerDown, true);
+    setDepth(
+      coordinator.register({
+        id,
+        layer,
+        modal,
+        lockScroll,
+        restoreFocus: restoreTarget,
+        onKeyDown,
+        onPointerDown,
+      }),
+    );
+
+    const focusFrame =
+      !modal && autoFocus && surface && ownerWindow?.requestAnimationFrame
+        ? ownerWindow.requestAnimationFrame(() => {
+            if (coordinator.isEventTopMost(id)) focusFirstInteractive(surfaceRef.current);
+          })
+        : null;
 
     return () => {
-      document.removeEventListener('keydown', onKeyDown, true);
-      document.removeEventListener('pointerdown', onPointerDown, true);
-      if (focusFrame !== null) cancelAnimationFrame(focusFrame);
+      if (focusFrame !== null) ownerWindow?.cancelAnimationFrame(focusFrame);
       const wasEventTopMost = coordinator.isEventTopMost(id);
       const previous = coordinator.unregister(id);
 
       if (restoreFocus && wasEventTopMost && previous?.isConnected) {
-        queueMicrotask(() => {
+        scheduleMicrotask(ownerWindow, () => {
           if (previous.isConnected && !previous.closest('[inert]')) {
             previous.focus({ preventScroll: true });
           }
@@ -103,4 +117,12 @@ export function useOverlayLifecycle({
       style: { '--oxs-overlay-depth': depth } as Record<string, string | number>,
     },
   };
+}
+
+function scheduleMicrotask(ownerWindow: Window | null, task: () => void) {
+  if (ownerWindow?.queueMicrotask) {
+    ownerWindow.queueMicrotask(task);
+    return;
+  }
+  Promise.resolve().then(task);
 }

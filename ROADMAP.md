@@ -19,10 +19,11 @@ Canonical gate contract: [`docs/quality/QUALITY_GATES.md`](docs/quality/QUALITY_
   - `UIR03-A` — Core structural flow (`Box`, `Stack`, `Row`, `Wrap`): **DONE**
   - `UIR03-B` — Grid/Container/Inset/SafeArea/Spacer: **DONE**
 - `UIR04` — Visual primitives (`Text`, `Heading`, `Label`, `Code`, `Icon`, `Surface`, `Divider`): **DONE**
-- `UIR05` — Interaction/runtime kernel: **IN PROGRESS**
+- `UIR05` — Interaction/runtime kernel: **DONE**
   - `UIR05-A` — Input authority (Press/Focus/Typeahead/Selection/Gesture Arena): **DONE**
-  - `UIR05-B` — Overlay authority: **NEXT**
-  - `UIR05-C` — Motion authority + kernel closeout: **TODO**
-- `UIR06+` — Components → System UI reacceptance: **TODO**
+  - `UIR05-B` — Overlay authority: **DONE**
+  - `UIR05-C` — Motion authority + kernel closeout: **DONE**
+- `UIR06` — Actions and command controls: **NEXT**
+- `UIR07+` — Components → System UI reacceptance: **TODO**
 
 No public visual export is considered accepted merely because it existed before this reset.
