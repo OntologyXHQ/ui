@@ -37,8 +37,8 @@ export function useRovingFocus({
       const items = focusableItems(containerRef.current, itemSelector);
       if (!items.length) return;
 
-      const active = document.activeElement;
-      const currentIndex = active instanceof HTMLElement ? items.indexOf(active) : -1;
+      const active = containerRef.current?.ownerDocument.activeElement ?? null;
+      const currentIndex = active ? items.indexOf(active as HTMLElement) : -1;
       const resolvedDirection = resolveUiDirection(direction, containerRef.current);
       const delta = navigationDelta(event.key, orientation, resolvedDirection);
 
@@ -65,8 +65,9 @@ export function useRovingFocus({
 }
 
 export function focusRelativeTo(reference: HTMLElement | null, backwards = false) {
-  if (!reference || typeof document === 'undefined') return false;
-  const root = reference.closest<HTMLElement>('.ui-root') ?? document.body;
+  if (!reference) return false;
+  const ownerDocument = reference.ownerDocument;
+  const root = reference.closest<HTMLElement>('.ui-root') ?? ownerDocument.body;
   const items = focusableItems(root, INTERACTIVE_SELECTOR).filter(
     (element) => !element.closest('[data-oxs-portal-root]'),
   );
@@ -110,7 +111,7 @@ export function keepFocusInside(event: KeyboardEvent, surface: HTMLElement | nul
 
   const first = items[0];
   const last = items.at(-1);
-  const active = document.activeElement;
+  const active = surface.ownerDocument.activeElement;
   if (event.shiftKey && (active === first || !surface.contains(active))) {
     event.preventDefault();
     last?.focus({ preventScroll: true });
@@ -133,8 +134,9 @@ function focusableItems(container: HTMLElement | null, selector: string) {
 
 function isRendered(element: HTMLElement) {
   if (element.hidden || element.closest('[hidden], [inert]')) return false;
-  if (typeof window === 'undefined' || typeof window.getComputedStyle !== 'function') return true;
-  const style = window.getComputedStyle(element);
+  const ownerWindow = element.ownerDocument.defaultView;
+  if (!ownerWindow || typeof ownerWindow.getComputedStyle !== 'function') return true;
+  const style = ownerWindow.getComputedStyle(element);
   return style.display !== 'none' && style.visibility !== 'hidden';
 }
 

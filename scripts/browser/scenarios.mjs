@@ -1228,8 +1228,54 @@ export const browserScenarios = [
   ),
 
   scenario(
+    'interaction-kernel-shared-typeahead',
+    ['interaction-kernel', 'keyboard', 'typeahead', 'selection', 'focus'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 1100, height: 820 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const selectWorkbench = await gotoCatalog(page, baseUrl, { entry: 'Select', tab: 'examples', example: 'overview' });
+        const select = selectWorkbench.getByRole('combobox', { name: 'Density', exact: true });
+        await select.waitFor({ state: 'visible' });
+        await select.focus();
+        await page.keyboard.press('c');
+        await page.keyboard.press('c');
+        assert.match(await select.innerText(), /Compact/, 'Repeated-key Select typeahead did not cycle through the shared matcher.');
+        await page.waitForTimeout(760);
+        await page.keyboard.press('c');
+        assert.match(await select.innerText(), /Comfortable/, 'Delayed Select typeahead did not reset to the first matching choice.');
+
+        const menuWorkbench = await gotoCatalog(page, baseUrl, { entry: 'Menu', tab: 'examples', example: 'preview' });
+        const trigger = menuWorkbench.getByRole('button', { name: 'Open menu', exact: true });
+        await trigger.click();
+        const menu = page.getByRole('menu', { name: 'Preview menu' });
+        await menu.waitFor({ state: 'visible' });
+        await page.keyboard.press('d');
+        const duplicate = page.getByRole('menuitem', { name: 'Duplicate', exact: true });
+        assert.equal(
+          await duplicate.evaluate((element) => element.ownerDocument.activeElement === element),
+          true,
+          'Menu did not use the shared typeahead matcher relative to its owning Document focus.',
+        );
+        await page.keyboard.press('Space');
+        await menu.waitFor({ state: 'detached' });
+        assert.equal(
+          await trigger.evaluate((element) => element.ownerDocument.activeElement === element),
+          true,
+          'Space activation after typeahead did not preserve native MenuItem activation/focus return.',
+        );
+        diagnostics.assertClean('interaction kernel shared typeahead');
+        return { repeatedSelectCycle: true, delayedReset: true, menuFocus: true };
+      } finally {
+        await context.close();
+      }
+    },
+  ),
+
+  scenario(
     'pointer-cancellation-and-activation',
-    ['pointer', 'cancellation', 'activation'],
+    ['interaction-kernel', 'pointer', 'cancellation', 'activation'],
     async ({ browser, baseUrl }) => {
       const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
       const page = await context.newPage();
@@ -1254,7 +1300,7 @@ export const browserScenarios = [
 
   scenario(
     'touch-long-press-context-menu',
-    ['touch', 'coarse-pointer', 'long-press', 'overlay', 'a11y'],
+    ['interaction-kernel', 'touch', 'coarse-pointer', 'long-press', 'overlay', 'a11y'],
     async ({ browser, baseUrl }) => {
       const context = await browser.newContext({
         viewport: { width: 390, height: 844 },

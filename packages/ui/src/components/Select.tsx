@@ -2,13 +2,12 @@ import type { KeyboardEvent, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useUiPortalHost, viewportLengthToPortalHost, viewportPointToPortalHost } from '../foundations/portal';
-import { type FloatingAnchor, useFloatingPosition, useOverlayLifecycle } from '../interaction';
+import { TypeaheadController, type FloatingAnchor, useFloatingPosition, useOverlayLifecycle } from '../interaction';
 import { defineUiIcon, Icon } from '../primitives';
 import { useControllableState } from './controlState';
 import { FieldFrame, type FieldStateProps, useFieldIds } from './Field';
 
 const selectChevron = defineUiIcon({ paths: ['m7 9 5 5 5-5'] });
-const TYPEAHEAD_RESET_MS = 700;
 
 export type SelectOption = {
   value: string;
@@ -62,7 +61,7 @@ export function Select({
   const [activeValue, setActiveValue] = useState('');
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
-  const typeaheadRef = useRef({ text: '', at: 0 });
+  const typeaheadRef = useRef(new TypeaheadController());
   const ids = useFieldIds({ id, description, error });
   const listboxId = `${ids.controlId}-listbox`;
   const selected = useMemo(() => options.find((option) => option.value === currentValue) ?? null, [currentValue, options]);
@@ -130,21 +129,18 @@ export function Select({
     setActiveValue(enabled[next]?.value ?? '');
   };
 
-  const applyTypeahead = (key: string, choose: boolean) => {
-    if (key.length !== 1 || /\s/.test(key) || !enabled.length) return false;
-    const normalizedKey = key.normalize('NFKC').toLocaleLowerCase();
-    const now = Date.now();
-    const previous = now - typeaheadRef.current.at > TYPEAHEAD_RESET_MS ? '' : typeaheadRef.current.text;
-    const repeated = previous.length > 0 && [...previous].every((character) => character === normalizedKey);
-    const text = repeated ? normalizedKey : `${previous}${normalizedKey}`;
-    typeaheadRef.current = { text, at: now };
-    const matches = enabled.filter((option) => normalizeTypeahead(option.label).startsWith(text));
-    if (!matches.length) return false;
-    let candidate = matches[0];
-    if (repeated && matches.length > 1) {
-      const from = matches.findIndex((option) => option.value === (activeValue || currentValue));
-      candidate = matches[(from + 1 + matches.length) % matches.length] ?? matches[0];
-    }
+  const applyTypeahead = (event: KeyboardEvent<HTMLButtonElement>, choose: boolean) => {
+    if (event.altKey || event.ctrlKey || event.metaKey || !enabled.length) return false;
+    const currentIndex = enabled.findIndex((option) => option.value === (activeValue || currentValue));
+    const match = typeaheadRef.current.search({
+      key: event.key,
+      labels: enabled.map((option) => option.label),
+      currentIndex,
+      nowMs: event.timeStamp,
+    });
+    if (!match) return false;
+    const candidate = enabled[match.index];
+    if (!candidate) return false;
     setActiveValue(candidate.value);
     if (choose) setCurrentValue(candidate.value);
     return true;
@@ -183,7 +179,7 @@ export function Select({
       else setOpen(true);
       return;
     }
-    if (applyTypeahead(event.key, !activeOpen)) event.preventDefault();
+    if (applyTypeahead(event, !activeOpen)) event.preventDefault();
   };
 
   const listbox = activeOpen && portalHost ? createPortal(
@@ -297,9 +293,6 @@ export function Select({
   );
 }
 
-function normalizeTypeahead(value: string) {
-  return value.normalize('NFKC').trim().toLocaleLowerCase();
-}
 
 function selectOptionId(controlId: string, value: string) {
   return `${controlId}-option-${safeDomId(value)}`;

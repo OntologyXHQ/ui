@@ -1,6 +1,6 @@
 import type { FocusEvent as ReactFocusEvent, HTMLAttributes, ReactNode } from 'react';
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
-import { useRovingFocus } from '../interaction';
+import { normalizeSingleSelection, useRovingFocus } from '../interaction';
 import { Heading } from '../primitives';
 import { Button } from './Button';
 import { useControllableState } from './controlState';
@@ -46,15 +46,13 @@ export function Tabs({
 }: TabsProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const generatedId = useId().replace(/:/g, '');
-  const firstEnabled = items.find((item) => !item.disabled)?.value ?? '';
+  const firstEnabled = normalizeSingleSelection(items, undefined) ?? '';
   const [current, setCurrent] = useControllableState({
     value,
     defaultValue: defaultValue ?? firstEnabled,
     onValueChange,
   });
-  const validSelected = items.some((item) => item.value === current && !item.disabled)
-    ? current
-    : firstEnabled;
+  const validSelected = normalizeSingleSelection(items, current, 'first-enabled') ?? firstEnabled;
   const [focusedValue, setFocusedValue] = useState(validSelected);
   const rovingValue = items.some((item) => item.value === focusedValue && !item.disabled)
     ? focusedValue
@@ -180,12 +178,10 @@ export function AdaptiveNavigation({
 }: AdaptiveNavigationProps) {
   const [current, setCurrent] = useControllableState({
     value,
-    defaultValue: defaultValue ?? items.find((item) => !item.disabled)?.value ?? '',
+    defaultValue: defaultValue ?? normalizeSingleSelection(items, undefined) ?? '',
     onValueChange,
   });
-  const validSelected = items.some((item) => item.value === current && !item.disabled)
-    ? current
-    : '';
+  const validSelected = normalizeSingleSelection(items, current, 'none') ?? '';
 
   return (
     <nav

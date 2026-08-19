@@ -2,12 +2,27 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { usePress } from '../press';
 
-function PressHarness({ onPress, onClick }: { onPress: () => void; onClick?: () => void }) {
-  const { pressProps, pressed } = usePress({ onPress });
+function PressHarness({
+  onPress,
+  onClick,
+  disabled = false,
+}: {
+  onPress: () => void;
+  onClick?: () => void;
+  disabled?: boolean;
+}) {
+  const { pressProps, pressed } = usePress({ onPress, disabled });
   return (
-    <button {...pressProps} onClick={onClick} data-testid="press-target">
+    <div
+      {...pressProps}
+      role="button"
+      tabIndex={disabled ? -1 : 0}
+      aria-disabled={disabled || undefined}
+      onClick={onClick}
+      data-testid="press-target"
+    >
       {pressed ? 'Pressed' : 'Idle'}
-    </button>
+    </div>
   );
 }
 
@@ -56,6 +71,31 @@ describe('press pointer-capture capability', () => {
       pointerId: 17, pointerType: 'touch', button: 0, isPrimary: true, clientX: 4, clientY: 4,
     });
     fireEvent.pointerCancel(target, { pointerId: 17, pointerType: 'touch', isPrimary: true });
+    fireEvent.click(target);
+
+    expect(onPress).not.toHaveBeenCalled();
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('cancels an active pointer transaction when disabled changes before release', () => {
+    const onPress = vi.fn();
+    const onClick = vi.fn();
+    const { rerender } = render(<PressHarness onPress={onPress} onClick={onClick} />);
+    const target = screen.getByTestId('press-target');
+
+    fireEvent.pointerDown(target, {
+      pointerId: 23,
+      pointerType: 'touch',
+      button: 0,
+      isPrimary: true,
+      clientX: 8,
+      clientY: 8,
+    });
+    expect(target).toHaveAttribute('data-pressed', 'true');
+
+    rerender(<PressHarness onPress={onPress} onClick={onClick} disabled />);
+    expect(target).not.toHaveAttribute('data-pressed');
+    fireEvent.pointerUp(target, { pointerId: 23, pointerType: 'touch', isPrimary: true });
     fireEvent.click(target);
 
     expect(onPress).not.toHaveBeenCalled();

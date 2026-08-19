@@ -1,6 +1,6 @@
 import type { HTMLAttributes, PointerEvent as ReactPointerEvent } from 'react';
 import { useCallback, useEffect, useId, useRef } from 'react';
-import { gestureArena } from './arena';
+import { useGestureArena } from './runtime';
 import type {
   GestureAxis,
   GesturePoint,
@@ -55,6 +55,7 @@ export function usePanGesture({
   onCancel,
 }: PanGestureOptions = {}) {
   const owner = useId();
+  const gestureArena = useGestureArena();
   const sessionRef = useRef<PanSession | null>(null);
   const callbacksRef = useRef({ onBegin, onUpdate, onEnd, onCancel });
   callbacksRef.current = { onBegin, onUpdate, onEnd, onCancel };
@@ -66,7 +67,7 @@ export function usePanGesture({
       gestureArena.release(session.pointerId, owner);
       releasePointerCapture(session.target, session.pointerId);
     },
-    [owner],
+    [gestureArena, owner],
   );
 
   const cancelSession = useCallback(
@@ -127,7 +128,7 @@ export function usePanGesture({
       event.preventDefault();
       callbacksRef.current.onUpdate?.(sampleFromSession(session, 'changed', delta));
     },
-    [axis, owner, threshold],
+    [axis, gestureArena, owner, threshold],
   );
 
   const finishSession = useCallback(
@@ -145,7 +146,7 @@ export function usePanGesture({
         callbacksRef.current.onEnd?.(sampleFromSession(session, 'ended'));
       }
     },
-    [owner, releaseSessionResources],
+    [gestureArena, owner, releaseSessionResources],
   );
 
   const installWindowContinuation = useCallback(
@@ -178,14 +179,17 @@ export function usePanGesture({
         cancelSession(event);
       };
 
-      window.addEventListener('pointermove', onWindowPointerMove);
-      window.addEventListener('pointerup', onWindowPointerUp);
-      window.addEventListener('pointercancel', onWindowPointerCancel);
+      const ownerWindow = session.target.ownerDocument.defaultView;
+      if (!ownerWindow) return () => {};
+
+      ownerWindow.addEventListener('pointermove', onWindowPointerMove);
+      ownerWindow.addEventListener('pointerup', onWindowPointerUp);
+      ownerWindow.addEventListener('pointercancel', onWindowPointerCancel);
 
       return () => {
-        window.removeEventListener('pointermove', onWindowPointerMove);
-        window.removeEventListener('pointerup', onWindowPointerUp);
-        window.removeEventListener('pointercancel', onWindowPointerCancel);
+        ownerWindow.removeEventListener('pointermove', onWindowPointerMove);
+        ownerWindow.removeEventListener('pointerup', onWindowPointerUp);
+        ownerWindow.removeEventListener('pointercancel', onWindowPointerCancel);
       };
     },
     [cancelSession, finishSession, updateSession],
@@ -229,7 +233,7 @@ export function usePanGesture({
       session.removeWindowContinuation = installWindowContinuation(session);
       sessionRef.current = session;
     },
-    [disabled, installWindowContinuation, owner, priority, releaseSessionResources],
+    [disabled, gestureArena, installWindowContinuation, owner, priority, releaseSessionResources],
   );
 
   const onPointerMove = useCallback(
@@ -255,6 +259,10 @@ export function usePanGesture({
     },
     [cancelSession],
   );
+
+  useEffect(() => {
+    if (disabled && sessionRef.current) cancelSession();
+  }, [cancelSession, disabled]);
 
   useEffect(
     () => () => {
@@ -304,7 +312,8 @@ function releasePointerCapture(target: HTMLElement, pointerId: number) {
 }
 
 function eventTargetsSessionElement(target: EventTarget | null, sessionTarget: HTMLElement) {
-  return target instanceof Node && sessionTarget.contains(target);
+  const NodeCtor = sessionTarget.ownerDocument.defaultView?.Node;
+  return Boolean(NodeCtor && target instanceof NodeCtor && sessionTarget.contains(target));
 }
 
 function sampleFromSession(

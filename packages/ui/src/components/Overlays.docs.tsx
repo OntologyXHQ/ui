@@ -212,8 +212,8 @@ export function MenuPreviewExample() {
     <>
       <Button ref={anchorRef} variant="soft" onClick={() => setOpen((value) => !value)}>Open menu</Button>
       <Menu open={open} onOpenChange={setOpen} anchorRef={anchorRef} ariaLabel="Preview menu">
-        <MenuItem onSelect={() => setOpen(false)}>Open</MenuItem>
-        <MenuItem onSelect={() => setOpen(false)}>Duplicate</MenuItem>
+        <MenuItem>Open</MenuItem>
+        <MenuItem>Duplicate</MenuItem>
       </Menu>
     </>
   );

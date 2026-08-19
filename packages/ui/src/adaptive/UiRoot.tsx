@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useRef, useState } from 'react'
 import type { CursorRuntimeConfig } from '../cursor';
 import { CursorRuntimeProvider, useCursorRuntime } from '../cursor';
 import { DragDropProvider } from '../drag-drop';
+import { GestureRuntimeProvider } from '../gestures/runtime';
 import type { EditableTextBridge, UiClipboardAdapter } from '../editing';
 import { EditableTextRuntimeProvider } from '../editing/runtime';
 import type { UiEnvironmentOptions } from '../foundations';
@@ -106,20 +107,22 @@ export function UiRoot({
           realmWindow={realm.window}
         >
           <EditableTextRuntimeProvider bridge={editingBridge} clipboardAdapter={clipboardAdapter}>
-            <OverlayRuntimeProvider>
-              <UiRootDepthContext.Provider value={parentDepth + 1}>
-                <UiRootFrame
-                  motionPreference={motion}
-                  targetFrameRate={targetFrameRate}
-                  scope={scope}
-                  className={className}
-                  style={style}
-                  onRootElement={bindRootElement}
-                >
-                  <DragDropProvider>{children}</DragDropProvider>
-                </UiRootFrame>
-              </UiRootDepthContext.Provider>
-            </OverlayRuntimeProvider>
+            <GestureRuntimeProvider>
+              <OverlayRuntimeProvider>
+                <UiRootDepthContext.Provider value={parentDepth + 1}>
+                  <UiRootFrame
+                    motionPreference={motion}
+                    targetFrameRate={targetFrameRate}
+                    scope={scope}
+                    className={className}
+                    style={style}
+                    onRootElement={bindRootElement}
+                  >
+                    <DragDropProvider>{children}</DragDropProvider>
+                  </UiRootFrame>
+                </UiRootDepthContext.Provider>
+              </OverlayRuntimeProvider>
+            </GestureRuntimeProvider>
           </EditableTextRuntimeProvider>
         </MotionRuntimeProvider>
       </CursorRuntimeProvider>

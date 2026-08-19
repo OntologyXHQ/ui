@@ -1,8 +1,11 @@
 # Changelog
 
+- UIR05-A input authority: root-scoped GestureArena ownership, disabled press/pan cancellation, realm-local focus and pointer continuation, shared Unicode typeahead and single-selection normalization, adversarial tests, G0 contract and dedicated browser evidence.
+  - Menu now owns enabled MenuItem activation closure: native mouse/Enter/Space activation runs item callbacks first, then closes through the canonical `requestOpenChange(false)` path so focus restoration cannot be bypassed by consumer-local state setters; `preventDefault()` can intentionally keep the menu open.
+  - G6 shared-typeahead evidence is scoped to the active catalog workbench, so duplicate accessible names in the global Studio environment toolbar cannot contaminate component certification.
 ## Unreleased — UIR04 visual primitives reacceptance
 
-- UIR04 Icon-pack closeout: directional mirroring now resolves from the Icon element’s local `:dir(rtl)` state so nested RTL/LTR scopes do not depend on UiRoot direction. Added the optional `@ontologyx/ui/icons` entry with 160 distinct static glyph definitions exposed through 244 semantic exports/aliases plus 22 typed multi-state animated families, all self-contained on `defineUiIcon`; the canonical `@ontologyx/ui` entry does not re-export the pack. Added package/build/type boundaries, Studio breadth preview, unit/type coverage, G0 count/isolation invariants and a dedicated G6 pack journey.
+- UIR04 Icon-pack closeout: directional mirroring now resolves through inherited logical-direction transform tokens published by nested LTR/RTL boundaries, avoiding SVG-local `:dir()` dependence while preserving nested overrides. Added the optional `@ontologyx/ui/icons` entry with 160 distinct static glyph definitions exposed through 244 semantic exports/aliases plus 22 typed multi-state animated families, all self-contained on `defineUiIcon`; the canonical `@ontologyx/ui` entry does not re-export the pack. Added package/build/type boundaries, Studio breadth preview, unit/type coverage, G0 count/isolation invariants and a dedicated G6 pack journey.
 
 - UIR04 reduced-motion follow-up: desired Icon state now reconciles in a pre-paint layout effect so the prior stable state cannot leak across a committed state change; reduced-motion G6 convergence now waits for the exact requested stable semantic + visual state instead of accepting any stable phase. The Primitive remains layer-correct: reduced visual timing is still projected through UiRoot/CSS rather than importing the Motion engine into Primitives.
 

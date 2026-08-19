@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { UiRoot } from '../../adaptive';
-import { gestureArena } from '../../gestures/arena';
+import { GestureArena } from '../../gestures/arena';
 import {
   AlertDialog,
   Banner,
@@ -188,7 +188,7 @@ describe('overlay and transient feedback components', () => {
 
   it('routes ContextMenu long-press through one shared trigger press candidate', () => {
     vi.useFakeTimers();
-    const register = vi.spyOn(gestureArena, 'register');
+    const register = vi.spyOn(GestureArena.prototype, 'register');
     try {
       wrap(
         <ContextMenu
@@ -246,6 +246,35 @@ describe('overlay and transient feedback components', () => {
     menu.focus();
     await user.keyboard('b');
     expect(screen.getByRole('menuitem', { name: 'Beta' })).toHaveFocus();
+  });
+
+
+  it('routes native MenuItem activation through Menu-owned close and focus restoration', async () => {
+    const user = userEvent.setup();
+    const onSelect = vi.fn();
+    function Harness() {
+      const anchor = useRef<HTMLButtonElement>(null);
+      const [open, setOpen] = useState(false);
+      return (
+        <>
+          <button ref={anchor} type="button" onClick={() => setOpen(true)}>Open commands</button>
+          <Menu open={open} onOpenChange={setOpen} anchorRef={anchor} ariaLabel="Owned commands">
+            <MenuItem>Alpha</MenuItem>
+            <MenuItem onSelect={onSelect}>Duplicate</MenuItem>
+          </Menu>
+        </>
+      );
+    }
+    wrap(<Harness />);
+    const trigger = screen.getByRole('button', { name: 'Open commands' });
+    await user.click(trigger);
+    await user.keyboard('d');
+    expect(screen.getByRole('menuitem', { name: 'Duplicate' })).toHaveFocus();
+    await user.keyboard(' ');
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole('menu', { name: 'Owned commands' })).not.toBeInTheDocument();
+    await act(async () => Promise.resolve());
+    expect(trigger).toHaveFocus();
   });
 
   it('keeps alert confirmation explicit and blocks outside-dismiss ownership', async () => {

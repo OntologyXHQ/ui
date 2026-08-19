@@ -8,8 +8,12 @@ describe('UI package public surfaces', () => {
     expect(PublicUi).not.toHaveProperty('MotionRuntimeProvider');
     expect(PublicUi).not.toHaveProperty('EditableTextRuntimeProvider');
     expect(PublicUi).not.toHaveProperty('OverlayRuntimeProvider');
+    expect(PublicUi).not.toHaveProperty('GestureRuntimeProvider');
+    expect(PublicUi).not.toHaveProperty('TypeaheadController');
     expect(AdvancedUi).toHaveProperty('DragDropProvider');
     expect(AdvancedUi).toHaveProperty('MotionRuntimeProvider');
+    expect(AdvancedUi).toHaveProperty('GestureRuntimeProvider');
+    expect(AdvancedUi).toHaveProperty('TypeaheadController');
   });
 
   it('keeps removed compatibility aliases off the canonical SDK', () => {

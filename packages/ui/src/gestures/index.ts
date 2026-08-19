@@ -1,5 +1,6 @@
 export type { GestureCandidate } from './arena';
-export { GestureArena, gestureArena } from './arena';
+export { GestureArena } from './arena';
+export { GestureRuntimeProvider, useGestureArena } from './runtime';
 export type {
   GestureAxis,
   GesturePhase,

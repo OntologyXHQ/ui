@@ -27,7 +27,7 @@ import {
 import { usePanGesture } from '../gestures';
 import { useUiPortalHost, viewportPointToPortalHost } from '../foundations/portal';
 import type { FloatingAnchor, FloatingGeometryRect, FloatingPlacement, PressActivation } from '../interaction';
-import { focusRelativeTo, useFloatingPosition, useOverlayLifecycle, useRovingFocus } from '../interaction';
+import { focusRelativeTo, isTypeaheadCharacter, TypeaheadController, useFloatingPosition, useOverlayLifecycle, useRovingFocus } from '../interaction';
 import type { InteractiveTransitionController } from '../motion';
 import { useInteractiveTransition } from '../motion';
 import { SafeArea, Surface } from '../primitives';
@@ -310,8 +310,7 @@ export function Menu({
   children,
 }: MenuProps) {
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const typeaheadRef = useRef('');
-  const typeaheadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const typeaheadRef = useRef(new TypeaheadController());
   const tabExitRef = useRef<'forward' | 'backward' | null>(null);
 
   const attachMenuRef = useCallback(
@@ -328,9 +327,6 @@ export function Menu({
     [open],
   );
 
-  useEffect(() => () => {
-    if (typeaheadTimerRef.current !== null) clearTimeout(typeaheadTimerRef.current);
-  }, []);
 
   const moveFocus = useRovingFocus({
     containerRef: menuRef,
@@ -373,29 +369,40 @@ export function Menu({
       }
       if (isTypeaheadKey(event)) {
         event.preventDefault();
-        if (typeaheadTimerRef.current !== null) clearTimeout(typeaheadTimerRef.current);
-        typeaheadRef.current += event.key.toLocaleLowerCase();
         const items = [...(menuRef.current?.querySelectorAll<HTMLButtonElement>(
           '[role="menuitem"]:not([disabled])',
         ) ?? [])];
-        const activeIndex = document.activeElement instanceof HTMLElement
-          ? items.indexOf(document.activeElement as HTMLButtonElement)
-          : -1;
-        const query = typeaheadRef.current;
-        const ordered = activeIndex < 0
-          ? items
-          : [...items.slice(activeIndex + 1), ...items.slice(0, activeIndex + 1)];
-        ordered.find((item) => normalizeTypeaheadText(item.textContent).startsWith(query))
-          ?.focus({ preventScroll: true });
-        typeaheadTimerRef.current = setTimeout(() => {
-          typeaheadRef.current = '';
-          typeaheadTimerRef.current = null;
-        }, 700);
+        const active = menuRef.current?.ownerDocument.activeElement ?? null;
+        const activeIndex = active ? items.indexOf(active as HTMLButtonElement) : -1;
+        const match = typeaheadRef.current.search({
+          key: event.key,
+          labels: items.map((item) => item.textContent ?? ''),
+          currentIndex: activeIndex,
+          nowMs: event.timeStamp,
+          preferNextMatch: true,
+        });
+        if (match) items[match.index]?.focus({ preventScroll: true });
         return;
       }
       moveFocus(event);
     },
     [moveFocus, requestOpenChange],
+  );
+
+  const handleItemClick = useCallback(
+    (event: ReactMouseEvent<HTMLDivElement>) => {
+      if (event.defaultPrevented) return;
+      const target = event.target as { closest?: (selector: string) => Element | null } | null;
+      const item = target?.closest?.('[role="menuitem"]') ?? null;
+      if (
+        !item ||
+        !event.currentTarget.contains(item) ||
+        item.hasAttribute('disabled') ||
+        item.getAttribute('aria-disabled') === 'true'
+      ) return;
+      requestOpenChange(false);
+    },
+    [requestOpenChange],
   );
 
   const anchorProps: OverlayAnchorProps = anchorRect
@@ -414,7 +421,7 @@ export function Menu({
       className={`ui-menu ${className}`.trim()}
       onKeyDown={handleKeyDown}
     >
-      <div ref={attachMenuRef} className="ui-menu__items">
+      <div ref={attachMenuRef} className="ui-menu__items" onClick={handleItemClick}>
         {children}
       </div>
     </Popover>
@@ -555,7 +562,6 @@ export function ContextMenu({
               destructive={action.destructive}
               onSelect={() => {
                 action.onSelect();
-                setPoint(null);
               }}
             >
               {action.label}
@@ -771,11 +777,7 @@ export function BottomSheet({
 }
 
 function isTypeaheadKey(event: ReactKeyboardEvent<HTMLElement>) {
-  return event.key.length === 1 && !event.altKey && !event.ctrlKey && !event.metaKey;
-}
-
-function normalizeTypeaheadText(value: string | null) {
-  return (value ?? '').normalize('NFKC').trim().toLocaleLowerCase();
+  return isTypeaheadCharacter(event.key) && !event.altKey && !event.ctrlKey && !event.metaKey;
 }
 
 type TooltipTriggerProps = {

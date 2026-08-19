@@ -9,7 +9,7 @@ import type {
 } from 'react';
 import { forwardRef, useCallback, useEffect, useId, useImperativeHandle, useRef } from 'react';
 import { observeElementSize, resolveUiDirection, useUiEnvironment } from '../foundations';
-import { gestureArena } from '../gestures/arena';
+import { useGestureArena } from '../gestures/runtime';
 import { releasePointerCaptureIfSupported, setPointerCaptureIfSupported } from '../gestures/pointerCapture';
 import { readSpringSpec, SpringValue, useMotionRuntime, useReducedMotion } from '../motion';
 import {
@@ -100,6 +100,7 @@ const ScrollViewImpl = forwardRef(function ScrollView(
   const hideIndicatorTimerRef = useRef<number | null>(null);
   const overscrollRef = useRef(0);
   const gestureOwner = useId();
+  const gestureArena = useGestureArena();
   const { clock } = useMotionRuntime();
   const { direction } = useUiEnvironment();
   const reducedMotion = useReducedMotion();
@@ -658,7 +659,7 @@ const ScrollViewImpl = forwardRef(function ScrollView(
     if (overscrollRef.current !== 0) {
       settleOverscroll();
     }
-  }, [gestureOwner, settleOverscroll]);
+  }, [gestureArena, gestureOwner, settleOverscroll]);
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLElement>) => {
     onPointerDown?.(event);

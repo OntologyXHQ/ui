@@ -5,7 +5,7 @@ import type {
   PointerEvent as ReactPointerEvent,
 } from 'react';
 import { useCallback, useEffect, useId, useRef } from 'react';
-import { gestureArena } from '../gestures/arena';
+import { useGestureArena } from '../gestures/runtime';
 import { releasePointerCaptureIfSupported, setPointerCaptureIfSupported } from '../gestures/pointerCapture';
 import { useDragDropRuntime } from './runtime';
 import type { DragItem, DragPoint, DragPreview } from './types';
@@ -48,6 +48,7 @@ export function useDragSource({
   const suppressNextClickRef = useRef(false);
   const suppressClickTimerRef = useRef<number | null>(null);
   const gestureOwner = useId();
+  const gestureArena = useGestureArena();
   const keyboardActive = session?.sourceId === id && session.modality === 'keyboard';
 
   const clearPending = useCallback((releaseArena = true) => {
@@ -58,7 +59,7 @@ export function useDragSource({
     pending.unregister();
     releasePointerCaptureIfSupported(pending.target, pending.pointerId);
     pendingRef.current = null;
-  }, [gestureOwner]);
+  }, [gestureArena, gestureOwner]);
 
   const start = useCallback(
     (pending: PendingPointer) => {
@@ -81,7 +82,7 @@ export function useDragSource({
       update(pending.latest);
       return true;
     },
-    [begin, gestureOwner, id, item, preview, update],
+    [begin, gestureArena, gestureOwner, id, item, preview, update],
   );
 
   const onPointerDown = useCallback(
@@ -115,7 +116,7 @@ export function useDragSource({
         }, touchLongPressMs);
       }
     },
-    [cancel, clearPending, disabled, gestureOwner, start, touchLongPressMs],
+    [cancel, clearPending, disabled, gestureArena, gestureOwner, start, touchLongPressMs],
   );
 
   const onPointerMove = useCallback(
@@ -135,7 +136,7 @@ export function useDragSource({
       event.preventDefault();
       update(pending.latest);
     },
-    [clearPending, gestureOwner, start, threshold, update],
+    [clearPending, gestureArena, gestureOwner, start, threshold, update],
   );
 
   const onPointerUp = useCallback(
@@ -154,7 +155,7 @@ export function useDragSource({
       }
       clearPending();
     },
-    [clearPending, finish, gestureOwner],
+    [clearPending, finish, gestureArena, gestureOwner],
   );
 
   const onPointerCancel = useCallback(

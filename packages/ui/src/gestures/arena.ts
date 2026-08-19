@@ -95,6 +95,12 @@ export class GestureArena {
     this.release(pointerId, owner);
   }
 
+  dispose() {
+    const candidates = [...this.pointers.values()].flatMap((arena) => [...arena.candidates.values()]);
+    this.pointers.clear();
+    for (const candidate of candidates) candidate.onCancel?.();
+  }
+
   private unregister(pointerId: number, owner: string) {
     const arena = this.pointers.get(pointerId);
     if (!arena) {
@@ -125,5 +131,3 @@ export class GestureArena {
     }
   }
 }
-
-export const gestureArena = new GestureArena();

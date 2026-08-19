@@ -6,7 +6,7 @@ import type {
   PointerEvent as ReactPointerEvent,
 } from 'react';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
-import { gestureArena } from '../gestures/arena';
+import { useGestureArena } from '../gestures/runtime';
 import { releasePointerCaptureIfSupported, setPointerCaptureIfSupported } from '../gestures/pointerCapture';
 
 export type PressSource = 'keyboard' | 'mouse' | 'pen' | 'touch';
@@ -51,6 +51,7 @@ export function usePress({
   keyboardActivation = 'managed',
 }: PressOptions = {}) {
   const owner = useId();
+  const gestureArena = useGestureArena();
   const sessionRef = useRef<PointerSession | null>(null);
   const keyboardKeyRef = useRef<string | null>(null);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -99,7 +100,7 @@ export function usePress({
       releasePointerCaptureIfSupported(session.target, session.pointerId);
       setPressed(false);
     },
-    [clearLongPressTimer, owner, setPressed],
+    [clearLongPressTimer, gestureArena, owner, setPressed],
   );
 
   const onPointerDown = useCallback(
@@ -124,6 +125,7 @@ export function usePress({
         onCancel: () => {
           if (sessionRef.current?.pointerId !== event.pointerId) return;
           sessionRef.current = null;
+          clearLongPressTimer();
           releasePointerCaptureIfSupported(target, event.pointerId);
           suppressNextClick();
           setPressed(false);
@@ -149,7 +151,7 @@ export function usePress({
         }, longPressDelay);
       }
     },
-    [clearSuppressionTimer, disabled, longPressDelay, owner, priority, setPressed, suppressNextClick],
+    [clearLongPressTimer, clearSuppressionTimer, disabled, gestureArena, longPressDelay, owner, priority, setPressed, suppressNextClick],
   );
 
   const onPointerMove = useCallback(
@@ -191,7 +193,7 @@ export function usePress({
         });
       }
     },
-    [clearLongPressTimer, clearPointerSession, disabled, owner, suppressNextClick],
+    [clearLongPressTimer, clearPointerSession, disabled, gestureArena, owner, suppressNextClick],
   );
 
   const onPointerCancel = useCallback(
@@ -244,6 +246,15 @@ export function usePress({
     },
     [setPressed],
   );
+
+  useEffect(() => {
+    if (!disabled) return;
+    if (sessionRef.current) suppressNextClick();
+    clearPointerSession();
+    clearLongPressTimer();
+    keyboardKeyRef.current = null;
+    setPressed(false);
+  }, [clearLongPressTimer, clearPointerSession, disabled, setPressed, suppressNextClick]);
 
   useEffect(
     () => () => {

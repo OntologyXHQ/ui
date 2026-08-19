@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "roadmap": "UIR05",
+  "status": "in-progress",
+  "slices": {
+    "input-authority": {
+      "owner": "UIR05-A",
+      "status": "certified",
+      "behaviorTests": [
+        "packages/ui/src/interaction/__tests__/press.test.tsx",
+        "packages/ui/src/interaction/__tests__/focus.test.ts",
+        "packages/ui/src/interaction/__tests__/typeahead-selection.test.ts",
+        "packages/ui/src/gestures/__tests__/gesture.test.ts",
+        "packages/ui/src/gestures/__tests__/runtime-scope.test.tsx",
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "pointer-cancellation-and-activation",
+        "touch-long-press-context-menu",
+        "interaction-kernel-shared-typeahead"
+      ],
+      "requiredAxes": [
+        "interaction-kernel",
+        "pointer",
+        "touch",
+        "keyboard",
+        "cancellation",
+        "focus",
+        "typeahead",
+        "selection"
+      ]
+    },
+    "overlay-authority": {
+      "owner": "UIR05-B",
+      "status": "candidate"
+    },
+    "motion-authority": {
+      "owner": "UIR05-C",
+      "status": "candidate"
+    }
+  }
+}

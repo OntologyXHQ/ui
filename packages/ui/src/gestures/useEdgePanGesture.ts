@@ -68,8 +68,9 @@ export function useEdgePanGesture({
 }
 
 function isWithinEdge(event: ReactPointerEvent<HTMLElement>, edge: ScreenEdge, edgeInset: number) {
-  const width = window.innerWidth;
-  const height = window.innerHeight;
+  const ownerWindow = event.currentTarget.ownerDocument.defaultView;
+  const width = ownerWindow?.innerWidth ?? 0;
+  const height = ownerWindow?.innerHeight ?? 0;
 
   if (edge === 'top') return event.clientY <= edgeInset;
   if (edge === 'bottom') return event.clientY >= height - edgeInset;
