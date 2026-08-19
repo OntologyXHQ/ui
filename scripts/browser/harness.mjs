@@ -311,15 +311,25 @@ export async function gotoCatalog(page, baseUrl, options = {}) {
   const route = new URL(page.url()).searchParams;
   assert.equal(route.get('entry'), entry, 'Studio route did not preserve the requested entry.');
   assert.equal(route.get('tab'), tab, 'Studio route did not preserve the requested tab.');
+  let requestedExample = null;
   if (options.example) {
     assert.equal(route.get('example'), options.example, 'Studio route did not preserve the requested example.');
-    const requested = page.locator(`#example-${options.example}`);
-    await assertActiveCatalogDeepTarget(requested, `Studio example deep link ${options.example}`);
+    requestedExample = workbench.locator(`#example-${options.example}`);
+    await requestedExample.first().waitFor({ state: 'attached' });
+    assert.equal(
+      await requestedExample.count(),
+      1,
+      `Studio example deep link ${options.example} did not resolve to exactly one canonical fixture inside ${entry}.`,
+    );
+    await assertActiveCatalogDeepTarget(requestedExample, `Studio example deep link ${options.example}`);
   }
   if (options.state) {
     assert.equal(route.get('state'), options.state, 'Studio route did not preserve the requested playground state.');
   }
-  return workbench;
+  // Stacked Studio deliberately mounts overview, examples, state samples and playground together.
+  // Example journeys therefore receive the exact canonical fixture rather than the whole workbench,
+  // preventing duplicated accessible names in adjacent previews from weakening or confusing G6 evidence.
+  return requestedExample ?? workbench;
 }
 
 

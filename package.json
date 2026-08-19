@@ -16,7 +16,7 @@
     "quality": "pnpm gate:architecture && pnpm gate:catalog && pnpm gate:types && pnpm gate:behavior",
     "verify": "pnpm quality && pnpm gate:studio && pnpm gate:browser",
     "release:check": "pnpm verify && node scripts/check-studio-production.mjs && pnpm package:smoke",
-    "gate:architecture": "python3 scripts/gates/check-architecture.py && node scripts/gates/check-foundations.mjs && node scripts/gates/check-environment.mjs && node scripts/gates/check-layout.mjs && node scripts/gates/check-visual.mjs && node scripts/gates/check-runtime-kernel.mjs",
+    "gate:architecture": "python3 scripts/gates/check-architecture.py && node scripts/gates/check-foundations.mjs && node scripts/gates/check-environment.mjs && node scripts/gates/check-layout.mjs && node scripts/gates/check-visual.mjs && node scripts/gates/check-runtime-kernel.mjs && node scripts/gates/check-actions.mjs && node scripts/gates/check-browser-fixture-scope.mjs",
     "gate:catalog": "pnpm catalog:check && node scripts/gates/check-catalog-acceptance.mjs",
     "gate:types": "pnpm --filter @ontologyx/ui check && pnpm --filter @ontologyx/ui-studio check",
     "gate:behavior": "pnpm --filter @ontologyx/ui test && pnpm --filter @ontologyx/ui docs:test",

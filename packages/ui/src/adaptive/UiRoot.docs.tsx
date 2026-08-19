@@ -109,7 +109,7 @@ export function UiRootNestedCertificationExample() {
     >
       <Stack gap="sm">
         <Text variant="body-strong">Outer certified scope</Text>
-        <Button variant="soft">Outer action</Button>
+        <Button variant="secondary">Outer action</Button>
         <UiRoot
           density="compact"
           occlusion={{ blockEnd: '40px' }}

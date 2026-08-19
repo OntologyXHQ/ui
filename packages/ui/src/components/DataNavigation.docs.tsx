@@ -12,9 +12,12 @@ import {
   ListItem,
   ListSection,
   Progress,
+  Row,
   Skeleton,
   Spinner,
+  Stack,
   StatusIndicator,
+  Text,
   tabRelationshipIds,
   TabPanel,
   Tabs,
@@ -84,14 +87,16 @@ export const uiDocs = defineUiDocsGroup([
     },
   },
   {
-    exportName: 'ActionGroup', layer: 'components', category: 'Navigation', order: 40,
-    summary: 'Labeled action cluster with optional compact-collapse intent for toolbars.', usage: 'Group related actions; pair compact-collapsible groups with an equivalent overflow action.',
-    status: 'candidate', accessibility: 'Exposes a named group without changing child button semantics.', rtl: 'Action order follows logical direction.', touch: 'Child actions own target policy.', responsive: 'Compact groups can collapse in constrained toolbar containers.',
+    exportName: 'ActionGroup', layer: 'components', category: 'Actions', order: 12,
+    summary: 'Named semantic action cluster that preserves every child action and never invents responsive hiding.', usage: 'Group related commands inside or outside a Toolbar; overflow/collapse policy belongs to the containing Toolbar/caller, not the group.',
+    status: 'accepted', accessibility: 'Exposes a named group while preserving each child control semantics and tab behavior.', rtl: 'Action order follows logical DOM order and surrounding direction.', touch: 'Child actions retain their own minimum target policy.', responsive: 'Wraps or stacks by explicit orientation but never silently removes commands.',
+    examples: [{ id: 'contract', title: 'Named action group', component: 'ActionGroupContractExample' }],
   },
   {
-    exportName: 'Toolbar', layer: 'components', category: 'Navigation', order: 40,
-    summary: 'Keyboard-roving toolbar with an explicit overflow slot.', usage: 'Use for related action sets; menu behavior for the overflow action comes from the overlay component layer.',
-    status: 'candidate', accessibility: 'Uses toolbar semantics and shared roving keyboard focus.', rtl: 'Horizontal keyboard traversal resolves logical direction.', touch: 'Does not shrink child action targets.', responsive: 'Content can scroll/collapse while overflow stays reachable.',
+    exportName: 'Toolbar', layer: 'components', category: 'Actions', order: 13,
+    summary: 'Named command toolbar with one roving tab stop, logical arrow/Home/End navigation and a caller-owned pinned overflow slot.', usage: 'Use for related commands. Toolbar owns roving focus and reachability; callers own which equivalent commands appear in overflow.',
+    status: 'accepted', accessibility: 'Uses toolbar/orientation semantics with exactly one roving tab stop across enabled command controls.', rtl: 'Horizontal ArrowLeft/ArrowRight traversal follows resolved logical direction; vertical toolbars use ArrowUp/ArrowDown.', touch: 'Never shrinks child Button/IconButton targets and keeps overflow reachable.', responsive: 'Primary content may scroll while an explicit overflow action stays pinned; Toolbar never silently moves or hides commands.',
+    examples: [{ id: 'contract', title: 'Roving command toolbar', component: 'ToolbarContractExample' }],
   },
   {
     exportName: 'AppBar', layer: 'components', category: 'Navigation', order: 40,
@@ -118,7 +123,7 @@ export const uiDocs = defineUiDocsGroup([
     exportName: 'Spinner', layer: 'components', category: 'Feedback', order: 60,
     summary: 'OntologyX O+X indeterminate activity mark with inline through hero-scale presentation and reduced-motion settlement.', usage: 'Use sm/md/lg for local transient activity and hero for first-entry or boot loading; the shared OX mark is also used by loading controls so product surfaces do not invent parallel spinners.',
     status: 'candidate', accessibility: 'Decorative/static activity is hidden from the accessibility tree by default; set announce to expose a polite loading status when the owning region needs it.', rtl: 'Direction-neutral.', touch: 'Non-interactive.', responsive: 'Intrinsic; hero keeps the same brand geometry with a stronger display-scale stroke treatment.',
-    playground: { preferredWidth: 'wide', controls: ['size', 'announce'], options: { size: ['sm', 'md', 'lg', 'hero'] }, fixture: { size: 'hero', label: 'Starting OntologyX' } },
+    playground: { preferredWidth: 'wide', controls: ['size', 'renderer', 'announce'], options: { size: ['sm', 'md', 'lg', 'hero'], renderer: ['svg', 'canvas'] }, fixture: { size: 'hero', renderer: 'svg', label: 'Starting OntologyX' } },
     examples: [{ id: 'ox-loading', title: 'OX boot loading choreography', component: 'SpinnerExample' }],
   },
   {
@@ -177,6 +182,34 @@ export function NavigationExample() {
   );
 }
 
+export function ActionGroupContractExample() {
+  return (
+    <ActionGroup label="Document actions">
+      <Button size="sm" variant="primary">Save</Button>
+      <Button size="sm" variant="secondary">Duplicate</Button>
+      <Button size="sm" intent="destructive" variant="quiet">Delete</Button>
+    </ActionGroup>
+  );
+}
+
+export function ToolbarContractExample() {
+  return (
+    <Toolbar
+      label="Editor commands"
+      overflow={<Button size="sm" aria-label="More commands">More</Button>}
+    >
+      <ActionGroup label="Editing">
+        <Button size="sm">Undo</Button>
+        <Button size="sm">Redo</Button>
+        <Button size="sm" disabled>Cut</Button>
+      </ActionGroup>
+      <ActionGroup label="Document">
+        <Button size="sm" variant="primary">Save</Button>
+      </ActionGroup>
+    </Toolbar>
+  );
+}
+
 export function FeedbackExample() {
   return (
     <div className="ui-doc-feedback-example">
@@ -191,14 +224,38 @@ export function FeedbackExample() {
 }
 
 export function SpinnerExample() {
+  const [renderer, setRenderer] = useState<'svg' | 'canvas'>('svg');
   return (
     <div className="ui-doc-spinner-boot" data-oxs-spinner-example="heartbeat">
-      <Spinner
-        data-oxs-spinner-purpose="boot"
-        label="Starting OntologyX"
-        announce
-        size="hero"
-      />
+      <Stack gap="lg" className="ui-doc-spinner-boot__content">
+        <Stack gap="2xs" className="ui-doc-spinner-boot__copy">
+          <Text variant="body-strong">First-entry loading</Text>
+          <Text tone="tertiary">One OX choreography, two render backends. Canvas lazy-loads only when selected.</Text>
+        </Stack>
+        <Row gap="sm" justify="center" className="ui-doc-spinner-boot__renderer">
+          <Button
+            size="sm"
+            variant={renderer === 'svg' ? 'primary' : 'quiet'}
+            onClick={() => setRenderer('svg')}
+          >
+            SVG
+          </Button>
+          <Button
+            size="sm"
+            variant={renderer === 'canvas' ? 'primary' : 'quiet'}
+            onClick={() => setRenderer('canvas')}
+          >
+            Canvas
+          </Button>
+        </Row>
+        <Spinner
+          data-oxs-spinner-purpose="boot"
+          label="Starting OntologyX"
+          announce
+          renderer={renderer}
+          size="hero"
+        />
+      </Stack>
     </div>
   );
 }

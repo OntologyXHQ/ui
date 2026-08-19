@@ -23,7 +23,10 @@ Canonical gate contract: [`docs/quality/QUALITY_GATES.md`](docs/quality/QUALITY_
   - `UIR05-A` — Input authority (Press/Focus/Typeahead/Selection/Gesture Arena): **DONE**
   - `UIR05-B` — Overlay authority: **DONE**
   - `UIR05-C` — Motion authority + kernel closeout: **DONE**
-- `UIR06` — Actions and command controls: **NEXT**
-- `UIR07+` — Components → System UI reacceptance: **TODO**
+- `UIR06` — Actions and command controls: **DONE**
+- `UIR07` — Fields, forms and text input: **NEXT**
+- `UIR08+` — Components → System UI reacceptance: **TODO**
+
+- Inter-batch Studio presentation follow-up — stacked generated docs + lazy Canvas OX boot renderer: **DONE** (not a numbered roadmap batch)
 
 No public visual export is considered accepted merely because it existed before this reset.

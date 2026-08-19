@@ -285,7 +285,7 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(functi
                 label={clearLabel}
                 icon="close"
                 size="sm"
-                variant="ghost"
+                variant="quiet"
                 onClick={clear}
                 tabIndex={clearTabIndex}
               />
@@ -293,7 +293,7 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(functi
             {suggestionsAvailable && onSuggestionsRequest && !disabled ? (
               <Button
                 size="sm"
-                variant="ghost"
+                variant="quiet"
                 onClick={onSuggestionsRequest}
                 className="ui-search-field__suggestions"
                 aria-label={suggestionsLabel}

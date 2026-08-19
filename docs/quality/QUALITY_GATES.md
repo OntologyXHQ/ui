@@ -82,7 +82,7 @@ G6 is production-artifact-backed. The command first runs G5, starts the built St
 
 The current harness proves the evidence system itself across real browser journeys:
 
-- deterministic Studio entry/tab/example deep links and environment projection;
+- deterministic Studio entry/section/example deep links and environment projection (the legacy `tab` query key remains a route-compatible section selector, not visible tab chrome);
 - the Foundations semantic-token substrate resolves across dark/light/custom themes without ornamental root imagery;
 - serious/critical `axe-core` violations are blocking;
 - keyboard sequential navigation, visible focus, roving focus and activation;
@@ -142,3 +142,5 @@ Focused gates may be rerun while debugging, but a part cannot close on a focused
 G0 Visual rejects an accepted multi-state Icon implementation that lacks both owner-node animation completion and bounded fallback settlement. This protects transient-state convergence when CSS animation events are cancelled or suppressed, while sequence identity protects retargeted transitions from stale completion.
 
 The same G0 gate also rejects root-coupled directional mirroring and icon-pack boundary drift: `@ontologyx/ui/icons` must remain a dedicated built subpath, the canonical package entry must not re-export the large vocabulary, declared static/animated counts must match source breadth, and pack sources may depend only on the canonical Icon definition contract.
+
+- `check-browser-fixture-scope.mjs` — requires canonical Studio example scoping for G6 journeys.

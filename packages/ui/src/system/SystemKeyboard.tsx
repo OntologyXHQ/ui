@@ -335,7 +335,7 @@ export function SystemKeyboardHost({
               <Button
                 key={value}
                 size="lg"
-                variant="soft"
+                variant="secondary"
                 className="ui-system-keyboard__alternate"
                 onClick={() => {
                   if (!state.sessionId) return;
@@ -417,7 +417,7 @@ function KeyboardButton({
   return (
     <Button
       size="lg"
-      variant={selected ? 'filled' : model.kind === 'character' || model.kind === 'numeric' || model.kind === 'symbol' ? 'soft' : 'ghost'}
+      variant={selected ? 'primary' : model.kind === 'character' || model.kind === 'numeric' || model.kind === 'symbol' ? 'secondary' : 'quiet'}
       className={`ui-system-keyboard__key ui-system-keyboard__key--${model.kind} ${model.action ? `ui-system-keyboard__key--${model.action}` : ''}`.trim()}
       disabled={!active}
       aria-label={model.ariaLabel ?? label}

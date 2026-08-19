@@ -39,6 +39,38 @@ else:
             'self-hosted Studio workbench is missing container-first breakpoints: ' + ', '.join(sorted(missing_container_breakpoints))
         )
 
+
+CATALOG_PAGE = STUDIO / 'catalog' / 'CatalogPage.tsx'
+catalog_page_text = CATALOG_PAGE.read_text(encoding='utf-8')
+if re.search(r'\b(TabPanel|Tabs)\b', catalog_page_text):
+    issues.append('generated Studio catalog must use one stacked reading flow; Tabs/TabPanel are forbidden in CatalogPage')
+if 'data-studio-layout="stacked"' not in catalog_page_text:
+    issues.append('generated Studio catalog must publish data-studio-layout="stacked" on the public-package workbench')
+for primitive in ('Heading', 'Text', 'Label', 'Code'):
+    if primitive not in catalog_page_text:
+        issues.append(f'generated Studio catalog must compose public {primitive} typography instead of Studio-local text styling')
+if '.ui-studio-detail__tabs' in studio_css:
+    issues.append('stacked Studio catalog must not retain the legacy tab-strip CSS')
+
+api_scroll_region = re.search(
+    r'<Box\s+(?P<attrs>[^>]*\bclassName="ui-studio-api-table-wrap"[^>]*)>',
+    catalog_page_text,
+    re.DOTALL,
+)
+if api_scroll_region is None:
+    issues.append('stacked Studio API reference must retain the canonical scroll-region wrapper')
+else:
+    api_scroll_attrs = api_scroll_region.group('attrs')
+    for required_attr, message in (
+        ('role="region"', 'Studio API overflow region must expose named region semantics'),
+        ('aria-label=', 'Studio API overflow region must expose an accessible name'),
+        ('tabIndex={0}', 'Studio API overflow region must be keyboard focusable'),
+    ):
+        if required_attr not in api_scroll_attrs:
+            issues.append(message)
+if '.ui-studio-api-table-wrap:focus-visible' not in studio_css:
+    issues.append('Studio API overflow region must expose a tokenized visible keyboard focus indicator')
+
 if entry_text.count(public_styles_import) != 1:
     issues.append('Studio browser host must import @ontologyx/ui/styles.css exactly once from main.tsx')
 if entry_text.count(studio_styles_import) != 1:

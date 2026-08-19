@@ -205,18 +205,22 @@ Acceptance: UIR05 is closed as one runtime authority: each UiRoot owns input/ges
 
 ---
 
-## UIR06 — Actions and command controls — NEXT
+## UIR06 — Actions and command controls — DONE
 
-- `UI-0601` Rebuild Button API/state model including loading, disabled, press, leading/trailing content and form semantics.
-- `UI-0602` Rebuild IconButton labeling, tooltip relationship and target sizing.
-- `UI-0603` Rebuild ActionGroup/Toolbar composition, roving keyboard behavior and overflow responsibilities.
-- `UI-0604` Normalize destructive/primary/quiet visual vocabulary without product-specific tones.
-- `UI-0605` Prove pointer/touch/keyboard equivalence and cancellation in real browser acceptance.
-- `UI-0606` Promote action controls only with dedicated examples and complete props docs.
+- `UI-0601` Rebuild Button API/state model including loading, disabled, press, leading/trailing content and form semantics. **DONE**
+- `UI-0602` Rebuild IconButton labeling, tooltip relationship and target sizing. **DONE**
+- `UI-0603` Rebuild ActionGroup/Toolbar composition, roving keyboard behavior and overflow responsibilities. **DONE**
+- `UI-0604` Normalize destructive/primary/quiet visual vocabulary without product-specific tones. **DONE**
+- `UI-0605` Prove pointer/touch/keyboard equivalence and cancellation in real browser acceptance. **DONE**
+- `UI-0606` Promote action controls only with dedicated examples and complete props docs. **DONE**
 
 ---
 
-## UIR07 — Fields, forms and text input — TODO
+Acceptance: Button owns native button/form/loading/press semantics with quiet/secondary/primary emphasis separated from destructive intent; IconButton requires an accessible name, preserves target sizing and explicitly relates supplemental tooltip text; ActionGroup never hides actions; Toolbar owns orientation-aware roving focus and pins only caller-supplied overflow. Dedicated tests/examples/G6 evidence promote Button, IconButton, ActionGroup and Toolbar while ToggleButton remains candidate for UIR08 selection-state certification. The closeout follow-up also removes the generated Studio tab chrome in favor of one public-typography stacked reading flow and adds an optional lazy Canvas backend to the OX Spinner without changing visual maturity. Public visual maturity advances to accepted=21/candidate=79; UIR07 Fields, forms and text input is next.
+
+---
+
+## UIR07 — Fields, forms and text input — NEXT
 
 - `UI-0701` Rebuild Field ownership for label/description/error/required/disabled/read-only relationships.
 - `UI-0702` Rebuild TextField controlled/uncontrolled semantics, prefix/suffix/actions and native form integration.

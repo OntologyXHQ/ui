@@ -16,7 +16,7 @@ The Studio shell has two bounded regions. The sidebar owns a fixed identity/sear
 
 ### Workbench
 
-Every public catalog entry gets the same generated tabs: Overview, API, Examples and Playground. API content is generated from TypeScript metadata, examples remain lazy/fault-isolated, and the playground seeds only safe props unless docs provide explicit options/static fixtures for complex values.
+Every public catalog entry gets one generated reading flow: Overview, API, Examples and Playground are all mounted in order on the same page. The historical `tab` query parameter is retained only as a deterministic section/deep-link key; Studio chrome no longer renders Tabs/TabPanel for documentation. API content is generated from TypeScript metadata, examples remain lazy/fault-isolated, and the playground seeds only safe props unless docs provide explicit options/static fixtures for complex values.
 
 ### Environment
 

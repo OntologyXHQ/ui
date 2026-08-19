@@ -176,8 +176,8 @@ export function AlertDialog({
             {cancelLabel}
           </Button>
           <Button
-            variant="filled"
-            tone={confirmTone}
+            variant="primary"
+            intent={confirmTone === 'danger' ? 'destructive' : 'neutral'}
             onClick={() => {
               onConfirm();
               close();

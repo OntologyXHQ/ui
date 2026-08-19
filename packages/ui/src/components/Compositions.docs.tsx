@@ -114,7 +114,7 @@ export function ScaffoldExample() {
     <PageScaffold
       className="ui-doc-scaffold"
       header={<Card padding="sm" title="Developer page" description="Header slot" />}
-      sidebar={<Card padding="sm" title="Sections"><Button fullWidth variant="soft">Overview</Button></Card>}
+      sidebar={<Card padding="sm" title="Sections"><Button fullWidth variant="secondary">Overview</Button></Card>}
       footer={<span>Footer slot</span>}
       contentLabel="Scaffold example content"
     >
@@ -142,7 +142,7 @@ export function StateExample() {
   return (
     <div className="ui-doc-composition-stack">
       <ContentState kind="empty" title="No items" description="Add an item when you are ready." actions={<Button size="sm">Create</Button>} />
-      <ContentState kind="error" title="Could not load" description="The caller owns retry policy and copy." actions={<Button size="sm" tone="danger">Retry</Button>} />
+      <ContentState kind="error" title="Could not load" description="The caller owns retry policy and copy." actions={<Button size="sm" intent="destructive">Retry</Button>} />
       <ContentState kind="loading" title="Loading content" description="Shared status semantics without product-specific progress policy." />
     </div>
   );

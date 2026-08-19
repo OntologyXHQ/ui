@@ -12,8 +12,6 @@ import {
   ScrollView,
   Stack,
   Surface,
-  TabPanel,
-  Tabs,
   Text,
 } from '@ontologyx/ui';
 import { useEffect, useMemo, useState } from 'react';
@@ -27,12 +25,7 @@ import { filterCatalog } from './navigation';
 import { readCatalogRoute, type CatalogTab, updateCatalogRoute } from './routing';
 import type { UiCatalogEntry } from './types';
 
-const tabItems = [
-  { value: 'overview', label: 'Overview' },
-  { value: 'api', label: 'API' },
-  { value: 'examples', label: 'Examples' },
-  { value: 'playground', label: 'Playground' },
-] as const;
+const sectionOrder: readonly CatalogTab[] = ['overview', 'api', 'examples', 'playground'];
 
 function selectedEntry(requested: string | null) {
   return uiCatalog.find((entry) => entry.id === requested) ?? uiCatalog[0];
@@ -73,15 +66,16 @@ function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
   const gaps = coverage(entry);
   return (
     <Stack gap="xl">
-      <Stack gap="md">
+      <Stack gap="md" className="ui-studio-entry-hero">
+        <Label tone="accent" emphasis="strong">Component profile</Label>
         <Row gap="sm" className="ui-studio-entry-badges">
           <Badge tone="accent">{entry.layer}</Badge>
           <Badge>{entry.category}</Badge>
           <Badge tone={entry.status === 'accepted' ? 'success' : entry.status === 'deprecated' ? 'danger' : 'warning'}>{entry.status}</Badge>
         </Row>
         <Heading level={1} size="display">{entry.exportName}</Heading>
-        <Text className="ui-studio-entry-summary" tone="secondary" selectable>{entry.summary}</Text>
-        <Text tone="tertiary" selectable>{entry.usage}</Text>
+        <Text className="ui-studio-entry-summary" variant="body-strong" tone="secondary" selectable wrap="pretty">{entry.summary}</Text>
+        <Text tone="tertiary" selectable wrap="pretty">{entry.usage}</Text>
       </Stack>
 
       <CatalogComponentPreview entry={entry} />
@@ -93,7 +87,14 @@ function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
         </Stack>
       </Surface>
 
-      <GuidanceGrid entry={entry} />
+      <Stack gap="md">
+        <Stack gap="2xs">
+          <Label tone="accent" emphasis="strong">Behavior guidance</Label>
+          <Heading level={2} size="title">Use it without breaking the platform contract</Heading>
+          <Text tone="tertiary" wrap="pretty">Accessibility, direction, touch and adaptation stay visible in the same reading flow.</Text>
+        </Stack>
+        <GuidanceGrid entry={entry} />
+      </Stack>
 
       <Surface material="subtle" radius="lg" className="ui-studio-coverage-card">
         <Stack gap="sm">
@@ -118,31 +119,36 @@ function ApiPanel({ entry }: { entry: UiCatalogEntry }) {
       <Stack gap="2xs">
         <Label tone="accent" emphasis="strong">Generated API</Label>
         <Heading level={2} size="title">Props from TypeScript</Heading>
-        <Text tone="tertiary">
+        <Text tone="tertiary" wrap="pretty">
           OntologyX UI-owned props only. Native DOM props stay native instead of flooding the generated reference.
         </Text>
       </Stack>
       {entry.props.length ? (
-        <Box className="ui-studio-api-table-wrap">
+        <Box
+          className="ui-studio-api-table-wrap"
+          role="region"
+          aria-label={`${entry.exportName} API reference`}
+          tabIndex={0}
+        >
           <table className="ui-studio-api-table" aria-label={`${entry.exportName} props`}>
             <thead>
               <tr>
-                <th scope="col">Prop</th>
-                <th scope="col">Type</th>
-                <th scope="col">Default</th>
-                <th scope="col">Description</th>
+                <th scope="col"><Label emphasis="strong">Prop</Label></th>
+                <th scope="col"><Label emphasis="strong">Type</Label></th>
+                <th scope="col"><Label emphasis="strong">Default</Label></th>
+                <th scope="col"><Label emphasis="strong">Description</Label></th>
               </tr>
             </thead>
             <tbody>
               {entry.props.map((prop) => (
                 <tr key={prop.name} data-deprecated={prop.deprecated || undefined}>
                   <td>
-                    <Code>{prop.name}</Code>{prop.optional ? <Text as="span" tone="tertiary">?</Text> : null}
+                    <Code>{prop.name}</Code>{prop.optional ? <Text as="span" variant="caption" tone="tertiary">?</Text> : null}
                     {prop.deprecated ? <Badge size="sm" tone="danger">deprecated</Badge> : null}
                   </td>
                   <td><Code wrap="normal" className="ui-studio-code-anywhere">{prop.type}</Code></td>
                   <td>{prop.default ? <Code wrap="normal" className="ui-studio-code-anywhere">{prop.default}</Code> : <Text tone="tertiary">—</Text>}</td>
-                  <td><Text tone={prop.description ? 'secondary' : 'tertiary'}>{prop.description || 'No JSDoc yet.'}</Text></td>
+                  <td><Text tone={prop.description ? 'secondary' : 'tertiary'} wrap="pretty">{prop.description || 'No JSDoc yet.'}</Text></td>
                 </tr>
               ))}
             </tbody>
@@ -154,27 +160,43 @@ function ApiPanel({ entry }: { entry: UiCatalogEntry }) {
 }
 
 function ExamplesPanel({ entry, requestedExample }: { entry: UiCatalogEntry; requestedExample: string | null }) {
-  if (!entry.examples.length) return <Text tone="tertiary">No colocated examples are documented for this export yet.</Text>;
   return (
     <Stack gap="lg">
-      {entry.examples.map((example) => (
+      <Stack gap="2xs">
+        <Label tone="accent" emphasis="strong">Source-owned examples</Label>
+        <Heading level={2} size="title">Examples</Heading>
+        <Text tone="tertiary" wrap="pretty">Real public-package examples stay in the document flow so comparison never requires switching context.</Text>
+      </Stack>
+      {entry.examples.length ? entry.examples.map((example) => (
         <section key={example.id} id={`example-${example.id}`} className="ui-studio-deep-target" data-active={requestedExample === example.id || undefined}>
           <Stack gap="sm">
             <Row justify="end">
-              <Button size="sm" variant="ghost" onClick={() => updateCatalogRoute({ tab: 'examples', example: example.id, state: null }, 'replace')}>
+              <Button size="sm" variant="quiet" onClick={() => updateCatalogRoute({ tab: 'examples', example: example.id, state: null }, 'replace')}>
                 Deep link
               </Button>
             </Row>
             <CatalogExample example={example} />
           </Stack>
         </section>
-      ))}
+      )) : <Text tone="tertiary">No colocated examples are documented for this export yet.</Text>}
+    </Stack>
+  );
+}
+
+function PlaygroundSection({ entry }: { entry: UiCatalogEntry }) {
+  return (
+    <Stack gap="lg">
+      <Stack gap="2xs">
+        <Label tone="accent" emphasis="strong">Interactive inspection</Label>
+        <Heading level={2} size="title">Playground & state matrix</Heading>
+        <Text tone="tertiary" wrap="pretty">Tune safe scalar props and inspect canonical states without leaving this component page.</Text>
+      </Stack>
+      <CatalogPlayground key={entry.id} entry={entry} />
     </Stack>
   );
 }
 
 function EntryWorkbench({ entry, tab, requestedExample }: { entry: UiCatalogEntry; tab: CatalogTab; requestedExample: string | null }) {
-  const baseId = `studio-${entry.id}`;
   return (
     <Surface
       className="ui-studio-detail"
@@ -183,29 +205,23 @@ function EntryWorkbench({ entry, tab, requestedExample }: { entry: UiCatalogEntr
       radius="lg"
       data-studio-entry={entry.id}
       data-studio-tab={tab}
+      data-studio-layout="stacked"
     >
-      <Stack gap="lg">
-        <Tabs
-          label={`${entry.exportName} documentation sections`}
-          items={tabItems.map((item) => ({ ...item, id: `${baseId}-tab-${item.value}`, panelId: `${baseId}-panel-${item.value}` }))}
-          value={tab}
-          onValueChange={(value) => updateCatalogRoute({ tab: value as CatalogTab, example: value === 'examples' ? requestedExample : null, state: value === 'playground' ? readCatalogRoute().state : null }, 'replace')}
-          className="ui-studio-detail__tabs"
-        />
+      <Stack gap="2xl" className="ui-studio-detail__flow">
+        <Box as="section" id="studio-section-overview" className="ui-studio-detail__section" data-active={tab === 'overview' || undefined} data-studio-section="overview">
+          <OverviewPanel entry={entry} />
+        </Box>
         <Divider />
-        <Box className="ui-studio-detail__panel">
-          <TabPanel value="overview" activeValue={tab} labelledBy={`${baseId}-tab-overview`} id={`${baseId}-panel-overview`}>
-            <OverviewPanel entry={entry} />
-          </TabPanel>
-          <TabPanel value="api" activeValue={tab} labelledBy={`${baseId}-tab-api`} id={`${baseId}-panel-api`}>
-            <ApiPanel entry={entry} />
-          </TabPanel>
-          <TabPanel value="examples" activeValue={tab} labelledBy={`${baseId}-tab-examples`} id={`${baseId}-panel-examples`}>
-            <ExamplesPanel entry={entry} requestedExample={requestedExample} />
-          </TabPanel>
-          <TabPanel value="playground" activeValue={tab} labelledBy={`${baseId}-tab-playground`} id={`${baseId}-panel-playground`}>
-            <CatalogPlayground key={entry.id} entry={entry} />
-          </TabPanel>
+        <Box as="section" id="studio-section-api" className="ui-studio-detail__section" data-active={tab === 'api' || undefined} data-studio-section="api">
+          <ApiPanel entry={entry} />
+        </Box>
+        <Divider />
+        <Box as="section" id="studio-section-examples" className="ui-studio-detail__section" data-active={tab === 'examples' || undefined} data-studio-section="examples">
+          <ExamplesPanel entry={entry} requestedExample={requestedExample} />
+        </Box>
+        <Divider />
+        <Box as="section" id="studio-section-playground" className="ui-studio-detail__section" data-active={tab === 'playground' || undefined} data-studio-section="playground">
+          <PlaygroundSection entry={entry} />
         </Box>
       </Stack>
     </Surface>
@@ -235,12 +251,18 @@ export function CatalogPage() {
 
   useEffect(() => {
     if (!active) return;
+    const scrollTo = (id: string, block: ScrollLogicalPosition = 'start') => {
+      requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ block }));
+    };
     if (route.example && route.tab === 'examples') {
-      requestAnimationFrame(() => document.getElementById(`example-${route.example}`)?.scrollIntoView({ block: 'center' }));
+      scrollTo(`example-${route.example}`, 'center');
+      return;
     }
     if (route.state && route.tab === 'playground') {
-      requestAnimationFrame(() => document.getElementById(`state-${route.state}`)?.scrollIntoView({ block: 'center' }));
+      scrollTo(`state-${route.state}`, 'center');
+      return;
     }
+    if (sectionOrder.includes(route.tab)) scrollTo(`studio-section-${route.tab}`);
   }, [active, route.example, route.state, route.tab]);
 
   if (!active) return <Text tone="tertiary">No documented public UI entries.</Text>;

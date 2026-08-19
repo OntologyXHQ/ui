@@ -1,6 +1,12 @@
 import type { HTMLAttributes, ReactNode } from 'react';
+import { lazy, Suspense } from 'react';
 import { Heading } from '../primitives';
 import { OxLoadingMark } from './OxLoadingMark';
+
+const LazyOxLoadingCanvas = lazy(async () => {
+  const module = await import('./OxLoadingCanvas');
+  return { default: module.OxLoadingCanvas };
+});
 
 export type BadgeTone = 'neutral' | 'accent' | 'success' | 'warning' | 'danger';
 export type BadgeProps = HTMLAttributes<HTMLSpanElement> & {
@@ -75,13 +81,20 @@ export function Progress({
   );
 }
 
+export type SpinnerRenderer = 'svg' | 'canvas';
+
 export type SpinnerProps = HTMLAttributes<HTMLSpanElement> & {
+  /** Accessible status copy when announce is enabled. @default Loading */
   label?: string;
+  /** Inline through boot-scale presentation. @default md */
   size?: 'sm' | 'md' | 'lg' | 'hero';
+  /** Announces loading through status semantics instead of keeping the decorative mark hidden. @default false */
   announce?: boolean;
+  /** Rendering backend. SVG stays the lightweight default; Canvas lazy-loads for large/boot choreography. @default svg */
+  renderer?: SpinnerRenderer;
 };
 
-export function Spinner({ announce = false, className = '', label = 'Loading', size = 'md', ...props }: SpinnerProps) {
+export function Spinner({ announce = false, className = '', label = 'Loading', renderer = 'svg', size = 'md', ...props }: SpinnerProps) {
   return (
     <span
       {...props}
@@ -89,8 +102,13 @@ export function Spinner({ announce = false, className = '', label = 'Loading', s
       role={announce ? 'status' : undefined}
       aria-label={announce ? label : undefined}
       aria-hidden={announce ? undefined : true}
+      data-oxs-spinner-renderer={renderer}
     >
-      <OxLoadingMark />
+      {renderer === 'canvas' ? (
+        <Suspense fallback={<OxLoadingMark />}>
+          <LazyOxLoadingCanvas />
+        </Suspense>
+      ) : <OxLoadingMark />}
     </span>
   );
 }

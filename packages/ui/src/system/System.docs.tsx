@@ -402,7 +402,7 @@ export function SystemTransientExample() {
       <SystemLockLayout
         primary="12:42"
         secondary="Tuesday"
-        authentication={<Button variant="filled">Unlock</Button>}
+        authentication={<Button variant="primary">Unlock</Button>}
       />
       <SystemCommandSurface
         open={commandsOpen}

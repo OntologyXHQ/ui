@@ -119,7 +119,7 @@ export function DialogExample() {
   return (
     <Stack gap="sm">
       <Row gap="sm"><Button onClick={() => setOpen(true)}>Open dialog</Button><Button ref={anchorRef} onClick={() => setPopover(true)}>Open popover</Button></Row>
-      <Dialog open={open} onOpenChange={setOpen} title="Example dialog" description="One overlay lifecycle." actions={<Button variant="filled" onClick={() => setOpen(false)}>Done</Button>}>
+      <Dialog open={open} onOpenChange={setOpen} title="Example dialog" description="One overlay lifecycle." actions={<Button variant="primary" onClick={() => setOpen(false)}>Done</Button>}>
         <Text>Focus, Escape and restoration are owned centrally.</Text>
       </Dialog>
       <Popover open={popover} onOpenChange={setPopover} anchorRef={anchorRef} ariaLabel="Example popover"><div className="ui-doc-example-chip">Anchored content</div></Popover>
@@ -129,7 +129,7 @@ export function DialogExample() {
 
 export function AlertDialogExample() {
   const [open, setOpen] = useState(false);
-  return <><Button tone="danger" onClick={() => setOpen(true)}>Remove item</Button><AlertDialog open={open} onOpenChange={setOpen} title="Remove item?" description="Explicit confirm/cancel ownership." confirmLabel="Remove" confirmTone="danger" onConfirm={() => {}} /></>;
+  return <><Button intent="destructive" onClick={() => setOpen(true)}>Remove item</Button><AlertDialog open={open} onOpenChange={setOpen} title="Remove item?" description="Explicit confirm/cancel ownership." confirmLabel="Remove" confirmTone="danger" onConfirm={() => {}} /></>;
 }
 
 export function ContextMenuPreviewExample() {
@@ -142,13 +142,13 @@ export function ContextMenuPreviewExample() {
         { id: 'remove', label: 'Remove', destructive: true, separatorBefore: true, onSelect: () => undefined },
       ]}
     >
-      <Button variant="soft">Right-click or long-press</Button>
+      <Button variant="secondary">Right-click or long-press</Button>
     </ContextMenu>
   );
 }
 
 export function TooltipPreviewExample() {
-  return <Tooltip content="Supplemental keyboard and pointer help"><Button variant="soft">Hover or focus me</Button></Tooltip>;
+  return <Tooltip content="Supplemental keyboard and pointer help"><Button variant="secondary">Hover or focus me</Button></Tooltip>;
 }
 
 
@@ -156,7 +156,7 @@ export function SheetPreviewExample() {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button variant="soft" onClick={() => setOpen(true)}>Open sheet</Button>
+      <Button variant="secondary" onClick={() => setOpen(true)}>Open sheet</Button>
       <Sheet open={open} onOpenChange={setOpen} ariaLabel="Preview sheet" header={<Text>Sheet preview</Text>} footer={<Button onClick={() => setOpen(false)}>Done</Button>}>
         <Text>This is the real shared Sheet surface.</Text>
       </Sheet>
@@ -168,7 +168,7 @@ export function BottomSheetPreviewExample() {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button variant="soft" onClick={() => setOpen(true)}>Open bottom sheet</Button>
+      <Button variant="secondary" onClick={() => setOpen(true)}>Open bottom sheet</Button>
       <BottomSheet open={open} onOpenChange={setOpen} ariaLabel="Preview bottom sheet" header={<Text>Bottom sheet preview</Text>}>
         <Text>Drag or dismiss the actual BottomSheet.</Text>
       </BottomSheet>
@@ -181,7 +181,7 @@ export function PopoverPreviewExample() {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button ref={anchorRef} variant="soft" onClick={() => setOpen((value) => !value)}>Toggle popover</Button>
+      <Button ref={anchorRef} variant="secondary" onClick={() => setOpen((value) => !value)}>Toggle popover</Button>
       <Popover open={open} onOpenChange={setOpen} anchorRef={anchorRef} ariaLabel="Preview popover"><Text>Anchored public Popover.</Text></Popover>
     </>
   );
@@ -192,7 +192,7 @@ export function PopoverModalFocusExample() {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button ref={anchorRef} variant="soft" onClick={() => setOpen(true)}>Open modal popover</Button>
+      <Button ref={anchorRef} variant="secondary" onClick={() => setOpen(true)}>Open modal popover</Button>
       <Popover
         open={open}
         onOpenChange={setOpen}
@@ -215,7 +215,7 @@ export function MenuPreviewExample() {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button ref={anchorRef} variant="soft" onClick={() => setOpen((value) => !value)}>Open menu</Button>
+      <Button ref={anchorRef} variant="secondary" onClick={() => setOpen((value) => !value)}>Open menu</Button>
       <Menu open={open} onOpenChange={setOpen} anchorRef={anchorRef} ariaLabel="Preview menu">
         <MenuItem>Open</MenuItem>
         <MenuItem>Duplicate</MenuItem>

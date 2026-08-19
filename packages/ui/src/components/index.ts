@@ -20,7 +20,7 @@ export type { ScrollSnapItemProps, ScrollViewHandle, ScrollViewProps } from './S
 export { ScrollSnapItem, ScrollView } from './ScrollView';
 export type {
   ButtonProps,
-  ButtonTone,
+  ButtonIntent,
   ButtonVariant,
   ControlSize,
   ToggleButtonProps,
@@ -67,6 +67,7 @@ export type {
   ProgressProps,
   SkeletonProps,
   SpinnerProps,
+  SpinnerRenderer,
   StatusIndicatorProps,
 } from './Feedback';
 export { Badge, EmptyState, Progress, Skeleton, Spinner, StatusIndicator } from './Feedback';

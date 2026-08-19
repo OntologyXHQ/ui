@@ -319,6 +319,88 @@
         "logical-inset",
         "a11y"
       ]
+    },
+    "Button": {
+      "owner": "UIR06",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/actions.test.tsx",
+        "packages/ui/src/interaction/__tests__/press.test.tsx"
+      ],
+      "browserScenarios": [
+        "button-action-contract-certification"
+      ],
+      "requiredAxes": [
+        "actions",
+        "button",
+        "native-form",
+        "loading",
+        "disabled",
+        "pointer",
+        "touch",
+        "keyboard",
+        "cancellation",
+        "rtl",
+        "a11y"
+      ]
+    },
+    "IconButton": {
+      "owner": "UIR06",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/actions.test.tsx"
+      ],
+      "browserScenarios": [
+        "icon-button-action-contract-certification"
+      ],
+      "requiredAxes": [
+        "actions",
+        "icon-button",
+        "label",
+        "tooltip",
+        "target-size",
+        "toggle",
+        "rtl",
+        "coarse-pointer",
+        "a11y"
+      ]
+    },
+    "ActionGroup": {
+      "owner": "UIR06",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/actions.test.tsx"
+      ],
+      "browserScenarios": [
+        "action-group-toolbar-certification"
+      ],
+      "requiredAxes": [
+        "actions",
+        "group",
+        "semantics",
+        "no-hidden-actions",
+        "responsive",
+        "rtl",
+        "a11y"
+      ]
+    },
+    "Toolbar": {
+      "owner": "UIR06",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/actions.test.tsx",
+        "packages/ui/src/components/__tests__/data-navigation.test.tsx"
+      ],
+      "browserScenarios": [
+        "action-group-toolbar-certification"
+      ],
+      "requiredAxes": [
+        "actions",
+        "toolbar",
+        "roving",
+        "keyboard",
+        "rtl",
+        "home-end",
+        "overflow",
+        "target-size",
+        "a11y"
+      ]
     }
   }
 }

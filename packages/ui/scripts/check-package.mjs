@@ -50,6 +50,21 @@ try { await walk(path.join(root, 'dist')); } catch {}
 for (const file of distFiles) {
   if (/(__tests__|\.test\.|\.docs\.)/.test(file)) failures.push(`test/docs artifact leaked into dist: ${path.relative(root, file)}`);
 }
+try {
+  const mainEntry = await readFile(path.join(root, 'dist/index.js'), 'utf8');
+  const canvasMarker = 'data-oxs-loading-renderer';
+  if (mainEntry.includes(canvasMarker)) {
+    failures.push('optional OX Canvas renderer was inlined into dist/index.js instead of remaining lazy');
+  }
+  const javascriptChunks = distFiles.filter((file) => file.endsWith('.js') && path.relative(root, file) !== 'dist/index.js');
+  let canvasChunkFound = false;
+  for (const file of javascriptChunks) {
+    const source = await readFile(file, 'utf8');
+    if (source.includes(canvasMarker)) { canvasChunkFound = true; break; }
+  }
+  if (!canvasChunkFound) failures.push('missing lazy OX Canvas renderer chunk in package artifact');
+} catch {}
+
 if (failures.length) {
   console.error('@ontologyx/ui package artifact check failed:');
   for (const failure of failures) console.error(` - ${failure}`);

@@ -90,7 +90,7 @@ export function Tabs({
             id={tabId}
             className="ui-tabs__tab"
             size={size}
-            variant="ghost"
+            variant="quiet"
             role="tab"
             aria-selected={selected}
             aria-controls={item.panelId}
@@ -197,7 +197,7 @@ export function AdaptiveNavigation({
             <Button
               key={item.value}
               className="ui-navigation__item"
-              variant="ghost"
+              variant="quiet"
               disabled={item.disabled}
               aria-current={selected ? 'page' : undefined}
               data-selected={selected || undefined}
@@ -217,24 +217,26 @@ export function AdaptiveNavigation({
 }
 
 export type ActionGroupProps = HTMLAttributes<HTMLDivElement> & {
+  /** Accessible name for the related action cluster. */
   label: string;
-  collapse?: 'never' | 'compact';
+  /** Logical arrangement only; ActionGroup never hides actions responsively. @default horizontal */
+  orientation?: 'horizontal' | 'vertical';
 };
 
 export function ActionGroup({
   children,
   className = '',
-  collapse = 'never',
   label,
+  orientation = 'horizontal',
   ...props
 }: ActionGroupProps) {
   return (
     <div
       {...props}
-      className={`ui-action-group ${className}`.trim()}
+      className={`ui-action-group ui-action-group--${orientation} ${className}`.trim()}
       role="group"
       aria-label={label}
-      data-collapse={collapse}
+      data-orientation={orientation}
     >
       <div className="ui-action-group__content">{children}</div>
     </div>
@@ -242,8 +244,14 @@ export function ActionGroup({
 }
 
 export type ToolbarProps = HTMLAttributes<HTMLDivElement> & {
+  /** Accessible toolbar name. */
   label: string;
+  /** Caller-owned equivalent overflow action; Toolbar pins it but never silently moves/hides commands. */
   overflow?: ReactNode;
+  /** Keyboard-roving axis and visual arrangement. @default horizontal */
+  orientation?: 'horizontal' | 'vertical';
+  /** Whether arrow-key roving wraps at the ends. @default true */
+  loop?: boolean;
 };
 
 const TOOLBAR_ITEM_SELECTOR = 'button:not([disabled]), [href]:not([aria-disabled="true"])';
@@ -252,8 +260,10 @@ export function Toolbar({
   children,
   className = '',
   label,
+  loop = true,
   onFocusCapture,
   onKeyDown,
+  orientation = 'horizontal',
   overflow,
   ...props
 }: ToolbarProps) {
@@ -261,7 +271,8 @@ export function Toolbar({
   const onRovingKeyDown = useRovingFocus({
     containerRef: rootRef,
     itemSelector: TOOLBAR_ITEM_SELECTOR,
-    orientation: 'horizontal',
+    orientation,
+    loop,
   });
 
   useLayoutEffect(() => {
@@ -275,9 +286,11 @@ export function Toolbar({
     <div
       {...props}
       ref={rootRef}
-      className={`ui-toolbar ${className}`.trim()}
+      className={`ui-toolbar ui-toolbar--${orientation} ${className}`.trim()}
       role="toolbar"
       aria-label={label}
+      aria-orientation={orientation}
+      data-orientation={orientation}
       onFocusCapture={(event) => {
         updateToolbarTabStop(rootRef.current, event.target);
         onFocusCapture?.(event as ReactFocusEvent<HTMLDivElement>);

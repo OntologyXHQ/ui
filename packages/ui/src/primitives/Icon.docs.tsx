@@ -87,7 +87,7 @@ export function IconStateTransitionExample() {
       </Row>
       <Button
         size="sm"
-        variant="soft"
+        variant="secondary"
         onClick={() => setState((current) => (current === 'play' ? 'pause' : 'play'))}
       >
         Toggle playback icon
@@ -156,7 +156,7 @@ export function IconPackExample() {
         <Icon glyph={ThemeStateGlyph} state={active ? 'dark' : 'light'} label="Theme" data-icon-pack-animated="theme" />
         <Icon glyph={ActivityStateGlyph} state={active ? 'active' : 'idle'} label="Activity" data-icon-pack-animated="activity" />
       </Row>
-      <Button size="sm" variant="soft" onClick={() => setActive((current) => !current)}>
+      <Button size="sm" variant="secondary" onClick={() => setActive((current) => !current)}>
         Toggle animated icon pack
       </Button>
     </Stack>

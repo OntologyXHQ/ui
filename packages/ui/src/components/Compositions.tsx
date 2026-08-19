@@ -426,7 +426,7 @@ export function Tile({
           <Button
             data-ui-tile-action
             className="ui-tile__action"
-            variant="ghost"
+            variant="quiet"
             disabled={disabled}
             loading={pending}
             loadingLabel={pendingLabel}

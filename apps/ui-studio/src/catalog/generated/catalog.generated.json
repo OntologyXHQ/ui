@@ -91,35 +91,41 @@
     "id": "ActionGroup",
     "exportName": "ActionGroup",
     "layer": "components",
-    "category": "Navigation",
-    "order": 40,
-    "summary": "Labeled action cluster with optional compact-collapse intent for toolbars.",
-    "usage": "Group related actions; pair compact-collapsible groups with an equivalent overflow action.",
-    "status": "candidate",
-    "accessibility": "Exposes a named group without changing child button semantics.",
-    "rtl": "Action order follows logical direction.",
-    "touch": "Child actions own target policy.",
-    "responsive": "Compact groups can collapse in constrained toolbar containers.",
+    "category": "Actions",
+    "order": 12,
+    "summary": "Named semantic action cluster that preserves every child action and never invents responsive hiding.",
+    "usage": "Group related commands inside or outside a Toolbar; overflow/collapse policy belongs to the containing Toolbar/caller, not the group.",
+    "status": "accepted",
+    "accessibility": "Exposes a named group while preserving each child control semantics and tab behavior.",
+    "rtl": "Action order follows logical DOM order and surrounding direction.",
+    "touch": "Child actions retain their own minimum target policy.",
+    "responsive": "Wraps or stacks by explicit orientation but never silently removes commands.",
     "playground": null,
     "props": [
-      {
-        "name": "collapse",
-        "type": "'never' | 'compact'",
-        "optional": true,
-        "description": "",
-        "deprecated": false,
-        "default": "'never'"
-      },
       {
         "name": "label",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Accessible name for the related action cluster.",
         "deprecated": false,
         "default": null
+      },
+      {
+        "name": "orientation",
+        "type": "'horizontal' | 'vertical'",
+        "optional": true,
+        "description": "Logical arrangement only; ActionGroup never hides actions responsively.",
+        "deprecated": false,
+        "default": "horizontal"
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "contract",
+        "title": "Named action group",
+        "component": "ActionGroupContractExample"
+      }
+    ]
   },
   {
     "id": "AdaptiveNavigation",
@@ -1011,18 +1017,18 @@
     "layer": "components",
     "category": "Actions",
     "order": 10,
-    "summary": "Developer-facing textual action with stable size, emphasis, tone, loading and content slots.",
-    "usage": "Use for explicit actions; variant controls emphasis while tone carries semantic danger intent.",
-    "status": "candidate",
-    "accessibility": "Native button semantics, disabled/busy behavior, focus-visible and loading announcements are built in.",
-    "rtl": "Leading/trailing content follows logical order and directional icons mirror through the Icon primitive.",
-    "touch": "Shared press ownership supplies pressed state while native button activation preserves keyboard and assistive semantics.",
-    "responsive": "Intrinsic by default and full-width on request; target size follows the UiRoot modality policy.",
+    "summary": "Native action control with quiet/secondary/primary emphasis, destructive intent, form semantics, shared press ownership and explicit pending state.",
+    "usage": "Use for momentary actions. Choose emphasis independently from destructive intent; use ToggleButton only when a pressed state is genuinely part of the action semantics.",
+    "status": "accepted",
+    "accessibility": "Preserves native button/form activation, disabled and busy semantics; loading replaces the accessible name while canceling active press ownership.",
+    "rtl": "Leading/trailing slots are logical and directional glyphs mirror through Icon without reordering DOM content.",
+    "touch": "Shared Press/Gesture Arena ownership preserves pointer/touch cancellation and modality-driven minimum targets.",
+    "responsive": "Intrinsic by default or full-inline-size on request; content truncation/wrapping stays inside the caller-owned layout.",
     "playground": {
       "preferredWidth": "medium",
       "controls": [
         "variant",
-        "tone",
+        "intent",
         "size",
         "loading",
         "fullWidth"
@@ -1032,13 +1038,13 @@
       },
       "options": {
         "variant": [
-          "ghost",
-          "soft",
-          "filled"
+          "quiet",
+          "secondary",
+          "primary"
         ],
-        "tone": [
-          "default",
-          "danger"
+        "intent": [
+          "neutral",
+          "destructive"
         ],
         "size": [
           "sm",
@@ -1052,15 +1058,23 @@
         "name": "fullWidth",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Expands the action to the available inline size without changing semantics.",
         "deprecated": false,
         "default": "false"
+      },
+      {
+        "name": "intent",
+        "type": "ButtonIntent",
+        "optional": true,
+        "description": "Semantic action intent. Destructive is reserved for irreversible/high-risk actions.",
+        "deprecated": false,
+        "default": "neutral"
       },
       {
         "name": "leading",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Decorative logical-leading content; hidden from the accessibility tree.",
         "deprecated": false,
         "default": null
       },
@@ -1068,7 +1082,7 @@
         "name": "loading",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Marks work as pending, cancels active press ownership and disables native activation.",
         "deprecated": false,
         "default": "false"
       },
@@ -1076,15 +1090,15 @@
         "name": "loadingLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible replacement name exposed while visual button content is hidden by loading state.",
         "deprecated": false,
-        "default": "'Working'"
+        "default": "Working"
       },
       {
         "name": "longPressDelay",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Long-press threshold in milliseconds for the shared press kernel.",
         "deprecated": false,
         "default": null
       },
@@ -1100,7 +1114,7 @@
         "name": "onPressChange",
         "type": "(pressed: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "Reports visual press ownership transitions without replacing native click activation.",
         "deprecated": false,
         "default": null
       },
@@ -1108,23 +1122,15 @@
         "name": "size",
         "type": "ControlSize",
         "optional": true,
-        "description": "",
+        "description": "Shared control height/target scale.",
         "deprecated": false,
-        "default": "'md'"
-      },
-      {
-        "name": "tone",
-        "type": "ButtonTone",
-        "optional": true,
-        "description": "",
-        "deprecated": false,
-        "default": "'default'"
+        "default": "md"
       },
       {
         "name": "trailing",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Decorative logical-trailing content; hidden from the accessibility tree.",
         "deprecated": false,
         "default": null
       },
@@ -1132,7 +1138,7 @@
         "name": "type",
         "type": "'button' | 'submit' | 'reset'",
         "optional": true,
-        "description": "",
+        "description": "Native button form behavior. Defaults to button so actions never submit a form accidentally.",
         "deprecated": false,
         "default": "'button'"
       },
@@ -1140,17 +1146,17 @@
         "name": "variant",
         "type": "ButtonVariant",
         "optional": true,
-        "description": "",
+        "description": "Visual emphasis only; semantic risk belongs to intent.",
         "deprecated": false,
-        "default": "'ghost'"
+        "default": "quiet"
       }
     ],
     "examples": [
       {
-        "id": "states",
-        "title": "Action states",
-        "description": "Emphasis, danger tone, loading, icon slots and toggle state.",
-        "component": "ButtonStatesExample"
+        "id": "contract",
+        "title": "Native action contract",
+        "description": "Emphasis, destructive intent, loading cancellation, logical slots and explicit submit behavior.",
+        "component": "ButtonContractExample"
       }
     ]
   },
@@ -2711,21 +2717,21 @@
     "exportName": "IconButton",
     "layer": "components",
     "category": "Actions",
-    "order": 10,
-    "summary": "Compact icon-only action in the Button family, including optional controlled/uncontrolled toggle state.",
-    "usage": "Use when the icon is the primary visual label; provide label and use pressed state only for genuine toggle actions.",
-    "status": "candidate",
-    "accessibility": "Requires an explicit accessible label; toggle mode adds aria-pressed and keeps native button keyboard semantics.",
-    "rtl": "Directional icons mirror semantically through the shared Icon primitive.",
-    "touch": "Keeps the same minimum target policy as Button even when the visible glyph is compact.",
-    "responsive": "Fits compact toolbars without shrinking below the active modality target.",
+    "order": 11,
+    "summary": "Compact icon-only action with mandatory accessible naming, linked tooltip description, Button-family intent/emphasis and full modality target sizing.",
+    "usage": "Use when a familiar glyph is the primary visual affordance; label remains mandatory and tooltip text is supplemental rather than the accessible-name source.",
+    "status": "accepted",
+    "accessibility": "Always exposes aria-label; optional tooltip is linked through aria-describedby while native button keyboard semantics and optional aria-pressed remain intact.",
+    "rtl": "Directional glyphs mirror through Icon while the hit target and accessible name remain direction-independent.",
+    "touch": "Visible glyph size stays compact but the Button-family hit target never shrinks below the current modality minimum.",
+    "responsive": "Fits toolbars without target shrinkage; labels are non-visual so localization cannot change the visible control footprint.",
     "playground": null,
     "props": [
       {
         "name": "defaultPressed",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Initial uncontrolled toggle state.",
         "deprecated": false,
         "default": null
       },
@@ -2733,15 +2739,23 @@
         "name": "icon",
         "type": "IconName",
         "optional": false,
-        "description": "",
+        "description": "Canonical built-in glyph name rendered decoratively inside the labeled button.",
         "deprecated": false,
         "default": null
+      },
+      {
+        "name": "intent",
+        "type": "ButtonIntent",
+        "optional": true,
+        "description": "Semantic risk intent shared with Button.",
+        "deprecated": false,
+        "default": "neutral"
       },
       {
         "name": "label",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Accessible action name; IconButton never infers semantics from the glyph.",
         "deprecated": false,
         "default": null
       },
@@ -2749,7 +2763,7 @@
         "name": "loading",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Pending action state; disables activation and reuses the OX loading mark.",
         "deprecated": false,
         "default": "false"
       },
@@ -2757,7 +2771,7 @@
         "name": "onPressedChange",
         "type": "(pressed: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "Toggle-state callback used only when the IconButton is configured as a toggle.",
         "deprecated": false,
         "default": null
       },
@@ -2765,7 +2779,7 @@
         "name": "pressed",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Controlled toggle state. Omit all pressed props for ordinary momentary actions.",
         "deprecated": false,
         "default": null
       },
@@ -2773,23 +2787,15 @@
         "name": "size",
         "type": "ControlSize",
         "optional": true,
-        "description": "",
+        "description": "Shared control height/target scale.",
         "deprecated": false,
-        "default": "'md'"
-      },
-      {
-        "name": "tone",
-        "type": "ButtonTone",
-        "optional": true,
-        "description": "",
-        "deprecated": false,
-        "default": "'default'"
+        "default": "md"
       },
       {
         "name": "tooltip",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Supplemental tooltip/description text linked through aria-describedby and native title.",
         "deprecated": false,
         "default": null
       },
@@ -2797,17 +2803,17 @@
         "name": "variant",
         "type": "ButtonVariant",
         "optional": true,
-        "description": "",
+        "description": "Action emphasis shared with Button.",
         "deprecated": false,
-        "default": "'ghost'"
+        "default": "quiet"
       }
     ],
     "examples": [
       {
-        "id": "states",
-        "title": "Icon actions",
-        "description": "Plain, filled and toggle icon actions.",
-        "component": "IconButtonStatesExample"
+        "id": "contract",
+        "title": "Labeled icon actions",
+        "description": "Accessible naming, linked tooltip, destructive intent, loading and toggle state.",
+        "component": "IconButtonContractExample"
       }
     ]
   },
@@ -5651,6 +5657,7 @@
       "preferredWidth": "wide",
       "controls": [
         "size",
+        "renderer",
         "announce"
       ],
       "options": {
@@ -5659,10 +5666,15 @@
           "md",
           "lg",
           "hero"
+        ],
+        "renderer": [
+          "svg",
+          "canvas"
         ]
       },
       "fixture": {
         "size": "hero",
+        "renderer": "svg",
         "label": "Starting OntologyX"
       }
     },
@@ -5671,7 +5683,7 @@
         "name": "announce",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Announces loading through status semantics instead of keeping the decorative mark hidden.",
         "deprecated": false,
         "default": "false"
       },
@@ -5679,17 +5691,25 @@
         "name": "label",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible status copy when announce is enabled.",
         "deprecated": false,
-        "default": "'Loading'"
+        "default": "Loading"
+      },
+      {
+        "name": "renderer",
+        "type": "SpinnerRenderer",
+        "optional": true,
+        "description": "Rendering backend. SVG stays the lightweight default; Canvas lazy-loads for large/boot choreography.",
+        "deprecated": false,
+        "default": "svg"
       },
       {
         "name": "size",
         "type": "'sm' | 'md' | 'lg' | 'hero'",
         "optional": true,
-        "description": "",
+        "description": "Inline through boot-scale presentation.",
         "deprecated": false,
-        "default": "'md'"
+        "default": "md"
       }
     ],
     "examples": [
@@ -8294,15 +8314,23 @@
         "name": "fullWidth",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Expands the action to the available inline size without changing semantics.",
         "deprecated": false,
-        "default": null
+        "default": "false"
+      },
+      {
+        "name": "intent",
+        "type": "ButtonIntent",
+        "optional": true,
+        "description": "Semantic action intent. Destructive is reserved for irreversible/high-risk actions.",
+        "deprecated": false,
+        "default": "neutral"
       },
       {
         "name": "leading",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Decorative logical-leading content; hidden from the accessibility tree.",
         "deprecated": false,
         "default": null
       },
@@ -8310,23 +8338,23 @@
         "name": "loading",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Marks work as pending, cancels active press ownership and disables native activation.",
         "deprecated": false,
-        "default": null
+        "default": "false"
       },
       {
         "name": "loadingLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible replacement name exposed while visual button content is hidden by loading state.",
         "deprecated": false,
-        "default": null
+        "default": "Working"
       },
       {
         "name": "longPressDelay",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Long-press threshold in milliseconds for the shared press kernel.",
         "deprecated": false,
         "default": null
       },
@@ -8342,7 +8370,7 @@
         "name": "onPressChange",
         "type": "(pressed: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "Reports visual press ownership transitions without replacing native click activation.",
         "deprecated": false,
         "default": null
       },
@@ -8366,23 +8394,15 @@
         "name": "size",
         "type": "ControlSize",
         "optional": true,
-        "description": "",
+        "description": "Shared control height/target scale.",
         "deprecated": false,
-        "default": null
-      },
-      {
-        "name": "tone",
-        "type": "ButtonTone",
-        "optional": true,
-        "description": "",
-        "deprecated": false,
-        "default": null
+        "default": "md"
       },
       {
         "name": "trailing",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Decorative logical-trailing content; hidden from the accessibility tree.",
         "deprecated": false,
         "default": null
       },
@@ -8390,7 +8410,7 @@
         "name": "type",
         "type": "'button' | 'submit' | 'reset'",
         "optional": true,
-        "description": "",
+        "description": "Native button form behavior. Defaults to button so actions never submit a form accidentally.",
         "deprecated": false,
         "default": null
       },
@@ -8398,9 +8418,9 @@
         "name": "variant",
         "type": "ButtonVariant",
         "optional": true,
-        "description": "",
+        "description": "Visual emphasis only; semantic risk belongs to intent.",
         "deprecated": false,
-        "default": null
+        "default": "quiet"
       }
     ],
     "examples": []
@@ -8499,35 +8519,57 @@
     "id": "Toolbar",
     "exportName": "Toolbar",
     "layer": "components",
-    "category": "Navigation",
-    "order": 40,
-    "summary": "Keyboard-roving toolbar with an explicit overflow slot.",
-    "usage": "Use for related action sets; menu behavior for the overflow action comes from the overlay component layer.",
-    "status": "candidate",
-    "accessibility": "Uses toolbar semantics and shared roving keyboard focus.",
-    "rtl": "Horizontal keyboard traversal resolves logical direction.",
-    "touch": "Does not shrink child action targets.",
-    "responsive": "Content can scroll/collapse while overflow stays reachable.",
+    "category": "Actions",
+    "order": 13,
+    "summary": "Named command toolbar with one roving tab stop, logical arrow/Home/End navigation and a caller-owned pinned overflow slot.",
+    "usage": "Use for related commands. Toolbar owns roving focus and reachability; callers own which equivalent commands appear in overflow.",
+    "status": "accepted",
+    "accessibility": "Uses toolbar/orientation semantics with exactly one roving tab stop across enabled command controls.",
+    "rtl": "Horizontal ArrowLeft/ArrowRight traversal follows resolved logical direction; vertical toolbars use ArrowUp/ArrowDown.",
+    "touch": "Never shrinks child Button/IconButton targets and keeps overflow reachable.",
+    "responsive": "Primary content may scroll while an explicit overflow action stays pinned; Toolbar never silently moves or hides commands.",
     "playground": null,
     "props": [
       {
         "name": "label",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Accessible toolbar name.",
         "deprecated": false,
         "default": null
+      },
+      {
+        "name": "loop",
+        "type": "boolean",
+        "optional": true,
+        "description": "Whether arrow-key roving wraps at the ends.",
+        "deprecated": false,
+        "default": "true"
+      },
+      {
+        "name": "orientation",
+        "type": "'horizontal' | 'vertical'",
+        "optional": true,
+        "description": "Keyboard-roving axis and visual arrangement.",
+        "deprecated": false,
+        "default": "horizontal"
       },
       {
         "name": "overflow",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Caller-owned equivalent overflow action; Toolbar pins it but never silently moves/hides commands.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "contract",
+        "title": "Roving command toolbar",
+        "component": "ToolbarContractExample"
+      }
+    ]
   },
   {
     "id": "Tooltip",

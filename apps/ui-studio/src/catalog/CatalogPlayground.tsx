@@ -354,7 +354,7 @@ export function CatalogPlayground({ entry }: { entry: UiCatalogEntry }) {
                   <Badge size="sm" tone={state === 'error' ? 'danger' : state === 'disabled' ? 'neutral' : 'accent'}>{state}</Badge>
                   <Button
                     size="sm"
-                    variant="ghost"
+                    variant="quiet"
                     onClick={() => updateCatalogRoute({ tab: 'playground', state, example: null }, 'replace')}
                   >
                     Deep link

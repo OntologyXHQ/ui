@@ -19,6 +19,7 @@ const tokenCss = fs.readFileSync(path.join(UI_ROOT, 'src/styles/tokens.css'), 'u
 const buttonSource = fs.readFileSync(path.join(UI_ROOT, 'src/components/Button.tsx'), 'utf8');
 const feedbackSource = fs.readFileSync(path.join(UI_ROOT, 'src/components/Feedback.tsx'), 'utf8');
 const loadingMarkSource = fs.readFileSync(path.join(UI_ROOT, 'src/components/OxLoadingMark.tsx'), 'utf8');
+const loadingCanvasSource = fs.readFileSync(path.join(UI_ROOT, 'src/components/OxLoadingCanvas.tsx'), 'utf8');
 const browserScenarioSource = fs.readFileSync(path.join(ROOT, 'scripts/browser/scenarios.mjs'), 'utf8');
 const catalog = buildCatalog({ uiRoot: UI_ROOT });
 const issues = [];
@@ -190,6 +191,25 @@ if (spinnerPeriod < 1600 || spinnerPeriod > 2400) {
 }
 if (!componentCss.includes(".ui-root[data-oxs-motion='reduced'] .ui-ox-loading-mark__orbit") || !componentCss.includes(".ui-root[data-oxs-motion='reduced'] .ui-ox-loading-mark__cross")) {
   issues.push('OntologyX loading mark must settle through resolved UiRoot reduced-motion policy');
+}
+
+if (!feedbackSource.includes("export type SpinnerRenderer = 'svg' | 'canvas'") || !feedbackSource.includes("import('./OxLoadingCanvas')")) {
+  issues.push('Spinner must expose svg/canvas render backends while lazy-loading the optional Canvas implementation.');
+}
+if (!feedbackSource.includes("renderer = 'svg'") || !feedbackSource.includes('data-oxs-spinner-renderer={renderer}')) {
+  issues.push('Spinner SVG must remain the lightweight default and publish its selected renderer for diagnostics.');
+}
+if (!loadingCanvasSource.includes('useMotionRuntime()') || !loadingCanvasSource.includes('runtime.clock.subscribe')) {
+  issues.push('OX Canvas loading renderer must schedule through the current UiRoot MotionClock.');
+}
+if (/\brequestAnimationFrame\s*\(/.test(loadingCanvasSource) || /\bsetTimeout\s*\(/.test(loadingCanvasSource)) {
+  issues.push('OX Canvas loading renderer must not create a global frame/timer loop outside the MotionClock.');
+}
+if (!loadingCanvasSource.includes('ownerDocument.defaultView') || !loadingCanvasSource.includes('devicePixelContentBoxSize')) {
+  issues.push('OX Canvas loading renderer must size against its own DOM realm and physical content-box resolution.');
+}
+if (!browserScenarioSource.includes('Spinner renderer parity')) {
+  issues.push('G6 must certify one-at-a-time SVG/Canvas Spinner rendering and live Canvas animation.');
 }
 
 if (!feedbackSource.includes("size?: 'sm' | 'md' | 'lg' | 'hero'")) {

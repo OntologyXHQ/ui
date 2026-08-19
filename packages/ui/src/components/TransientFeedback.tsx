@@ -1,9 +1,9 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
-import { Button, type ButtonTone } from './Button';
+import { Button, type ButtonIntent } from './Button';
 
 export type TransientTone = 'neutral' | 'accent' | 'success' | 'warning' | 'danger';
-export type ToastAction = { label: string; onAction: () => void; tone?: ButtonTone };
+export type ToastAction = { label: string; onAction: () => void; intent?: ButtonIntent };
 export type ToastItem = {
   id: string;
   title?: ReactNode;
@@ -75,15 +75,15 @@ export function Snackbar({
         {action ? (
           <Button
             size="sm"
-            variant="ghost"
-            tone={action.tone ?? (tone === 'danger' ? 'danger' : 'default')}
+            variant="quiet"
+            intent={action.intent ?? (tone === 'danger' ? 'destructive' : 'neutral')}
             onClick={action.onAction}
           >
             {action.label}
           </Button>
         ) : null}
         {dismissible && onDismiss ? (
-          <Button size="sm" variant="ghost" onClick={onDismiss} aria-label={dismissLabel}>
+          <Button size="sm" variant="quiet" onClick={onDismiss} aria-label={dismissLabel}>
             {dismissText}
           </Button>
         ) : null}
@@ -202,12 +202,12 @@ export function Banner({
       </div>
       <div className="ui-banner__actions">
         {action ? (
-          <Button size="sm" variant="ghost" tone={action.tone ?? 'default'} onClick={action.onAction}>
+          <Button size="sm" variant="quiet" intent={action.intent ?? 'neutral'} onClick={action.onAction}>
             {action.label}
           </Button>
         ) : null}
         {onDismiss ? (
-          <Button size="sm" variant="ghost" aria-label={dismissLabel} onClick={onDismiss}>
+          <Button size="sm" variant="quiet" aria-label={dismissLabel} onClick={onDismiss}>
             {dismissText}
           </Button>
         ) : null}

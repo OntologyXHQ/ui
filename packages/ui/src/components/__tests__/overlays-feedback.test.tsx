@@ -196,7 +196,7 @@ describe('overlay and transient feedback components', () => {
           longPressDelayMs={40}
           actions={[{ id: 'open', label: 'Open', onSelect: () => {} }]}
         >
-          <Button variant="soft">File target</Button>
+          <Button variant="secondary">File target</Button>
         </ContextMenu>,
       );
       const trigger = screen.getByRole('button', { name: 'File target' });

@@ -62,9 +62,37 @@ export const browserScenarios = [
         });
         await assertPublicUiStylesLoaded(page);
         await assertWithinViewport(workbench, 'Button Studio workbench');
+        const stacked = await workbench.evaluate((element) => {
+          const sections = [...element.querySelectorAll('[data-studio-section]')];
+          return {
+            layout: element.getAttribute('data-studio-layout'),
+            tablists: element.querySelectorAll('[role="tablist"]').length,
+            sections: sections.map((section) => ({
+              id: section.getAttribute('data-studio-section'),
+              visible: section instanceof HTMLElement && section.getBoundingClientRect().height > 0,
+              top: section instanceof HTMLElement ? section.getBoundingClientRect().top : 0,
+            })),
+            apiScrollRegion: (() => {
+              const region = element.querySelector('.ui-studio-api-table-wrap');
+              return region instanceof HTMLElement
+                ? { role: region.getAttribute('role'), label: region.getAttribute('aria-label'), tabIndex: region.tabIndex }
+                : null;
+            })(),
+          };
+        });
+        assert.equal(stacked.layout, 'stacked', 'Studio catalog did not publish the stacked reading-flow contract.');
+        assert.equal(stacked.tablists, 0, 'Studio catalog chrome regressed to a tabbed documentation layout.');
+        assert.deepEqual(stacked.sections.map((section) => section.id), ['overview', 'api', 'examples', 'playground'], 'Studio stacked section order drifted.');
+        assert.ok(stacked.sections.every((section) => section.visible), 'Studio stacked documentation did not keep every section mounted and visible.');
+        assert.ok(stacked.sections.every((section, index) => index === 0 || section.top > stacked.sections[index - 1].top), 'Studio stacked documentation sections are not laid out in reading order.');
+        assert.deepEqual(
+          stacked.apiScrollRegion,
+          { role: 'region', label: 'Button API reference', tabIndex: 0 },
+          'Studio API overflow wrapper must remain a named keyboard-focusable scroll region.',
+        );
         const axe = await runAxe(page, 'Button Studio route');
         diagnostics.assertClean('Button Studio route');
-        return { axe };
+        return { axe, stacked };
       } finally {
         await context.close();
       }
@@ -86,14 +114,16 @@ export const browserScenarios = [
         const page = await context.newPage();
         const diagnostics = attachRuntimeDiagnostics(page);
         try {
-          await gotoCatalog(page, baseUrl, {
+          const example = await gotoCatalog(page, baseUrl, {
             entry: 'UiRoot',
             tab: 'examples',
             example: 'token-contract',
             theme: testCase.id,
           });
-          const root = page.locator('.ui-root').first();
-          const substrate = await root.evaluate((element) => {
+          await example.waitFor({ state: 'visible' });
+          const substrate = await example.evaluate((fixture) => {
+            const element = fixture.closest('.ui-root');
+            if (!(element instanceof HTMLElement)) throw new Error('Foundation token fixture lost its owning UiRoot.');
             const style = getComputedStyle(element);
             const roles = [
               '--oxs-color-accent',
@@ -129,29 +159,28 @@ export const browserScenarios = [
 
   scenario(
     'keyboard-roving-visible-focus',
-    ['keyboard', 'focus', 'roving', 'activation'],
+    ['keyboard', 'focus', 'roving', 'activation', 'component-tabs'],
     async ({ browser, baseUrl }) => {
       const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        await gotoCatalog(page, baseUrl, { entry: 'Button', tab: 'overview' });
-        const overview = page.getByRole('tab', { name: 'Overview', exact: true });
+        const workbench = await gotoCatalog(page, baseUrl, { entry: 'Tabs', tab: 'examples', example: 'overview' });
+        const overview = workbench.getByRole('tab', { name: 'Overview', exact: true });
         await focusByTab(page, overview);
-        await assertVisibleFocus(overview, 'Overview documentation tab');
+        await assertVisibleFocus(overview, 'Tabs component Overview control');
 
         await page.keyboard.press('ArrowRight');
-        const api = page.getByRole('tab', { name: 'API', exact: true });
-        await api.waitFor({ state: 'visible' });
-        assert.equal(await api.getAttribute('aria-selected'), 'true', 'ArrowRight did not automatically activate the API tab.');
-        assert.equal(await api.evaluate((element) => document.activeElement === element), true, 'Roving focus did not move to the API tab.');
-        assert.equal(new URL(page.url()).searchParams.get('tab'), 'api', 'Roving activation did not update the deterministic Studio route.');
-        await assertVisibleFocus(api, 'API documentation tab');
+        const activity = workbench.getByRole('tab', { name: 'Activity', exact: true });
+        await activity.waitFor({ state: 'visible' });
+        assert.equal(await activity.getAttribute('aria-selected'), 'true', 'ArrowRight did not automatically activate the component Activity tab.');
+        assert.equal(await activity.evaluate((element) => element.ownerDocument.activeElement === element), true, 'Roving focus did not move to the component Activity tab.');
+        await assertVisibleFocus(activity, 'Tabs component Activity control');
 
         await page.keyboard.press('ArrowLeft');
-        assert.equal(await overview.getAttribute('aria-selected'), 'true', 'ArrowLeft did not return selection to Overview.');
+        assert.equal(await overview.getAttribute('aria-selected'), 'true', 'ArrowLeft did not return component selection to Overview.');
         diagnostics.assertClean('keyboard/roving journey');
-        return { tabStopsToOverview: 'reachable', activation: 'automatic' };
+        return { componentTabs: 'reachable', activation: 'automatic' };
       } finally {
         await context.close();
       }
@@ -166,8 +195,8 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        await gotoCatalog(page, baseUrl, { entry: 'Dialog', tab: 'examples', example: 'overview' });
-        const trigger = page.getByRole('button', { name: 'Open dialog', exact: true });
+        const example = await gotoCatalog(page, baseUrl, { entry: 'Dialog', tab: 'examples', example: 'overview' });
+        const trigger = example.getByRole('button', { name: 'Open dialog', exact: true });
         await waitForStudioExampleControl(page, trigger, 'Dialog trigger');
         await focusByTab(page, trigger);
         await assertVisibleFocus(trigger, 'Dialog trigger');
@@ -215,8 +244,8 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        await gotoCatalog(page, baseUrl, { entry: 'Popover', tab: 'examples', example: 'modal-focus' });
-        const trigger = page.getByRole('button', { name: 'Open modal popover', exact: true });
+        const example = await gotoCatalog(page, baseUrl, { entry: 'Popover', tab: 'examples', example: 'modal-focus' });
+        const trigger = example.getByRole('button', { name: 'Open modal popover', exact: true });
         await waitForStudioExampleControl(page, trigger, 'Modal Popover trigger');
         await focusByTab(page, trigger);
         await page.keyboard.press('Enter');
@@ -259,7 +288,7 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        await gotoCatalog(page, baseUrl, {
+        const example = await gotoCatalog(page, baseUrl, {
           entry: 'UiRoot',
           tab: 'examples',
           example: 'nested-certification',
@@ -269,13 +298,13 @@ export const browserScenarios = [
           motion: 'reduced',
         });
 
-        const outer = page.locator('.ui-doc-uiroot-outer');
-        const inner = page.locator('.ui-doc-uiroot-inner');
+        const outer = example.locator('.ui-doc-uiroot-outer');
+        const inner = example.locator('.ui-doc-uiroot-inner');
         await outer.waitFor({ state: 'visible' });
         await inner.waitFor({ state: 'visible' });
-        const environment = await page.evaluate(() => {
-          const outer = document.querySelector('.ui-doc-uiroot-outer');
-          const inner = document.querySelector('.ui-doc-uiroot-inner');
+        const environment = await example.evaluate((fixture) => {
+          const outer = fixture.querySelector('.ui-doc-uiroot-outer');
+          const inner = fixture.querySelector('.ui-doc-uiroot-inner');
           if (!(outer instanceof HTMLElement) || !(inner instanceof HTMLElement)) return null;
           const outerStyle = getComputedStyle(outer);
           const innerStyle = getComputedStyle(inner);
@@ -323,16 +352,17 @@ export const browserScenarios = [
           },
         }, 'Nested UiRoot did not inherit/override its environment contract deterministically.');
 
-        const outerAction = page.getByRole('button', { name: 'Outer action', exact: true });
-        const trigger = page.getByRole('button', { name: 'Open nested dialog', exact: true });
+        const outerAction = example.getByRole('button', { name: 'Outer action', exact: true });
+        const trigger = example.getByRole('button', { name: 'Open nested dialog', exact: true });
         await focusByTab(page, trigger);
         await page.keyboard.press('Enter');
         const dialog = page.getByRole('dialog', { name: 'Nested root dialog' });
         await dialog.waitFor({ state: 'visible' });
 
         const ownership = await dialog.evaluate((element) => {
-          const inner = document.querySelector('.ui-doc-uiroot-inner');
-          const outerAction = [...document.querySelectorAll('button')].find(
+          const example = document.querySelector('#example-nested-certification');
+          const inner = example?.querySelector('.ui-doc-uiroot-inner');
+          const outerAction = [...(example?.querySelectorAll('button') ?? [])].find(
             (button) => button.textContent?.trim() === 'Outer action',
           );
           const portal = element.closest('[data-oxs-portal-root]');
@@ -358,7 +388,7 @@ export const browserScenarios = [
           hiddenFocusedAncestor: false,
         }, 'Nested modal escaped its nearest UiRoot ownership boundary.');
 
-        await page.getByRole('button', { name: 'Done', exact: true }).click();
+        await dialog.getByRole('button', { name: 'Done', exact: true }).click();
         await dialog.waitFor({ state: 'hidden' });
         assert.equal(await trigger.evaluate((element) => document.activeElement === element), true, 'Nested UiRoot did not restore focus to its trigger.');
         await outerAction.click();
@@ -380,7 +410,7 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        await gotoCatalog(page, baseUrl, {
+        const example = await gotoCatalog(page, baseUrl, {
           entry: 'Box',
           tab: 'examples',
           example: 'boundary-contract',
@@ -389,7 +419,7 @@ export const browserScenarios = [
           viewport: 'fit',
           container: 'compact',
         });
-        const box = page.getByRole('region', { name: 'Certified Box boundary' });
+        const box = example.getByRole('region', { name: 'Certified Box boundary' });
         await box.waitFor({ state: 'visible' });
         const boundary = await box.evaluate((element) => {
           const style = getComputedStyle(element);
@@ -407,7 +437,7 @@ export const browserScenarios = [
         assert.equal(boundary.flexGrow, '1', 'Box flex="grow" did not participate in its Row parent.');
         assert.equal(boundary.direction, 'rtl', 'Box did not inherit the resolved logical direction.');
 
-        const fullSpan = page.locator('[aria-label="Full-span Box"]');
+        const fullSpan = example.locator('[aria-label="Full-span Box"]');
         const span = await fullSpan.evaluate((element) => getComputedStyle(element).gridColumnEnd);
         assert.equal(span, '-1', 'Box gridSpan="full" did not span the full Grid inline track range.');
         await assertNoGlobalHorizontalOverflow(page, 'Box layout boundary');
@@ -429,7 +459,7 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        await gotoCatalog(page, baseUrl, {
+        let example = await gotoCatalog(page, baseUrl, {
           entry: 'Stack',
           tab: 'examples',
           example: 'block-flow',
@@ -438,7 +468,7 @@ export const browserScenarios = [
           viewport: 'fit',
           container: 'compact',
         });
-        const stack = page.getByRole('region', { name: 'Certified Stack flow' });
+        const stack = example.getByRole('region', { name: 'Certified Stack flow' });
         await stack.waitFor({ state: 'visible' });
         const stackState = await stack.evaluate((element) => {
           const style = getComputedStyle(element);
@@ -455,7 +485,7 @@ export const browserScenarios = [
         assert.ok(stackState.blockOrder[0] < stackState.blockOrder[1] && stackState.blockOrder[1] < stackState.blockOrder[2], 'Stack visual order diverged from DOM order.');
         const stackAxe = await runAxe(page, 'Stack flow certification');
 
-        await gotoCatalog(page, baseUrl, {
+        example = await gotoCatalog(page, baseUrl, {
           entry: 'Row',
           tab: 'examples',
           example: 'inline-flow',
@@ -464,7 +494,7 @@ export const browserScenarios = [
           viewport: 'fit',
           container: 'compact',
         });
-        const row = page.getByRole('region', { name: 'Certified Row flow' });
+        const row = example.getByRole('region', { name: 'Certified Row flow' });
         await row.waitFor({ state: 'visible' });
         const rowState = await row.evaluate((element) => {
           const style = getComputedStyle(element);
@@ -481,7 +511,7 @@ export const browserScenarios = [
         assert.ok(rowState.children[0].x > rowState.children[1].x, 'RTL Row did not place the first DOM child at inline-start.');
         const rowAxe = await runAxe(page, 'Row RTL certification');
 
-        await gotoCatalog(page, baseUrl, {
+        example = await gotoCatalog(page, baseUrl, {
           entry: 'Wrap',
           tab: 'examples',
           example: 'intrinsic-wrap',
@@ -490,7 +520,7 @@ export const browserScenarios = [
           viewport: 'phone',
           container: 'compact',
         });
-        const wrap = page.getByRole('region', { name: 'Certified Wrap flow' });
+        const wrap = example.getByRole('region', { name: 'Certified Wrap flow' });
         await wrap.waitFor({ state: 'visible' });
         const wrapState = await wrap.evaluate((element) => {
           const style = getComputedStyle(element);
@@ -520,7 +550,7 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        await gotoCatalog(page, baseUrl, {
+        let example = await gotoCatalog(page, baseUrl, {
           entry: 'Grid',
           tab: 'examples',
           example: 'track-strategies',
@@ -552,7 +582,7 @@ export const browserScenarios = [
           (studioGeometry.workspace?.width ?? 0) > 200 && (studioGeometry.exampleCanvas?.width ?? 0) > 100,
           `Studio simulated viewport collapsed the active example before Grid layout could be certified: ${JSON.stringify(studioGeometry)}`,
         );
-        const intrinsic = page.getByRole('region', { name: 'Certified intrinsic Grid' });
+        const intrinsic = example.getByRole('region', { name: 'Certified intrinsic Grid' });
         await intrinsic.waitFor({ state: 'visible' });
         const readIntrinsicState = (locator) => locator.evaluate((element) => {
           const style = getComputedStyle(element);
@@ -570,18 +600,18 @@ export const browserScenarios = [
         assert.ok(phoneIntrinsicState.columns.length >= 1, 'auto-fit Grid did not form an intrinsic track in the compact container.');
         assert.equal(phoneIntrinsicState.minInlineSize, '0px', 'Grid did not preserve nested-layout min-inline-size safety.');
 
-        const fixed = page.getByRole('region', { name: 'Certified fixed Grid' });
+        const fixed = example.getByRole('region', { name: 'Certified fixed Grid' });
         const fixedState = await fixed.evaluate((element) => ({
           columns: getComputedStyle(element).gridTemplateColumns.split(/\s+/).filter(Boolean).length,
           children: [...element.children].map((child) => child.textContent?.replace(/\s+/g, ' ').trim()),
         }));
         assert.equal(fixedState.columns, 4, 'Grid columns={4} did not produce exactly four finite tracks.');
         assert.deepEqual(fixedState.children, ['Span 2', 'Peer A', 'Peer B'], 'Grid visual contract must preserve DOM/content order.');
-        const span = await page.getByLabel('Two-column Grid item').evaluate((element) => getComputedStyle(element).gridColumnEnd);
+        const span = await example.getByLabel('Two-column Grid item').evaluate((element) => getComputedStyle(element).gridColumnEnd);
         assert.match(span, /span\s+2/, 'Box gridSpan={2} did not participate in the fixed Grid track model.');
         await assertNoGlobalHorizontalOverflow(page, 'Grid compact track strategies');
 
-        await gotoCatalog(page, baseUrl, {
+        example = await gotoCatalog(page, baseUrl, {
           entry: 'Grid',
           tab: 'examples',
           example: 'track-strategies',
@@ -590,7 +620,7 @@ export const browserScenarios = [
           viewport: 'desktop',
           container: 'wide',
         });
-        const wideIntrinsic = page.getByRole('region', { name: 'Certified intrinsic Grid' });
+        const wideIntrinsic = example.getByRole('region', { name: 'Certified intrinsic Grid' });
         await wideIntrinsic.waitFor({ state: 'visible' });
         const wideIntrinsicState = await readIntrinsicState(wideIntrinsic);
         assert.ok(
@@ -622,7 +652,7 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        await gotoCatalog(page, baseUrl, {
+        const example = await gotoCatalog(page, baseUrl, {
           entry: 'Container',
           tab: 'examples',
           example: 'semantic-widths',
@@ -631,8 +661,8 @@ export const browserScenarios = [
           viewport: 'ultrawide',
           container: 'wide',
         });
-        const readable = page.getByRole('region', { name: 'Certified readable Container' });
-        const full = page.getByRole('region', { name: 'Certified full Container' });
+        const readable = example.getByRole('region', { name: 'Certified readable Container' });
+        const full = example.getByRole('region', { name: 'Certified full Container' });
         await readable.waitFor({ state: 'visible' });
         const geometry = await Promise.all([readable, full].map((locator) => locator.evaluate((element) => {
           const style = getComputedStyle(element);
@@ -669,7 +699,7 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        await gotoCatalog(page, baseUrl, {
+        const example = await gotoCatalog(page, baseUrl, {
           entry: 'Inset',
           tab: 'examples',
           example: 'logical-spacing',
@@ -678,7 +708,7 @@ export const browserScenarios = [
           viewport: 'fit',
           container: 'compact',
         });
-        const inset = page.getByRole('region', { name: 'Certified logical Inset' });
+        const inset = example.getByRole('region', { name: 'Certified logical Inset' });
         await inset.waitFor({ state: 'visible' });
         const state = await inset.evaluate((element) => {
           const style = getComputedStyle(element);
@@ -720,7 +750,7 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        await gotoCatalog(page, baseUrl, {
+        let example = await gotoCatalog(page, baseUrl, {
           entry: 'SafeArea',
           tab: 'examples',
           example: 'logical-edges',
@@ -730,7 +760,7 @@ export const browserScenarios = [
           viewport: 'fit',
           container: 'compact',
         });
-        const safeArea = page.getByRole('region', { name: 'Certified SafeArea edges' });
+        const safeArea = example.getByRole('region', { name: 'Certified SafeArea edges' });
         await safeArea.waitFor({ state: 'visible' });
         const notch = await safeArea.evaluate((element) => {
           const style = getComputedStyle(element);
@@ -748,7 +778,7 @@ export const browserScenarios = [
           'SafeArea consumed edges outside its explicit logical ownership set.',
         );
 
-        await gotoCatalog(page, baseUrl, {
+        example = await gotoCatalog(page, baseUrl, {
           entry: 'SafeArea',
           tab: 'examples',
           example: 'logical-edges',
@@ -758,7 +788,7 @@ export const browserScenarios = [
           viewport: 'fit',
           container: 'compact',
         });
-        const keyboardSafeArea = page.getByRole('region', { name: 'Certified SafeArea edges' });
+        const keyboardSafeArea = example.getByRole('region', { name: 'Certified SafeArea edges' });
         const keyboard = await keyboardSafeArea.evaluate((element) => {
           const root = element.closest('.ui-root');
           const style = getComputedStyle(element);
@@ -790,7 +820,7 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        await gotoCatalog(page, baseUrl, {
+        const example = await gotoCatalog(page, baseUrl, {
           entry: 'Spacer',
           tab: 'examples',
           example: 'logical-axis',
@@ -799,8 +829,8 @@ export const browserScenarios = [
           viewport: 'fit',
           container: 'compact',
         });
-        const inlineSpacer = page.locator('.ui-doc-spacer-inline');
-        const blockSpacer = page.locator('.ui-doc-spacer-block');
+        const inlineSpacer = example.locator('.ui-doc-spacer-inline');
+        const blockSpacer = example.locator('.ui-doc-spacer-block');
         await inlineSpacer.waitFor({ state: 'attached' });
         const inline = await inlineSpacer.evaluate((element) => {
           const style = getComputedStyle(element);
@@ -835,7 +865,7 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        await gotoCatalog(page, baseUrl, {
+        let example = await gotoCatalog(page, baseUrl, {
           entry: 'Text',
           tab: 'examples',
           example: 'mixed-copy',
@@ -844,10 +874,12 @@ export const browserScenarios = [
           viewport: 'phone',
           container: 'compact',
         });
-        await page.locator('.ui-root').first().evaluate((root) => {
+        await example.evaluate((fixture) => {
+          const root = fixture.closest('.ui-root');
+          if (!(root instanceof HTMLElement)) throw new Error('Text certification fixture lost its owning UiRoot.');
           root.style.setProperty('--oxs-font-sans', '"Definitely Missing OntologyX Font", system-ui, sans-serif');
         });
-        const text = page.locator('[data-visual-cert="text"]');
+        const text = example.locator('[data-visual-cert="text"]');
         await text.waitFor({ state: 'visible' });
         const textState = await text.evaluate((element) => {
           const style = getComputedStyle(element);
@@ -878,10 +910,10 @@ export const browserScenarios = [
         await assertNoGlobalHorizontalOverflow(page, 'Text browser zoom reflow');
         await cdp.send('Emulation.setPageScaleFactor', { pageScaleFactor: 1 });
 
-        await gotoCatalog(page, baseUrl, {
+        example = await gotoCatalog(page, baseUrl, {
           entry: 'Heading', tab: 'examples', example: 'semantic-rank', theme: 'light', dir: 'rtl', viewport: 'phone', container: 'compact',
         });
-        const heading = page.locator('[data-visual-cert="heading"]');
+        const heading = example.locator('[data-visual-cert="heading"]');
         const headingState = await heading.evaluate((element) => ({
           tagName: element.tagName,
           fontSize: getComputedStyle(element).fontSize,
@@ -890,10 +922,10 @@ export const browserScenarios = [
         assert.equal(headingState.tagName, 'H3', 'Heading visual size changed native semantic rank.');
         assert.notEqual(headingState.maxInlineSize, '11ch', 'Display/heading typography still owns a legacy content-width cap.');
 
-        await gotoCatalog(page, baseUrl, {
+        example = await gotoCatalog(page, baseUrl, {
           entry: 'Label', tab: 'examples', example: 'metadata-label', theme: 'light', dir: 'rtl', viewport: 'phone', container: 'compact',
         });
-        const label = page.locator('[data-visual-cert="label"]');
+        const label = example.locator('[data-visual-cert="label"]');
         const labelState = await label.evaluate((element) => ({
           tagName: element.tagName,
           role: element.getAttribute('role'),
@@ -901,10 +933,10 @@ export const browserScenarios = [
         }));
         assert.deepEqual(labelState, { tagName: 'SPAN', role: null, tabIndex: -1 }, 'Label invented control/focus semantics.');
 
-        await gotoCatalog(page, baseUrl, {
+        example = await gotoCatalog(page, baseUrl, {
           entry: 'Code', tab: 'examples', example: 'native-code-semantics', theme: 'dark', dir: 'rtl', viewport: 'phone', container: 'compact',
         });
-        const code = page.locator('[data-visual-cert="code"]');
+        const code = example.locator('[data-visual-cert="code"]');
         const codeState = await code.evaluate((element) => {
           const style = getComputedStyle(element);
           return {
@@ -937,11 +969,11 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        await gotoCatalog(page, baseUrl, {
+        let example = await gotoCatalog(page, baseUrl, {
           entry: 'Icon', tab: 'examples', example: 'state-transition', theme: 'dark', dir: 'ltr', motion: 'full', viewport: 'fit', container: 'compact',
         });
-        const icon = page.locator('[data-visual-cert="stateful-icon"]');
-        const toggle = page.getByRole('button', { name: 'Toggle playback icon' });
+        let icon = example.locator('[data-visual-cert="stateful-icon"]');
+        let toggle = example.getByRole('button', { name: 'Toggle playback icon' });
         await icon.waitFor({ state: 'visible' });
         const initial = await icon.evaluate((element) => ({
           state: element.getAttribute('data-oxs-icon-state'),
@@ -961,7 +993,7 @@ export const browserScenarios = [
         await toggle.evaluate((button) => button.click());
         await page.waitForFunction(
           () => {
-            const target = document.querySelector('[data-visual-cert="stateful-icon"]');
+            const target = document.querySelector('#example-state-transition [data-visual-cert="stateful-icon"]');
             return target?.getAttribute('data-oxs-icon-phase') === 'transitioning'
               && target.getAttribute('data-oxs-icon-visual-state') === 'pausing';
           },
@@ -981,7 +1013,7 @@ export const browserScenarios = [
         }, 'Icon did not publish the explicit play → pausing → pause transition contract.');
 
         await page.waitForFunction(
-          () => document.querySelector('[data-visual-cert="stateful-icon"]')?.getAttribute('data-oxs-icon-phase') === 'stable',
+          () => document.querySelector('#example-state-transition [data-visual-cert="stateful-icon"]')?.getAttribute('data-oxs-icon-phase') === 'stable',
           undefined,
           { timeout: 1000 },
         );
@@ -989,7 +1021,7 @@ export const browserScenarios = [
 
         await toggle.evaluate((button) => button.click());
         await page.waitForFunction(
-          () => document.querySelector('[data-visual-cert="stateful-icon"]')?.getAttribute('data-oxs-icon-visual-state') === 'playing',
+          () => document.querySelector('#example-state-transition [data-visual-cert="stateful-icon"]')?.getAttribute('data-oxs-icon-visual-state') === 'playing',
           undefined,
           { timeout: 1000 },
         );
@@ -997,7 +1029,7 @@ export const browserScenarios = [
         await toggle.evaluate((button) => button.click());
         await page.waitForFunction(
           () => {
-            const target = document.querySelector('[data-visual-cert="stateful-icon"]');
+            const target = document.querySelector('#example-state-transition [data-visual-cert="stateful-icon"]');
             return target?.getAttribute('data-oxs-icon-phase') === 'transitioning'
               && target.getAttribute('data-oxs-icon-visual-state') === 'pausing'
               && target.getAttribute('data-oxs-icon-state') === 'pause';
@@ -1013,23 +1045,25 @@ export const browserScenarios = [
         };
         assert.deepEqual(interrupted, { first: 'playing', second: 'pausing', phase: 'transitioning', destination: 'pause' }, 'Interrupted Icon transition did not retarget through declared transient states.');
         await page.waitForFunction(
-          () => document.querySelector('[data-visual-cert="stateful-icon"]')?.getAttribute('data-oxs-icon-phase') === 'stable',
+          () => document.querySelector('#example-state-transition [data-visual-cert="stateful-icon"]')?.getAttribute('data-oxs-icon-phase') === 'stable',
           undefined,
           { timeout: 1000 },
         );
         assert.equal(await icon.getAttribute('data-oxs-icon-state'), 'pause', 'Interrupted Icon did not settle at the newest semantic destination.');
 
-        await gotoCatalog(page, baseUrl, {
+        example = await gotoCatalog(page, baseUrl, {
           entry: 'Icon', tab: 'examples', example: 'state-transition', theme: 'dark', dir: 'ltr', motion: 'reduced', viewport: 'fit', container: 'compact',
         });
-        const reducedIcon = page.locator('[data-visual-cert="stateful-icon"]');
-        const reducedToggle = page.getByRole('button', { name: 'Toggle playback icon' });
+        icon = example.locator('[data-visual-cert="stateful-icon"]');
+        toggle = example.getByRole('button', { name: 'Toggle playback icon' });
+        const reducedIcon = icon;
+        const reducedToggle = toggle;
         const reducedBefore = await reducedIcon.getAttribute('data-oxs-icon-state');
         const reducedExpected = reducedBefore === 'play' ? 'pause' : 'play';
         await reducedToggle.click();
         await page.waitForFunction(
           (expected) => {
-            const target = document.querySelector('[data-visual-cert="stateful-icon"]');
+            const target = document.querySelector('#example-state-transition [data-visual-cert="stateful-icon"]');
             return target?.getAttribute('data-oxs-icon-phase') === 'stable'
               && target.getAttribute('data-oxs-icon-state') === expected
               && target.getAttribute('data-oxs-icon-visual-state') === expected;
@@ -1040,12 +1074,12 @@ export const browserScenarios = [
         assert.equal(await reducedIcon.getAttribute('data-oxs-icon-state'), reducedExpected, 'Reduced-motion Icon did not settle at the requested stable state.');
         assert.equal(await reducedIcon.getAttribute('data-oxs-icon-visual-state'), reducedExpected, 'Reduced-motion Icon leaked a persistent transient visual state.');
 
-        await gotoCatalog(page, baseUrl, {
+        example = await gotoCatalog(page, baseUrl, {
           entry: 'Icon', tab: 'examples', example: 'static-extension', theme: 'light', dir: 'ltr', motion: 'full', viewport: 'fit', container: 'compact',
         });
-        const rtlIcon = page.locator('[data-visual-cert="rtl-icon"]');
-        const ltrIcon = page.locator('[data-visual-cert="ltr-icon"]');
-        const custom = page.locator('[data-visual-cert="custom-icon"]');
+        const rtlIcon = example.locator('[data-visual-cert="rtl-icon"]');
+        const ltrIcon = example.locator('[data-visual-cert="ltr-icon"]');
+        const custom = example.locator('[data-visual-cert="custom-icon"]');
         const staticState = await Promise.all([rtlIcon, ltrIcon, custom].map((locator) => locator.evaluate((element) => {
           const style = getComputedStyle(element);
           return {
@@ -1084,10 +1118,10 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        await gotoCatalog(page, baseUrl, {
+        const example = await gotoCatalog(page, baseUrl, {
           entry: 'Icon', tab: 'examples', example: 'icon-pack', theme: 'dark', dir: 'ltr', motion: 'full', viewport: 'fit', container: 'wide',
         });
-        const pack = page.locator('[data-visual-cert="icon-pack"]');
+        const pack = example.locator('[data-visual-cert="icon-pack"]');
         await pack.waitFor({ state: 'visible' });
         const staticSamples = pack.locator('[data-icon-pack-static="true"]');
         const animatedSamples = pack.locator('[data-icon-pack-animated]');
@@ -1108,10 +1142,10 @@ export const browserScenarios = [
 
         const playback = pack.locator('[data-icon-pack-animated="playback"]');
         assert.equal(await playback.getAttribute('data-oxs-icon-state'), 'play', 'Pack playback family did not expose its initial stable state.');
-        await page.getByRole('button', { name: 'Toggle animated icon pack' }).click();
+        await example.getByRole('button', { name: 'Toggle animated icon pack' }).click();
         await page.waitForFunction(
           () => {
-            const target = document.querySelector('[data-icon-pack-animated="playback"]');
+            const target = document.querySelector('#example-icon-pack [data-icon-pack-animated="playback"]');
             return target?.getAttribute('data-oxs-icon-state') === 'pause'
               && target.getAttribute('data-oxs-icon-phase') === 'stable'
               && target.getAttribute('data-oxs-icon-visual-state') === 'pause';
@@ -1129,7 +1163,7 @@ export const browserScenarios = [
               activity: 'active',
             };
             return Object.entries(expected).every(([selector, state]) => {
-              const target = document.querySelector(`[data-icon-pack-animated="${selector}"]`);
+              const target = document.querySelector(`#example-icon-pack [data-icon-pack-animated="${selector}"]`);
               return target?.getAttribute('data-oxs-icon-phase') === 'stable'
                 && target.getAttribute('data-oxs-icon-state') === state
                 && target.getAttribute('data-oxs-icon-visual-state') === state;
@@ -1170,10 +1204,10 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        await gotoCatalog(page, baseUrl, {
+        let example = await gotoCatalog(page, baseUrl, {
           entry: 'Surface', tab: 'examples', example: 'material-boundary', theme: 'dark', dir: 'rtl', viewport: 'fit', container: 'compact',
         });
-        const surface = page.locator('[data-visual-cert="surface"]');
+        const surface = example.locator('[data-visual-cert="surface"]');
         await surface.waitFor({ state: 'visible' });
         const surfaceState = await surface.evaluate((element) => {
           const style = getComputedStyle(element);
@@ -1196,12 +1230,12 @@ export const browserScenarios = [
         assert.equal(surfaceState.overflow, 'hidden', 'Surface clip did not clip visual descendants.');
         assert.deepEqual({ role: surfaceState.role, tabIndex: surfaceState.tabIndex }, { role: null, tabIndex: -1 }, 'Surface invented interaction/accessibility semantics by default.');
 
-        await gotoCatalog(page, baseUrl, {
+        example = await gotoCatalog(page, baseUrl, {
           entry: 'Divider', tab: 'examples', example: 'separator-semantics', theme: 'dark', dir: 'rtl', viewport: 'fit', container: 'compact',
         });
-        const horizontal = page.locator('[data-visual-cert="horizontal-divider"]');
-        const vertical = page.locator('[data-visual-cert="vertical-divider"]');
-        const decorative = page.locator('[data-visual-cert="decorative-divider"]');
+        const horizontal = example.locator('[data-visual-cert="horizontal-divider"]');
+        const vertical = example.locator('[data-visual-cert="vertical-divider"]');
+        const decorative = example.locator('[data-visual-cert="decorative-divider"]');
         const dividerState = await Promise.all([horizontal, vertical, decorative].map((locator) => locator.evaluate((element) => {
           const style = getComputedStyle(element);
           return {
@@ -1368,7 +1402,7 @@ export const browserScenarios = [
         );
 
         await page.emulateMedia({ reducedMotion: 'reduce' });
-        await page.locator('.ui-root').evaluate((root) => root.setAttribute('data-oxs-motion', 'reduced'));
+        await mark.evaluate((element) => element.closest('.ui-root')?.setAttribute('data-oxs-motion', 'reduced'));
         const reduced = await mark.evaluate((element) => {
           const orbit = element.querySelector('.ui-ox-loading-mark__orbit');
           const strokes = [...element.querySelectorAll('.ui-ox-loading-mark__cross-stroke')];
@@ -1392,6 +1426,58 @@ export const browserScenarios = [
   ),
 
   scenario(
+    'spinner-svg-canvas-renderer-parity',
+    ['visual', 'brand', 'loading', 'svg', 'canvas', 'motion', 'realm'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 920, height: 720 }, reducedMotion: 'no-preference' });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const workbench = await gotoCatalog(page, baseUrl, { entry: 'Spinner', tab: 'examples', example: 'ox-loading', motion: 'full' });
+        const bootSpinner = workbench.locator('[data-oxs-spinner-purpose="boot"]');
+        await bootSpinner.waitFor({ state: 'visible' });
+        assert.equal(await bootSpinner.getAttribute('data-oxs-spinner-renderer'), 'svg', 'Spinner renderer parity must start from the lightweight SVG backend.');
+        assert.equal(await bootSpinner.locator('svg[data-oxs-loading-mark="ox"]').count(), 1, 'Spinner renderer parity lost the canonical SVG mark.');
+        assert.equal(await bootSpinner.locator('canvas[data-oxs-loading-renderer="canvas"]').count(), 0, 'Canvas backend loaded before it was requested.');
+
+        await workbench.getByRole('button', { name: 'Canvas', exact: true }).click();
+        const canvas = bootSpinner.locator('canvas[data-oxs-loading-renderer="canvas"]');
+        await canvas.waitFor({ state: 'visible' });
+        assert.equal(await bootSpinner.getAttribute('data-oxs-spinner-renderer'), 'canvas', 'Spinner did not publish the selected Canvas backend.');
+        assert.equal(await bootSpinner.locator('[data-oxs-loading-mark]').count(), 1, 'Spinner renderer parity rendered SVG and Canvas marks at the same time.');
+        const canvasState = await canvas.evaluate((element) => {
+          const rect = element.getBoundingClientRect();
+          const ownerWindow = element.ownerDocument.defaultView;
+          return {
+            cssWidth: rect.width,
+            cssHeight: rect.height,
+            backingWidth: element.width,
+            backingHeight: element.height,
+            realmReady: Boolean(ownerWindow),
+            choreography: element.getAttribute('data-oxs-loading-choreography'),
+          };
+        });
+        assert.ok(canvasState.cssWidth >= 120 && canvasState.cssHeight >= 120, 'Canvas OX boot renderer lost the hero presentation size.');
+        assert.ok(canvasState.backingWidth >= Math.floor(canvasState.cssWidth), 'Canvas OX renderer did not allocate a physical/content-box backing store.');
+        assert.equal(canvasState.realmReady, true, 'Canvas OX renderer lost its owner Window realm.');
+        assert.equal(canvasState.choreography, 'write-heartbeat-release', 'Canvas OX renderer drifted from the shared branded choreography identity.');
+        const firstFrame = await canvas.evaluate((element) => element.toDataURL());
+        await page.waitForTimeout(140);
+        const secondFrame = await canvas.evaluate((element) => element.toDataURL());
+        assert.notEqual(firstFrame, secondFrame, 'Spinner renderer parity found a static Canvas backend while full motion was requested.');
+
+        await workbench.getByRole('button', { name: 'SVG', exact: true }).click();
+        await bootSpinner.locator('svg[data-oxs-loading-mark="ox"]').waitFor({ state: 'visible' });
+        assert.equal(await bootSpinner.locator('canvas[data-oxs-loading-renderer="canvas"]').count(), 0, 'Canvas backend did not unmount when Spinner returned to SVG.');
+        diagnostics.assertClean('Spinner renderer parity');
+        return { canvas: canvasState, animated: true, exclusiveBackend: true };
+      } finally {
+        await context.close();
+      }
+    },
+  ),
+
+  scenario(
     'overlay-authority-cross-root-certification',
     ['overlay-kernel', 'overlay', 'portal', 'modal-isolation', 'focus', 'escape', 'nested-root', 'realm', 'a11y'],
     async ({ browser, baseUrl }) => {
@@ -1400,25 +1486,25 @@ export const browserScenarios = [
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
         const workbench = await gotoCatalog(page, baseUrl, { entry: 'Dialog', tab: 'examples', example: 'authority' });
+        const rootA = workbench.locator('.ui-doc-overlay-authority-root--a');
+        const rootB = workbench.locator('.ui-doc-overlay-authority-root--b');
         const triggerA = workbench.getByRole('button', { name: 'Open modal A', exact: true });
         const triggerB = workbench.getByRole('button', { name: 'Open modal B', exact: true });
+        await waitForStudioExampleControl(page, triggerA, 'Overlay authority root A trigger');
+        await waitForStudioExampleControl(page, triggerB, 'Overlay authority root B trigger');
+        await Promise.all([rootA.waitFor({ state: 'visible' }), rootB.waitFor({ state: 'visible' })]);
         await triggerA.click();
         const dialogA = page.getByRole('dialog', { name: 'Authority modal A' });
         await dialogA.waitFor({ state: 'visible' });
 
-        const firstScope = await page.evaluate(() => {
-          const triggerA = [...document.querySelectorAll('button')].find((element) => element.textContent?.trim() === 'Open modal A');
-          const triggerB = [...document.querySelectorAll('button')].find((element) => element.textContent?.trim() === 'Open modal B');
-          const dialogA = [...document.querySelectorAll('[role="dialog"]')].find((element) => element.getAttribute('aria-labelledby') && element.textContent?.includes('Modal owned by root A'));
-          const runtimeA = triggerA?.closest('.ui-root')?.querySelector('.ui-drag-drop-runtime');
-          const runtimeB = triggerB?.closest('.ui-root')?.querySelector('.ui-drag-drop-runtime');
-          const portalRoot = dialogA?.closest('[data-oxs-portal-root]');
-          return {
-            aBackgroundInert: runtimeA?.hasAttribute('inert') ?? false,
-            bBackgroundInert: runtimeB?.hasAttribute('inert') ?? false,
-            portalOwnedByA: Boolean(portalRoot?.parentElement?.classList.contains('ui-doc-overlay-authority-root--a')),
-          };
-        });
+        // Role locators intentionally stop resolving while their owning background is inert.
+        // Inspect the stable UiRoot DOM identities instead of re-resolving an inaccessible trigger.
+        const [aBackgroundInert, bBackgroundInert, portalOwnedByA] = await Promise.all([
+          rootA.locator('.ui-drag-drop-runtime').evaluate((element) => element.hasAttribute('inert')),
+          rootB.locator('.ui-drag-drop-runtime').evaluate((element) => element.hasAttribute('inert')),
+          dialogA.evaluate((element) => Boolean(element.closest('[data-oxs-portal-root]')?.parentElement?.classList.contains('ui-doc-overlay-authority-root--a'))),
+        ]);
+        const firstScope = { aBackgroundInert, bBackgroundInert, portalOwnedByA };
         assert.deepEqual(firstScope, { aBackgroundInert: true, bBackgroundInert: false, portalOwnedByA: true }, 'Root A modal leaked isolation or portal ownership across UiRoot boundaries.');
 
         await triggerB.click();
@@ -1509,7 +1595,7 @@ export const browserScenarios = [
         await page.waitForTimeout(35);
         await toggle.click();
         await page.waitForFunction(() => {
-          const probe = [...document.querySelectorAll('[data-motion-authority-probe]')].find((element) => element.getAttribute('data-motion-authority-probe') === 'Outer runtime');
+          const probe = [...document.querySelectorAll('#example-authority [data-motion-authority-probe]')].find((element) => element.getAttribute('data-motion-authority-probe') === 'Outer runtime');
           const surface = probe?.querySelector('[data-motion-probe-surface]');
           return surface?.getAttribute('data-present') === 'true' && surface?.getAttribute('data-hidden') === 'false';
         }, null, { timeout: 1800 });
@@ -1524,7 +1610,7 @@ export const browserScenarios = [
         assert.equal(await reducedOuter.evaluate((element) => element.closest('.ui-root')?.getAttribute('data-oxs-motion')), 'reduced', 'Reduced-motion route did not resolve through the motion runtime.');
         await reducedToggle.click();
         await page.waitForFunction(() => {
-          const probe = [...document.querySelectorAll('[data-motion-authority-probe]')].find((element) => element.getAttribute('data-motion-authority-probe') === 'Outer runtime');
+          const probe = [...document.querySelectorAll('#example-authority [data-motion-authority-probe]')].find((element) => element.getAttribute('data-motion-authority-probe') === 'Outer runtime');
           const surface = probe?.querySelector('[data-motion-probe-surface]');
           return surface?.getAttribute('data-present') === 'false' && surface?.getAttribute('data-hidden') === 'true';
         }, null, { timeout: 250 });
@@ -1562,7 +1648,7 @@ export const browserScenarios = [
         const menu = page.getByRole('menu', { name: 'Preview menu' });
         await menu.waitFor({ state: 'visible' });
         await page.keyboard.press('d');
-        const duplicate = page.getByRole('menuitem', { name: 'Duplicate', exact: true });
+        const duplicate = menu.getByRole('menuitem', { name: 'Duplicate', exact: true });
         assert.equal(
           await duplicate.evaluate((element) => element.ownerDocument.activeElement === element),
           true,
@@ -1591,15 +1677,20 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        await gotoCatalog(page, baseUrl, { entry: 'Button', tab: 'examples', modality: 'mouse', pointer: 'fine' });
-        const toggle = page.getByRole('button', { name: 'Favorite', exact: true });
-        await toggle.waitFor({ state: 'visible' });
-        assert.equal(await toggle.getAttribute('aria-pressed'), 'true', 'Pointer fixture must begin pressed.');
-        await performPointerCancel(page, toggle);
-        assert.equal(await toggle.getAttribute('aria-pressed'), 'true', 'Pointer release outside the target incorrectly activated ToggleButton.');
-        assert.equal(await toggle.getAttribute('data-pressed'), null, 'Pressed visual state leaked after pointer cancellation.');
-        await toggle.click();
-        assert.equal(await toggle.getAttribute('aria-pressed'), 'false', 'Normal pointer activation did not toggle ToggleButton.');
+        const example = await gotoCatalog(page, baseUrl, { entry: 'Button', tab: 'examples', example: 'contract', modality: 'mouse', pointer: 'fine' });
+        const primary = example.getByRole('button', { name: 'Primary', exact: true });
+        const counter = example.locator('[data-action-primary-count]');
+        await primary.waitFor({ state: 'visible' });
+        const beforeCancel = await counter.getAttribute('data-action-primary-count');
+        await performPointerCancel(page, primary);
+        assert.equal(await counter.getAttribute('data-action-primary-count'), beforeCancel, 'Pointer release outside the target incorrectly activated Button.');
+        assert.equal(await primary.getAttribute('data-pressed'), null, 'Pressed visual state leaked after pointer cancellation.');
+        await primary.click();
+        assert.equal(
+          await counter.getAttribute('data-action-primary-count'),
+          String(Number(beforeCancel) + 1),
+          'Normal pointer activation did not activate Button exactly once.',
+        );
         diagnostics.assertClean('pointer cancellation journey');
         return { cancellationPreservedValue: true, normalActivation: true };
       } finally {
@@ -1620,7 +1711,7 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        await gotoCatalog(page, baseUrl, {
+        const example = await gotoCatalog(page, baseUrl, {
           entry: 'ContextMenu',
           tab: 'examples',
           example: 'preview',
@@ -1661,12 +1752,12 @@ export const browserScenarios = [
           176,
           'Phone Studio documentation viewport',
         );
-        const trigger = page.getByRole('button', { name: 'Right-click or long-press', exact: true });
+        const trigger = example.getByRole('button', { name: 'Right-click or long-press', exact: true });
         const size = await trigger.boundingBox();
         assert.ok(size && size.height >= 44, `Coarse-pointer trigger is below the 44px browser target floor (${size?.height ?? 0}px).`);
         const menu = page.getByRole('menu', { name: 'File actions' });
         const activationMs = await performTouchLongPress(page, trigger, menu, { activationBudgetMs: 1000 });
-        assert.equal(await page.getByRole('menuitem').count(), 3, 'Long-press ContextMenu exposed the wrong command count.');
+        assert.equal(await menu.getByRole('menuitem').count(), 3, 'Long-press ContextMenu exposed the wrong command count.');
         const axe = await runAxe(page, 'Touch ContextMenu');
         diagnostics.assertClean('touch long-press journey');
         return { axe, targetHeight: size.height, documentationViewportHeight, commands: 3, activationMs };
@@ -1781,4 +1872,120 @@ export const browserScenarios = [
       return { cases: observations };
     },
   ),
+
+  scenario(
+    'button-action-contract-certification',
+    ['actions', 'button', 'native-form', 'loading', 'disabled', 'pointer', 'touch', 'keyboard', 'cancellation', 'rtl', 'a11y'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 900, height: 760 }, hasTouch: true });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const workbench = await gotoCatalog(page, baseUrl, { entry: 'Button', tab: 'examples', example: 'contract', dir: 'rtl', pointer: 'coarse' });
+        const primary = workbench.getByRole('button', { name: 'Primary', exact: true });
+        const submit = workbench.getByRole('button', { name: 'Submit form', exact: true });
+        const loading = workbench.getByRole('button', { name: 'Saving changes', exact: true });
+        const disabled = workbench.getByRole('button', { name: 'Disabled', exact: true });
+        const destructive = workbench.getByRole('button', { name: 'Delete', exact: true });
+        await primary.waitFor({ state: 'visible' });
+        assert.equal(await loading.isDisabled(), true, 'Loading Button did not suppress native activation.');
+        assert.equal(await loading.getAttribute('aria-busy'), 'true', 'Loading Button did not expose aria-busy.');
+        assert.equal(await disabled.isDisabled(), true, 'Disabled Button lost native disabled semantics.');
+        assert.ok((await destructive.getAttribute('class'))?.includes('ui-button--intent-destructive'), 'Destructive intent did not project independently from emphasis.');
+        assert.equal(await submit.getAttribute('type'), 'submit', 'Explicit Button submit type was not preserved.');
+        await submit.focus();
+        await page.keyboard.press('Enter');
+        assert.equal(await workbench.locator('[data-action-submit-count]').getAttribute('data-action-submit-count'), '1', 'Keyboard activation did not preserve native form submission.');
+        const beforeCancel = await workbench.locator('[data-action-primary-count]').getAttribute('data-action-primary-count');
+        await performPointerCancel(page, primary);
+        assert.equal(await workbench.locator('[data-action-primary-count]').getAttribute('data-action-primary-count'), beforeCancel, 'Pointer cancellation still activated Button.');
+        const box = await primary.boundingBox();
+        assert.ok(box, 'Primary Button has no touch geometry.');
+        await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
+        assert.equal(await workbench.locator('[data-action-primary-count]').getAttribute('data-action-primary-count'), String(Number(beforeCancel) + 1), 'Touch activation diverged from Button native action behavior.');
+        assert.equal(await primary.evaluate((element) => getComputedStyle(element).direction), 'rtl', 'Button did not inherit RTL action flow.');
+        const axe = await runAxe(page, 'Button action contract');
+        diagnostics.assertClean('Button action contract');
+        return { submit: 'native', cancellation: 'preserved', touch: 'equivalent', axe };
+      } finally { await context.close(); }
+    },
+    { accepts: ['Button'] },
+  ),
+
+  scenario(
+    'icon-button-action-contract-certification',
+    ['actions', 'icon-button', 'label', 'tooltip', 'target-size', 'toggle', 'rtl', 'coarse-pointer', 'a11y'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 760, height: 680 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const workbench = await gotoCatalog(page, baseUrl, { entry: 'IconButton', tab: 'examples', example: 'contract', dir: 'rtl', pointer: 'coarse' });
+        const search = workbench.getByRole('button', { name: 'Search', exact: true });
+        const pinned = workbench.getByRole('button', { name: 'Pinned', exact: true });
+        const next = workbench.getByRole('button', { name: 'Next', exact: true });
+        await search.waitFor({ state: 'visible' });
+        const descriptionId = await search.getAttribute('aria-describedby');
+        assert.ok(descriptionId, 'IconButton tooltip was not linked through aria-describedby.');
+        assert.equal(await page.locator(`#${descriptionId}`).getAttribute('role'), 'tooltip', 'IconButton tooltip relationship does not target tooltip semantics.');
+        const searchBox = await search.boundingBox();
+        assert.ok(searchBox && searchBox.width >= 44 && searchBox.height >= 44, `Coarse-pointer IconButton target collapsed (${searchBox?.width}x${searchBox?.height}).`);
+        assert.equal(await pinned.getAttribute('aria-pressed'), 'true', 'IconButton toggle did not expose initial pressed state.');
+        await pinned.click();
+        assert.equal(await pinned.getAttribute('aria-pressed'), 'false', 'IconButton toggle did not update pressed state.');
+        const iconTransform = await next.locator('svg').evaluate((element) => getComputedStyle(element).transform);
+        assert.notEqual(iconTransform, 'none', 'Directional IconButton glyph did not mirror from local RTL direction.');
+        const axe = await runAxe(page, 'IconButton action contract');
+        diagnostics.assertClean('IconButton action contract');
+        return { target: searchBox, tooltip: descriptionId, rtlTransform: iconTransform, axe };
+      } finally { await context.close(); }
+    },
+    { accepts: ['IconButton'] },
+  ),
+
+  scenario(
+    'action-group-toolbar-certification',
+    ['actions', 'group', 'semantics', 'no-hidden-actions', 'responsive', 'toolbar', 'roving', 'keyboard', 'rtl', 'home-end', 'overflow', 'target-size', 'a11y'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 820, height: 720 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        let workbench = await gotoCatalog(page, baseUrl, { entry: 'ActionGroup', tab: 'examples', example: 'contract', viewport: 'phone', container: 'compact' });
+        const group = workbench.getByRole('group', { name: 'Document actions' });
+        await group.waitFor({ state: 'visible' });
+        const groupButtons = group.getByRole('button');
+        assert.equal(await groupButtons.count(), 3, 'ActionGroup silently hid or moved commands in a compact container.');
+        for (const label of ['Save', 'Duplicate', 'Delete']) assert.equal(await group.getByRole('button', { name: label, exact: true }).isVisible(), true, `ActionGroup hid ${label}.`);
+
+        workbench = await gotoCatalog(page, baseUrl, { entry: 'Toolbar', tab: 'examples', example: 'contract', dir: 'ltr', pointer: 'coarse' });
+        const toolbar = workbench.getByRole('toolbar', { name: 'Editor commands' });
+        const undo = toolbar.getByRole('button', { name: 'Undo', exact: true });
+        const redo = toolbar.getByRole('button', { name: 'Redo', exact: true });
+        const save = toolbar.getByRole('button', { name: 'Save', exact: true });
+        const more = toolbar.getByRole('button', { name: 'More commands', exact: true });
+        await undo.focus();
+        await page.keyboard.press('ArrowRight');
+        assert.equal(await redo.evaluate((element) => element.ownerDocument.activeElement === element), true, 'Toolbar ArrowRight did not move logical roving focus.');
+        await page.keyboard.press('End');
+        assert.equal(await more.evaluate((element) => element.ownerDocument.activeElement === element), true, 'Toolbar End did not reach caller-owned overflow action.');
+        await page.keyboard.press('Home');
+        assert.equal(await undo.evaluate((element) => element.ownerDocument.activeElement === element), true, 'Toolbar Home did not restore the first enabled command.');
+        for (const target of [undo, redo, save, more]) await assertMinimumBlockSize(target, 44, 'Toolbar coarse-pointer action');
+
+        workbench = await gotoCatalog(page, baseUrl, { entry: 'Toolbar', tab: 'examples', example: 'contract', dir: 'rtl' });
+        const rtlToolbar = workbench.getByRole('toolbar', { name: 'Editor commands' });
+        const rtlUndo = rtlToolbar.getByRole('button', { name: 'Undo', exact: true });
+        const rtlMore = rtlToolbar.getByRole('button', { name: 'More commands', exact: true });
+        await rtlUndo.focus();
+        await page.keyboard.press('ArrowRight');
+        assert.equal(await rtlMore.evaluate((element) => element.ownerDocument.activeElement === element), true, 'RTL Toolbar ArrowRight did not follow logical reverse traversal with looping.');
+        const axe = await runAxe(page, 'ActionGroup/Toolbar action contract');
+        diagnostics.assertClean('ActionGroup/Toolbar action contract');
+        return { groupCount: 3, roving: 'logical', overflow: 'reachable', axe };
+      } finally { await context.close(); }
+    },
+    { accepts: ['ActionGroup', 'Toolbar'] },
+  ),
+
 ];

@@ -1,3 +1,29 @@
+# Changelog
+
+- Re-audited the entire G6 suite for stacked-Studio fixture ownership: every deep-linked example journey now consumes the canonical `#example-<id>` scope, legacy layout/visual queries and DOM polling are scoped, and a new G0 gate prevents this class of duplicate-preview drift from returning.
+## UIR06 v6 — stacked Studio post-isolation browser evidence repair
+
+- Repaired the cross-root overlay authority G6 journey so modal isolation is measured from stable UiRoot DOM identities after the trigger becomes intentionally inert/absent from the accessibility tree.
+- Added explicit example-readiness checks and a G0 regression invariant preventing accessibility-role locators from being re-resolved for post-isolation DOM evidence.
+
+## Unreleased — UIR06 closeout follow-up: stacked Studio + Canvas OX renderer
+
+- Browser-fixture scoping follow-up: stacked Studio deliberately keeps overview, examples, state samples and playground mounted together, so `gotoCatalog(..., example)` now returns the exact canonical `#example-<id>` fixture for component-behavior journeys instead of the whole workbench. Dialog/Popover/UiRoot/ContextMenu triggers are scoped likewise, and the legacy pointer-cancellation journey now uses the accepted Button contract rather than the removed Favorite ToggleButton preview.
+- Accessibility follow-up: the horizontally scrollable generated API table is now a named keyboard-focusable region with tokenized focus-visible treatment; G4 and browser Studio evidence reject regressions back to an inaccessible overflow container.
+- Fixed the final legacy SystemKeyboard Button variant consumer (`filled/soft/ghost` → `primary/secondary/quiet`) and strengthened the G0 Actions gate to scan all UI/Studio TSX consumers so legacy action vocabulary cannot hide outside Button itself.
+- Rebuilt the generated Studio detail view as one stacked Overview → API → Examples → Playground reading flow. Historical `tab` routes remain deterministic section/deep-link keys, but Studio chrome no longer renders Tabs/TabPanel; headings, supporting copy, labels and code use the public OntologyX typography primitives.
+- Moved the browser roving-focus journey from Studio chrome to the real public Tabs example and made the Studio route journey certify that all four documentation sections remain mounted/visible with zero tablists.
+- Added `Spinner renderer="svg|canvas"`: SVG remains the lightweight default and Button loading stays SVG, while the optional Canvas backend is lazy-loaded, realm-local, ResizeObserver physical-box sized and scheduled exclusively through the owning UiRoot MotionClock. The canonical Spinner example toggles one renderer at a time and G6 verifies Canvas motion/backing-store behavior without duplicating the mark.
+
+## Unreleased — UIR06 Actions and command controls
+
+- Reaccepted Button, IconButton, ActionGroup and Toolbar with dedicated examples, behavior ownership and browser certification; catalog maturity advances to accepted=21/candidate=79 while ToggleButton remains candidate for UIR08.
+- Replaced legacy ghost/soft/filled + danger Button vocabulary with quiet/secondary/primary emphasis and independent neutral/destructive intent; migrated internal consumers to the canonical action language.
+- Button now documents/owns explicit native type, form, loading/disabled press cancellation, logical decorative slots and accessible pending-name behavior.
+- IconButton now requires its accessible label, links supplemental tooltip text through aria-describedby, preserves optional toggle state and inherits Button target/loading semantics.
+- ActionGroup no longer hides actions through container collapse. Toolbar owns orientation-aware roving focus, Home/End, logical RTL arrows and a pinned caller-owned overflow slot without inventing overflow policy.
+- Added G0 action drift protection plus dedicated G6 action journeys.
+
 ## Unreleased — UIR05 runtime authority closeout
 
 - UIR05-B/C browser follow-up: separated cross-root coexistence/visual-stacking evidence from outside-pointer dismissal semantics. The dedicated authority fixture now keeps both root-local modals open with `dismissOnOutsidePress={false}`, while runtime tests continue to prove document-top-most outside-pointer arbitration; G6 first proves modal A survives opening B before comparing independent portal hosts and Escape order.
@@ -7,8 +33,6 @@
 - Rebuilt MotionClock around an injected Window frame host; RAF, delayed cleanup timers, PerformanceObserver instrumentation and spring computed-style reads no longer borrow ambient globals from another realm. SharedBounds expiry is owned and cancelled by the root motion clock.
 - Added adversarial overlay broker tests across independent UiRoots and iframe Documents plus motion tests for realm-host scheduling, runtime replacement, delayed timer disposal and owner-realm spring token reads.
 - Added dedicated Studio/G6 authority fixtures proving cross-root portal isolation + Escape order and nested motion runtimes + interruption/reduced-motion convergence. Runtime kernel certification is now closed while visual catalog maturity remains accepted=17/candidate=83.
-
-# Changelog
 
 ## OX loading presentation follow-up
 
