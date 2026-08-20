@@ -10,7 +10,10 @@ import type {
 import { forwardRef, useCallback, useEffect, useId, useImperativeHandle, useRef } from 'react';
 import { observeElementSize, resolveUiDirection, useUiEnvironment } from '../foundations';
 import { useGestureArena } from '../gestures/runtime';
-import { releasePointerCaptureIfSupported, setPointerCaptureIfSupported } from '../gestures/pointerCapture';
+import {
+  releasePointerCaptureIfSupported,
+  setPointerCaptureIfSupported,
+} from '../gestures/pointerCapture';
 import { readSpringSpec, SpringValue, useMotionRuntime, useReducedMotion } from '../motion';
 import {
   applyEdgeResistance,
@@ -26,7 +29,12 @@ import {
   type ScrollIndicatorMode,
   type ScrollSnapMode,
 } from './physics';
-import { alignedSnapOffset, logicalInlineStart, readLogicalHorizontalScroll, writeLogicalHorizontalScroll } from './logicalPosition';
+import {
+  alignedSnapOffset,
+  logicalInlineStart,
+  readLogicalHorizontalScroll,
+  writeLogicalHorizontalScroll,
+} from './logicalPosition';
 
 export type ScrollViewHandle = {
   element: HTMLElement | null;
@@ -358,11 +366,12 @@ const ScrollViewImpl = forwardRef(function ScrollView(
 
     const resolvedDirection = resolveUiDirection(direction, viewport);
     const viewportExtent = readViewportExtent(viewport);
-    const snapItems = [...content.querySelectorAll<HTMLElement>('[data-oxs-scroll-snap-item="true"]')];
+    const snapItems = [
+      ...content.querySelectorAll<HTMLElement>('[data-oxs-scroll-snap-item="true"]'),
+    ];
     const offsets = snapItems.map((item) => {
-      const itemStart = axis === 'vertical'
-        ? item.offsetTop
-        : logicalInlineStart(item, content, resolvedDirection);
+      const itemStart =
+        axis === 'vertical' ? item.offsetTop : logicalInlineStart(item, content, resolvedDirection);
       const itemExtent = axis === 'vertical' ? item.offsetHeight : item.offsetWidth;
       const rawAlign = item.dataset.snapAlign;
       const align = rawAlign === 'center' || rawAlign === 'end' ? rawAlign : 'start';
@@ -552,11 +561,12 @@ const ScrollViewImpl = forwardRef(function ScrollView(
 
     const onWheelEvent = (event: WheelEvent) => {
       const resolvedDirection = resolveUiDirection(direction, viewport);
-      const rawDelta = axis === 'vertical'
-        ? event.deltaY
-        : resolvedDirection === 'rtl'
-          ? -event.deltaX
-          : event.deltaX;
+      const rawDelta =
+        axis === 'vertical'
+          ? event.deltaY
+          : resolvedDirection === 'rtl'
+            ? -event.deltaX
+            : event.deltaX;
       if (rawDelta === 0) {
         return;
       }
@@ -589,7 +599,18 @@ const ScrollViewImpl = forwardRef(function ScrollView(
 
     viewport.addEventListener('wheel', onWheelEvent, { passive: false });
     return () => viewport.removeEventListener('wheel', onWheelEvent);
-  }, [applyChainedDelta, axis, canConsumeChainedDelta, clearSnapTimer, direction, readMax, readPosition, readViewportExtent, scheduleSnap, stopMomentum]);
+  }, [
+    applyChainedDelta,
+    axis,
+    canConsumeChainedDelta,
+    clearSnapTimer,
+    direction,
+    readMax,
+    readPosition,
+    readViewportExtent,
+    scheduleSnap,
+    stopMomentum,
+  ]);
 
   useEffect(() => {
     const viewport = viewportRef.current;
@@ -770,7 +791,8 @@ const ScrollViewImpl = forwardRef(function ScrollView(
 
     if (session.moved) {
       suppressNextClickRef.current = true;
-      if (suppressClickTimerRef.current !== null) window.clearTimeout(suppressClickTimerRef.current);
+      if (suppressClickTimerRef.current !== null)
+        window.clearTimeout(suppressClickTimerRef.current);
       suppressClickTimerRef.current = window.setTimeout(() => {
         suppressNextClickRef.current = false;
         suppressClickTimerRef.current = null;
@@ -920,7 +942,6 @@ function findParentScrollViewport(viewport: HTMLElement) {
   return parentRoot?.querySelector<HTMLElement>(':scope > .ui-scroll-view__viewport') ?? null;
 }
 
-
 function hasNativeScrollableAncestor(viewport: HTMLElement, axis: ScrollAxis) {
   let element = viewport.parentElement;
   while (element) {
@@ -930,7 +951,8 @@ function hasNativeScrollableAncestor(viewport: HTMLElement, axis: ScrollAxis) {
     }
     const style = window.getComputedStyle(element);
     const overflow = axis === 'vertical' ? style.overflowY : style.overflowX;
-    const scrollable = /(auto|scroll|overlay)/.test(overflow) &&
+    const scrollable =
+      /(auto|scroll|overlay)/.test(overflow) &&
       (axis === 'vertical'
         ? element.scrollHeight > element.clientHeight
         : element.scrollWidth > element.clientWidth);

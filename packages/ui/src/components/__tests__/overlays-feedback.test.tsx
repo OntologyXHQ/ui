@@ -7,15 +7,24 @@ import { UiRoot } from '../../adaptive';
 import { GestureArena } from '../../gestures/arena';
 import {
   AlertDialog,
+  Badge,
   Banner,
+  BottomSheet,
+  Button,
   ContextMenu,
   Dialog,
+  EmptyState,
   Menu,
   MenuItem,
   Popover,
+  Progress,
+  Scrim,
+  Sheet,
+  Skeleton,
+  Spinner,
+  StatusIndicator,
   ToastHost,
   Tooltip,
-  Button,
   useToastQueue,
 } from '../index';
 
@@ -34,7 +43,9 @@ describe('overlay and transient feedback components', () => {
       const [open, setOpen] = useState(false);
       return (
         <>
-          <button type="button" onClick={() => setOpen(true)}>Open</button>
+          <button type="button" onClick={() => setOpen(true)}>
+            Open
+          </button>
           <Dialog open={open} onOpenChange={setOpen} title="Preferences">
             <button type="button">Inside</button>
           </Dialog>
@@ -67,7 +78,6 @@ describe('overlay and transient feedback components', () => {
     expect(outside.closest('.ui-drag-drop-runtime')).toHaveAttribute('inert');
   });
 
-
   it('moves focus into a modal Popover before isolating its focused background', async () => {
     const user = userEvent.setup();
     function Harness() {
@@ -75,7 +85,9 @@ describe('overlay and transient feedback components', () => {
       const [open, setOpen] = useState(false);
       return (
         <>
-          <Button ref={anchorRef} onClick={() => setOpen(true)}>Open modal popover</Button>
+          <Button ref={anchorRef} onClick={() => setOpen(true)}>
+            Open modal popover
+          </Button>
           <Popover
             open={open}
             onOpenChange={setOpen}
@@ -114,8 +126,12 @@ describe('overlay and transient feedback components', () => {
             Lower content
           </Dialog>
           <Dialog open={upperOpen} onOpenChange={setUpperOpen} title="Upper modal">
-            <button type="button" onClick={() => setLowerOpen(false)}>Close lower</button>
-            <button type="button" onClick={() => setUpperOpen(false)}>Close upper</button>
+            <button type="button" onClick={() => setLowerOpen(false)}>
+              Close lower
+            </button>
+            <button type="button" onClick={() => setUpperOpen(false)}>
+              Close upper
+            </button>
           </Dialog>
         </>
       );
@@ -123,7 +139,9 @@ describe('overlay and transient feedback components', () => {
 
     const { container } = wrap(<Harness />);
     const root = container.querySelector<HTMLElement>('.ui-root');
-    const backgroundRuntime = screen.getByText('Background', { selector: 'button' }).closest<HTMLElement>('.ui-drag-drop-runtime');
+    const backgroundRuntime = screen
+      .getByText('Background', { selector: 'button' })
+      .closest<HTMLElement>('.ui-drag-drop-runtime');
     expect(root?.style.overflow).toBe('hidden');
     expect(backgroundRuntime).toHaveAttribute('inert');
 
@@ -141,13 +159,21 @@ describe('overlay and transient feedback components', () => {
   it('arbitrates Escape across independent UiRoots without sharing modal state', () => {
     function RootDialog({ name }: { name: string }) {
       const [open, setOpen] = useState(true);
-      return <Dialog open={open} onOpenChange={setOpen} title={name}>Content</Dialog>;
+      return (
+        <Dialog open={open} onOpenChange={setOpen} title={name}>
+          Content
+        </Dialog>
+      );
     }
 
     render(
       <>
-        <UiRoot><RootDialog name="First root dialog" /></UiRoot>
-        <UiRoot><RootDialog name="Second root dialog" /></UiRoot>
+        <UiRoot>
+          <RootDialog name="First root dialog" />
+        </UiRoot>
+        <UiRoot>
+          <RootDialog name="Second root dialog" />
+        </UiRoot>
       </>,
     );
 
@@ -162,7 +188,9 @@ describe('overlay and transient feedback components', () => {
   it('owns outside pointer dismissal once instead of double-firing through the scrim', () => {
     const onOpenChange = vi.fn();
     const { container } = wrap(
-      <Dialog open onOpenChange={onOpenChange} title="Single dismiss">Content</Dialog>,
+      <Dialog open onOpenChange={onOpenChange} title="Single dismiss">
+        Content
+      </Dialog>,
     );
     const scrim = container.querySelector<HTMLElement>('.ui-scrim');
     expect(scrim).not.toBeNull();
@@ -233,7 +261,9 @@ describe('overlay and transient feedback components', () => {
       const anchor = useRef<HTMLButtonElement>(null);
       return (
         <>
-          <button ref={anchor} type="button">Anchor</button>
+          <button ref={anchor} type="button">
+            Anchor
+          </button>
           <Menu open onOpenChange={() => {}} anchorRef={anchor} ariaLabel="Commands">
             <MenuItem>Alpha</MenuItem>
             <MenuItem>Beta</MenuItem>
@@ -248,7 +278,6 @@ describe('overlay and transient feedback components', () => {
     expect(screen.getByRole('menuitem', { name: 'Beta' })).toHaveFocus();
   });
 
-
   it('routes native MenuItem activation through Menu-owned close and focus restoration', async () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
@@ -257,7 +286,9 @@ describe('overlay and transient feedback components', () => {
       const [open, setOpen] = useState(false);
       return (
         <>
-          <button ref={anchor} type="button" onClick={() => setOpen(true)}>Open commands</button>
+          <button ref={anchor} type="button" onClick={() => setOpen(true)}>
+            Open commands
+          </button>
           <Menu open={open} onOpenChange={setOpen} anchorRef={anchor} ariaLabel="Owned commands">
             <MenuItem>Alpha</MenuItem>
             <MenuItem onSelect={onSelect}>Duplicate</MenuItem>
@@ -306,7 +337,9 @@ describe('overlay and transient feedback components', () => {
       const [open, setOpen] = useState(false);
       return (
         <>
-          <button ref={anchor} type="button" onClick={() => setOpen(true)}>Actions</button>
+          <button ref={anchor} type="button" onClick={() => setOpen(true)}>
+            Actions
+          </button>
           <Menu open={open} onOpenChange={setOpen} anchorRef={anchor} ariaLabel="Actions">
             <MenuItem>First</MenuItem>
             <MenuItem>Second</MenuItem>
@@ -339,11 +372,14 @@ describe('overlay and transient feedback components', () => {
     const item = { id: 'one', message: 'Saved', durationMs: 1000 } as const;
     const { rerender } = wrap(<ToastHost items={[item]} onDismiss={dismiss} />);
     act(() => vi.advanceTimersByTime(600));
-    rerender(<UiRoot><ToastHost items={[item]} onDismiss={dismiss} /></UiRoot>);
+    rerender(
+      <UiRoot>
+        <ToastHost items={[item]} onDismiss={dismiss} />
+      </UiRoot>,
+    );
     act(() => vi.advanceTimersByTime(450));
     expect(dismiss).toHaveBeenCalledWith('one');
   });
-
 
   it('upserts duplicate explicit toast ids instead of creating duplicate keys or dismiss groups', async () => {
     const user = userEvent.setup();
@@ -376,7 +412,9 @@ describe('overlay and transient feedback components', () => {
       const queue = useToastQueue();
       return (
         <>
-          <button type="button" onClick={() => queue.push({ message: 'Saved', durationMs: null })}>Notify</button>
+          <button type="button" onClick={() => queue.push({ message: 'Saved', durationMs: null })}>
+            Notify
+          </button>
           <Banner message="Connected" />
           <ToastHost items={queue.toasts} onDismiss={queue.dismiss} />
         </>
@@ -395,13 +433,21 @@ describe('overlay and transient feedback components', () => {
       const [upperOpen, setUpperOpen] = useState(false);
       return (
         <>
-          <button type="button" onClick={() => setLowerOpen(true)}>Open lower</button>
+          <button type="button" onClick={() => setLowerOpen(true)}>
+            Open lower
+          </button>
           <Dialog open={lowerOpen} onOpenChange={setLowerOpen} title="Lower focus modal">
-            <button type="button" onClick={() => setUpperOpen(true)}>Open upper</button>
+            <button type="button" onClick={() => setUpperOpen(true)}>
+              Open upper
+            </button>
           </Dialog>
           <Dialog open={upperOpen} onOpenChange={setUpperOpen} title="Upper focus modal">
-            <button type="button" onClick={() => setLowerOpen(false)}>Remove lower</button>
-            <button type="button" onClick={() => setUpperOpen(false)}>Close upper</button>
+            <button type="button" onClick={() => setLowerOpen(false)}>
+              Remove lower
+            </button>
+            <button type="button" onClick={() => setUpperOpen(false)}>
+              Close upper
+            </button>
           </Dialog>
         </>
       );
@@ -424,7 +470,9 @@ describe('overlay and transient feedback components', () => {
       return (
         <>
           <button type="button">Before</button>
-          <button ref={anchor} type="button" onClick={() => setOpen(true)}>Menu trigger</button>
+          <button ref={anchor} type="button" onClick={() => setOpen(true)}>
+            Menu trigger
+          </button>
           <button type="button">After</button>
           <Menu open={open} onOpenChange={setOpen} anchorRef={anchor} ariaLabel="Tab menu">
             <MenuItem>Command</MenuItem>
@@ -440,4 +488,63 @@ describe('overlay and transient feedback components', () => {
     expect(screen.getByRole('button', { name: 'After' })).toHaveFocus();
   });
 
+  it('keeps Sheet and BottomSheet on the shared dialog lifecycle', () => {
+    const { rerender } = wrap(
+      <Sheet open onOpenChange={() => undefined} ariaLabel="Settings sheet">
+        Sheet content
+      </Sheet>,
+    );
+    expect(screen.getByRole('dialog', { name: 'Settings sheet' })).toBeInTheDocument();
+    rerender(
+      <UiRoot>
+        <BottomSheet open onOpenChange={() => undefined} ariaLabel="Mobile actions">
+          Bottom sheet content
+        </BottomSheet>
+      </UiRoot>,
+    );
+    expect(screen.getByRole('dialog', { name: 'Mobile actions' })).toBeInTheDocument();
+  });
+
+  it('keeps Scrim dismissal caller-owned and removes it from focus order', async () => {
+    const dismiss = vi.fn();
+    const user = userEvent.setup();
+    render(<Scrim active onDismiss={dismiss} dismissLabel="Dismiss preview" />);
+    const scrim = screen.getByRole('button', { name: 'Dismiss preview' });
+    expect(scrim).toHaveAttribute('tabindex', '-1');
+    await user.click(scrim);
+    expect(dismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('exposes semantic native and reduced-motion-safe feedback primitives', () => {
+    render(
+      <UiRoot motion="reduced">
+        <Badge>3</Badge>
+        <StatusIndicator label="Connected" announce />
+        <Progress label="Upload" value={25} max={50} showValue />
+        <Spinner label="Loading workspace" announce />
+        <Skeleton data-testid="skeleton" />
+        <EmptyState title="No results" description="Try another query." />
+      </UiRoot>,
+    );
+    expect(screen.getByText('3')).toBeInTheDocument();
+    expect(screen.getByText('Connected')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar', { name: 'Upload' })).toHaveAttribute('value', '25');
+    expect(screen.getByRole('status', { name: 'Loading workspace' })).toBeInTheDocument();
+    expect(screen.getByTestId('skeleton')).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByRole('heading', { name: 'No results' })).toBeInTheDocument();
+  });
+
+  it('uses one labelled live region and stable ids for controlled toasts', () => {
+    render(
+      <ToastHost
+        label="Workspace notifications"
+        items={[{ id: 'sync-1', message: 'Synced', durationMs: null }]}
+        onDismiss={() => undefined}
+      />,
+    );
+    const host = screen.getByRole('region', { name: 'Workspace notifications' });
+    expect(host).toHaveAttribute('aria-live', 'polite');
+    expect(host).toHaveAttribute('aria-relevant', 'additions text');
+    expect(host.querySelector('[data-toast-id="sync-1"]')).not.toBeNull();
+  });
 });

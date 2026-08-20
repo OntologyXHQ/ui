@@ -23,10 +23,22 @@ describe('System layout library', () => {
       <UiRoot>
         <div style={{ position: 'relative', width: 900, height: 600 }}>
           <DesktopShellLayout
-            workspace={<SystemWorkspace><div>Native scene</div></SystemWorkspace>}
+            workspace={
+              <SystemWorkspace>
+                <div>Native scene</div>
+              </SystemWorkspace>
+            }
             topBar={<SystemBar label="Top bar" leading={<span>Status</span>} />}
-            dock={<SystemDock><Button>Launcher</Button></SystemDock>}
-            panel={<SystemPanel title="Side panel"><span>Panel content</span></SystemPanel>}
+            dock={
+              <SystemDock>
+                <Button>Launcher</Button>
+              </SystemDock>
+            }
+            panel={
+              <SystemPanel title="Side panel">
+                <span>Panel content</span>
+              </SystemPanel>
+            }
           />
         </div>
       </UiRoot>,
@@ -75,7 +87,10 @@ describe('System layout library', () => {
       <UiRoot>
         <SystemSettingsLayout
           title="Settings"
-          sections={[{ value: 'display', label: 'Display' }, { value: 'input', label: 'Input' }]}
+          sections={[
+            { value: 'display', label: 'Display' },
+            { value: 'input', label: 'Input' },
+          ]}
           value="display"
           onValueChange={onValueChange}
         >
@@ -92,7 +107,9 @@ describe('System layout library', () => {
     render(
       <UiRoot>
         <SystemNotificationCenter
-          items={[{ id: '1', title: 'Update ready', body: 'Restart when convenient', unread: true }]}
+          items={[
+            { id: '1', title: 'Update ready', body: 'Restart when convenient', unread: true },
+          ]}
         />
         <SystemQuickSettings
           sections={[
@@ -115,7 +132,15 @@ describe('System layout library', () => {
           <SystemOsd label="Volume" value={64} />
           <SystemLockLayout primary="12:42" authentication={<Button>Unlock</Button>} />
           <SystemKeyboardHost
-            state={{ surfaceId: 'test-keyboard', sessionId: 'session-1', visible: true, language: 'en', layout: 'letters', contentPurpose: 'text', secure: false }}
+            state={{
+              surfaceId: 'test-keyboard',
+              sessionId: 'session-1',
+              visible: true,
+              language: 'en',
+              layout: 'letters',
+              contentPurpose: 'text',
+              secure: false,
+            }}
             onCommand={() => undefined}
           />
         </div>
@@ -123,12 +148,12 @@ describe('System layout library', () => {
     );
     expect(screen.getByRole('progressbar', { name: 'Volume' })).toHaveAttribute('value', '64');
     expect(screen.getByRole('region', { name: 'Lock screen' })).toBeInTheDocument();
-    expect(screen.getByRole('group', { name: 'System touch keyboard' }).closest('[data-oxs-system-surface]')).toHaveAttribute(
-      'data-oxs-system-surface',
-      'privileged',
-    );
+    expect(
+      screen
+        .getByRole('group', { name: 'System touch keyboard' })
+        .closest('[data-oxs-system-surface]'),
+    ).toHaveAttribute('data-oxs-system-surface', 'privileged');
   });
-
 
   it('filters command results and transfers Arrow focus from search into the command list', () => {
     render(
@@ -188,7 +213,9 @@ describe('System layout library', () => {
       </UiRoot>,
     );
     expect(screen.getByRole('main', { name: 'Preference details' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Preference details', { selector: '.ui-scroll-view__viewport' })).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('Preference details', { selector: '.ui-scroll-view__viewport' }),
+    ).toBeInTheDocument();
   });
 
   it('renders a command surface with shared dialog/search/list semantics', () => {

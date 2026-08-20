@@ -18,12 +18,11 @@ export type ScrollSnapItemProps = ScrollRuntimeSnapItemProps;
  * Public Component-layer facade over the shared scroll runtime. Runtime physics,
  * gesture arbitration and nested-scroll ownership stay in the scroll service.
  */
-export const ScrollView = forwardRef<ScrollViewHandle, ScrollViewProps>(function ScrollView(
-  props,
-  ref,
-) {
-  return <ScrollRuntimeView {...props} ref={ref} />;
-});
+export const ScrollView = forwardRef<ScrollViewHandle, ScrollViewProps>(
+  function ScrollView(props, ref) {
+    return <ScrollRuntimeView {...props} ref={ref} />;
+  },
+);
 
 export function ScrollSnapItem(props: ScrollSnapItemProps) {
   return <ScrollRuntimeSnapItem {...props} />;

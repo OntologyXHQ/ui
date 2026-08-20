@@ -5,14 +5,21 @@ export function readCatalogRoute() {
   const tab = params.get('tab');
   return {
     entry: params.get('entry'),
-    tab: (tab === 'api' || tab === 'examples' || tab === 'playground' ? tab : 'overview') as CatalogTab,
+    tab: (tab === 'api' || tab === 'examples' || tab === 'playground'
+      ? tab
+      : 'overview') as CatalogTab,
     example: params.get('example'),
     state: params.get('state'),
   };
 }
 
 export function updateCatalogRoute(
-  patch: Partial<{ entry: string | null; tab: CatalogTab | null; example: string | null; state: string | null }>,
+  patch: Partial<{
+    entry: string | null;
+    tab: CatalogTab | null;
+    example: string | null;
+    state: string | null;
+  }>,
   mode: 'push' | 'replace' = 'push',
 ) {
   const url = new URL(window.location.href);

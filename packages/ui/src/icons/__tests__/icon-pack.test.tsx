@@ -10,17 +10,14 @@ import {
   VolumeStateGlyph,
 } from '../animated';
 import * as StaticIcons from '../static';
-import {
-  ChevronStartGlyph,
-  HomeGlyph,
-  OxMarkGlyph,
-  STATIC_ICON_PACK_COUNT,
-} from '../static';
+import { ChevronStartGlyph, HomeGlyph, OxMarkGlyph, STATIC_ICON_PACK_COUNT } from '../static';
 
 describe('optional OntologyX icon pack', () => {
   it('keeps the declared static and animated breadth machine-checkable', () => {
     const staticGlyphExports = Object.keys(StaticIcons).filter((name) => name.endsWith('Glyph'));
-    const animatedGlyphExports = Object.keys(AnimatedIcons).filter((name) => name.endsWith('Glyph'));
+    const animatedGlyphExports = Object.keys(AnimatedIcons).filter((name) =>
+      name.endsWith('Glyph'),
+    );
 
     expect(staticGlyphExports).toHaveLength(STATIC_ICON_PACK_COUNT);
     expect(animatedGlyphExports).toHaveLength(ANIMATED_ICON_FAMILY_COUNT);
@@ -39,11 +36,25 @@ describe('optional OntologyX icon pack', () => {
       </UiRoot>,
     );
 
-    expect(screen.getByRole('img', { name: 'Home pack glyph' })).toHaveAttribute('data-oxs-icon-state', 'default');
-    expect(screen.getByRole('img', { name: 'OntologyX mark glyph' })).toHaveAttribute('data-oxs-icon-state', 'default');
-    expect(screen.getByRole('img', { name: 'Directional pack glyph' })).toHaveClass('ui-icon--mirror-rtl');
-    expect(screen.getByRole('img', { name: 'Playback pack glyph' })).toHaveAttribute('data-oxs-icon-state', 'pause');
-    expect(screen.getByRole('img', { name: 'Activity pack glyph' })).toHaveAttribute('data-oxs-icon-state', 'active');
+    expect(screen.getByRole('img', { name: 'Home pack glyph' })).toHaveAttribute(
+      'data-oxs-icon-state',
+      'default',
+    );
+    expect(screen.getByRole('img', { name: 'OntologyX mark glyph' })).toHaveAttribute(
+      'data-oxs-icon-state',
+      'default',
+    );
+    expect(screen.getByRole('img', { name: 'Directional pack glyph' })).toHaveClass(
+      'ui-icon--mirror-rtl',
+    );
+    expect(screen.getByRole('img', { name: 'Playback pack glyph' })).toHaveAttribute(
+      'data-oxs-icon-state',
+      'pause',
+    );
+    expect(screen.getByRole('img', { name: 'Activity pack glyph' })).toHaveAttribute(
+      'data-oxs-icon-state',
+      'active',
+    );
   });
 
   it('preserves state-family typing at the optional subpath boundary', () => {

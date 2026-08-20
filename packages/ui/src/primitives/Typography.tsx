@@ -153,7 +153,11 @@ export function Label({
     .filter(Boolean)
     .join(' ');
 
-  return <span className={classes} {...props}>{children}</span>;
+  return (
+    <span className={classes} {...props}>
+      {children}
+    </span>
+  );
 }
 
 type PolymorphicCodeProps<T extends CodeElement> = {
@@ -163,12 +167,12 @@ type PolymorphicCodeProps<T extends CodeElement> = {
   className?: string;
 } & Omit<
   ComponentPropsWithoutRef<T>,
-  keyof Pick<SharedTextProps, 'tone' | 'selectable' | 'wrap' | 'overflowWrap'> |
-    'as' |
-    'children' |
-    'className' |
-    'style' |
-    'color'
+  | keyof Pick<SharedTextProps, 'tone' | 'selectable' | 'wrap' | 'overflowWrap'>
+  | 'as'
+  | 'children'
+  | 'className'
+  | 'style'
+  | 'color'
 >;
 
 export type CodeProps<T extends CodeElement = 'code'> = PropsWithChildren<

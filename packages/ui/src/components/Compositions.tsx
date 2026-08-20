@@ -43,7 +43,7 @@ export function Card({
     <div
       {...props}
       className={`ui-card ui-card--${emphasis} ui-card--pad-${padding} ${className}`.trim()}
-      role={props.role ?? (labelled ? 'group' : undefined)}
+      role={props.role ?? 'group'}
       aria-labelledby={props['aria-labelledby'] ?? (labelled ? titleId : undefined)}
       aria-describedby={props['aria-describedby'] ?? (described ? descriptionId : undefined)}
     >
@@ -143,15 +143,14 @@ export function Disclosure({
           {description}
         </span>
       ) : null}
-      <div
+      <section
         id={contentId}
         className="ui-disclosure__content"
-        role="region"
         aria-labelledby={triggerId}
         hidden={!current}
       >
         {children}
-      </div>
+      </section>
     </div>
   );
 }
@@ -214,8 +213,8 @@ export function Accordion({
       {...props}
       ref={rootRef}
       className={`ui-accordion ${className}`.trim()}
-      role={props.role ?? (label ? 'group' : undefined)}
-      aria-label={label}
+      role={props.role ?? 'group'}
+      aria-label={props['aria-label'] ?? label}
       onKeyDown={(event) => {
         if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
           const triggers = [
@@ -223,7 +222,7 @@ export function Accordion({
               '[data-ui-accordion-trigger]:not(:disabled)',
             ) ?? []),
           ];
-          const index = triggers.findIndex((trigger) => trigger === event.target);
+          const index = triggers.indexOf(event.target as HTMLButtonElement);
           const nextIndex =
             event.key === 'Home'
               ? 0
@@ -297,15 +296,14 @@ export function Accordion({
                 {item.description}
               </span>
             ) : null}
-            <div
+            <section
               id={contentId}
               className="ui-disclosure__content"
-              role="region"
               aria-labelledby={`oxs-accordion-${accordionId}-${itemToken}-trigger`}
               hidden={!expanded}
             >
               {item.content}
-            </div>
+            </section>
           </div>
         );
       })}
@@ -354,7 +352,7 @@ export function PageScaffold({
             {children}
           </main>
         ) : (
-          <section className="ui-page-scaffold__content" role="region" aria-label={contentLabel}>
+          <section className="ui-page-scaffold__content" aria-label={contentLabel}>
             {children}
           </section>
         )}
@@ -402,7 +400,8 @@ export function TileGrid({
     const target = event.target;
     if (
       keyboardNavigation &&
-      target instanceof event.currentTarget.ownerDocument.defaultView!.HTMLElement &&
+      event.currentTarget.ownerDocument.defaultView?.HTMLElement &&
+      target instanceof event.currentTarget.ownerDocument.defaultView.HTMLElement &&
       target.matches(TILE_ACTION_SELECTOR)
     ) {
       for (const item of tileActions(gridRef.current)) item.tabIndex = item === target ? 0 : -1;
@@ -415,7 +414,7 @@ export function TileGrid({
       {...props}
       ref={gridRef}
       className={`ui-tile-grid ui-tile-grid--${density} ${className}`.trim()}
-      role={props.role ?? (label ? 'group' : undefined)}
+      role={props.role ?? 'group'}
       aria-label={props['aria-label'] ?? label}
       onFocusCapture={updateRovingTabStop}
       onKeyDown={(event) => {

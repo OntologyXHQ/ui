@@ -30,7 +30,8 @@ function readSize(element: Element): UiObservedSize {
 
 function observerFor(element: Element) {
   const realmWindow = ownerWindow(element);
-  const ResizeObserverConstructor = (realmWindow as (Window & typeof globalThis) | null)?.ResizeObserver;
+  const ResizeObserverConstructor = (realmWindow as (Window & typeof globalThis) | null)
+    ?.ResizeObserver;
   if (!realmWindow || typeof ResizeObserverConstructor !== 'function') return null;
 
   let observer = resizeObservers.get(realmWindow);

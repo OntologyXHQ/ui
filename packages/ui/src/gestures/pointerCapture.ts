@@ -14,7 +14,8 @@ export function releasePointerCaptureIfSupported(target: HTMLElement, pointerId:
   if (typeof releasePointerCapture !== 'function') return false;
   try {
     const hasPointerCapture = target.hasPointerCapture;
-    if (typeof hasPointerCapture === 'function' && !hasPointerCapture.call(target, pointerId)) return false;
+    if (typeof hasPointerCapture === 'function' && !hasPointerCapture.call(target, pointerId))
+      return false;
     releasePointerCapture.call(target, pointerId);
     return true;
   } catch {

@@ -29,7 +29,8 @@ export function SystemSettingsLayout({
   children,
   className = '',
 }: SystemSettingsLayoutProps) {
-  const resolvedContentLabel = contentLabel ?? (typeof title === 'string' ? `${title} content` : 'Settings content');
+  const resolvedContentLabel =
+    contentLabel ?? (typeof title === 'string' ? `${title} content` : 'Settings content');
   return (
     <PageScaffold
       className={`ui-system-settings-layout ${className}`.trim()}
@@ -48,7 +49,12 @@ export function SystemSettingsLayout({
       }
       contentLabel={resolvedContentLabel}
     >
-      <ScrollView className="ui-system-settings-layout__content-scroll" ariaLabel={resolvedContentLabel}>{children}</ScrollView>
+      <ScrollView
+        className="ui-system-settings-layout__content-scroll"
+        ariaLabel={resolvedContentLabel}
+      >
+        {children}
+      </ScrollView>
     </PageScaffold>
   );
 }

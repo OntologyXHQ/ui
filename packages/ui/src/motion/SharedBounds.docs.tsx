@@ -4,7 +4,8 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'SharedBounds',
     layer: 'components',
-    category: 'Interaction', order: 80,
+    category: 'Interaction',
+    order: 80,
     summary: 'Shared-bounds transition helper for related visual elements.',
     usage:
       'Use for continuity between related source and destination surfaces, not as generic layout.',

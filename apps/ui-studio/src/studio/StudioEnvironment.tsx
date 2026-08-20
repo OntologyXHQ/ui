@@ -10,7 +10,14 @@ import type {
   UiTokenOverrides,
 } from '@ontologyx/ui';
 import { UiRoot } from '@ontologyx/ui';
-import { createContext, type CSSProperties, type PropsWithChildren, useContext, useMemo, useState } from 'react';
+import {
+  createContext,
+  type CSSProperties,
+  type PropsWithChildren,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 
 export type StudioViewport = 'fit' | 'phone' | 'tablet' | 'desktop' | 'ultrawide';
 export type StudioEnvironmentInsetPreset = 'none' | 'notch' | 'gesture' | 'keyboard';
@@ -30,7 +37,10 @@ export type StudioEnvironmentState = {
 
 type StudioEnvironmentContextValue = {
   environment: StudioEnvironmentState;
-  update: <K extends keyof StudioEnvironmentState>(key: K, value: StudioEnvironmentState[K]) => void;
+  update: <K extends keyof StudioEnvironmentState>(
+    key: K,
+    value: StudioEnvironmentState[K],
+  ) => void;
 };
 
 const StudioEnvironmentContext = createContext<StudioEnvironmentContextValue | null>(null);
@@ -60,9 +70,15 @@ const environmentInsetPresets: Record<StudioEnvironmentInsetPreset, StudioEnviro
     safeArea: { blockStart: '0px', inlineEnd: '0px', blockEnd: '0px', inlineStart: '0px' },
     occlusion: { blockStart: '0px', inlineEnd: '0px', blockEnd: '0px', inlineStart: '0px' },
   },
-  notch: { safeArea: { blockStart: '32px', inlineEnd: '12px', blockEnd: '12px', inlineStart: '12px' } },
-  gesture: { safeArea: { blockStart: '0px', inlineEnd: '0px', blockEnd: '28px', inlineStart: '0px' } },
-  keyboard: { occlusion: { blockStart: '0px', inlineEnd: '0px', blockEnd: '280px', inlineStart: '0px' } },
+  notch: {
+    safeArea: { blockStart: '32px', inlineEnd: '12px', blockEnd: '12px', inlineStart: '12px' },
+  },
+  gesture: {
+    safeArea: { blockStart: '0px', inlineEnd: '0px', blockEnd: '28px', inlineStart: '0px' },
+  },
+  keyboard: {
+    occlusion: { blockStart: '0px', inlineEnd: '0px', blockEnd: '280px', inlineStart: '0px' },
+  },
 };
 
 const customTokens: UiTokenOverrides = {
@@ -129,10 +145,12 @@ export function StudioEnvironmentProvider({ children }: PropsWithChildren) {
         <div
           className="ui-studio-viewport"
           data-viewport={environment.viewport}
-          style={{
-            '--ui-studio-viewport-width': viewportWidths[environment.viewport],
-            '--ui-studio-content-width': containerWidths[environment.container],
-          } as CSSProperties}
+          style={
+            {
+              '--ui-studio-viewport-width': viewportWidths[environment.viewport],
+              '--ui-studio-content-width': containerWidths[environment.container],
+            } as CSSProperties
+          }
         >
           <UiRoot
             instrumentPerformance

@@ -14,7 +14,9 @@
     "responsive": "Sections fill their containing width and copy wraps naturally.",
     "playground": {
       "preferredWidth": "medium",
-      "controls": ["multiple"],
+      "controls": [
+        "multiple"
+      ],
       "fixture": {
         "items": [
           {
@@ -28,7 +30,9 @@
             "content": "Second section content"
           }
         ],
-        "defaultValue": ["first"]
+        "defaultValue": [
+          "first"
+        ]
       }
     },
     "props": [
@@ -152,9 +156,16 @@
     "responsive": "Auto mode changes bar → rail → drawer from container width, not device identity.",
     "playground": {
       "preferredWidth": "wide",
-      "controls": ["mode"],
+      "controls": [
+        "mode"
+      ],
       "options": {
-        "mode": ["auto", "bar", "rail", "drawer"]
+        "mode": [
+          "auto",
+          "bar",
+          "rail",
+          "drawer"
+        ]
       },
       "fixture": {
         "label": "Workspace navigation",
@@ -241,7 +252,7 @@
     "order": 70,
     "summary": "Confirmation dialog with explicit cancel/confirm semantics.",
     "usage": "Use for consequential confirmation; outside press is intentionally disabled.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Uses alertdialog semantics and the same modal focus lifecycle as Dialog.",
     "rtl": "Action order follows semantic source order and logical layout.",
     "touch": "Confirmation actions keep the shared coarse-pointer target floor.",
@@ -252,7 +263,7 @@
         "name": "actions",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional action footer rendered after dialog content.",
         "deprecated": false,
         "default": null
       },
@@ -260,7 +271,7 @@
         "name": "ariaLabel",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Accessible dialog name when no visible title is rendered.",
         "deprecated": false,
         "default": null
       },
@@ -268,23 +279,23 @@
         "name": "autoFocus",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Moves focus into the surface when it becomes active.",
         "deprecated": false,
-        "default": null
+        "default": "true"
       },
       {
         "name": "cancelLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Visible label for the cancellation action.",
         "deprecated": false,
-        "default": "'Cancel'"
+        "default": "Cancel"
       },
       {
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Additional class name applied to the dialog surface.",
         "deprecated": false,
         "default": null
       },
@@ -292,7 +303,7 @@
         "name": "confirmLabel",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Visible label for the consequential confirmation action.",
         "deprecated": false,
         "default": null
       },
@@ -300,15 +311,15 @@
         "name": "confirmTone",
         "type": "'default' | 'danger'",
         "optional": true,
-        "description": "",
+        "description": "Confirmation emphasis without changing alert semantics.",
         "deprecated": false,
-        "default": "'default'"
+        "default": "default"
       },
       {
         "name": "description",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional descriptive copy wired to aria-describedby.",
         "deprecated": false,
         "default": null
       },
@@ -316,31 +327,31 @@
         "name": "dismissOnEscape",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Allows topmost Escape to request dismissal.",
         "deprecated": false,
-        "default": null
+        "default": "true"
       },
       {
         "name": "dismissOnOutsidePress",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Allows topmost outside interaction to request dismissal.",
         "deprecated": false,
-        "default": null
+        "default": "true"
       },
       {
         "name": "modal",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Enables focus isolation, scrim and scroll locking.",
         "deprecated": false,
-        "default": null
+        "default": "true"
       },
       {
         "name": "onCancel",
         "type": "() => void",
         "optional": true,
-        "description": "",
+        "description": "Optional callback before cancellation closes the alert dialog.",
         "deprecated": false,
         "default": null
       },
@@ -348,7 +359,7 @@
         "name": "onConfirm",
         "type": "() => void",
         "optional": false,
-        "description": "",
+        "description": "Called when the user explicitly confirms the action.",
         "deprecated": false,
         "default": null
       },
@@ -356,7 +367,7 @@
         "name": "onOpenChange",
         "type": "(open: boolean) => void",
         "optional": false,
-        "description": "",
+        "description": "Receives dismissal and visibility requests from the shared overlay lifecycle.",
         "deprecated": false,
         "default": null
       },
@@ -364,7 +375,7 @@
         "name": "open",
         "type": "boolean",
         "optional": false,
-        "description": "",
+        "description": "Controlled visibility state for the overlay lifecycle.",
         "deprecated": false,
         "default": null
       },
@@ -372,31 +383,31 @@
         "name": "restoreFocus",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Restores focus to the prior valid target after close.",
         "deprecated": false,
-        "default": null
+        "default": "true"
       },
       {
         "name": "role",
         "type": "'dialog' | 'alertdialog'",
         "optional": true,
-        "description": "",
+        "description": "ARIA dialog role; AlertDialog owns alertdialog automatically.",
         "deprecated": false,
-        "default": null
+        "default": "dialog"
       },
       {
         "name": "size",
         "type": "DialogSize",
         "optional": true,
-        "description": "",
+        "description": "Bounded dialog presentation size.",
         "deprecated": false,
-        "default": null
+        "default": "md"
       },
       {
         "name": "title",
         "type": "undefined",
         "optional": true,
-        "description": "",
+        "description": "Omitting title requires an explicit accessible label.",
         "deprecated": false,
         "default": null
       }
@@ -611,7 +622,7 @@
     "order": 60,
     "summary": "Compact semantic-tone label/count indicator.",
     "usage": "Use for short metadata and counts; use StatusIndicator for state with meaning beyond a label.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Plain text remains readable by assistive technology unless the caller explicitly hides it.",
     "rtl": "Inline content follows surrounding bidi flow.",
     "touch": "Non-interactive.",
@@ -622,17 +633,17 @@
         "name": "size",
         "type": "'sm' | 'md'",
         "optional": true,
-        "description": "",
+        "description": "Compact or regular badge sizing.",
         "deprecated": false,
-        "default": "'md'"
+        "default": "md"
       },
       {
         "name": "tone",
         "type": "BadgeTone",
         "optional": true,
-        "description": "",
+        "description": "Semantic visual tone for the metadata label.",
         "deprecated": false,
-        "default": "'neutral'"
+        "default": "neutral"
       }
     ],
     "examples": [
@@ -651,7 +662,7 @@
     "order": 60,
     "summary": "Persistent inline feedback message with optional action and dismissal.",
     "usage": "Use when feedback must remain visible in document flow until addressed or dismissed.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Uses status/alert semantics, keeps action/dismiss controls in normal focus order, and exposes caller-owned dismiss label/text for localization.",
     "rtl": "Layout uses logical flow and wraps without physical positioning.",
     "touch": "Actions inherit the shared Button target policy.",
@@ -662,7 +673,7 @@
         "name": "action",
         "type": "ToastAction",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned action shown with the message.",
         "deprecated": false,
         "default": null
       },
@@ -670,23 +681,23 @@
         "name": "dismissLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible label for the dismiss control.",
         "deprecated": false,
-        "default": "'Dismiss banner'"
+        "default": "Dismiss banner"
       },
       {
         "name": "dismissText",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Visible localized dismiss copy.",
         "deprecated": false,
-        "default": "'Close'"
+        "default": "Close"
       },
       {
         "name": "message",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Required persistent feedback message.",
         "deprecated": false,
         "default": null
       },
@@ -694,7 +705,7 @@
         "name": "onDismiss",
         "type": "() => void",
         "optional": true,
-        "description": "",
+        "description": "Enables dismissal and receives the user dismissal request.",
         "deprecated": false,
         "default": null
       },
@@ -702,7 +713,7 @@
         "name": "title",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional emphasized title shown before persistent feedback.",
         "deprecated": false,
         "default": null
       },
@@ -710,9 +721,9 @@
         "name": "tone",
         "type": "TransientTone",
         "optional": true,
-        "description": "",
+        "description": "Semantic feedback tone; danger uses alert semantics.",
         "deprecated": false,
-        "default": "'neutral'"
+        "default": "neutral"
       }
     ],
     "examples": [
@@ -731,7 +742,7 @@
     "order": 70,
     "summary": "Touch-first bottom-edge Sheet with gesture-arena drag interaction.",
     "usage": "Use for transient tasks whose physical bottom-edge presentation is intentional.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Inherits Sheet dialog and focus semantics.",
     "rtl": "Bottom edge does not mirror; content remains bidi-aware.",
     "touch": "Drag gesture is first-class and competes through the shared gesture arena.",
@@ -742,7 +753,7 @@
         "name": "ariaDescribedBy",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Id of descriptive content associated with the sheet.",
         "deprecated": false,
         "default": null
       },
@@ -750,7 +761,7 @@
         "name": "ariaLabel",
         "type": "undefined",
         "optional": true,
-        "description": "",
+        "description": "Omitting an explicit label requires ariaLabelledBy.",
         "deprecated": false,
         "default": null
       },
@@ -758,7 +769,7 @@
         "name": "ariaLabelledBy",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Id of visible content that names the sheet.",
         "deprecated": false,
         "default": null
       },
@@ -766,23 +777,23 @@
         "name": "autoFocus",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Moves focus into the sheet on activation.",
         "deprecated": false,
-        "default": null
+        "default": "true"
       },
       {
         "name": "dismissLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible label for the dismiss affordance.",
         "deprecated": false,
-        "default": null
+        "default": "Close overlay"
       },
       {
         "name": "dragDistance",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Physical drag distance representing a full transition.",
         "deprecated": false,
         "default": "320"
       },
@@ -790,7 +801,7 @@
         "name": "draggable",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Enables vertical direct-manipulation dismissal.",
         "deprecated": false,
         "default": "true"
       },
@@ -798,7 +809,7 @@
         "name": "footer",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional footer composition inside the panel.",
         "deprecated": false,
         "default": null
       },
@@ -806,23 +817,23 @@
         "name": "grabber",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Renders the shared drag/dismiss grabber.",
         "deprecated": false,
-        "default": null
+        "default": "false"
       },
       {
         "name": "grabberLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible label for the drag grabber.",
         "deprecated": false,
-        "default": null
+        "default": "Drag sheet"
       },
       {
         "name": "grabberProps",
         "type": "ButtonHTMLAttributes<HTMLButtonElement>",
         "optional": true,
-        "description": "",
+        "description": "Native button props composed onto the optional grabber.",
         "deprecated": false,
         "default": null
       },
@@ -830,7 +841,7 @@
         "name": "header",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional header composition inside the panel.",
         "deprecated": false,
         "default": null
       },
@@ -838,7 +849,7 @@
         "name": "layerClassName",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Additional class name applied to the owning overlay layer.",
         "deprecated": false,
         "default": null
       },
@@ -846,15 +857,15 @@
         "name": "modal",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Enables focus isolation, scrim and scroll locking.",
         "deprecated": false,
-        "default": null
+        "default": "true"
       },
       {
         "name": "onOpenChange",
         "type": "(open: boolean) => void",
         "optional": false,
-        "description": "",
+        "description": "Receives dismissal and transition settlement requests.",
         "deprecated": false,
         "default": null
       },
@@ -862,7 +873,7 @@
         "name": "open",
         "type": "boolean",
         "optional": false,
-        "description": "",
+        "description": "Controlled target visibility for the sheet.",
         "deprecated": false,
         "default": null
       },
@@ -870,7 +881,7 @@
         "name": "panelClassName",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Additional class name applied to the sheet panel.",
         "deprecated": false,
         "default": null
       },
@@ -878,23 +889,23 @@
         "name": "placement",
         "type": "SheetPlacement",
         "optional": true,
-        "description": "",
+        "description": "Physical presentation strategy; auto adapts from measured container geometry.",
         "deprecated": false,
-        "default": null
+        "default": "auto"
       },
       {
         "name": "restoreFocus",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Restores focus after the sheet fully closes.",
         "deprecated": false,
-        "default": null
+        "default": "true"
       },
       {
         "name": "scrimClassName",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Additional class name applied to the modal scrim.",
         "deprecated": false,
         "default": null
       },
@@ -902,7 +913,7 @@
         "name": "transition",
         "type": "InteractiveTransitionController",
         "optional": true,
-        "description": "",
+        "description": "Optional externally owned interactive transition controller.",
         "deprecated": false,
         "default": null
       }
@@ -1035,14 +1046,31 @@
     "responsive": "Intrinsic by default or full-inline-size on request; content truncation/wrapping stays inside the caller-owned layout.",
     "playground": {
       "preferredWidth": "medium",
-      "controls": ["variant", "intent", "size", "loading", "fullWidth"],
+      "controls": [
+        "variant",
+        "intent",
+        "size",
+        "loading",
+        "fullWidth"
+      ],
       "fixture": {
         "children": "Continue"
       },
       "options": {
-        "variant": ["quiet", "secondary", "primary"],
-        "intent": ["neutral", "destructive"],
-        "size": ["sm", "md", "lg"]
+        "variant": [
+          "quiet",
+          "secondary",
+          "primary"
+        ],
+        "intent": [
+          "neutral",
+          "destructive"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ]
       }
     },
     "props": [
@@ -1660,7 +1688,7 @@
     "order": 70,
     "summary": "Contextual Menu invoked from pointer position, keyboard or long press.",
     "usage": "Use for actions whose meaning is tied to a target context.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Supports ContextMenu/Shift+F10 and Menu semantics.",
     "rtl": "Floating placement and command flow are writing-direction aware.",
     "touch": "Long press uses the shared press/gesture path.",
@@ -1671,7 +1699,7 @@
         "name": "actions",
         "type": "readonly ContextMenuAction[]",
         "optional": false,
-        "description": "",
+        "description": "Ordered commands rendered with optional separators.",
         "deprecated": false,
         "default": null
       },
@@ -1679,7 +1707,7 @@
         "name": "ariaLabel",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Accessible name applied to the opened context menu.",
         "deprecated": false,
         "default": null
       },
@@ -1687,7 +1715,7 @@
         "name": "children",
         "type": "ReactElement<ContextMenuTriggerProps>",
         "optional": false,
-        "description": "",
+        "description": "Single trigger element enhanced with pointer, keyboard and long-press invocation.",
         "deprecated": false,
         "default": null
       },
@@ -1695,7 +1723,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Disables all context-menu invocation paths.",
         "deprecated": false,
         "default": "false"
       },
@@ -1703,9 +1731,9 @@
         "name": "longPressDelayMs",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Touch long-press delay when the trigger does not provide the shared press contract.",
         "deprecated": false,
-        "default": null
+        "default": "520"
       }
     ],
     "examples": [
@@ -1859,7 +1887,7 @@
     "order": 70,
     "summary": "Modal or non-modal task surface on the shared overlay lifecycle.",
     "usage": "Use for focused transient tasks without product-specific shell semantics.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Owns dialog semantics, focus containment/restoration, Escape policy and title/description wiring.",
     "rtl": "Content and actions use logical flow.",
     "touch": "Actions inherit shared touch targets and outside dismissal is explicit.",
@@ -1870,7 +1898,7 @@
         "name": "actions",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional action footer rendered after dialog content.",
         "deprecated": false,
         "default": null
       },
@@ -1878,7 +1906,7 @@
         "name": "ariaLabel",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Accessible dialog name when no visible title is rendered.",
         "deprecated": false,
         "default": null
       },
@@ -1886,7 +1914,7 @@
         "name": "autoFocus",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Moves focus into the surface when it becomes active.",
         "deprecated": false,
         "default": "true"
       },
@@ -1894,7 +1922,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Additional class name applied to the dialog surface.",
         "deprecated": false,
         "default": "''"
       },
@@ -1902,7 +1930,7 @@
         "name": "description",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional descriptive copy wired to aria-describedby.",
         "deprecated": false,
         "default": null
       },
@@ -1910,7 +1938,7 @@
         "name": "dismissOnEscape",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Allows topmost Escape to request dismissal.",
         "deprecated": false,
         "default": "true"
       },
@@ -1918,7 +1946,7 @@
         "name": "dismissOnOutsidePress",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Allows topmost outside interaction to request dismissal.",
         "deprecated": false,
         "default": "true"
       },
@@ -1926,7 +1954,7 @@
         "name": "modal",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Enables focus isolation, scrim and scroll locking.",
         "deprecated": false,
         "default": "true"
       },
@@ -1934,7 +1962,7 @@
         "name": "onOpenChange",
         "type": "(open: boolean) => void",
         "optional": false,
-        "description": "",
+        "description": "Receives dismissal and visibility requests from the shared overlay lifecycle.",
         "deprecated": false,
         "default": null
       },
@@ -1942,7 +1970,7 @@
         "name": "open",
         "type": "boolean",
         "optional": false,
-        "description": "",
+        "description": "Controlled visibility state for the overlay lifecycle.",
         "deprecated": false,
         "default": null
       },
@@ -1950,7 +1978,7 @@
         "name": "restoreFocus",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Restores focus to the prior valid target after close.",
         "deprecated": false,
         "default": "true"
       },
@@ -1958,23 +1986,23 @@
         "name": "role",
         "type": "'dialog' | 'alertdialog'",
         "optional": true,
-        "description": "",
+        "description": "ARIA dialog role; AlertDialog owns alertdialog automatically.",
         "deprecated": false,
-        "default": "'dialog'"
+        "default": "dialog"
       },
       {
         "name": "size",
         "type": "DialogSize",
         "optional": true,
-        "description": "",
+        "description": "Bounded dialog presentation size.",
         "deprecated": false,
-        "default": "'md'"
+        "default": "md"
       },
       {
         "name": "title",
         "type": "undefined",
         "optional": true,
-        "description": "",
+        "description": "Omitting title requires an explicit accessible label.",
         "deprecated": false,
         "default": null
       }
@@ -2145,7 +2173,7 @@
     "order": 60,
     "summary": "Generic empty-content composition with optional icon, description and action.",
     "usage": "Use for empty collections/results without embedding product-specific copy or recovery logic.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Keeps semantic text/action ownership with caller-provided content.",
     "rtl": "Centered composition is bidi-safe.",
     "touch": "Optional action consumes the normal component target contract.",
@@ -2156,7 +2184,7 @@
         "name": "action",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned action rendered after the description.",
         "deprecated": false,
         "default": null
       },
@@ -2164,7 +2192,7 @@
         "name": "description",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional explanatory copy below the title.",
         "deprecated": false,
         "default": null
       },
@@ -2172,7 +2200,7 @@
         "name": "icon",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional decorative icon displayed with the empty state.",
         "deprecated": false,
         "default": null
       },
@@ -2180,7 +2208,7 @@
         "name": "title",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Required heading content naming the empty state.",
         "deprecated": false,
         "default": null
       },
@@ -2188,12 +2216,18 @@
         "name": "titleLevel",
         "type": "2 | 3 | 4 | 5 | 6",
         "optional": true,
-        "description": "",
+        "description": "Semantic heading level used by the empty-state title.",
         "deprecated": false,
         "default": "3"
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "feedback-contract",
+        "title": "Feedback semantics",
+        "component": "FeedbackExample"
+      }
+    ]
   },
   {
     "id": "FadeTransition",
@@ -3344,7 +3378,7 @@
     "order": 70,
     "summary": "Keyboard-navigable action menu hosted by the shared Popover implementation.",
     "usage": "Use for a concise set of commands rather than generic content.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Owns menu role, initial focus and vertical roving navigation.",
     "rtl": "Placement is logical and command content follows writing direction.",
     "touch": "Menu targets honor coarse-pointer sizing.",
@@ -3369,7 +3403,7 @@
         "name": "anchorRect",
         "type": "FloatingGeometryRect",
         "optional": false,
-        "description": "",
+        "description": "Explicit anchor geometry for pointer-position or fixture-owned overlays.",
         "deprecated": false,
         "default": null
       },
@@ -3377,7 +3411,7 @@
         "name": "anchorRef",
         "type": "never",
         "optional": true,
-        "description": "",
+        "description": "Live anchor references are mutually exclusive with explicit geometry.",
         "deprecated": false,
         "default": null
       },
@@ -3385,7 +3419,7 @@
         "name": "ariaLabel",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Accessible menu name.",
         "deprecated": false,
         "default": null
       },
@@ -3393,7 +3427,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Additional class name applied to the menu surface.",
         "deprecated": false,
         "default": "''"
       },
@@ -3401,7 +3435,7 @@
         "name": "focusReturnRef",
         "type": "RefObject<HTMLElement | null>",
         "optional": true,
-        "description": "",
+        "description": "Explicit focus-return target when it differs from the anchor.",
         "deprecated": false,
         "default": null
       },
@@ -3409,7 +3443,7 @@
         "name": "onOpenChange",
         "type": "(open: boolean) => void",
         "optional": false,
-        "description": "",
+        "description": "Receives menu dismissal and visibility requests.",
         "deprecated": false,
         "default": null
       },
@@ -3417,7 +3451,7 @@
         "name": "open",
         "type": "boolean",
         "optional": false,
-        "description": "",
+        "description": "Controlled visibility state for the action menu.",
         "deprecated": false,
         "default": null
       },
@@ -3425,9 +3459,9 @@
         "name": "placement",
         "type": "FloatingPlacement",
         "optional": true,
-        "description": "",
+        "description": "Logical preferred placement before collision resolution.",
         "deprecated": false,
-        "default": "'bottom-start'"
+        "default": "bottom-start"
       }
     ],
     "examples": [
@@ -3446,7 +3480,7 @@
     "order": 70,
     "summary": "Action row inside Menu.",
     "usage": "Use only inside Menu for command-like actions.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Uses native button plus menuitem semantics.",
     "rtl": "Content uses logical flow.",
     "touch": "Target sizing follows shared Component tokens.",
@@ -3457,7 +3491,7 @@
         "name": "destructive",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Marks the command as destructive for semantic visual treatment.",
         "deprecated": false,
         "default": "false"
       },
@@ -3465,12 +3499,18 @@
         "name": "onSelect",
         "type": "() => void",
         "optional": true,
-        "description": "",
+        "description": "Called after native activation unless the click was prevented.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "menu-contract",
+        "title": "Menu item contract",
+        "component": "MenuPreviewExample"
+      }
+    ]
   },
   {
     "id": "MenuSeparator",
@@ -3480,14 +3520,20 @@
     "order": 70,
     "summary": "Semantic separator inside Menu.",
     "usage": "Use sparingly to group related commands.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Rendered as a native separator.",
     "rtl": "Direction-neutral.",
     "touch": "Non-interactive.",
     "responsive": "Fills the Menu inline size.",
     "playground": null,
     "props": [],
-    "examples": []
+    "examples": [
+      {
+        "id": "menu-contract",
+        "title": "Menu separator contract",
+        "component": "MenuPreviewExample"
+      }
+    ]
   },
   {
     "id": "MotionTransition",
@@ -3649,7 +3695,7 @@
     "order": 70,
     "summary": "Anchored floating surface on shared collision, observation and dismissal services.",
     "usage": "Use for lightweight anchored content.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Supports dialog/menu roles, Escape dismissal and optional modal focus containment.",
     "rtl": "Logical start/end placements resolve with writing direction.",
     "touch": "Outside press works across coarse and fine pointers.",
@@ -3674,7 +3720,7 @@
         "name": "anchorRect",
         "type": "FloatingGeometryRect",
         "optional": false,
-        "description": "",
+        "description": "Explicit anchor geometry for pointer-position or fixture-owned overlays.",
         "deprecated": false,
         "default": null
       },
@@ -3682,7 +3728,7 @@
         "name": "anchorRef",
         "type": "never",
         "optional": true,
-        "description": "",
+        "description": "Live anchor references are mutually exclusive with explicit geometry.",
         "deprecated": false,
         "default": null
       },
@@ -3690,7 +3736,7 @@
         "name": "ariaLabel",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Accessible name for the floating surface.",
         "deprecated": false,
         "default": null
       },
@@ -3698,7 +3744,7 @@
         "name": "autoFocus",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Moves focus into the surface when opened.",
         "deprecated": false,
         "default": "false"
       },
@@ -3706,7 +3752,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Additional class name applied to the floating surface.",
         "deprecated": false,
         "default": "''"
       },
@@ -3714,7 +3760,7 @@
         "name": "modal",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Enables modal focus isolation and scroll locking.",
         "deprecated": false,
         "default": "false"
       },
@@ -3722,7 +3768,7 @@
         "name": "onKeyDown",
         "type": "KeyboardEventHandler<HTMLDivElement>",
         "optional": true,
-        "description": "",
+        "description": "Optional key handler composed with the shared overlay lifecycle.",
         "deprecated": false,
         "default": null
       },
@@ -3730,7 +3776,7 @@
         "name": "onOpenChange",
         "type": "(open: boolean) => void",
         "optional": false,
-        "description": "",
+        "description": "Receives shared dismissal and visibility requests.",
         "deprecated": false,
         "default": null
       },
@@ -3738,7 +3784,7 @@
         "name": "open",
         "type": "boolean",
         "optional": false,
-        "description": "",
+        "description": "Controlled visibility state for the floating overlay.",
         "deprecated": false,
         "default": null
       },
@@ -3746,15 +3792,15 @@
         "name": "placement",
         "type": "FloatingPlacement",
         "optional": true,
-        "description": "",
+        "description": "Logical preferred placement before collision/flip resolution.",
         "deprecated": false,
-        "default": "'bottom-start'"
+        "default": "bottom-start"
       },
       {
         "name": "restoreFocus",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Restores prior focus after dismissal.",
         "deprecated": false,
         "default": "true"
       },
@@ -3762,9 +3808,9 @@
         "name": "role",
         "type": "'dialog' | 'menu'",
         "optional": true,
-        "description": "",
+        "description": "Surface semantics used by generic popovers and Menu.",
         "deprecated": false,
-        "default": "'dialog'"
+        "default": "dialog"
       }
     ],
     "examples": [
@@ -3788,7 +3834,7 @@
     "order": 60,
     "summary": "Determinate or indeterminate native progress contract with optional visible percentage.",
     "usage": "Use for bounded work progress; omit value for indeterminate work.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Built on native progress semantics with an accessible label.",
     "rtl": "Label/value header follows logical order.",
     "touch": "Non-interactive.",
@@ -3799,7 +3845,7 @@
         "name": "label",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Accessible name shown beside and applied to the native progress element.",
         "deprecated": false,
         "default": null
       },
@@ -3807,7 +3853,7 @@
         "name": "max",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Positive upper bound used to normalize determinate progress.",
         "deprecated": false,
         "default": "100"
       },
@@ -3815,7 +3861,7 @@
         "name": "showValue",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Shows a rounded percentage when progress is determinate.",
         "deprecated": false,
         "default": "false"
       },
@@ -3823,12 +3869,18 @@
         "name": "value",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Determinate progress value; omit for indeterminate progress.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "feedback-contract",
+        "title": "Feedback semantics",
+        "component": "FeedbackExample"
+      }
+    ]
   },
   {
     "id": "Radio",
@@ -4398,7 +4450,7 @@
     "order": 70,
     "summary": "Backdrop surface for modal and transient layered UI.",
     "usage": "Use behind an owned overlay; overlay lifecycle/focus ownership is centralized in UIP03.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Decorative by default; interaction semantics belong to the owning overlay.",
     "rtl": "Covers logical viewport bounds identically in LTR and RTL.",
     "touch": "Pointer dismissal behavior belongs to the overlay owner, not the scrim itself.",
@@ -4409,7 +4461,7 @@
         "name": "active",
         "type": "boolean",
         "optional": false,
-        "description": "",
+        "description": "Whether the backdrop currently participates in the owning overlay.",
         "deprecated": false,
         "default": null
       },
@@ -4417,7 +4469,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Additional class name for composition without owning overlay behavior.",
         "deprecated": false,
         "default": "''"
       },
@@ -4425,15 +4477,15 @@
         "name": "dismissLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible label used when the scrim itself is dismissible.",
         "deprecated": false,
-        "default": "'Dismiss overlay'"
+        "default": "Dismiss overlay"
       },
       {
         "name": "onDismiss",
         "type": "() => void",
         "optional": true,
-        "description": "",
+        "description": "Optional dismissal request; lifecycle authority remains with the overlay owner.",
         "deprecated": false,
         "default": null
       },
@@ -4441,12 +4493,18 @@
         "name": "tone",
         "type": "ScrimTone",
         "optional": true,
-        "description": "",
+        "description": "Backdrop strength without changing modality semantics.",
         "deprecated": false,
-        "default": "'standard'"
+        "default": "standard"
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "ownership",
+        "title": "Caller-owned scrim dismissal",
+        "component": "ScrimOwnershipExample"
+      }
+    ]
   },
   {
     "id": "ScrollSnapItem",
@@ -4562,7 +4620,12 @@
     "responsive": "Fits narrow toolbars/containers without shrinking trailing actions below their target contract.",
     "playground": {
       "preferredWidth": "medium",
-      "controls": ["value", "disabled", "readOnly", "suggestionsAvailable"],
+      "controls": [
+        "value",
+        "disabled",
+        "readOnly",
+        "suggestionsAvailable"
+      ],
       "fixture": {
         "value": "Launcher",
         "label": "Search applications",
@@ -4891,7 +4954,11 @@
     "responsive": "Popup width follows the trigger minimum while shared collision handling keeps it inside the viewport.",
     "playground": {
       "preferredWidth": "medium",
-      "controls": ["value", "disabled", "required"],
+      "controls": [
+        "value",
+        "disabled",
+        "required"
+      ],
       "fixture": {
         "label": "Density",
         "value": "comfortable",
@@ -5184,7 +5251,7 @@
     "order": 70,
     "summary": "Adaptive transient task surface using shared overlay and safe-area services.",
     "usage": "Use for layered supporting tasks; auto placement adapts without OXS-specific layout assumptions.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Provides dialog semantics, focus containment/restoration and Escape handling.",
     "rtl": "Content follows logical direction while bottom is a physical edge.",
     "touch": "Optional drag ownership is delegated to the shared gesture arena.",
@@ -5195,7 +5262,7 @@
         "name": "ariaDescribedBy",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Id of descriptive content associated with the sheet.",
         "deprecated": false,
         "default": null
       },
@@ -5203,7 +5270,7 @@
         "name": "ariaLabel",
         "type": "undefined",
         "optional": true,
-        "description": "",
+        "description": "Omitting an explicit label requires ariaLabelledBy.",
         "deprecated": false,
         "default": null
       },
@@ -5211,7 +5278,7 @@
         "name": "ariaLabelledBy",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Id of visible content that names the sheet.",
         "deprecated": false,
         "default": null
       },
@@ -5219,7 +5286,7 @@
         "name": "autoFocus",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Moves focus into the sheet on activation.",
         "deprecated": false,
         "default": "true"
       },
@@ -5227,15 +5294,15 @@
         "name": "dismissLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible label for the dismiss affordance.",
         "deprecated": false,
-        "default": "'Close overlay'"
+        "default": "Close overlay"
       },
       {
         "name": "footer",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional footer composition inside the panel.",
         "deprecated": false,
         "default": null
       },
@@ -5243,7 +5310,7 @@
         "name": "grabber",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Renders the shared drag/dismiss grabber.",
         "deprecated": false,
         "default": "false"
       },
@@ -5251,15 +5318,15 @@
         "name": "grabberLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible label for the drag grabber.",
         "deprecated": false,
-        "default": "'Drag sheet'"
+        "default": "Drag sheet"
       },
       {
         "name": "grabberProps",
         "type": "ButtonHTMLAttributes<HTMLButtonElement>",
         "optional": true,
-        "description": "",
+        "description": "Native button props composed onto the optional grabber.",
         "deprecated": false,
         "default": null
       },
@@ -5267,7 +5334,7 @@
         "name": "header",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional header composition inside the panel.",
         "deprecated": false,
         "default": null
       },
@@ -5275,7 +5342,7 @@
         "name": "layerClassName",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Additional class name applied to the owning overlay layer.",
         "deprecated": false,
         "default": "''"
       },
@@ -5283,7 +5350,7 @@
         "name": "modal",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Enables focus isolation, scrim and scroll locking.",
         "deprecated": false,
         "default": "true"
       },
@@ -5291,7 +5358,7 @@
         "name": "onOpenChange",
         "type": "(open: boolean) => void",
         "optional": false,
-        "description": "",
+        "description": "Receives dismissal and transition settlement requests.",
         "deprecated": false,
         "default": null
       },
@@ -5299,7 +5366,7 @@
         "name": "open",
         "type": "boolean",
         "optional": false,
-        "description": "",
+        "description": "Controlled target visibility for the sheet.",
         "deprecated": false,
         "default": null
       },
@@ -5307,7 +5374,7 @@
         "name": "panelClassName",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Additional class name applied to the sheet panel.",
         "deprecated": false,
         "default": "''"
       },
@@ -5315,15 +5382,15 @@
         "name": "placement",
         "type": "SheetPlacement",
         "optional": true,
-        "description": "",
+        "description": "Physical presentation strategy; auto adapts from measured container geometry.",
         "deprecated": false,
-        "default": "'auto'"
+        "default": "auto"
       },
       {
         "name": "restoreFocus",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Restores focus after the sheet fully closes.",
         "deprecated": false,
         "default": "true"
       },
@@ -5331,7 +5398,7 @@
         "name": "scrimClassName",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Additional class name applied to the modal scrim.",
         "deprecated": false,
         "default": "''"
       },
@@ -5339,7 +5406,7 @@
         "name": "transition",
         "type": "InteractiveTransitionController",
         "optional": true,
-        "description": "",
+        "description": "Optional externally owned interactive transition controller.",
         "deprecated": false,
         "default": null
       }
@@ -5360,7 +5427,7 @@
     "order": 60,
     "summary": "Decorative lightweight placeholder for text, rectangle and avatar-like shapes.",
     "usage": "Use to preserve layout while nearby content is loading; announce loading state on the owning region instead.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Hidden from the accessibility tree so it does not become fake content.",
     "rtl": "Direction-neutral geometry.",
     "touch": "Non-interactive.",
@@ -5371,20 +5438,26 @@
         "name": "shape",
         "type": "'text' | 'rect' | 'circle'",
         "optional": true,
-        "description": "",
+        "description": "Placeholder geometry without introducing fake accessible content.",
         "deprecated": false,
-        "default": "'text'"
+        "default": "text"
       },
       {
         "name": "width",
         "type": "'short' | 'medium' | 'full'",
         "optional": true,
-        "description": "",
+        "description": "Container-relative placeholder width preset.",
         "deprecated": false,
-        "default": "'full'"
+        "default": "full"
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "feedback-contract",
+        "title": "Feedback semantics",
+        "component": "FeedbackExample"
+      }
+    ]
   },
   {
     "id": "Slider",
@@ -5574,7 +5647,7 @@
     "order": 60,
     "summary": "Compact transient message with optional action and dismissal.",
     "usage": "Use for short-lived app feedback; persistent or structural messages belong in Banner.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Uses status/alert semantics based on tone, keeps actions keyboard reachable, and lets callers localize both dismiss label and visible dismiss text.",
     "rtl": "Copy and actions use logical flow.",
     "touch": "Actions use shared Button targets and the toast host pauses timeout during interaction.",
@@ -5585,7 +5658,7 @@
         "name": "action",
         "type": "ToastAction",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned action shown beside the message.",
         "deprecated": false,
         "default": null
       },
@@ -5593,7 +5666,7 @@
         "name": "dismissible",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Enables the dismiss control when onDismiss is also supplied.",
         "deprecated": false,
         "default": "false"
       },
@@ -5601,23 +5674,23 @@
         "name": "dismissLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible name for the dismiss action.",
         "deprecated": false,
-        "default": "'Dismiss message'"
+        "default": "Dismiss message"
       },
       {
         "name": "dismissText",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Visible localized dismiss copy.",
         "deprecated": false,
-        "default": "'Close'"
+        "default": "Close"
       },
       {
         "name": "message",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Required feedback message content.",
         "deprecated": false,
         "default": null
       },
@@ -5625,7 +5698,7 @@
         "name": "onDismiss",
         "type": "() => void",
         "optional": true,
-        "description": "",
+        "description": "Called when the user activates the dismiss control.",
         "deprecated": false,
         "default": null
       },
@@ -5633,7 +5706,7 @@
         "name": "title",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional emphasized title shown before the message.",
         "deprecated": false,
         "default": null
       },
@@ -5641,9 +5714,9 @@
         "name": "tone",
         "type": "TransientTone",
         "optional": true,
-        "description": "",
+        "description": "Semantic feedback tone; danger uses alert semantics.",
         "deprecated": false,
-        "default": "'neutral'"
+        "default": "neutral"
       }
     ],
     "examples": [
@@ -5711,17 +5784,29 @@
     "order": 60,
     "summary": "OntologyX O+X indeterminate activity mark with inline through hero-scale presentation and reduced-motion settlement.",
     "usage": "Use sm/md/lg for local transient activity and hero for first-entry or boot loading; the shared OX mark is also used by loading controls so product surfaces do not invent parallel spinners.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Decorative/static activity is hidden from the accessibility tree by default; set announce to expose a polite loading status when the owning region needs it.",
     "rtl": "Direction-neutral.",
     "touch": "Non-interactive.",
     "responsive": "Intrinsic; hero keeps the same brand geometry with a stronger display-scale stroke treatment.",
     "playground": {
       "preferredWidth": "wide",
-      "controls": ["size", "renderer", "announce"],
+      "controls": [
+        "size",
+        "renderer",
+        "announce"
+      ],
       "options": {
-        "size": ["sm", "md", "lg", "hero"],
-        "renderer": ["svg", "canvas"]
+        "size": [
+          "sm",
+          "md",
+          "lg",
+          "hero"
+        ],
+        "renderer": [
+          "svg",
+          "canvas"
+        ]
       },
       "fixture": {
         "size": "hero",
@@ -5908,7 +5993,7 @@
     "order": 60,
     "summary": "Tone-aware status dot with visible or visually-hidden label.",
     "usage": "Use for presence/health/state summaries that need an accessible status name.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Static status is ordinary labelled content by default; set announce when a state transition genuinely needs a polite live-region announcement.",
     "rtl": "Dot and label use logical inline order.",
     "touch": "Non-interactive.",
@@ -5919,7 +6004,7 @@
         "name": "announce",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Opts changing status into a polite live-region announcement.",
         "deprecated": false,
         "default": "false"
       },
@@ -5927,7 +6012,7 @@
         "name": "label",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Accessible text naming the represented status.",
         "deprecated": false,
         "default": null
       },
@@ -5935,7 +6020,7 @@
         "name": "showLabel",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Keeps the status label visually visible instead of visually hidden.",
         "deprecated": false,
         "default": "true"
       },
@@ -5943,12 +6028,18 @@
         "name": "tone",
         "type": "BadgeTone",
         "optional": true,
-        "description": "",
+        "description": "Semantic visual tone for the status.",
         "deprecated": false,
-        "default": "'neutral'"
+        "default": "neutral"
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "feedback-contract",
+        "title": "Feedback semantics",
+        "component": "FeedbackExample"
+      }
+    ]
   },
   {
     "id": "Surface",
@@ -7595,10 +7686,20 @@
     "responsive": "The tab strip can scroll/clip within constrained containers without device detection.",
     "playground": {
       "preferredWidth": "medium",
-      "controls": ["activationMode", "size"],
+      "controls": [
+        "activationMode",
+        "size"
+      ],
       "options": {
-        "activationMode": ["automatic", "manual"],
-        "size": ["sm", "md", "lg"]
+        "activationMode": [
+          "automatic",
+          "manual"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ]
       },
       "fixture": {
         "label": "Workbench sections",
@@ -8334,7 +8435,7 @@
     "order": 60,
     "summary": "Safe-area-aware transient feedback host with timeout and pause behavior.",
     "usage": "Mount once in an application scope and feed it a controlled queue or useToastQueue result. Reusing an explicit toast id replaces that queue entry instead of creating duplicate keys.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Announces additions through a polite live region while danger messages use alert semantics.",
     "rtl": "Placement uses logical inline-end and message layout follows writing direction.",
     "touch": "Pointer/focus interaction pauses auto-dismiss so actions are not time pressured.",
@@ -8345,7 +8446,7 @@
         "name": "items",
         "type": "readonly ToastItem[]",
         "optional": false,
-        "description": "",
+        "description": "Controlled toast queue rendered in stable caller-provided order.",
         "deprecated": false,
         "default": null
       },
@@ -8353,15 +8454,15 @@
         "name": "label",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible live-region name.",
         "deprecated": false,
-        "default": "'Notifications'"
+        "default": "Notifications"
       },
       {
         "name": "onDismiss",
         "type": "(id: string) => void",
         "optional": false,
-        "description": "",
+        "description": "Removes one toast by its stable id after timeout or user dismissal.",
         "deprecated": false,
         "default": null
       },
@@ -8369,9 +8470,9 @@
         "name": "placement",
         "type": "'block-end' | 'block-start'",
         "optional": true,
-        "description": "",
+        "description": "Logical block edge used for host placement.",
         "deprecated": false,
-        "default": "'block-end'"
+        "default": "block-end"
       }
     ],
     "examples": [
@@ -8670,7 +8771,7 @@
     "order": 70,
     "summary": "Supplemental delayed description associated with a trigger.",
     "usage": "Use only for supplemental help; essential information must remain available without hover.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Trigger owns aria-describedby while Tooltip participates in shared Escape/stack lifecycle without stealing focus.",
     "rtl": "Placement uses logical alignment.",
     "touch": "Touch hover activation is intentionally suppressed.",
@@ -8681,7 +8782,7 @@
         "name": "children",
         "type": "ReactElement<TooltipTriggerProps>",
         "optional": false,
-        "description": "",
+        "description": "Single trigger element enhanced with focus/pointer description wiring.",
         "deprecated": false,
         "default": null
       },
@@ -8689,7 +8790,7 @@
         "name": "content",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Supplemental descriptive content shown in the tooltip.",
         "deprecated": false,
         "default": null
       },
@@ -8697,15 +8798,15 @@
         "name": "delayMs",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Fine-pointer hover delay in milliseconds.",
         "deprecated": false,
-        "default": null
+        "default": "550"
       },
       {
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Disables focus and pointer tooltip activation.",
         "deprecated": false,
         "default": "false"
       },
@@ -8713,9 +8814,9 @@
         "name": "placement",
         "type": "FloatingPlacement",
         "optional": true,
-        "description": "",
+        "description": "Logical preferred placement before collision resolution.",
         "deprecated": false,
-        "default": "'top-start'"
+        "default": "top-start"
       }
     ],
     "examples": [

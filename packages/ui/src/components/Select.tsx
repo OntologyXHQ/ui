@@ -1,4 +1,4 @@
-import type { KeyboardEvent, ReactNode } from 'react';
+import type { KeyboardEvent } from 'react';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
@@ -253,6 +253,8 @@ export function Select({
             {options.map((option) => {
               const optionId = selectOptionId(ids.controlId, option.value);
               return (
+                // biome-ignore lint/a11y/useFocusableInteractive: listbox uses aria-activedescendant; DOM focus intentionally stays on the combobox trigger.
+                // biome-ignore lint/a11y/useKeyWithClickEvents: keyboard selection is handled by the owning combobox/listbox composite.
                 <div
                   key={option.value}
                   id={optionId}

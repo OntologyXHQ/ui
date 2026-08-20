@@ -41,8 +41,10 @@ function humanize(name: string) {
 
 function sampleString(entry: UiCatalogEntry, prop: UiCatalogProp) {
   const component = humanize(entry.exportName);
-  if (prop.name === 'label' || prop.name === 'ariaLabel' || prop.name.endsWith('Label')) return component;
-  if (prop.name === 'placeholder' || prop.name.endsWith('Placeholder')) return `Try ${component.toLocaleLowerCase()}…`;
+  if (prop.name === 'label' || prop.name === 'ariaLabel' || prop.name.endsWith('Label'))
+    return component;
+  if (prop.name === 'placeholder' || prop.name.endsWith('Placeholder'))
+    return `Try ${component.toLocaleLowerCase()}…`;
   if (prop.name === 'title') return `${component} preview`;
   if (prop.name === 'description') return 'Rendered from the real public @ontologyx/ui export.';
   if (prop.name === 'value') return entry.exportName === 'SearchField' ? 'Launcher' : 'Example';
@@ -63,15 +65,21 @@ function seedValue(entry: UiCatalogEntry, prop: UiCatalogProp): unknown {
   if (prop.type === 'string') return sampleString(entry, prop);
   if (prop.type === 'number') return 0;
   if (prop.type === 'boolean') return false;
-  if (prop.type === 'ReactNode') return prop.name === 'description'
-    ? 'Rendered from the real public @ontologyx/ui export.'
-    : humanize(entry.exportName);
+  if (prop.type === 'ReactNode')
+    return prop.name === 'description'
+      ? 'Rendered from the real public @ontologyx/ui export.'
+      : humanize(entry.exportName);
   if (/^\(.*\) => /.test(prop.type) || prop.type.includes('=>')) return () => undefined;
   return undefined;
 }
 
 function isSimpleControl(entry: UiCatalogEntry, prop: UiCatalogProp) {
-  return prop.type === 'boolean' || prop.type === 'string' || prop.type === 'number' || Boolean(controlOptions(entry, prop));
+  return (
+    prop.type === 'boolean' ||
+    prop.type === 'string' ||
+    prop.type === 'number' ||
+    Boolean(controlOptions(entry, prop))
+  );
 }
 
 const PRESENTATION_OPTIONALS = new Set([
@@ -95,7 +103,8 @@ function initialProps(entry: UiCatalogEntry) {
   for (const prop of entry.props) {
     if (prop.name in result) continue;
     const value = seedValue(entry, prop);
-    const shouldPresent = !prop.optional || prop.default !== null || PRESENTATION_OPTIONALS.has(prop.name);
+    const shouldPresent =
+      !prop.optional || prop.default !== null || PRESENTATION_OPTIONALS.has(prop.name);
     if (value !== undefined && shouldPresent) result[prop.name] = value;
   }
   return result;
@@ -143,7 +152,7 @@ function PlaygroundControl({
         label={prop.name}
         description={prop.description || undefined}
         options={union.map((item) => ({ value: item, label: item }))}
-        value={typeof value === 'string' ? value : union[0] ?? ''}
+        value={typeof value === 'string' ? value : (union[0] ?? '')}
         onValueChange={onChange}
       />
     );
@@ -211,12 +220,25 @@ function bindInteractiveProps(
 
 function applicableStates(entry: UiCatalogEntry) {
   const names = new Set(entry.props.map((prop) => prop.name));
-  const interactive = ['Actions', 'Selection', 'Fields', 'Navigation', 'Data & collection', 'Overlays', 'Interaction', 'Surfaces', 'Layouts', 'Chrome', 'Privileged'].includes(entry.category);
+  const interactive = [
+    'Actions',
+    'Selection',
+    'Fields',
+    'Navigation',
+    'Data & collection',
+    'Overlays',
+    'Interaction',
+    'Surfaces',
+    'Layouts',
+    'Chrome',
+    'Privileged',
+  ].includes(entry.category);
   const states = ['rest'];
   if (interactive) states.push('hover', 'pressed', 'focus');
   if (names.has('disabled')) states.push('disabled');
   if (names.has('loading') || names.has('pending') || names.has('busy')) states.push('loading');
-  if (names.has('selected') || names.has('checked') || names.has('pressed')) states.push('selected');
+  if (names.has('selected') || names.has('checked') || names.has('pressed'))
+    states.push('selected');
   if (names.has('error')) states.push('error');
   if (names.has('readOnly')) states.push('read-only');
   return states;
@@ -228,7 +250,8 @@ function CanonicalExampleFallback({ entry }: { entry: UiCatalogEntry }) {
   if (!example || !Example) {
     return (
       <Text tone="tertiary">
-        This export still needs source-owned preview fixture metadata before it can be rendered safely.
+        This export still needs source-owned preview fixture metadata before it can be rendered
+        safely.
       </Text>
     );
   }
@@ -263,24 +286,46 @@ function PreviewStage({
         data-studio-state={state}
         data-preferred-width={preferredWidth}
       >
-        {!preferExample && Component && canSeedRequiredProps(entry)
-          ? createElement(Component, resolved)
-          : <CanonicalExampleFallback entry={entry} />}
+        {!preferExample && Component && canSeedRequiredProps(entry) ? (
+          createElement(Component, resolved)
+        ) : (
+          <CanonicalExampleFallback entry={entry} />
+        )}
       </div>
     </CatalogErrorBoundary>
   );
 }
 
-export function CatalogComponentPreview({ entry, compact = false }: { entry: UiCatalogEntry; compact?: boolean }) {
+export function CatalogComponentPreview({
+  entry,
+  compact = false,
+}: {
+  entry: UiCatalogEntry;
+  compact?: boolean;
+}) {
   const seed = useMemo(() => initialProps(entry), [entry]);
   const [values, setValues] = useState<Record<string, unknown>>(seed);
   return (
-    <Surface material="subtle" radius="lg" className="ui-studio-component-preview" data-compact={compact || undefined}>
+    <Surface
+      material="subtle"
+      radius="lg"
+      className="ui-studio-component-preview"
+      data-compact={compact || undefined}
+    >
       <Stack gap="md">
-        <Row justify="between" align="center" gap="sm" className="ui-studio-component-preview__header">
+        <Row
+          justify="between"
+          align="center"
+          gap="sm"
+          className="ui-studio-component-preview__header"
+        >
           <Stack gap="3xs">
-            <Label tone="accent" emphasis="strong">Live component</Label>
-            <Text tone="tertiary">Real <Code>{`@ontologyx/ui.${entry.exportName}`}</Code> · interactive</Text>
+            <Label tone="accent" emphasis="strong">
+              Live component
+            </Label>
+            <Text tone="tertiary">
+              Real <Code>{`@ontologyx/ui.${entry.exportName}`}</Code> · interactive
+            </Text>
           </Stack>
           <Badge tone="success">public export</Badge>
         </Row>
@@ -308,7 +353,9 @@ export function CatalogPlayground({ entry }: { entry: UiCatalogEntry }) {
           <Stack gap="md">
             <Row justify="between" align="center" gap="sm">
               <Stack gap="3xs">
-                <Label tone="accent" emphasis="strong">Live preview</Label>
+                <Label tone="accent" emphasis="strong">
+                  Live preview
+                </Label>
                 <Text tone="tertiary">Interact with the actual public component.</Text>
               </Stack>
               <Badge tone="success">@ontologyx/ui</Badge>
@@ -318,25 +365,37 @@ export function CatalogPlayground({ entry }: { entry: UiCatalogEntry }) {
         </Surface>
         <Surface material="subtle" radius="lg" className="ui-studio-playground__controls">
           <Stack gap="md">
-            <Label tone="accent" emphasis="strong">Safe generated controls</Label>
-            {controls.length ? controls.map((prop) => (
-              <PlaygroundControl
-                key={prop.name}
-                entry={entry}
-                prop={prop}
-                value={values[prop.name] ?? seedValue(entry, prop)}
-                onChange={(value) => setValues((current) => ({ ...current, [prop.name]: value }))}
-              />
-            )) : <Text tone="tertiary">This component is previewed from source-owned fixture/example data; no scalar controls are needed.</Text>}
+            <Label tone="accent" emphasis="strong">
+              Safe generated controls
+            </Label>
+            {controls.length ? (
+              controls.map((prop) => (
+                <PlaygroundControl
+                  key={prop.name}
+                  entry={entry}
+                  prop={prop}
+                  value={values[prop.name] ?? seedValue(entry, prop)}
+                  onChange={(value) => setValues((current) => ({ ...current, [prop.name]: value }))}
+                />
+              ))
+            ) : (
+              <Text tone="tertiary">
+                This component is previewed from source-owned fixture/example data; no scalar
+                controls are needed.
+              </Text>
+            )}
           </Stack>
         </Surface>
       </Grid>
 
       <Stack gap="md">
         <Stack gap="2xs">
-          <Label tone="accent" emphasis="strong">Canonical state matrix</Label>
+          <Label tone="accent" emphasis="strong">
+            Canonical state matrix
+          </Label>
           <Text tone="tertiary">
-            Every cell renders the real public export. Controlled states are materialized directly; hover, pressed and focus remain live interaction targets.
+            Every cell renders the real public export. Controlled states are materialized directly;
+            hover, pressed and focus remain live interaction targets.
           </Text>
         </Stack>
         <Grid columns="auto-fit" minColumn="card" gap="md" className="ui-studio-state-matrix">
@@ -351,11 +410,20 @@ export function CatalogPlayground({ entry }: { entry: UiCatalogEntry }) {
             >
               <Stack gap="sm">
                 <Row className="ui-studio-state-card__header" justify="between" gap="sm">
-                  <Badge size="sm" tone={state === 'error' ? 'danger' : state === 'disabled' ? 'neutral' : 'accent'}>{state}</Badge>
+                  <Badge
+                    size="sm"
+                    tone={
+                      state === 'error' ? 'danger' : state === 'disabled' ? 'neutral' : 'accent'
+                    }
+                  >
+                    {state}
+                  </Badge>
                   <Button
                     size="sm"
                     variant="quiet"
-                    onClick={() => updateCatalogRoute({ tab: 'playground', state, example: null }, 'replace')}
+                    onClick={() =>
+                      updateCatalogRoute({ tab: 'playground', state, example: null }, 'replace')
+                    }
                   >
                     Deep link
                   </Button>
@@ -370,7 +438,9 @@ export function CatalogPlayground({ entry }: { entry: UiCatalogEntry }) {
       <Surface material="subtle" radius="md" className="ui-studio-playground__props">
         <Stack gap="xs">
           <Label emphasis="strong">Current props</Label>
-          <Code wrap="normal" className="ui-studio-code-anywhere">{JSON.stringify(values)}</Code>
+          <Code wrap="normal" className="ui-studio-code-anywhere">
+            {JSON.stringify(values)}
+          </Code>
         </Stack>
       </Surface>
     </Stack>

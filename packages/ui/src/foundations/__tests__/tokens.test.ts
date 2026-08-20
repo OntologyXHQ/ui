@@ -20,12 +20,14 @@ describe('semantic token contract', () => {
   });
 
   it('maps only declared semantic overrides to scoped CSS custom properties', () => {
-    expect(uiTokenStyle({
-      'color-accent': '#123456',
-      'space-md': '1.125rem',
-      'layout-readable': '46rem',
-      'weight-strong': '700',
-    })).toEqual({
+    expect(
+      uiTokenStyle({
+        'color-accent': '#123456',
+        'space-md': '1.125rem',
+        'layout-readable': '46rem',
+        'weight-strong': '700',
+      }),
+    ).toEqual({
       '--oxs-color-accent': '#123456',
       '--oxs-space-md': '1.125rem',
       '--oxs-layout-readable': '46rem',

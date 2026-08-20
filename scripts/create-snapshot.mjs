@@ -16,13 +16,18 @@ function git(args) {
 
 const dirty = git(['status', '--porcelain']);
 if (dirty) {
-  console.error('Snapshot refused: working tree is not clean. Commit/stash intentionally before creating a canonical tracked-source snapshot.');
+  console.error(
+    'Snapshot refused: working tree is not clean. Commit/stash intentionally before creating a canonical tracked-source snapshot.',
+  );
   process.exit(1);
 }
 
 const head = git(['rev-parse', 'HEAD']);
 const branch = git(['branch', '--show-current']) || 'detached';
-const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+const stamp = new Date()
+  .toISOString()
+  .replace(/[-:]/g, '')
+  .replace(/\.\d{3}Z$/, 'Z');
 const base = `OXS-UI-snapshot-${stamp}`;
 const tarPath = path.join(outDir, `${base}.tar`);
 const manifestPath = path.join(outDir, `${base}.json`);

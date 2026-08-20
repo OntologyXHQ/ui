@@ -31,11 +31,7 @@ describe('shared typeahead and selection normalization', () => {
   });
 
   it('normalizes invalid and disabled single selections through one shared rule', () => {
-    const items = [
-      { value: 'one' },
-      { value: 'two', disabled: true },
-      { value: 'three' },
-    ] as const;
+    const items = [{ value: 'one' }, { value: 'two', disabled: true }, { value: 'three' }] as const;
 
     expect(normalizeSingleSelection(items, 'three')).toBe('three');
     expect(normalizeSingleSelection(items, 'two')).toBe('one');

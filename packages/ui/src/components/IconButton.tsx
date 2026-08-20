@@ -6,7 +6,10 @@ import type { ButtonIntent, ButtonVariant, ControlSize } from './Button';
 import { Button } from './Button';
 import { useControllableState } from './controlState';
 
-export type IconButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-label' | 'aria-pressed' | 'children' | 'type'> & {
+export type IconButtonProps = Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'aria-label' | 'aria-pressed' | 'children' | 'type'
+> & {
   /** Accessible action name; IconButton never infers semantics from the glyph. */
   label: string;
   /** Canonical built-in glyph name rendered decoratively inside the labeled button. */
@@ -51,14 +54,16 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
   ref,
 ) {
   const tooltipId = useId().replace(/:/g, '');
-  const toggle = pressed !== undefined || defaultPressed !== undefined || onPressedChange !== undefined;
+  const toggle =
+    pressed !== undefined || defaultPressed !== undefined || onPressedChange !== undefined;
   const [currentPressed, setCurrentPressed] = useControllableState({
     value: pressed,
     defaultValue: defaultPressed ?? false,
     onValueChange: onPressedChange,
   });
   const tooltipDescriptionId = tooltip ? `${tooltipId}-tooltip` : undefined;
-  const combinedDescription = [describedBy, tooltipDescriptionId].filter(Boolean).join(' ') || undefined;
+  const combinedDescription =
+    [describedBy, tooltipDescriptionId].filter(Boolean).join(' ') || undefined;
 
   return (
     <>
@@ -79,12 +84,17 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
         title={title ?? tooltip ?? label}
         onClick={(event) => {
           onClick?.(event);
-          if (!event.defaultPrevented && toggle && !disabled && !loading) setCurrentPressed(!currentPressed);
+          if (!event.defaultPrevented && toggle && !disabled && !loading)
+            setCurrentPressed(!currentPressed);
         }}
       >
         <Icon name={icon} size={size === 'sm' ? 'sm' : 'md'} />
       </Button>
-      {tooltip ? <span id={tooltipDescriptionId} role="tooltip" className="ui-visually-hidden">{tooltip}</span> : null}
+      {tooltip ? (
+        <span id={tooltipDescriptionId} role="tooltip" className="ui-visually-hidden">
+          {tooltip}
+        </span>
+      ) : null}
     </>
   );
 });

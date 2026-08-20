@@ -1,7 +1,13 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { UiRoot } from '../../index';
-import { filterSystemLauncherItems, SystemLauncher, SystemScaffold, SystemSurface, SystemWorkspace } from '..';
+import {
+  filterSystemLauncherItems,
+  SystemLauncher,
+  SystemScaffold,
+  SystemSurface,
+  SystemWorkspace,
+} from '..';
 
 describe('System UI boundary', () => {
   it('keeps workspace, chrome, transient and privileged hosts structurally distinct', () => {
@@ -17,10 +23,9 @@ describe('System UI boundary', () => {
     const root = screen.getByText('Workspace slot').closest('[data-oxs-system-scaffold]');
     expect(root).toHaveStyle('--oxs-system-inset-block-start: 12px');
     expect(root).toHaveStyle('--oxs-system-inset-block-end: 44px');
-    expect(screen.getByText('Privileged slot').closest('[data-oxs-system-surface]')).toHaveAttribute(
-      'data-oxs-system-surface',
-      'privileged',
-    );
+    expect(
+      screen.getByText('Privileged slot').closest('[data-oxs-system-surface]'),
+    ).toHaveAttribute('data-oxs-system-surface', 'privileged');
   });
 
   it('filters launcher items and keeps activation policy outside the System visual', () => {
@@ -51,7 +56,11 @@ describe('System UI boundary', () => {
   });
 
   it('keeps desktop workspace composition separate from native scene authority', () => {
-    render(<SystemWorkspace title="OXS" status="Desktop"><div>Native scene slot</div></SystemWorkspace>);
+    render(
+      <SystemWorkspace title="OXS" status="Desktop">
+        <div>Native scene slot</div>
+      </SystemWorkspace>,
+    );
     expect(screen.getByRole('region', { name: 'Desktop workspace' })).toHaveAttribute(
       'data-oxs-production-workspace',
     );

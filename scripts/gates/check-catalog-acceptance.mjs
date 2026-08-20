@@ -29,7 +29,9 @@ for (const entry of catalog) {
   ids.add(entry.exportName);
 
   if (!allowedStatuses.has(entry.status)) {
-    issues.push(`${entry.exportName}: forbidden/unrecognized lifecycle status ${JSON.stringify(entry.status)}`);
+    issues.push(
+      `${entry.exportName}: forbidden/unrecognized lifecycle status ${JSON.stringify(entry.status)}`,
+    );
     continue;
   }
   if (entry.status === 'candidate') candidate += 1;
@@ -38,7 +40,9 @@ for (const entry of catalog) {
 
   const certification = certificationEntries[entry.exportName];
   if (!certification || typeof certification !== 'object') {
-    issues.push(`${entry.exportName}: accepted export needs a docs/quality/CERTIFICATIONS.json record`);
+    issues.push(
+      `${entry.exportName}: accepted export needs a docs/quality/CERTIFICATIONS.json record`,
+    );
   } else {
     if (!meaningful(certification.owner, 4)) {
       issues.push(`${entry.exportName}: certification needs an owning roadmap part`);
@@ -47,16 +51,29 @@ for (const entry of catalog) {
       issues.push(`${entry.exportName}: certification needs at least one behavior-test owner`);
     } else {
       for (const relative of certification.behaviorTests) {
-        if (typeof relative !== 'string' || !relative.includes('__tests__') || !fs.existsSync(path.join(ROOT, relative))) {
-          issues.push(`${entry.exportName}: certification behavior test is missing/not a test path: ${JSON.stringify(relative)}`);
+        if (
+          typeof relative !== 'string' ||
+          !relative.includes('__tests__') ||
+          !fs.existsSync(path.join(ROOT, relative))
+        ) {
+          issues.push(
+            `${entry.exportName}: certification behavior test is missing/not a test path: ${JSON.stringify(relative)}`,
+          );
         }
       }
     }
-    if (!Array.isArray(certification.browserScenarios) || certification.browserScenarios.length === 0) {
-      issues.push(`${entry.exportName}: certification needs component-specific G6 browser scenario ownership`);
+    if (
+      !Array.isArray(certification.browserScenarios) ||
+      certification.browserScenarios.length === 0
+    ) {
+      issues.push(
+        `${entry.exportName}: certification needs component-specific G6 browser scenario ownership`,
+      );
     }
     if (!Array.isArray(certification.requiredAxes) || certification.requiredAxes.length === 0) {
-      issues.push(`${entry.exportName}: certification needs explicit required browser acceptance axes`);
+      issues.push(
+        `${entry.exportName}: certification needs explicit required browser acceptance axes`,
+      );
     }
   }
 
@@ -76,16 +93,19 @@ for (const entry of catalog) {
   const hasExample = Array.isArray(entry.examples) && entry.examples.length > 0;
   const hasFixture = Boolean(entry.playground?.fixture);
   if (!hasExample && !hasFixture) {
-    issues.push(`${entry.exportName}: accepted export needs a dedicated example or explicit playground fixture`);
+    issues.push(
+      `${entry.exportName}: accepted export needs a dedicated example or explicit playground fixture`,
+    );
   }
 }
-
 
 for (const exportName of Object.keys(certificationEntries)) {
   const entry = catalog.find((candidate) => candidate.exportName === exportName);
   if (!entry) issues.push(`certification references non-catalog export: ${exportName}`);
   else if (entry.status !== 'accepted') {
-    issues.push(`${exportName}: certification record is stale while catalog status is ${entry.status}`);
+    issues.push(
+      `${exportName}: certification record is stale while catalog status is ${entry.status}`,
+    );
   }
 }
 
@@ -101,4 +121,6 @@ if (issues.length > 0) {
   process.exit(1);
 }
 
-console.log(`G1 catalog acceptance gate passed: ${catalog.length} public visual exports · accepted=${accepted} · candidate=${candidate} · no legacy maturity claims.`);
+console.log(
+  `G1 catalog acceptance gate passed: ${catalog.length} public visual exports · accepted=${accepted} · candidate=${candidate} · no legacy maturity claims.`,
+);

@@ -1,5 +1,13 @@
 import type { PropsWithChildren } from 'react';
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   getConfiguredUiClipboardAdapter,
   hasUiClipboardTransport,
@@ -54,24 +62,33 @@ export function EditableTextRuntimeProvider({
     setSession(next);
   }, []);
 
-  const begin = useCallback((next: EditableTextSessionSnapshot) => {
-    const previous = sessionRef.current;
-    if (previous && previous.id !== next.id) bridgeRef.current?.end?.(previous.id);
-    commitSession(next);
-    bridgeRef.current?.begin?.(next);
-  }, [commitSession]);
+  const begin = useCallback(
+    (next: EditableTextSessionSnapshot) => {
+      const previous = sessionRef.current;
+      if (previous && previous.id !== next.id) bridgeRef.current?.end?.(previous.id);
+      commitSession(next);
+      bridgeRef.current?.begin?.(next);
+    },
+    [commitSession],
+  );
 
-  const update = useCallback((next: EditableTextSessionSnapshot) => {
-    if (sessionRef.current?.id !== next.id) return;
-    commitSession(next);
-    bridgeRef.current?.update?.(next);
-  }, [commitSession]);
+  const update = useCallback(
+    (next: EditableTextSessionSnapshot) => {
+      if (sessionRef.current?.id !== next.id) return;
+      commitSession(next);
+      bridgeRef.current?.update?.(next);
+    },
+    [commitSession],
+  );
 
-  const end = useCallback((sessionId: string) => {
-    if (sessionRef.current?.id !== sessionId) return;
-    commitSession(null);
-    bridgeRef.current?.end?.(sessionId);
-  }, [commitSession]);
+  const end = useCallback(
+    (sessionId: string) => {
+      if (sessionRef.current?.id !== sessionId) return;
+      commitSession(null);
+      bridgeRef.current?.end?.(sessionId);
+    },
+    [commitSession],
+  );
 
   const hasClipboard = useCallback(() => adapterRef.current?.isAvailable() ?? false, []);
   const writeClipboardText = useCallback(
@@ -80,7 +97,8 @@ export function EditableTextRuntimeProvider({
   );
   const readClipboardText = useCallback(() => {
     const adapter = adapterRef.current;
-    if (!adapter) return Promise.reject(new Error('OntologyX UI clipboard adapter is unavailable.'));
+    if (!adapter)
+      return Promise.reject(new Error('OntologyX UI clipboard adapter is unavailable.'));
     return adapter.readText();
   }, []);
 

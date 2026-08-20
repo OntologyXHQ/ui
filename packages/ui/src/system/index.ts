@@ -17,8 +17,17 @@ export type {
   SystemDockProps,
   SystemPanelProps,
 } from './DesktopShellLayout';
-export { DesktopShellLayout, SystemBar, SystemChromeGroup, SystemDock, SystemPanel } from './DesktopShellLayout';
-export type { SystemApplicationBrowserProps, SystemApplicationItem } from './SystemApplicationBrowser';
+export {
+  DesktopShellLayout,
+  SystemBar,
+  SystemChromeGroup,
+  SystemDock,
+  SystemPanel,
+} from './DesktopShellLayout';
+export type {
+  SystemApplicationBrowserProps,
+  SystemApplicationItem,
+} from './SystemApplicationBrowser';
 export { SystemApplicationBrowser } from './SystemApplicationBrowser';
 export type { SystemSettingsLayoutProps } from './SystemSettingsLayout';
 export { SystemSettingsLayout } from './SystemSettingsLayout';

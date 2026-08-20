@@ -31,25 +31,18 @@ export function rtlScrollType(): RtlScrollType {
   return cachedRtlScrollType;
 }
 
-export function logicalHorizontalFromPhysical(
-  type: RtlScrollType,
-  max: number,
-  physical: number,
-) {
+export function logicalHorizontalFromPhysical(type: RtlScrollType, max: number, physical: number) {
   const boundedMax = Math.max(0, max);
-  const logical = type === 'negative'
-    ? -physical
-    : type === 'positive-descending'
-      ? boundedMax - physical
-      : physical;
+  const logical =
+    type === 'negative'
+      ? -physical
+      : type === 'positive-descending'
+        ? boundedMax - physical
+        : physical;
   return Math.min(boundedMax, Math.max(0, logical));
 }
 
-export function physicalHorizontalFromLogical(
-  type: RtlScrollType,
-  max: number,
-  logical: number,
-) {
+export function physicalHorizontalFromLogical(type: RtlScrollType, max: number, logical: number) {
   const boundedMax = Math.max(0, max);
   const value = Math.min(boundedMax, Math.max(0, logical));
   if (type === 'negative') return -value;
@@ -70,12 +63,15 @@ export function writeLogicalHorizontalScroll(
 ) {
   const max = Math.max(0, element.scrollWidth - element.clientWidth);
   const value = Math.min(max, Math.max(0, logicalPosition));
-  element.scrollLeft = direction === 'ltr'
-    ? value
-    : physicalHorizontalFromLogical(rtlScrollType(), max, value);
+  element.scrollLeft =
+    direction === 'ltr' ? value : physicalHorizontalFromLogical(rtlScrollType(), max, value);
 }
 
-export function logicalInlineStart(item: HTMLElement, content: HTMLElement, direction: 'ltr' | 'rtl') {
+export function logicalInlineStart(
+  item: HTMLElement,
+  content: HTMLElement,
+  direction: 'ltr' | 'rtl',
+) {
   if (direction === 'ltr') return item.offsetLeft;
   return Math.max(0, content.scrollWidth - (item.offsetLeft + item.offsetWidth));
 }

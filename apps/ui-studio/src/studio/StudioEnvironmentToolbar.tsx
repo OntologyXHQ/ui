@@ -109,7 +109,9 @@ export function StudioEnvironmentToolbar() {
             fieldSize="sm"
             options={pointerOptions}
             value={environment.pointerPrecision}
-            onValueChange={(value) => update('pointerPrecision', value as typeof environment.pointerPrecision)}
+            onValueChange={(value) =>
+              update('pointerPrecision', value as typeof environment.pointerPrecision)
+            }
           />
           <Select
             label="Viewport preset"
@@ -133,7 +135,9 @@ export function StudioEnvironmentToolbar() {
             fieldSize="sm"
             options={safeAreaOptions}
             value={environment.insetPreset}
-            onValueChange={(value) => update('insetPreset', value as typeof environment.insetPreset)}
+            onValueChange={(value) =>
+              update('insetPreset', value as typeof environment.insetPreset)
+            }
           />
         </Toolbar>
       </Row>

@@ -65,7 +65,8 @@ export class DocumentOverlayBroker {
   private recomputePortalRanks() {
     const next = new Map<HTMLElement, number>();
     this.registrations.forEach((registration, index) => {
-      const portalRoot = registration.entry.layer?.closest<HTMLElement>('[data-oxs-portal-root]') ?? null;
+      const portalRoot =
+        registration.entry.layer?.closest<HTMLElement>('[data-oxs-portal-root]') ?? null;
       if (portalRoot) next.set(portalRoot, index + 1);
     });
     for (const portalRoot of this.rankedPortalRoots) {
@@ -124,7 +125,10 @@ export class OverlayCoordinator {
 
   register(entry: OverlayEntry) {
     const replaced = this.entries.find((candidate) => candidate.id === entry.id);
-    if (replaced?.layer?.ownerDocument && replaced.layer.ownerDocument !== entry.layer?.ownerDocument) {
+    if (
+      replaced?.layer?.ownerDocument &&
+      replaced.layer.ownerDocument !== entry.layer?.ownerDocument
+    ) {
       documentOverlayBroker(replaced.layer.ownerDocument).unregister(this, entry.id);
     }
 
@@ -165,9 +169,7 @@ export class OverlayCoordinator {
     const entry = this.entries.find((candidate) => candidate.id === id);
     const documentRef = entry?.layer?.ownerDocument ?? null;
     return Boolean(
-      documentRef &&
-        this.isTopMost(id) &&
-        documentOverlayBroker(documentRef).isTopMost(this, id),
+      documentRef && this.isTopMost(id) && documentOverlayBroker(documentRef).isTopMost(this, id),
     );
   }
 

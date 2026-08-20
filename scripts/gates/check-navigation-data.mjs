@@ -35,7 +35,7 @@ for (const token of [
   'LiHTMLAttributes<HTMLLIElement>',
   '<li',
   'state?: ListState',
-  "role={state === 'error' ? 'alert' : state === 'loading' ? 'status' : undefined}",
+  "role={state === 'error' ? 'alert' : 'status'}",
 ]) {
   if (!list.includes(token)) issues.push(`semantic list contract missing ${token}`);
 }

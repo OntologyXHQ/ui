@@ -38,7 +38,9 @@ export async function getFreePort() {
     server.listen(0, '127.0.0.1', () => {
       const address = server.address();
       if (!address || typeof address === 'string') {
-        server.close(() => reject(new Error('Could not allocate a local browser-acceptance port.')));
+        server.close(() =>
+          reject(new Error('Could not allocate a local browser-acceptance port.')),
+        );
         return;
       }
       const { port } = address;
@@ -62,7 +64,9 @@ async function waitForUrl(url, child, timeoutMs = 20_000) {
     }
     await sleep(100);
   }
-  throw new Error(`Studio preview did not become ready at ${url}: ${lastError?.message ?? 'timeout'}`);
+  throw new Error(
+    `Studio preview did not become ready at ${url}: ${lastError?.message ?? 'timeout'}`,
+  );
 }
 
 export async function startStudioPreview() {
@@ -129,7 +133,11 @@ function platformBrowserCandidates() {
     ];
   }
   if (process.platform === 'win32') {
-    const roots = [process.env.PROGRAMFILES, process.env['PROGRAMFILES(X86)'], process.env.LOCALAPPDATA].filter(Boolean);
+    const roots = [
+      process.env.PROGRAMFILES,
+      process.env['PROGRAMFILES(X86)'],
+      process.env.LOCALAPPDATA,
+    ].filter(Boolean);
     return roots.flatMap((root) => [
       path.join(root, 'Google/Chrome/Application/chrome.exe'),
       path.join(root, 'Chromium/Application/chrome.exe'),
@@ -191,21 +199,24 @@ export async function launchSystemBrowser() {
   );
 }
 
-export function routeUrl(baseUrl, {
-  entry = 'Button',
-  tab = 'overview',
-  theme = 'dark',
-  dir = 'ltr',
-  density = 'comfortable',
-  motion = 'full',
-  modality = 'mouse',
-  pointer = 'fine',
-  viewport = 'fit',
-  container = 'auto',
-  insets = 'none',
-  example = null,
-  state = null,
-} = {}) {
+export function routeUrl(
+  baseUrl,
+  {
+    entry = 'Button',
+    tab = 'overview',
+    theme = 'dark',
+    dir = 'ltr',
+    density = 'comfortable',
+    motion = 'full',
+    modality = 'mouse',
+    pointer = 'fine',
+    viewport = 'fit',
+    container = 'auto',
+    insets = 'none',
+    example = null,
+    state = null,
+  } = {},
+) {
   const url = new URL('/', baseUrl);
   const values = {
     'ui-kit': '1',
@@ -266,7 +277,8 @@ export function attachRuntimeDiagnostics(page) {
     const type = message.type();
     const text = message.text();
     const accessibilityWarning =
-      type === 'warning' && /blocked aria-hidden|descendant retained focus|focus must not be hidden/i.test(text);
+      type === 'warning' &&
+      /blocked aria-hidden|descendant retained focus|focus must not be hidden/i.test(text);
     if (type !== 'error' && !accessibilityWarning) return;
     const location = message.location();
     const source = location.url
@@ -278,11 +290,17 @@ export function attachRuntimeDiagnostics(page) {
     if (response.status() >= 400) errors.push(`http ${response.status()}: ${response.url()}`);
   });
   page.on('requestfailed', (request) => {
-    errors.push(`requestfailed: ${request.method()} ${request.url()} (${request.failure()?.errorText ?? 'unknown error'})`);
+    errors.push(
+      `requestfailed: ${request.method()} ${request.url()} (${request.failure()?.errorText ?? 'unknown error'})`,
+    );
   });
   return {
     assertClean(label) {
-      assert.equal(errors.length, 0, `${label} produced browser runtime errors:\n${errors.join('\n')}`);
+      assert.equal(
+        errors.length,
+        0,
+        `${label} produced browser runtime errors:\n${errors.join('\n')}`,
+      );
     },
   };
 }
@@ -313,7 +331,11 @@ export async function gotoCatalog(page, baseUrl, options = {}) {
   assert.equal(route.get('tab'), tab, 'Studio route did not preserve the requested tab.');
   let requestedExample = null;
   if (options.example) {
-    assert.equal(route.get('example'), options.example, 'Studio route did not preserve the requested example.');
+    assert.equal(
+      route.get('example'),
+      options.example,
+      'Studio route did not preserve the requested example.',
+    );
     requestedExample = workbench.locator(`#example-${options.example}`);
     await requestedExample.first().waitFor({ state: 'attached' });
     assert.equal(
@@ -321,10 +343,17 @@ export async function gotoCatalog(page, baseUrl, options = {}) {
       1,
       `Studio example deep link ${options.example} did not resolve to exactly one canonical fixture inside ${entry}.`,
     );
-    await assertActiveCatalogDeepTarget(requestedExample, `Studio example deep link ${options.example}`);
+    await assertActiveCatalogDeepTarget(
+      requestedExample,
+      `Studio example deep link ${options.example}`,
+    );
   }
   if (options.state) {
-    assert.equal(route.get('state'), options.state, 'Studio route did not preserve the requested playground state.');
+    assert.equal(
+      route.get('state'),
+      options.state,
+      'Studio route did not preserve the requested playground state.',
+    );
   }
   // Stacked Studio deliberately mounts overview, examples, state samples and playground together.
   // Example journeys therefore receive the exact canonical fixture rather than the whole workbench,
@@ -332,15 +361,24 @@ export async function gotoCatalog(page, baseUrl, options = {}) {
   return requestedExample ?? workbench;
 }
 
-
-export async function waitForStudioExampleControl(page, locator, label, { timeoutMs = 8_000 } = {}) {
+export async function waitForStudioExampleControl(
+  page,
+  locator,
+  label,
+  { timeoutMs = 8_000 } = {},
+) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     if (await locator.isVisible().catch(() => false)) return;
-    const failure = page.locator('.ui-catalog-error').filter({ hasText: 'Isolated example failure' }).first();
+    const failure = page
+      .locator('.ui-catalog-error')
+      .filter({ hasText: 'Isolated example failure' })
+      .first();
     if (await failure.isVisible().catch(() => false)) {
       const detail = (await failure.innerText()).replace(/\s+/g, ' ').trim();
-      throw new Error(`${label} did not render because its public-package Studio example failed: ${detail}`);
+      throw new Error(
+        `${label} did not render because its public-package Studio example failed: ${detail}`,
+      );
     }
     await sleep(50);
   }
@@ -450,11 +488,19 @@ export async function assertEnvironment(page, expected) {
     'pointerPreference',
     'adaptiveBand',
   ]) {
-    if (expected[key] !== undefined) assert.equal(actual[key], expected[key], `Environment mismatch for ${key}.`);
+    if (expected[key] !== undefined)
+      assert.equal(actual[key], expected[key], `Environment mismatch for ${key}.`);
   }
-  if (expected.viewport !== undefined) assert.equal(viewport.preset, expected.viewport, 'Viewport preset mismatch.');
-  if (expected.viewportWidth !== undefined) assert.equal(viewport.width, expected.viewportWidth, 'Viewport width projection mismatch.');
-  if (expected.containerWidth !== undefined) assert.equal(viewport.containerWidth, expected.containerWidth, 'Container width projection mismatch.');
+  if (expected.viewport !== undefined)
+    assert.equal(viewport.preset, expected.viewport, 'Viewport preset mismatch.');
+  if (expected.viewportWidth !== undefined)
+    assert.equal(viewport.width, expected.viewportWidth, 'Viewport width projection mismatch.');
+  if (expected.containerWidth !== undefined)
+    assert.equal(
+      viewport.containerWidth,
+      expected.containerWidth,
+      'Container width projection mismatch.',
+    );
   for (const [label, projection] of [
     ['Safe-area', expected.safeArea],
     ['Occlusion', expected.occlusion],
@@ -477,13 +523,22 @@ export async function runAxe(page, label) {
       resultTypes: ['violations', 'incomplete'],
     });
   });
-  const blockers = result.violations.filter((violation) => violation.impact === 'serious' || violation.impact === 'critical');
+  const blockers = result.violations.filter(
+    (violation) => violation.impact === 'serious' || violation.impact === 'critical',
+  );
   if (blockers.length) {
-    const detail = blockers.map((violation) => {
-      const targets = violation.nodes.slice(0, 4).map((node) => node.target.join(' ')).join(', ');
-      return `${violation.impact} ${violation.id}: ${violation.help} [${targets}]`;
-    }).join('\n');
-    throw new Error(`${label} has ${blockers.length} serious/critical axe violation(s):\n${detail}`);
+    const detail = blockers
+      .map((violation) => {
+        const targets = violation.nodes
+          .slice(0, 4)
+          .map((node) => node.target.join(' '))
+          .join(', ');
+        return `${violation.impact} ${violation.id}: ${violation.help} [${targets}]`;
+      })
+      .join('\n');
+    throw new Error(
+      `${label} has ${blockers.length} serious/critical axe violation(s):\n${detail}`,
+    );
   }
   return {
     violations: result.violations.length,
@@ -503,7 +558,9 @@ export async function focusByTab(page, locator, { maxSteps = 120 } = {}) {
     await page.keyboard.press('Tab');
     if (await locator.evaluate((element) => document.activeElement === element)) return index + 1;
   }
-  throw new Error(`Element was not reachable in sequential keyboard navigation after ${maxSteps} Tab presses.`);
+  throw new Error(
+    `Element was not reachable in sequential keyboard navigation after ${maxSteps} Tab presses.`,
+  );
 }
 
 export async function assertVisibleFocus(locator, label) {
@@ -519,10 +576,21 @@ export async function assertVisibleFocus(locator, label) {
     };
   });
   assert.equal(state.active, true, `${label} is not the active element.`);
-  assert.equal(state.focusVisible, true, `${label} does not match :focus-visible after keyboard navigation.`);
-  const outlineVisible = state.outlineStyle !== 'none' && Number.parseFloat(state.outlineWidth) > 0 && state.outlineColor !== 'transparent';
+  assert.equal(
+    state.focusVisible,
+    true,
+    `${label} does not match :focus-visible after keyboard navigation.`,
+  );
+  const outlineVisible =
+    state.outlineStyle !== 'none' &&
+    Number.parseFloat(state.outlineWidth) > 0 &&
+    state.outlineColor !== 'transparent';
   const shadowVisible = state.boxShadow !== 'none' && !state.boxShadow.includes('rgba(0, 0, 0, 0)');
-  assert.equal(outlineVisible || shadowVisible, true, `${label} has no observable focus indicator.`);
+  assert.equal(
+    outlineVisible || shadowVisible,
+    true,
+    `${label} has no observable focus indicator.`,
+  );
 }
 
 export async function assertNoGlobalHorizontalOverflow(page, label, tolerance = 1) {
@@ -537,7 +605,10 @@ export async function assertNoGlobalHorizontalOverflow(page, label, tolerance = 
     };
   });
   const overflow = Math.max(geometry.documentScroll, geometry.bodyScroll) - geometry.documentClient;
-  assert.ok(overflow <= tolerance, `${label} has ${overflow}px of page-level horizontal overflow at ${geometry.viewport}px viewport width.`);
+  assert.ok(
+    overflow <= tolerance,
+    `${label} has ${overflow}px of page-level horizontal overflow at ${geometry.viewport}px viewport width.`,
+  );
   return geometry;
 }
 
@@ -551,8 +622,14 @@ export async function assertWithinViewport(locator, label, tolerance = 1) {
       viewport: window.innerWidth,
     };
   });
-  assert.ok(result.left >= -tolerance, `${label} starts outside the inline viewport (${result.left}px).`);
-  assert.ok(result.right <= result.viewport + tolerance, `${label} escapes the inline viewport (${result.right}px > ${result.viewport}px).`);
+  assert.ok(
+    result.left >= -tolerance,
+    `${label} starts outside the inline viewport (${result.left}px).`,
+  );
+  assert.ok(
+    result.right <= result.viewport + tolerance,
+    `${label} escapes the inline viewport (${result.right}px > ${result.viewport}px).`,
+  );
 }
 
 export async function assertMinimumBlockSize(locator, minimumPx, label) {
@@ -593,9 +670,12 @@ export async function performTouchLongPress(
   await locator.evaluate((target) => {
     target.scrollIntoView({ block: 'center', inline: 'center', behavior: 'auto' });
   });
-  await page.evaluate(() => new Promise((resolve) => {
-    requestAnimationFrame(() => requestAnimationFrame(resolve));
-  }));
+  await page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(resolve));
+      }),
+  );
 
   const box = await locator.boundingBox();
   assert.ok(box, 'Long-press target has no browser geometry.');
@@ -607,35 +687,38 @@ export async function performTouchLongPress(
     x >= 0 && x <= viewport.width && y >= 0 && y <= viewport.height,
     `Long-press target center is outside the browser viewport (${Math.round(x)}, ${Math.round(y)} within ${viewport.width}x${viewport.height}).`,
   );
-  const hitTest = await locator.evaluate((target, point) => {
-    const hit = document.elementFromPoint(point.x, point.y);
-    const describe = (element) => {
-      if (!(element instanceof Element)) return null;
-      const rect = element.getBoundingClientRect();
-      const style = getComputedStyle(element);
-      return {
-        tag: element.tagName.toLowerCase(),
-        id: element.id || null,
-        className: typeof element.className === 'string' ? element.className : null,
-        role: element.getAttribute('role'),
-        ariaLabel: element.getAttribute('aria-label'),
-        pointerEvents: style.pointerEvents,
-        position: style.position,
-        zIndex: style.zIndex,
-        rect: {
-          x: Math.round(rect.x),
-          y: Math.round(rect.y),
-          width: Math.round(rect.width),
-          height: Math.round(rect.height),
-        },
+  const hitTest = await locator.evaluate(
+    (target, point) => {
+      const hit = document.elementFromPoint(point.x, point.y);
+      const describe = (element) => {
+        if (!(element instanceof Element)) return null;
+        const rect = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return {
+          tag: element.tagName.toLowerCase(),
+          id: element.id || null,
+          className: typeof element.className === 'string' ? element.className : null,
+          role: element.getAttribute('role'),
+          ariaLabel: element.getAttribute('aria-label'),
+          pointerEvents: style.pointerEvents,
+          position: style.position,
+          zIndex: style.zIndex,
+          rect: {
+            x: Math.round(rect.x),
+            y: Math.round(rect.y),
+            width: Math.round(rect.width),
+            height: Math.round(rect.height),
+          },
+        };
       };
-    };
-    return {
-      owned: hit === target || (hit instanceof Node && target.contains(hit)),
-      target: describe(target),
-      hit: describe(hit),
-    };
-  }, { x, y });
+      return {
+        owned: hit === target || (hit instanceof Node && target.contains(hit)),
+        target: describe(target),
+        hit: describe(hit),
+      };
+    },
+    { x, y },
+  );
   assert.equal(
     hitTest.owned,
     true,
@@ -663,7 +746,9 @@ export async function performTouchLongPress(
     return activationMs;
   } finally {
     if (touchStarted) {
-      await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }).catch(() => {});
+      await session
+        .send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+        .catch(() => {});
     }
     await session.detach();
   }

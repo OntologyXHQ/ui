@@ -6,7 +6,10 @@ import type {
 } from 'react';
 import { useCallback, useEffect, useId, useRef } from 'react';
 import { useGestureArena } from '../gestures/runtime';
-import { releasePointerCaptureIfSupported, setPointerCaptureIfSupported } from '../gestures/pointerCapture';
+import {
+  releasePointerCaptureIfSupported,
+  setPointerCaptureIfSupported,
+} from '../gestures/pointerCapture';
 import { useDragDropRuntime } from './runtime';
 import type { DragItem, DragPoint, DragPreview } from './types';
 
@@ -51,15 +54,18 @@ export function useDragSource({
   const gestureArena = useGestureArena();
   const keyboardActive = session?.sourceId === id && session.modality === 'keyboard';
 
-  const clearPending = useCallback((releaseArena = true) => {
-    const pending = pendingRef.current;
-    if (!pending) return;
-    if (pending.timer !== null) window.clearTimeout(pending.timer);
-    if (releaseArena) gestureArena.release(pending.pointerId, gestureOwner);
-    pending.unregister();
-    releasePointerCaptureIfSupported(pending.target, pending.pointerId);
-    pendingRef.current = null;
-  }, [gestureArena, gestureOwner]);
+  const clearPending = useCallback(
+    (releaseArena = true) => {
+      const pending = pendingRef.current;
+      if (!pending) return;
+      if (pending.timer !== null) window.clearTimeout(pending.timer);
+      if (releaseArena) gestureArena.release(pending.pointerId, gestureOwner);
+      pending.unregister();
+      releasePointerCaptureIfSupported(pending.target, pending.pointerId);
+      pendingRef.current = null;
+    },
+    [gestureArena, gestureOwner],
+  );
 
   const start = useCallback(
     (pending: PendingPointer) => {
@@ -68,7 +74,12 @@ export function useDragSource({
         sourceId: id,
         pointerId: pending.pointerId,
         pointerType: pending.pointerType,
-        modality: pending.pointerType === 'touch' ? 'touch' : pending.pointerType === 'pen' ? 'pen' : 'pointer',
+        modality:
+          pending.pointerType === 'touch'
+            ? 'touch'
+            : pending.pointerType === 'pen'
+              ? 'pen'
+              : 'pointer',
         item,
         point: pending.latest,
         preview,
@@ -124,7 +135,10 @@ export function useDragSource({
       const pending = pendingRef.current;
       if (!pending || event.pointerId !== pending.pointerId) return;
       pending.latest = { x: event.clientX, y: event.clientY };
-      const distance = Math.hypot(pending.latest.x - pending.origin.x, pending.latest.y - pending.origin.y);
+      const distance = Math.hypot(
+        pending.latest.x - pending.origin.x,
+        pending.latest.y - pending.origin.y,
+      );
       if (!pending.active) {
         if (pending.pointerType === 'touch') {
           if (distance >= threshold) clearPending();
@@ -146,7 +160,8 @@ export function useDragSource({
       const owned = pending.active && gestureArena.owns(event.pointerId, gestureOwner);
       if (owned) {
         suppressNextClickRef.current = true;
-        if (suppressClickTimerRef.current !== null) window.clearTimeout(suppressClickTimerRef.current);
+        if (suppressClickTimerRef.current !== null)
+          window.clearTimeout(suppressClickTimerRef.current);
         suppressClickTimerRef.current = window.setTimeout(() => {
           suppressNextClickRef.current = false;
           suppressClickTimerRef.current = null;
@@ -179,7 +194,6 @@ export function useDragSource({
     event.stopPropagation();
   }, []);
 
-
   const onKeyDown = useCallback(
     (event: ReactKeyboardEvent<HTMLElement>) => {
       if (disabled || keyboardActive || (event.key !== ' ' && event.key !== 'Enter')) return;
@@ -203,7 +217,8 @@ export function useDragSource({
     () => () => {
       if (pendingRef.current?.active) cancel();
       clearPending();
-      if (suppressClickTimerRef.current !== null) window.clearTimeout(suppressClickTimerRef.current);
+      if (suppressClickTimerRef.current !== null)
+        window.clearTimeout(suppressClickTimerRef.current);
     },
     [cancel, clearPending],
   );
@@ -217,7 +232,9 @@ export function useDragSource({
     onClickCapture,
     onKeyDown,
     tabIndex: disabled ? undefined : 0,
-    'aria-keyshortcuts': disabled ? undefined : 'Space Enter ArrowUp ArrowDown ArrowLeft ArrowRight Escape',
+    'aria-keyshortcuts': disabled
+      ? undefined
+      : 'Space Enter ArrowUp ArrowDown ArrowLeft ArrowRight Escape',
     'data-oxs-drag-source': id,
     'data-oxs-drag-active': keyboardActive ? 'true' : 'false',
   };

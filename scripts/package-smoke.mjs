@@ -123,10 +123,19 @@ export const Smoke = () => (
   );
 
   run(['install', '--prefer-offline', '--ignore-scripts', '--strict-peer-dependencies'], consumer);
-  runNode(['--input-type=module', '--eval', "await import('@ontologyx/ui'); await import('@ontologyx/ui/advanced'); await import('@ontologyx/ui/icons');"], consumer);
+  runNode(
+    [
+      '--input-type=module',
+      '--eval',
+      "await import('@ontologyx/ui'); await import('@ontologyx/ui/advanced'); await import('@ontologyx/ui/icons');",
+    ],
+    consumer,
+  );
   run(['exec', 'tsc', '--noEmit', '-p', 'tsconfig.json', '--pretty', 'false'], consumer);
   run(['exec', 'vite', 'build'], consumer);
-  console.log('Published-tarball consumer smoke passed: install · Node import (main/advanced/icons) · types · explicit styles export · Vite build.');
+  console.log(
+    'Published-tarball consumer smoke passed: install · Node import (main/advanced/icons) · types · explicit styles export · Vite build.',
+  );
 } finally {
   await rm(temp, { recursive: true, force: true });
 }

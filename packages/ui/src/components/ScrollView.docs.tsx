@@ -5,7 +5,8 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'ScrollView',
     layer: 'components',
-    category: 'Interaction', order: 80,
+    category: 'Interaction',
+    order: 80,
     summary:
       'Reusable scroll owner with inertia, overscroll, snapping, indicators and keyboard support.',
     usage:
@@ -28,14 +29,16 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'ScrollSnapItem',
     layer: 'components',
-    category: 'Interaction', order: 80,
+    category: 'Interaction',
+    order: 80,
     summary: 'Child marker that contributes real start/center/end snap alignment to ScrollView.',
     usage: 'Use only as a direct/owned ScrollView child when snap behavior is needed.',
     status: 'candidate',
     accessibility: 'Does not alter child accessibility semantics.',
     rtl: 'Start/end snap alignment is interpreted logically by the scroll service.',
     touch: 'Does not own touch input independently of ScrollView.',
-    responsive: 'Start/center/end offsets derive from real item and viewport geometry, then clamp through the shared scroll service.',
+    responsive:
+      'Start/center/end offsets derive from real item and viewport geometry, then clamp through the shared scroll service.',
   },
 ] as const);
 

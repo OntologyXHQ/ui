@@ -58,25 +58,27 @@ export function filterCatalog(entries: readonly UiCatalogEntry[], query: string)
 }
 
 export function groupCatalog(entries: readonly UiCatalogEntry[]): readonly CatalogLayerGroup[] {
-  return catalogLayerOrder.map((layer) => {
-    const layerEntries = entries.filter((entry) => entry.layer === layer);
-    const categoryMap = new Map<string, UiCatalogEntry[]>();
-    for (const entry of layerEntries) {
-      const bucket = categoryMap.get(entry.category) ?? [];
-      bucket.push(entry);
-      categoryMap.set(entry.category, bucket);
-    }
-    const categories = [...categoryMap.entries()]
-      .map(([label, categoryEntries]) => ({
-        id: `${layer}:${label}`,
-        layer,
-        label,
-        order: Math.min(...categoryEntries.map((entry) => entry.order)),
-        entries: [...categoryEntries].sort(
-          (a, b) => a.order - b.order || a.exportName.localeCompare(b.exportName),
-        ),
-      }))
-      .sort((a, b) => a.order - b.order || a.label.localeCompare(b.label));
-    return { layer, categories, count: layerEntries.length };
-  }).filter((group) => group.count > 0);
+  return catalogLayerOrder
+    .map((layer) => {
+      const layerEntries = entries.filter((entry) => entry.layer === layer);
+      const categoryMap = new Map<string, UiCatalogEntry[]>();
+      for (const entry of layerEntries) {
+        const bucket = categoryMap.get(entry.category) ?? [];
+        bucket.push(entry);
+        categoryMap.set(entry.category, bucket);
+      }
+      const categories = [...categoryMap.entries()]
+        .map(([label, categoryEntries]) => ({
+          id: `${layer}:${label}`,
+          layer,
+          label,
+          order: Math.min(...categoryEntries.map((entry) => entry.order)),
+          entries: [...categoryEntries].sort(
+            (a, b) => a.order - b.order || a.exportName.localeCompare(b.exportName),
+          ),
+        }))
+        .sort((a, b) => a.order - b.order || a.label.localeCompare(b.label));
+      return { layer, categories, count: layerEntries.length };
+    })
+    .filter((group) => group.count > 0);
 }

@@ -6,14 +6,13 @@ import type {
   PointerEventHandler,
   PropsWithChildren,
   ReactElement,
-  ReactNode,
-  RefObject,
   FocusEvent as ReactFocusEvent,
   KeyboardEvent as ReactKeyboardEvent,
   MouseEvent as ReactMouseEvent,
+  ReactNode,
   PointerEvent as ReactPointerEvent,
+  RefObject,
 } from 'react';
-import { createPortal } from 'react-dom';
 import {
   cloneElement,
   Fragment,
@@ -24,10 +23,23 @@ import {
   useRef,
   useState,
 } from 'react';
-import { usePanGesture } from '../gestures';
+import { createPortal } from 'react-dom';
 import { useUiPortalHost, viewportPointToPortalHost } from '../foundations/portal';
-import type { FloatingAnchor, FloatingGeometryRect, FloatingPlacement, PressActivation } from '../interaction';
-import { focusRelativeTo, isTypeaheadCharacter, TypeaheadController, useFloatingPosition, useOverlayLifecycle, useRovingFocus } from '../interaction';
+import { usePanGesture } from '../gestures';
+import type {
+  FloatingAnchor,
+  FloatingGeometryRect,
+  FloatingPlacement,
+  PressActivation,
+} from '../interaction';
+import {
+  focusRelativeTo,
+  isTypeaheadCharacter,
+  TypeaheadController,
+  useFloatingPosition,
+  useOverlayLifecycle,
+  useRovingFocus,
+} from '../interaction';
 import type { InteractiveTransitionController } from '../motion';
 import { useInteractiveTransition } from '../motion';
 import { SafeArea, Surface } from '../primitives';
@@ -41,20 +53,42 @@ const CONTEXT_LONG_PRESS_DELAY = 520;
 
 export type DialogSize = 'sm' | 'md' | 'lg' | 'fullscreen';
 type DialogName =
-  | { title: ReactNode; ariaLabel?: string }
-  | { title?: undefined; ariaLabel: string };
+  | {
+      /** Visible dialog title used as the accessible name. */
+      title: ReactNode;
+      /** Optional fallback label; ignored when title is present. */
+      ariaLabel?: string;
+    }
+  | {
+      /** Omitting title requires an explicit accessible label. */
+      title?: undefined;
+      /** Accessible dialog name when no visible title is rendered. */
+      ariaLabel: string;
+    };
 type DialogBaseProps = PropsWithChildren<{
+  /** Controlled visibility state for the overlay lifecycle. */
   open: boolean;
+  /** Receives dismissal and visibility requests from the shared overlay lifecycle. */
   onOpenChange: (open: boolean) => void;
+  /** Optional descriptive copy wired to aria-describedby. */
   description?: ReactNode;
+  /** Optional action footer rendered after dialog content. */
   actions?: ReactNode;
+  /** Bounded dialog presentation size. @default md */
   size?: DialogSize;
+  /** Enables focus isolation, scrim and scroll locking. @default true */
   modal?: boolean;
+  /** Allows topmost outside interaction to request dismissal. @default true */
   dismissOnOutsidePress?: boolean;
+  /** Allows topmost Escape to request dismissal. @default true */
   dismissOnEscape?: boolean;
+  /** Moves focus into the surface when it becomes active. @default true */
   autoFocus?: boolean;
+  /** Restores focus to the prior valid target after close. @default true */
   restoreFocus?: boolean;
+  /** Additional class name applied to the dialog surface. */
   className?: string;
+  /** ARIA dialog role; AlertDialog owns alertdialog automatically. @default dialog */
   role?: 'dialog' | 'alertdialog';
 }>;
 export type DialogProps = DialogName & DialogBaseProps;
@@ -127,8 +161,16 @@ export function Dialog({
         >
           {title || description ? (
             <header className="ui-dialog__header">
-              {title ? <h2 id={titleId} className="ui-dialog__title">{title}</h2> : null}
-              {description ? <p id={descriptionId} className="ui-dialog__description">{description}</p> : null}
+              {title ? (
+                <h2 id={titleId} className="ui-dialog__title">
+                  {title}
+                </h2>
+              ) : null}
+              {description ? (
+                <p id={descriptionId} className="ui-dialog__description">
+                  {description}
+                </p>
+              ) : null}
             </header>
           ) : null}
           <div className="ui-dialog__content">{children}</div>
@@ -142,10 +184,15 @@ export function Dialog({
 
 export type AlertDialogProps = DialogName &
   Omit<DialogBaseProps, 'actions' | 'role' | 'dismissOnOutsidePress'> & {
+    /** Visible label for the consequential confirmation action. */
     confirmLabel: string;
+    /** Visible label for the cancellation action. @default Cancel */
     cancelLabel?: string;
+    /** Confirmation emphasis without changing alert semantics. @default default */
     confirmTone?: 'default' | 'danger';
+    /** Called when the user explicitly confirms the action. */
     onConfirm: () => void;
+    /** Optional callback before cancellation closes the alert dialog. */
     onCancel?: () => void;
   };
 
@@ -192,21 +239,43 @@ export function AlertDialog({
 }
 
 type OverlayAnchorProps =
-  | { anchorRef: RefObject<HTMLElement | null>; anchorRect?: never }
-  | { anchorRect: FloatingGeometryRect; anchorRef?: never };
+  | {
+      /** Live anchor element observed in its owner realm for geometry changes. */
+      anchorRef: RefObject<HTMLElement | null>;
+      /** Static geometry is mutually exclusive with a live anchor reference. */
+      anchorRect?: never;
+    }
+  | {
+      /** Explicit anchor geometry for pointer-position or fixture-owned overlays. */
+      anchorRect: FloatingGeometryRect;
+      /** Live anchor references are mutually exclusive with explicit geometry. */
+      anchorRef?: never;
+    };
 
-export type PopoverProps = PropsWithChildren<OverlayAnchorProps & {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  placement?: FloatingPlacement;
-  ariaLabel: string;
-  role?: 'dialog' | 'menu';
-  className?: string;
-  modal?: boolean;
-  autoFocus?: boolean;
-  restoreFocus?: boolean;
-  onKeyDown?: KeyboardEventHandler<HTMLDivElement>;
-}>;
+export type PopoverProps = PropsWithChildren<
+  OverlayAnchorProps & {
+    /** Controlled visibility state for the floating overlay. */
+    open: boolean;
+    /** Receives shared dismissal and visibility requests. */
+    onOpenChange: (open: boolean) => void;
+    /** Logical preferred placement before collision/flip resolution. @default bottom-start */
+    placement?: FloatingPlacement;
+    /** Accessible name for the floating surface. */
+    ariaLabel: string;
+    /** Surface semantics used by generic popovers and Menu. @default dialog */
+    role?: 'dialog' | 'menu';
+    /** Additional class name applied to the floating surface. */
+    className?: string;
+    /** Enables modal focus isolation and scroll locking. @default false */
+    modal?: boolean;
+    /** Moves focus into the surface when opened. @default false */
+    autoFocus?: boolean;
+    /** Restores prior focus after dismissal. @default true */
+    restoreFocus?: boolean;
+    /** Optional key handler composed with the shared overlay lifecycle. */
+    onKeyDown?: KeyboardEventHandler<HTMLDivElement>;
+  }
+>;
 
 export function Popover({
   open,
@@ -289,14 +358,22 @@ export function Popover({
   );
 }
 
-export type MenuProps = PropsWithChildren<OverlayAnchorProps & {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  placement?: FloatingPlacement;
-  ariaLabel: string;
-  className?: string;
-  focusReturnRef?: RefObject<HTMLElement | null>;
-}>;
+export type MenuProps = PropsWithChildren<
+  OverlayAnchorProps & {
+    /** Controlled visibility state for the action menu. */
+    open: boolean;
+    /** Receives menu dismissal and visibility requests. */
+    onOpenChange: (open: boolean) => void;
+    /** Logical preferred placement before collision resolution. @default bottom-start */
+    placement?: FloatingPlacement;
+    /** Accessible menu name. */
+    ariaLabel: string;
+    /** Additional class name applied to the menu surface. */
+    className?: string;
+    /** Explicit focus-return target when it differs from the anchor. */
+    focusReturnRef?: RefObject<HTMLElement | null>;
+  }
+>;
 
 export function Menu({
   open,
@@ -317,7 +394,7 @@ export function Menu({
     (node: HTMLDivElement | null) => {
       menuRef.current = node;
       if (!node || !open) return;
-      queueMicrotask(() => {
+      scheduleOwnerMicrotask(node, () => {
         if (menuRef.current !== node || !node.isConnected) return;
         node
           .querySelector<HTMLButtonElement>('[role="menuitem"]:not([disabled])')
@@ -326,7 +403,6 @@ export function Menu({
     },
     [open],
   );
-
 
   const moveFocus = useRovingFocus({
     containerRef: menuRef,
@@ -345,7 +421,7 @@ export function Menu({
       const tabExit = tabExitRef.current;
       tabExitRef.current = null;
       onOpenChange(false);
-      queueMicrotask(() => {
+      scheduleOwnerMicrotask(returnTarget, () => {
         if (!returnTarget?.isConnected) return;
         if (tabExit) {
           if (!focusRelativeTo(returnTarget, tabExit === 'backward')) {
@@ -369,9 +445,11 @@ export function Menu({
       }
       if (isTypeaheadKey(event)) {
         event.preventDefault();
-        const items = [...(menuRef.current?.querySelectorAll<HTMLButtonElement>(
-          '[role="menuitem"]:not([disabled])',
-        ) ?? [])];
+        const items = [
+          ...(menuRef.current?.querySelectorAll<HTMLButtonElement>(
+            '[role="menuitem"]:not([disabled])',
+          ) ?? []),
+        ];
         const active = menuRef.current?.ownerDocument.activeElement ?? null;
         const activeIndex = active ? items.indexOf(active as HTMLButtonElement) : -1;
         const match = typeaheadRef.current.search({
@@ -399,15 +477,14 @@ export function Menu({
         !event.currentTarget.contains(item) ||
         item.hasAttribute('disabled') ||
         item.getAttribute('aria-disabled') === 'true'
-      ) return;
+      )
+        return;
       requestOpenChange(false);
     },
     [requestOpenChange],
   );
 
-  const anchorProps: OverlayAnchorProps = anchorRect
-    ? { anchorRect }
-    : { anchorRef: anchorRef! };
+  const anchorProps: OverlayAnchorProps = anchorRect ? { anchorRect } : { anchorRef: anchorRef! };
 
   return (
     <Popover
@@ -429,7 +506,9 @@ export function Menu({
 }
 
 export type MenuItemProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'role' | 'type'> & {
+  /** Called after native activation unless the click was prevented. */
   onSelect?: () => void;
+  /** Marks the command as destructive for semantic visual treatment. @default false */
   destructive?: boolean;
 };
 
@@ -482,10 +561,15 @@ type ContextMenuTriggerProps = {
 };
 
 export type ContextMenuProps = {
+  /** Accessible name applied to the opened context menu. */
   ariaLabel: string;
+  /** Ordered commands rendered with optional separators. */
   actions: readonly ContextMenuAction[];
+  /** Single trigger element enhanced with pointer, keyboard and long-press invocation. */
   children: ReactElement<ContextMenuTriggerProps>;
+  /** Disables all context-menu invocation paths. @default false */
   disabled?: boolean;
+  /** Touch long-press delay when the trigger does not provide the shared press contract. @default 520 */
   longPressDelayMs?: number;
 };
 
@@ -498,9 +582,12 @@ export function ContextMenu({
 }: ContextMenuProps) {
   const [point, setPoint] = useState<{ x: number; y: number } | null>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
-  const openAt = useCallback((next: { x: number; y: number }) => {
-    if (!disabled) setPoint(next);
-  }, [disabled]);
+  const openAt = useCallback(
+    (next: { x: number; y: number }) => {
+      if (!disabled) setPoint(next);
+    },
+    [disabled],
+  );
   const trigger = cloneElement(children, {
     onContextMenu: (event: ReactMouseEvent<HTMLElement>) => {
       children.props.onContextMenu?.(event);
@@ -516,7 +603,8 @@ export function ContextMenu({
         event.defaultPrevented ||
         disabled ||
         (event.key !== 'ContextMenu' && !(event.shiftKey && event.key === 'F10'))
-      ) return;
+      )
+        return;
       event.preventDefault();
       const rect = event.currentTarget.getBoundingClientRect();
       openAt({
@@ -575,25 +663,52 @@ export function ContextMenu({
 
 export type SheetPlacement = 'bottom' | 'center' | 'auto';
 type SheetName =
-  | { ariaLabel: string; ariaLabelledBy?: string }
-  | { ariaLabel?: undefined; ariaLabelledBy: string };
+  | {
+      /** Accessible sheet name when no external labelled-by relationship is used. */
+      ariaLabel: string;
+      /** Optional external label relationship; ariaLabel remains the fallback name. */
+      ariaLabelledBy?: string;
+    }
+  | {
+      /** Omitting an explicit label requires ariaLabelledBy. */
+      ariaLabel?: undefined;
+      /** Id of visible content that names the sheet. */
+      ariaLabelledBy: string;
+    };
 type SheetBaseProps = PropsWithChildren<{
+  /** Controlled target visibility for the sheet. */
   open: boolean;
+  /** Receives dismissal and transition settlement requests. */
   onOpenChange: (open: boolean) => void;
+  /** Optional externally owned interactive transition controller. */
   transition?: InteractiveTransitionController;
+  /** Physical presentation strategy; auto adapts from measured container geometry. @default auto */
   placement?: SheetPlacement;
+  /** Enables focus isolation, scrim and scroll locking. @default true */
   modal?: boolean;
+  /** Id of descriptive content associated with the sheet. */
   ariaDescribedBy?: string;
+  /** Additional class name applied to the sheet panel. */
   panelClassName?: string;
+  /** Additional class name applied to the owning overlay layer. */
   layerClassName?: string;
+  /** Additional class name applied to the modal scrim. */
   scrimClassName?: string;
+  /** Renders the shared drag/dismiss grabber. @default false */
   grabber?: boolean;
+  /** Native button props composed onto the optional grabber. */
   grabberProps?: ButtonHTMLAttributes<HTMLButtonElement>;
+  /** Accessible label for the dismiss affordance. @default Close overlay */
   dismissLabel?: string;
+  /** Accessible label for the drag grabber. @default Drag sheet */
   grabberLabel?: string;
+  /** Restores focus after the sheet fully closes. @default true */
   restoreFocus?: boolean;
+  /** Optional header composition inside the panel. */
   header?: ReactNode;
+  /** Optional footer composition inside the panel. */
   footer?: ReactNode;
+  /** Moves focus into the sheet on activation. @default true */
   autoFocus?: boolean;
 }>;
 export type SheetProps = SheetName & SheetBaseProps;
@@ -667,7 +782,9 @@ export function Sheet({
   return createPortal(
     <div
       ref={layerRef}
-      className={['ui-sheet-layer', `ui-sheet-layer--${placement}`, layerClassName].filter(Boolean).join(' ')}
+      className={['ui-sheet-layer', `ui-sheet-layer--${placement}`, layerClassName]
+        .filter(Boolean)
+        .join(' ')}
       data-open={open}
       data-visible={open}
       aria-hidden={!open}
@@ -721,8 +838,11 @@ export function Sheet({
 
 export type BottomSheetProps = SheetName &
   Omit<SheetBaseProps, 'placement' | 'grabber' | 'grabberProps' | 'transition'> & {
+    /** Optional externally owned interactive transition controller. */
     transition?: InteractiveTransitionController;
+    /** Enables vertical direct-manipulation dismissal. @default true */
     draggable?: boolean;
+    /** Physical drag distance representing a full transition. @default 320 */
     dragDistance?: number;
   };
 
@@ -776,6 +896,15 @@ export function BottomSheet({
   );
 }
 
+function scheduleOwnerMicrotask(node: HTMLElement | null, task: () => void) {
+  const ownerWindow = node?.ownerDocument.defaultView ?? null;
+  if (ownerWindow?.queueMicrotask) {
+    ownerWindow.queueMicrotask(task);
+    return;
+  }
+  Promise.resolve().then(task);
+}
+
 function isTypeaheadKey(event: ReactKeyboardEvent<HTMLElement>) {
   return isTypeaheadCharacter(event.key) && !event.altKey && !event.ctrlKey && !event.metaKey;
 }
@@ -789,10 +918,15 @@ type TooltipTriggerProps = {
 };
 
 export type TooltipProps = {
+  /** Supplemental descriptive content shown in the tooltip. */
   content: ReactNode;
+  /** Single trigger element enhanced with focus/pointer description wiring. */
   children: ReactElement<TooltipTriggerProps>;
+  /** Logical preferred placement before collision resolution. @default top-start */
   placement?: FloatingPlacement;
+  /** Fine-pointer hover delay in milliseconds. @default 550 */
   delayMs?: number;
+  /** Disables focus and pointer tooltip activation. @default false */
   disabled?: boolean;
 };
 
@@ -807,7 +941,7 @@ export function Tooltip({
   const tooltipId = useId();
   const anchorRef = useRef<HTMLElement | null>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const timerRef = useRef<number | null>(null);
+  const timerRef = useRef<{ ownerWindow: Window; id: number } | null>(null);
   const [open, setOpen] = useState(false);
   const anchor: FloatingAnchor = { kind: 'element', ref: anchorRef };
   const activeOpen = open && portalHost !== null;
@@ -833,20 +967,27 @@ export function Tooltip({
   });
 
   const clearTimer = useCallback(() => {
-    if (timerRef.current !== null) {
-      window.clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
+    const timer = timerRef.current;
+    if (!timer) return;
+    timer.ownerWindow.clearTimeout(timer.id);
+    timerRef.current = null;
   }, []);
   useEffect(() => clearTimer, [clearTimer]);
   const scheduleOpen = useCallback(() => {
     if (disabled) return;
     clearTimer();
-    timerRef.current = window.setTimeout(() => {
+    const ownerWindow =
+      anchorRef.current?.ownerDocument.defaultView ??
+      tooltipRef.current?.ownerDocument.defaultView ??
+      portalHost?.ownerDocument.defaultView ??
+      null;
+    if (!ownerWindow) return;
+    const id = ownerWindow.setTimeout(() => {
       timerRef.current = null;
       setOpen(true);
     }, delayMs);
-  }, [clearTimer, delayMs, disabled]);
+    timerRef.current = { ownerWindow, id };
+  }, [clearTimer, delayMs, disabled, portalHost]);
   const close = useCallback(() => {
     clearTimer();
     setOpen(false);
@@ -864,7 +1005,9 @@ export function Tooltip({
   }, [overlay.depth, portalHost, position.x, position.y]);
 
   const existingDescription = children.props['aria-describedby'];
-  const describedBy = activeOpen ? [existingDescription, tooltipId].filter(Boolean).join(' ') : existingDescription;
+  const describedBy = activeOpen
+    ? [existingDescription, tooltipId].filter(Boolean).join(' ')
+    : existingDescription;
   const trigger = cloneElement(children, {
     'aria-describedby': describedBy,
     onPointerEnter: (event: ReactPointerEvent<HTMLElement>) => {
@@ -890,20 +1033,22 @@ export function Tooltip({
   return (
     <>
       {trigger}
-      {activeOpen && portalHost ? createPortal(
-        <div
-          ref={tooltipRef}
-          id={tooltipId}
-          role="tooltip"
-          className="ui-tooltip"
-          data-placement={position.placement}
-          data-ready={position.ready}
-          data-oxs-overlay-depth={overlay.depth}
-        >
-          {content}
-        </div>,
-        portalHost,
-      ) : null}
+      {activeOpen && portalHost
+        ? createPortal(
+            <div
+              ref={tooltipRef}
+              id={tooltipId}
+              role="tooltip"
+              className="ui-tooltip"
+              data-placement={position.placement}
+              data-ready={position.ready}
+              data-oxs-overlay-depth={overlay.depth}
+            >
+              {content}
+            </div>,
+            portalHost,
+          )
+        : null}
     </>
   );
 }

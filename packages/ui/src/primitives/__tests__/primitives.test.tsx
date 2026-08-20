@@ -8,7 +8,12 @@ describe('Primitive layer contract', () => {
     render(
       <UiRoot direction="rtl">
         <Box as="section" aria-label="Primitive scope">
-          <Stack gap="sm"><Wrap gap="xs"><Text>سلام</Text><Code>const x = 1</Code></Wrap></Stack>
+          <Stack gap="sm">
+            <Wrap gap="xs">
+              <Text>سلام</Text>
+              <Code>const x = 1</Code>
+            </Wrap>
+          </Stack>
           <SafeArea edges="inline" data-testid="safe" />
           <Divider data-testid="divider" />
         </Box>
@@ -16,13 +21,21 @@ describe('Primitive layer contract', () => {
     );
     expect(screen.getByRole('region', { name: 'Primitive scope' })).toBeInTheDocument();
     expect(screen.getByText('const x = 1').tagName).toBe('CODE');
-    expect(screen.getByTestId('safe')).toHaveClass('ui-safe-area-edge-inline-start', 'ui-safe-area-edge-inline-end');
+    expect(screen.getByTestId('safe')).toHaveClass(
+      'ui-safe-area-edge-inline-start',
+      'ui-safe-area-edge-inline-end',
+    );
     expect(screen.getByTestId('divider')).toHaveAttribute('role', 'separator');
   });
 
   it('keeps icons decorative by default and supports path-only custom glyph extension', () => {
     const glyph = defineUiIcon({ paths: ['M4 12h16'] });
-    const { container } = render(<><Icon name="chevron-end" /><Icon glyph={glyph} label="Custom" /></>);
+    const { container } = render(
+      <>
+        <Icon name="chevron-end" />
+        <Icon glyph={glyph} label="Custom" />
+      </>,
+    );
     const icons = container.querySelectorAll('svg');
     expect(icons[0]).toHaveAttribute('aria-hidden', 'true');
     expect(icons[0]).toHaveClass('ui-icon--mirror-rtl');

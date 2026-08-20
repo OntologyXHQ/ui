@@ -4,7 +4,8 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'GestureRevealHandle',
     layer: 'components',
-    category: 'Interaction', order: 80,
+    category: 'Interaction',
+    order: 80,
     summary: 'Visual handle for edge/reveal interactions.',
     usage:
       'Use as the reusable visual handle for a shared reveal/edge gesture owner; product/System placement and open-state policy stay outside the Component.',

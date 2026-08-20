@@ -76,7 +76,10 @@ describe('accepted grid and spacing boundary contract', () => {
         occlusion={{ blockEnd: '240px' }}
       >
         <SafeArea edges="inline" data-testid="inline-safe" />
-        <SafeArea edges={['inline-start', 'block-end', 'inline-start']} data-testid="explicit-safe" />
+        <SafeArea
+          edges={['inline-start', 'block-end', 'inline-start']}
+          data-testid="explicit-safe"
+        />
       </UiRoot>,
     );
 
@@ -106,7 +109,9 @@ describe('accepted grid and spacing boundary contract', () => {
 
   it('keeps the redesigned APIs type-bounded', () => {
     if (false) {
-      <Grid as="ol" start={2} columns={12}><li>typed</li></Grid>;
+      <Grid as="ol" start={2} columns={12}>
+        <li>typed</li>
+      </Grid>;
       // @ts-expect-error arbitrary CSS track strings are not a Grid column contract
       <Grid columns="240px 1fr" />;
       // @ts-expect-error physical spacing is not part of Inset

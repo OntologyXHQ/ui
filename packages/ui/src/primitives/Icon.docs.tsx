@@ -33,31 +33,37 @@ export const uiDocs = defineUiDocsGroup([
     category: 'Iconography',
     order: 40,
     status: 'accepted',
-    summary: 'Current-color SVG icon primitive with immutable multi-state glyph families and explicit transient transition states.',
+    summary:
+      'Current-color SVG icon primitive with immutable multi-state glyph families and explicit transient transition states.',
     usage:
       'Use built-in semantic glyph families, `defineUiIcon`, or the optional tree-shakeable `@ontologyx/ui/icons` pack. For stateful glyphs change only the stable `state`; Icon owns the visual transition phase, interruption/retargeting and reduced-motion settlement. Icons never own action semantics.',
     accessibility:
       'Decorative by default and permanently unfocusable. Pass `label` only when the standalone glyph itself conveys meaning; role/aria-hidden wiring is owned by Icon.',
     rtl: 'Directional families declare semantic mirroring once; `mirror="auto"` follows the Icon element’s resolved local direction, including nested RTL/LTR subtrees, without separate left/right glyph APIs.',
-    touch: 'Never becomes a pointer/touch target by itself; Button/IconButton and other Components own hit targets.',
-    responsive: 'Finite sizes preserve the shared viewBox/currentColor contract; state transitions do not change layout geometry.',
+    touch:
+      'Never becomes a pointer/touch target by itself; Button/IconButton and other Components own hit targets.',
+    responsive:
+      'Finite sizes preserve the shared viewBox/currentColor contract; state transitions do not change layout geometry.',
     examples: [
       {
         id: 'state-transition',
         title: 'Stable → transient → stable',
-        description: 'Playback publishes play/pause stable states and pausing/playing transient states; reduced motion settles through the same contract without visual motion.',
+        description:
+          'Playback publishes play/pause stable states and pausing/playing transient states; reduced motion settles through the same contract without visual motion.',
         component: 'IconStateTransitionExample',
       },
       {
         id: 'static-extension',
         title: 'Static custom + local-direction glyphs',
-        description: 'Static path shorthand remains available, while directional glyphs mirror from their own nested direction rather than assuming the root direction.',
+        description:
+          'Static path shorthand remains available, while directional glyphs mirror from their own nested direction rather than assuming the root direction.',
         component: 'IconStaticContractExample',
       },
       {
         id: 'icon-pack',
         title: 'Optional static + animated icon pack',
-        description: 'The separate @ontologyx/ui/icons entry provides a broad static vocabulary and stateful animated families without forcing the pack into the main @ontologyx/ui entry.',
+        description:
+          'The separate @ontologyx/ui/icons entry provides a broad static vocabulary and stateful animated families without forcing the pack into the main @ontologyx/ui entry.',
         component: 'IconPackExample',
       },
     ],
@@ -81,7 +87,9 @@ export function IconStateTransitionExample() {
           data-visual-cert="stateful-icon"
         />
         <Stack gap="2xs">
-          <Text variant="body-strong">Stable target: <Code>{state}</Code></Text>
+          <Text variant="body-strong">
+            Stable target: <Code>{state}</Code>
+          </Text>
           <Text tone="tertiary">The transient visual state belongs to Icon, not feature CSS.</Text>
         </Stack>
       </Row>
@@ -138,7 +146,8 @@ export function IconPackExample() {
       data-icon-pack-animated-count={ANIMATED_ICON_FAMILY_COUNT}
     >
       <Text variant="body-strong">
-        <Code>{STATIC_ICON_PACK_COUNT}</Code> static exports · <Code>{ANIMATED_ICON_FAMILY_COUNT}</Code> animated state families
+        <Code>{STATIC_ICON_PACK_COUNT}</Code> static exports ·{' '}
+        <Code>{ANIMATED_ICON_FAMILY_COUNT}</Code> animated state families
       </Text>
       <Wrap gap="sm" aria-label="Representative static icon pack">
         {staticPackSamples.map(([label, glyph]) => (
@@ -149,12 +158,42 @@ export function IconPackExample() {
         ))}
       </Wrap>
       <Row gap="lg" align="center" aria-label="Representative animated icon families">
-        <Icon glyph={PlaybackGlyph} state={active ? 'pause' : 'play'} label="Playback" data-icon-pack-animated="playback" />
-        <Icon glyph={FavoriteStateGlyph} state={active ? 'on' : 'off'} label="Favorite" data-icon-pack-animated="favorite" />
-        <Icon glyph={LockStateGlyph} state={active ? 'unlocked' : 'locked'} label="Lock" data-icon-pack-animated="lock" />
-        <Icon glyph={ConnectivityStateGlyph} state={active ? 'online' : 'offline'} label="Connectivity" data-icon-pack-animated="connectivity" />
-        <Icon glyph={ThemeStateGlyph} state={active ? 'dark' : 'light'} label="Theme" data-icon-pack-animated="theme" />
-        <Icon glyph={ActivityStateGlyph} state={active ? 'active' : 'idle'} label="Activity" data-icon-pack-animated="activity" />
+        <Icon
+          glyph={PlaybackGlyph}
+          state={active ? 'pause' : 'play'}
+          label="Playback"
+          data-icon-pack-animated="playback"
+        />
+        <Icon
+          glyph={FavoriteStateGlyph}
+          state={active ? 'on' : 'off'}
+          label="Favorite"
+          data-icon-pack-animated="favorite"
+        />
+        <Icon
+          glyph={LockStateGlyph}
+          state={active ? 'unlocked' : 'locked'}
+          label="Lock"
+          data-icon-pack-animated="lock"
+        />
+        <Icon
+          glyph={ConnectivityStateGlyph}
+          state={active ? 'online' : 'offline'}
+          label="Connectivity"
+          data-icon-pack-animated="connectivity"
+        />
+        <Icon
+          glyph={ThemeStateGlyph}
+          state={active ? 'dark' : 'light'}
+          label="Theme"
+          data-icon-pack-animated="theme"
+        />
+        <Icon
+          glyph={ActivityStateGlyph}
+          state={active ? 'active' : 'idle'}
+          label="Activity"
+          data-icon-pack-animated="activity"
+        />
       </Row>
       <Button size="sm" variant="secondary" onClick={() => setActive((current) => !current)}>
         Toggle animated icon pack

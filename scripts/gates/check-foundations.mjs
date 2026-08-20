@@ -11,10 +11,14 @@ const issues = [];
 
 const tokenSource = fs.readFileSync(tokenSourcePath, 'utf8');
 const tokenCss = fs.readFileSync(tokenCssPath, 'utf8');
-const groupsBody = tokenSource.match(/export const UI_TOKEN_GROUPS\s*=\s*\{([\s\S]*?)\n\} as const;/)?.[1];
+const groupsBody = tokenSource.match(
+  /export const UI_TOKEN_GROUPS\s*=\s*\{([\s\S]*?)\n\} as const;/,
+)?.[1];
 if (!groupsBody) issues.push('cannot parse UI_TOKEN_GROUPS structural declaration');
 
-const tokens = groupsBody ? [...groupsBody.matchAll(/'([a-z0-9-]+)'/g)].map((match) => match[1]) : [];
+const tokens = groupsBody
+  ? [...groupsBody.matchAll(/'([a-z0-9-]+)'/g)].map((match) => match[1])
+  : [];
 const duplicates = tokens.filter((token, index) => tokens.indexOf(token) !== index);
 for (const token of new Set(duplicates)) issues.push(`duplicate public semantic token: ${token}`);
 
@@ -62,27 +66,34 @@ function extractBalancedBlock(source, marker, from = 0) {
 function definitions(block) {
   if (!block) return new Map();
   return new Map(
-    [...block.matchAll(/(--oxs-[a-z0-9-]+)\s*:\s*([^;]+);/g)]
-      .map((match) => [match[1], match[2].trim()]),
+    [...block.matchAll(/(--oxs-[a-z0-9-]+)\s*:\s*([^;]+);/g)].map((match) => [
+      match[1],
+      match[2].trim(),
+    ]),
   );
 }
 
 const baseDefinitions = definitions(extractBalancedBlock(tokenCss, '.ui-root'));
 const lightDefinitions = definitions(extractBalancedBlock(tokenCss, "[data-oxs-theme='light']"));
 const systemMedia = extractBalancedBlock(tokenCss, '@media (prefers-color-scheme: light)');
-const systemLightDefinitions = definitions(systemMedia && extractBalancedBlock(systemMedia, "[data-oxs-theme='system']"));
+const systemLightDefinitions = definitions(
+  systemMedia && extractBalancedBlock(systemMedia, "[data-oxs-theme='system']"),
+);
 
 for (const token of tokens) {
   const variable = `--oxs-${token}`;
-  if (!baseDefinitions.has(variable)) issues.push(`public semantic token has no .ui-root default: ${token}`);
+  if (!baseDefinitions.has(variable))
+    issues.push(`public semantic token has no .ui-root default: ${token}`);
 }
 
 const colorBody = groupsBody?.match(/color\s*:\s*\[([\s\S]*?)\],\s*typography\s*:/)?.[1] ?? '';
 const colors = [...colorBody.matchAll(/'([a-z0-9-]+)'/g)].map((match) => match[1]);
 for (const token of colors) {
   const variable = `--oxs-${token}`;
-  if (!lightDefinitions.has(variable)) issues.push(`theme color has no explicit light value: ${token}`);
-  if (!systemLightDefinitions.has(variable)) issues.push(`theme color has no explicit system-light value: ${token}`);
+  if (!lightDefinitions.has(variable))
+    issues.push(`theme color has no explicit light value: ${token}`);
+  if (!systemLightDefinitions.has(variable))
+    issues.push(`theme color has no explicit system-light value: ${token}`);
 }
 
 for (const tone of ['accent', 'danger', 'success', 'warning']) {
@@ -98,11 +109,14 @@ for (const tone of ['accent', 'danger', 'success', 'warning']) {
 }
 
 const colorLiteral = /#[0-9a-f]{3,8}\b|rgba?\(/i;
-for (const file of fs.readdirSync(packageStylesRoot).filter((name) => name.endsWith('.css') && name !== 'tokens.css')) {
+for (const file of fs
+  .readdirSync(packageStylesRoot)
+  .filter((name) => name.endsWith('.css') && name !== 'tokens.css')) {
   const text = fs.readFileSync(path.join(packageStylesRoot, file), 'utf8');
   const lines = text.split(/\r?\n/);
   lines.forEach((line, index) => {
-    if (colorLiteral.test(line)) issues.push(`${file}:${index + 1}: raw color literal is forbidden outside tokens.css`);
+    if (colorLiteral.test(line))
+      issues.push(`${file}:${index + 1}: raw color literal is forbidden outside tokens.css`);
   });
 }
 
@@ -140,4 +154,6 @@ if (issues.length) {
   process.exit(1);
 }
 
-console.log(`G0 foundation contract passed: ${tokens.length} customizable semantic tokens · ${colors.length} theme color roles · explicit light/system-light color coverage · no raw package colors outside tokens.css.`);
+console.log(
+  `G0 foundation contract passed: ${tokens.length} customizable semantic tokens · ${colors.length} theme color roles · explicit light/system-light color coverage · no raw package colors outside tokens.css.`,
+);

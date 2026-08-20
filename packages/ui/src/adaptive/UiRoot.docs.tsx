@@ -18,7 +18,8 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'UiRoot',
     layer: 'foundations',
-    category: 'Environment', order: 10,
+    category: 'Environment',
+    order: 10,
     summary:
       'Certified scoped UI environment and runtime boundary for semantic tokens, resolved capabilities, host insets, portals and root-owned services.',
     usage:
@@ -26,16 +27,27 @@ export const uiDocs = defineUiDocsGroup([
     status: 'accepted',
     accessibility:
       'Owns environment/runtime coordination without inventing application roles. Modal isolation, focus restoration and portal ownership remain local to the nearest UiRoot; reduced motion is resolved per owning Window realm.',
-    rtl:
-      'Auto direction inherits the enclosing UiRoot or owning document. Nested roots can override direction explicitly and all public box styling remains logical-property based.',
+    rtl: 'Auto direction inherits the enclosing UiRoot or owning document. Nested roots can override direction explicitly and all public box styling remains logical-property based.',
     touch:
       'Auto pointer precision/density and modality are observed in the concrete owning Window realm. Coarse-pointer target floors remain independent of visual density.',
     responsive:
       'Each root measures its own container for adaptive bands. Persistent safe area and transient occlusion remain separate logical host inputs and nested roots inherit/override them predictably.',
     examples: [
-      { id: 'token-contract', title: 'Semantic token contract', component: 'FoundationTokenContractExample' },
-      { id: 'environment-contract', title: 'Resolved environment contract', component: 'FoundationEnvironmentContractExample' },
-      { id: 'nested-certification', title: 'Nested root certification', component: 'UiRootNestedCertificationExample' },
+      {
+        id: 'token-contract',
+        title: 'Semantic token contract',
+        component: 'FoundationTokenContractExample',
+      },
+      {
+        id: 'environment-contract',
+        title: 'Resolved environment contract',
+        component: 'FoundationEnvironmentContractExample',
+      },
+      {
+        id: 'nested-certification',
+        title: 'Nested root certification',
+        component: 'UiRootNestedCertificationExample',
+      },
     ],
   },
 ] as const);
@@ -44,11 +56,14 @@ export function FoundationTokenContractExample() {
   return (
     <Stack gap="md">
       <Text tone="secondary">
-        Theme overrides are a finite semantic contract. Runtime mechanics such as z-order, gesture physics and scroll physics are intentionally not theme tokens.
+        Theme overrides are a finite semantic contract. Runtime mechanics such as z-order, gesture
+        physics and scroll physics are intentionally not theme tokens.
       </Text>
       <Wrap gap="xs">
         {(['accent', 'success', 'warning', 'danger'] as const).map((tone) => (
-          <Badge key={tone} tone={tone} size="sm">{tone}</Badge>
+          <Badge key={tone} tone={tone} size="sm">
+            {tone}
+          </Badge>
         ))}
       </Wrap>
       <Stack gap="sm">
@@ -57,7 +72,9 @@ export function FoundationTokenContractExample() {
             <Stack gap="xs">
               <Row gap="sm" align="center" justify="between">
                 <Text variant="body-strong">{group}</Text>
-                <Badge tone="neutral" size="sm">{tokens.length}</Badge>
+                <Badge tone="neutral" size="sm">
+                  {tokens.length}
+                </Badge>
               </Row>
               <Code wrap="normal">{tokens.join(' · ')}</Code>
             </Stack>
@@ -81,7 +98,8 @@ export function FoundationEnvironmentContractExample() {
   return (
     <Stack gap="sm">
       <Text tone="secondary">
-        Environment preferences and resolved runtime state are deliberately separate. Components consume resolved capabilities, not device names.
+        Environment preferences and resolved runtime state are deliberately separate. Components
+        consume resolved capabilities, not device names.
       </Text>
       {contracts.map(([name, contract]) => (
         <Surface key={name} material="subtle" elevation={0} radius="md" border="subtle">

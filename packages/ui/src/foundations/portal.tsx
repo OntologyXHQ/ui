@@ -14,16 +14,12 @@ export function useUiPortalHost() {
   return useContext(UiPortalHostContext);
 }
 
-
 export type UiPortalPoint = { x: number; y: number };
 
 /** Converts viewport/client coordinates into the coordinate plane owned by a UiRoot portal.
  * Scale/translation are supported; rotation/skew are intentionally outside the V1 portal contract.
  */
-export function viewportPointToPortalHost(
-  host: HTMLElement,
-  point: UiPortalPoint,
-): UiPortalPoint {
+export function viewportPointToPortalHost(host: HTMLElement, point: UiPortalPoint): UiPortalPoint {
   const rect = host.getBoundingClientRect();
   const layoutWidth = host.offsetWidth || rect.width || 1;
   const layoutHeight = host.offsetHeight || rect.height || 1;
@@ -41,7 +37,8 @@ export function viewportLengthToPortalHost(
   axis: 'inline' | 'block',
 ) {
   const rect = host.getBoundingClientRect();
-  const layout = axis === 'inline' ? (host.offsetWidth || rect.width || 1) : (host.offsetHeight || rect.height || 1);
+  const layout =
+    axis === 'inline' ? host.offsetWidth || rect.width || 1 : host.offsetHeight || rect.height || 1;
   const visual = axis === 'inline' ? rect.width : rect.height;
   const scale = visual > 0 ? visual / layout : 1;
   return length / (scale || 1);

@@ -7,8 +7,10 @@ const acceptedSurface = {
   order: 30,
   status: 'accepted' as const,
   rtl: 'Material and border are direction-neutral; Divider inset start/end use logical axes.',
-  touch: 'Visual-only and non-interactive by default; Components own press/hover/selection state and target behavior.',
-  responsive: 'Never owns viewport breakpoints; geometry follows the containing layout and logical axis.',
+  touch:
+    'Visual-only and non-interactive by default; Components own press/hover/selection state and target behavior.',
+  responsive:
+    'Never owns viewport breakpoints; geometry follows the containing layout and logical axis.',
 };
 
 export const uiDocs = defineUiDocsGroup([
@@ -24,7 +26,8 @@ export const uiDocs = defineUiDocsGroup([
       {
         id: 'material-boundary',
         title: 'Material/elevation boundary',
-        description: 'Material, elevation, radius, border and clipping stay finite and token-backed without interactive pseudo-state ownership.',
+        description:
+          'Material, elevation, radius, border and clipping stay finite and token-backed without interactive pseudo-state ownership.',
         component: 'SurfaceMaterialBoundaryExample',
       },
     ],
@@ -32,7 +35,8 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'Divider',
     ...acceptedSurface,
-    summary: 'Semantic or decorative separator with logical inset, semantic border tone and finite thickness.',
+    summary:
+      'Semantic or decorative separator with logical inset, semantic border tone and finite thickness.',
     usage:
       'Use between adjacent regions when separation is meaningful. Set `decorative` only when the visual line should be removed from the accessibility tree.',
     accessibility:
@@ -41,7 +45,8 @@ export const uiDocs = defineUiDocsGroup([
       {
         id: 'separator-semantics',
         title: 'Separator semantics',
-        description: 'Horizontal/vertical geometry, logical inset and decorative-vs-semantic accessibility remain explicit.',
+        description:
+          'Horizontal/vertical geometry, logical inset and decorative-vs-semantic accessibility remain explicit.',
         component: 'DividerSemanticExample',
       },
     ],
@@ -59,7 +64,9 @@ export function SurfaceMaterialBoundaryExample() {
         border="strong"
         clip
       >
-        <Inset space="md"><Text>Certified static visual surface</Text></Inset>
+        <Inset space="md">
+          <Text>Certified static visual surface</Text>
+        </Inset>
       </Surface>
       <Text tone="tertiary">No hover/pressed/selected prop exists at the Primitive boundary.</Text>
     </Stack>

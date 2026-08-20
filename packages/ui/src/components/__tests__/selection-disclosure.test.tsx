@@ -1,7 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { MouseEvent as ReactMouseEvent, ReactNode } from 'react';
-import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { UiRoot } from '../../adaptive';
 import { ToggleButton } from '../Button';
@@ -121,6 +120,7 @@ describe('UIR08 selection and disclosure contracts', () => {
     const trigger = screen.getByRole('combobox', { name: 'Density' });
     trigger.focus();
     fireEvent.keyDown(trigger, { key: 'c', timeStamp: 10 });
+    fireEvent.keyDown(trigger, { key: 'c', timeStamp: 20 });
     expect(trigger).toHaveTextContent('Compact');
     await user.click(screen.getByRole('button', { name: 'Reset density' }));
     expect(trigger).toHaveTextContent('Comfortable');

@@ -21,7 +21,8 @@ const acceptedLayout = {
   accessibility:
     'Adds no interaction role of its own; semantic element selection preserves native document structure while visual ordering never changes DOM order.',
   rtl: 'Uses logical axes and flex/grid semantics; no left/right public layout API is exposed.',
-  touch: 'Layout-only; it preserves the target geometry and interaction ownership of child Components.',
+  touch:
+    'Layout-only; it preserves the target geometry and interaction ownership of child Components.',
   responsive:
     'Intrinsic and container-first; overflow/min-size controls prevent nested layouts from forcing viewport overflow.',
 };
@@ -47,7 +48,8 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'Stack',
     ...acceptedLayout,
-    summary: 'Polymorphic block-axis flex composition with semantic gap, alignment and distribution.',
+    summary:
+      'Polymorphic block-axis flex composition with semantic gap, alignment and distribution.',
     usage:
       'Use for vertical one-dimensional composition; choose a semantic `as` element when the group carries document structure.',
     examples: [
@@ -62,7 +64,8 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'Row',
     ...acceptedLayout,
-    summary: 'Polymorphic inline-axis flex composition that follows the resolved writing direction.',
+    summary:
+      'Polymorphic inline-axis flex composition that follows the resolved writing direction.',
     usage:
       'Use when peers must remain on one logical row; use Wrap instead when contraction is allowed to create additional lines.',
     examples: [
@@ -109,14 +112,16 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'Container',
     ...acceptedLayout,
-    summary: 'Polymorphic centered inline-size boundary with readable, content, wide and full semantic width tiers.',
+    summary:
+      'Polymorphic centered inline-size boundary with readable, content, wide and full semantic width tiers.',
     usage:
       'Use to constrain a content region by meaning rather than viewport/device names. Pair with Inset when the region also owns internal padding.',
     examples: [
       {
         id: 'semantic-widths',
         title: 'Semantic width tiers',
-        description: 'Readable and full-width regions remain centered and bounded by their containing block.',
+        description:
+          'Readable and full-width regions remain centered and bounded by their containing block.',
         component: 'ContainerWidthsExample',
       },
     ],
@@ -132,7 +137,8 @@ export const uiDocs = defineUiDocsGroup([
       {
         id: 'logical-spacing',
         title: 'Logical spacing precedence',
-        description: 'All → axis → edge precedence stays tokenized and follows logical writing direction.',
+        description:
+          'All → axis → edge precedence stays tokenized and follows logical writing direction.',
         component: 'InsetLogicalExample',
       },
     ],
@@ -147,7 +153,8 @@ export const uiDocs = defineUiDocsGroup([
       {
         id: 'logical-edges',
         title: 'Persistent logical edges',
-        description: 'Explicit edge combinations consume only persistent UiRoot safe-area variables.',
+        description:
+          'Explicit edge combinations consume only persistent UiRoot safe-area variables.',
         component: 'SafeAreaEdgesExample',
       },
     ],
@@ -164,7 +171,8 @@ export const uiDocs = defineUiDocsGroup([
       {
         id: 'logical-axis',
         title: 'Logical axis extent',
-        description: 'Inline and block spacers reserve only the selected logical dimension and remain permanently hidden from accessibility APIs.',
+        description:
+          'Inline and block spacers reserve only the selected logical dimension and remain permanently hidden from accessibility APIs.',
         component: 'SpacerAxisExample',
       },
     ],
@@ -185,7 +193,8 @@ export function BoxBoundaryExample() {
   return (
     <Stack gap="sm">
       <Text tone="secondary">
-        Box keeps layout behavior typed: semantic element, overflow, min-size and parent-layout participation.
+        Box keeps layout behavior typed: semantic element, overflow, min-size and parent-layout
+        participation.
       </Text>
       <Row gap="sm" aria-label="Box flex boundary host">
         <Box
@@ -197,7 +206,10 @@ export function BoxBoundaryExample() {
         >
           <Surface material="subtle" radius="md">
             <Inset space="sm">
-              <Text>Long nested content remains owned by this boundary instead of forcing the outer document wider.</Text>
+              <Text>
+                Long nested content remains owned by this boundary instead of forcing the outer
+                document wider.
+              </Text>
             </Inset>
           </Surface>
         </Box>
@@ -209,8 +221,12 @@ export function BoxBoundaryExample() {
         <Box gridSpan="full" aria-label="Full-span Box">
           <DemoTile label="Full grid span" />
         </Box>
-        <Box><DemoTile label="Grid peer A" /></Box>
-        <Box><DemoTile label="Grid peer B" /></Box>
+        <Box>
+          <DemoTile label="Grid peer A" />
+        </Box>
+        <Box>
+          <DemoTile label="Grid peer B" />
+        </Box>
       </Grid>
     </Stack>
   );
@@ -239,11 +255,13 @@ export function RowFlowExample() {
 export function WrapFlowExample() {
   return (
     <Wrap as="section" aria-label="Certified Wrap flow" gap="xs" align="center" justify="start">
-      {['Alpha item', 'Beta item', 'Gamma item', 'Delta item', 'Epsilon item', 'Zeta item'].map((label) => (
-        <Box key={label} flex="none">
-          <DemoTile label={label} />
-        </Box>
-      ))}
+      {['Alpha item', 'Beta item', 'Gamma item', 'Delta item', 'Epsilon item', 'Zeta item'].map(
+        (label) => (
+          <Box key={label} flex="none">
+            <DemoTile label={label} />
+          </Box>
+        ),
+      )}
     </Wrap>
   );
 }
@@ -258,12 +276,20 @@ export function GridTracksExample() {
         minColumn="tile"
         gap="xs"
       >
-        {['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon'].map((label) => <DemoTile key={label} label={label} />)}
+        {['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon'].map((label) => (
+          <DemoTile key={label} label={label} />
+        ))}
       </Grid>
       <Grid as="section" aria-label="Certified fixed Grid" columns={4} minColumn="tile" gap="xs">
-        <Box gridSpan={2} aria-label="Two-column Grid item"><DemoTile label="Span 2" /></Box>
-        <Box><DemoTile label="Peer A" /></Box>
-        <Box><DemoTile label="Peer B" /></Box>
+        <Box gridSpan={2} aria-label="Two-column Grid item">
+          <DemoTile label="Span 2" />
+        </Box>
+        <Box>
+          <DemoTile label="Peer A" />
+        </Box>
+        <Box>
+          <DemoTile label="Peer B" />
+        </Box>
       </Grid>
     </Stack>
   );

@@ -110,7 +110,6 @@ describe('UI Kit drag/drop runtime', () => {
     fireEvent(source, pointerEvent('pointercancel', { clientX: 30, clientY: 30 }));
   });
 
-
   it('abandons touch drag-start when movement turns the same pointer stream into scrolling', () => {
     function Fixture() {
       const sourceProps = useDragSource({
@@ -127,14 +126,40 @@ describe('UI Kit drag/drop runtime', () => {
       );
     }
 
-    render(<UiRoot><Fixture /></UiRoot>);
+    render(
+      <UiRoot>
+        <Fixture />
+      </UiRoot>,
+    );
     const source = screen.getByRole('button', { name: 'Touch source' });
-    fireEvent(source, pointerEvent('pointerdown', { pointerId: 11, pointerType: 'touch', clientX: 10, clientY: 80 }));
-    fireEvent(source, pointerEvent('pointermove', { pointerId: 11, pointerType: 'touch', clientX: 10, clientY: 50 }));
+    fireEvent(
+      source,
+      pointerEvent('pointerdown', {
+        pointerId: 11,
+        pointerType: 'touch',
+        clientX: 10,
+        clientY: 80,
+      }),
+    );
+    fireEvent(
+      source,
+      pointerEvent('pointermove', {
+        pointerId: 11,
+        pointerType: 'touch',
+        clientX: 10,
+        clientY: 50,
+      }),
+    );
 
     expect(screen.queryByText('Should not drag')).not.toBeInTheDocument();
-    expect(source.closest('.ui-drag-drop-runtime')).toHaveAttribute('data-oxs-drag-active', 'false');
-    fireEvent(source, pointerEvent('pointerup', { pointerId: 11, pointerType: 'touch', clientX: 10, clientY: 50 }));
+    expect(source.closest('.ui-drag-drop-runtime')).toHaveAttribute(
+      'data-oxs-drag-active',
+      'false',
+    );
+    fireEvent(
+      source,
+      pointerEvent('pointerup', { pointerId: 11, pointerType: 'touch', clientX: 10, clientY: 50 }),
+    );
   });
 
   it('continues edge autoscroll on animation frames while the drag pointer stays still', () => {
@@ -149,7 +174,15 @@ describe('UI Kit drag/drop runtime', () => {
       scrollBy: { configurable: true, value: scrollBy },
     });
     vi.spyOn(scrollable, 'getBoundingClientRect').mockReturnValue({
-      x: 0, y: 0, left: 0, top: 0, right: 100, bottom: 100, width: 100, height: 100, toJSON: () => ({}),
+      x: 0,
+      y: 0,
+      left: 0,
+      top: 0,
+      right: 100,
+      bottom: 100,
+      width: 100,
+      height: 100,
+      toJSON: () => ({}),
     });
     Object.defineProperty(document, 'elementFromPoint', {
       configurable: true,
@@ -166,7 +199,11 @@ describe('UI Kit drag/drop runtime', () => {
     }
 
     try {
-      render(<DragDropProvider><Fixture /></DragDropProvider>);
+      render(
+        <DragDropProvider>
+          <Fixture />
+        </DragDropProvider>,
+      );
       const source = screen.getByRole('button', { name: 'Auto-scroll source' });
       fireEvent(source, pointerEvent('pointerdown', { clientX: 50, clientY: 94 }));
       fireEvent(source, pointerEvent('pointermove', { clientX: 50, clientY: 98 }));
@@ -174,11 +211,11 @@ describe('UI Kit drag/drop runtime', () => {
       expect(scrollBy.mock.calls.length).toBeGreaterThan(1);
       fireEvent(source, pointerEvent('pointercancel', { clientX: 50, clientY: 98 }));
     } finally {
-      if (originalDescriptor) Object.defineProperty(document, 'elementFromPoint', originalDescriptor);
+      if (originalDescriptor)
+        Object.defineProperty(document, 'elementFromPoint', originalDescriptor);
       else Reflect.deleteProperty(document, 'elementFromPoint');
     }
   });
-
 
   it('keeps one drag session authoritative across multiple pointer sources', () => {
     function Fixture() {
@@ -194,9 +231,18 @@ describe('UI Kit drag/drop runtime', () => {
         preview: 'Second preview',
         threshold: 2,
       });
-      return <><button {...first}>First source</button><button {...second}>Second source</button></>;
+      return (
+        <>
+          <button {...first}>First source</button>
+          <button {...second}>Second source</button>
+        </>
+      );
     }
-    render(<UiRoot><Fixture /></UiRoot>);
+    render(
+      <UiRoot>
+        <Fixture />
+      </UiRoot>,
+    );
     const first = screen.getByRole('button', { name: 'First source' });
     const second = screen.getByRole('button', { name: 'Second source' });
     fireEvent(first, pointerEvent('pointerdown', { pointerId: 31, clientX: 5, clientY: 5 }));
@@ -208,5 +254,4 @@ describe('UI Kit drag/drop runtime', () => {
     expect(screen.getByText('First preview')).toBeInTheDocument();
     fireEvent(first, pointerEvent('pointercancel', { pointerId: 31, clientX: 15, clientY: 15 }));
   });
-
 });

@@ -24,7 +24,6 @@ export function filterSystemLauncherItems(
   return filterSystemApplicationItems(apps, query);
 }
 
-
 export function SystemLauncher({
   open,
   transition,

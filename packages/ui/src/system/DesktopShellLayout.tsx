@@ -29,13 +29,22 @@ export function DesktopShellLayout({
   insets,
   className = '',
 }: DesktopShellLayoutProps) {
-  const chrome = topBar || dock || panel ? (
-    <div className="ui-desktop-shell-layout__chrome">
-      {topBar ? <div className="ui-desktop-shell-layout__top-bar">{topBar}</div> : null}
-      {dock ? <div className="ui-desktop-shell-layout__dock" data-edge={dockEdge}>{dock}</div> : null}
-      {panel ? <div className="ui-desktop-shell-layout__panel" data-edge={panelEdge}>{panel}</div> : null}
-    </div>
-  ) : undefined;
+  const chrome =
+    topBar || dock || panel ? (
+      <div className="ui-desktop-shell-layout__chrome">
+        {topBar ? <div className="ui-desktop-shell-layout__top-bar">{topBar}</div> : null}
+        {dock ? (
+          <div className="ui-desktop-shell-layout__dock" data-edge={dockEdge}>
+            {dock}
+          </div>
+        ) : null}
+        {panel ? (
+          <div className="ui-desktop-shell-layout__panel" data-edge={panelEdge}>
+            {panel}
+          </div>
+        ) : null}
+      </div>
+    ) : undefined;
 
   return (
     <SystemScaffold
@@ -69,7 +78,12 @@ export function SystemBar({
   className = '',
 }: SystemBarProps) {
   return (
-    <SystemSurface kind="chrome" edge={edge} label={label} className={`ui-system-bar ui-system-bar--${density} ${className}`.trim()}>
+    <SystemSurface
+      kind="chrome"
+      edge={edge}
+      label={label}
+      className={`ui-system-bar ui-system-bar--${density} ${className}`.trim()}
+    >
       <Toolbar className="ui-system-bar__toolbar" label={label}>
         <span className="ui-system-bar__leading">{leading}</span>
         <span className="ui-system-bar__center">{center}</span>
@@ -95,8 +109,15 @@ export function SystemDock({
   className = '',
 }: SystemDockProps) {
   return (
-    <SystemSurface kind="chrome" edge={edge} label={label} className={`ui-system-dock ${className}`.trim()}>
-      <Toolbar className="ui-system-dock__toolbar" label={label} overflow={trailing}>{children}</Toolbar>
+    <SystemSurface
+      kind="chrome"
+      edge={edge}
+      label={label}
+      className={`ui-system-dock ${className}`.trim()}
+    >
+      <Toolbar className="ui-system-dock__toolbar" label={label} overflow={trailing}>
+        {children}
+      </Toolbar>
     </SystemSurface>
   );
 }
@@ -132,7 +153,14 @@ export function SystemPanel({
       label={resolvedLabel}
       className={`ui-system-panel ui-system-panel--${width} ${className}`.trim()}
     >
-      <Card className="ui-system-panel__card" padding="sm" title={title} description={subtitle} actions={actions} emphasis="strong">
+      <Card
+        className="ui-system-panel__card"
+        padding="sm"
+        title={title}
+        description={subtitle}
+        actions={actions}
+        emphasis="strong"
+      >
         <ScrollView className="ui-system-panel__scroll" ariaLabel={resolvedLabel}>
           {children}
         </ScrollView>

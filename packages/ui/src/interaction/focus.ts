@@ -82,9 +82,7 @@ export function focusRelativeTo(reference: HTMLElement | null, backwards = false
       const NodeCtor = reference.ownerDocument.defaultView?.Node;
       const preceding = NodeCtor?.DOCUMENT_POSITION_PRECEDING ?? 2;
       const following = NodeCtor?.DOCUMENT_POSITION_FOLLOWING ?? 4;
-      return backwards
-        ? Boolean(relation & preceding)
-        : Boolean(relation & following);
+      return backwards ? Boolean(relation & preceding) : Boolean(relation & following);
     });
   }
   if (!target) return false;

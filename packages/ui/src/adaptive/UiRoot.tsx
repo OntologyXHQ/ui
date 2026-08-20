@@ -69,7 +69,11 @@ export function UiRoot({
   style,
 }: UiRootProps) {
   const parentDepth = useContext(UiRootDepthContext);
-  const [realm, setRealm] = useState<UiRootRealm>({ window: null, document: null, nestedByDom: false });
+  const [realm, setRealm] = useState<UiRootRealm>({
+    window: null,
+    document: null,
+    nestedByDom: false,
+  });
   const bindRootElement = useCallback((element: HTMLDivElement | null) => {
     if (!element) return;
     const nextDocument = element.ownerDocument;

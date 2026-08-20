@@ -17,7 +17,12 @@ export type SystemScaffoldProps = {
 };
 
 export type SystemSurfaceKind = 'chrome' | 'transient' | 'privileged';
-export type SystemSurfaceEdge = 'none' | 'block-start' | 'inline-end' | 'block-end' | 'inline-start';
+export type SystemSurfaceEdge =
+  | 'none'
+  | 'block-start'
+  | 'inline-end'
+  | 'block-end'
+  | 'inline-start';
 
 export type SystemSurfaceProps = {
   kind: SystemSurfaceKind;

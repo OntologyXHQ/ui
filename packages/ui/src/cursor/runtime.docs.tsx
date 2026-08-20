@@ -4,7 +4,8 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'CursorRuntimeProvider',
     layer: 'foundations',
-    category: 'Environment', order: 10,
+    category: 'Environment',
+    order: 10,
     summary: 'Provides cursor theme, scale, modality and visibility state to UI consumers.',
     usage: 'Normally owned by UiRoot; use directly only for isolated runtime fixtures.',
     status: 'candidate',

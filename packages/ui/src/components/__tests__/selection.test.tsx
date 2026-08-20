@@ -25,7 +25,9 @@ describe('UIP06 action and selection Components', () => {
     const user = userEvent.setup();
     render(
       <Root>
-        <Button loading loadingLabel="Saving">Save</Button>
+        <Button loading loadingLabel="Saving">
+          Save
+        </Button>
         <ToggleButton>Pin</ToggleButton>
         <IconButton icon="settings" label="Lock settings" defaultPressed />
       </Root>,
@@ -36,7 +38,10 @@ describe('UIP06 action and selection Components', () => {
     expect(toggle).toHaveAttribute('aria-pressed', 'false');
     await user.click(toggle);
     expect(toggle).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByRole('button', { name: 'Lock settings' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Lock settings' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
   });
 
   it('supports controlled checkbox and radio selection contracts', async () => {
@@ -68,7 +73,10 @@ describe('UIP06 action and selection Components', () => {
         <Checkbox label="Mixed" indeterminate />
       </Root>,
     );
-    expect(screen.getByRole('checkbox', { name: 'Mixed' })).toHaveAttribute('aria-checked', 'mixed');
+    expect(screen.getByRole('checkbox', { name: 'Mixed' })).toHaveAttribute(
+      'aria-checked',
+      'mixed',
+    );
   });
 
   it('toggles Switch by native button activation and exposes switch semantics', async () => {
@@ -114,18 +122,30 @@ describe('UIP06 action and selection Components', () => {
     render(
       <Root>
         <ToggleButton onClick={cancel}>Pin</ToggleButton>
-        <IconButton icon="settings" label="Settings toggle" defaultPressed={false} onClick={cancel} />
+        <IconButton
+          icon="settings"
+          label="Settings toggle"
+          defaultPressed={false}
+          onClick={cancel}
+        />
       </Root>,
     );
     await user.click(screen.getByRole('button', { name: 'Pin' }));
     await user.click(screen.getByRole('button', { name: 'Settings toggle' }));
     expect(screen.getByRole('button', { name: 'Pin' })).toHaveAttribute('aria-pressed', 'false');
-    expect(screen.getByRole('button', { name: 'Settings toggle' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: 'Settings toggle' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
   });
 
   it('makes the visible Switch label an activation target', async () => {
     const user = userEvent.setup();
-    render(<Root><Switch label="Wi-Fi" /></Root>);
+    render(
+      <Root>
+        <Switch label="Wi-Fi" />
+      </Root>,
+    );
     await user.click(screen.getByText('Wi-Fi'));
     expect(screen.getByRole('switch', { name: 'Wi-Fi' })).toHaveAttribute('aria-checked', 'true');
   });
@@ -197,5 +217,4 @@ describe('UIP06 action and selection Components', () => {
     expect(onClick).toHaveBeenCalledTimes(1);
     expect(slider).toHaveAttribute('aria-valuenow', '40');
   });
-
 });

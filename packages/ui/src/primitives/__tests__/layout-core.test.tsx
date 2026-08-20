@@ -80,8 +80,12 @@ describe('accepted layout core contract', () => {
 
   it('preserves native prop typing through polymorphic as while forbidding inline style', () => {
     if (false) {
-      <Box as="ol" start={2}><li>Docs</li></Box>;
-      <Stack as="ol" start={2}><li>Item</li></Stack>;
+      <Box as="ol" start={2}>
+        <li>Docs</li>
+      </Box>;
+      <Stack as="ol" start={2}>
+        <li>Item</li>
+      </Stack>;
       // @ts-expect-error section does not accept ordered-list-only start
       <Box as="section" start={2} />;
       // @ts-expect-error inline style bypasses the typed Foundations/Primitive contract

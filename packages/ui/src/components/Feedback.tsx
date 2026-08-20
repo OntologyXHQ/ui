@@ -10,11 +10,19 @@ const LazyOxLoadingCanvas = lazy(async () => {
 
 export type BadgeTone = 'neutral' | 'accent' | 'success' | 'warning' | 'danger';
 export type BadgeProps = HTMLAttributes<HTMLSpanElement> & {
+  /** Semantic visual tone for the metadata label. @default neutral */
   tone?: BadgeTone;
+  /** Compact or regular badge sizing. @default md */
   size?: 'sm' | 'md';
 };
 
-export function Badge({ children, className = '', size = 'md', tone = 'neutral', ...props }: BadgeProps) {
+export function Badge({
+  children,
+  className = '',
+  size = 'md',
+  tone = 'neutral',
+  ...props
+}: BadgeProps) {
   return (
     <span {...props} className={`ui-badge ui-badge--${tone} ui-badge--${size} ${className}`.trim()}>
       {children}
@@ -23,9 +31,13 @@ export function Badge({ children, className = '', size = 'md', tone = 'neutral',
 }
 
 export type StatusIndicatorProps = Omit<HTMLAttributes<HTMLSpanElement>, 'children'> & {
+  /** Accessible text naming the represented status. */
   label: string;
+  /** Semantic visual tone for the status. @default neutral */
   tone?: BadgeTone;
+  /** Keeps the status label visually visible instead of visually hidden. @default true */
   showLabel?: boolean;
+  /** Opts changing status into a polite live-region announcement. @default false */
   announce?: boolean;
 };
 
@@ -44,15 +56,23 @@ export function StatusIndicator({
       role={announce ? 'status' : undefined}
     >
       <span className="ui-status-indicator__dot" aria-hidden />
-      {showLabel ? <span className="ui-status-indicator__label">{label}</span> : <span className="ui-visually-hidden">{label}</span>}
+      {showLabel ? (
+        <span className="ui-status-indicator__label">{label}</span>
+      ) : (
+        <span className="ui-visually-hidden">{label}</span>
+      )}
     </span>
   );
 }
 
 export type ProgressProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
+  /** Accessible name shown beside and applied to the native progress element. */
   label: string;
+  /** Determinate progress value; omit for indeterminate progress. */
   value?: number;
+  /** Positive upper bound used to normalize determinate progress. @default 100 */
   max?: number;
+  /** Shows a rounded percentage when progress is determinate. @default false */
   showValue?: boolean;
 };
 
@@ -65,9 +85,10 @@ export function Progress({
   ...props
 }: ProgressProps) {
   const safeMax = Number.isFinite(max) && max > 0 ? max : 100;
-  const normalized = value === undefined || !Number.isFinite(value)
-    ? undefined
-    : Math.min(safeMax, Math.max(0, value));
+  const normalized =
+    value === undefined || !Number.isFinite(value)
+      ? undefined
+      : Math.min(safeMax, Math.max(0, value));
   return (
     <div {...props} className={`ui-progress ${className}`.trim()}>
       <div className="ui-progress__header">
@@ -76,7 +97,12 @@ export function Progress({
           <span className="ui-progress__value">{Math.round((normalized / safeMax) * 100)}%</span>
         ) : null}
       </div>
-      <progress className="ui-progress__native" aria-label={label} max={safeMax} value={normalized} />
+      <progress
+        className="ui-progress__native"
+        aria-label={label}
+        max={safeMax}
+        value={normalized}
+      />
     </div>
   );
 }
@@ -94,7 +120,14 @@ export type SpinnerProps = HTMLAttributes<HTMLSpanElement> & {
   renderer?: SpinnerRenderer;
 };
 
-export function Spinner({ announce = false, className = '', label = 'Loading', renderer = 'svg', size = 'md', ...props }: SpinnerProps) {
+export function Spinner({
+  announce = false,
+  className = '',
+  label = 'Loading',
+  renderer = 'svg',
+  size = 'md',
+  ...props
+}: SpinnerProps) {
   return (
     <span
       {...props}
@@ -108,13 +141,17 @@ export function Spinner({ announce = false, className = '', label = 'Loading', r
         <Suspense fallback={<OxLoadingMark />}>
           <LazyOxLoadingCanvas />
         </Suspense>
-      ) : <OxLoadingMark />}
+      ) : (
+        <OxLoadingMark />
+      )}
     </span>
   );
 }
 
 export type SkeletonProps = HTMLAttributes<HTMLSpanElement> & {
+  /** Container-relative placeholder width preset. @default full */
   width?: 'short' | 'medium' | 'full';
+  /** Placeholder geometry without introducing fake accessible content. @default text */
   shape?: 'text' | 'rect' | 'circle';
 };
 
@@ -134,10 +171,15 @@ export function Skeleton({
 }
 
 export type EmptyStateProps = HTMLAttributes<HTMLDivElement> & {
+  /** Required heading content naming the empty state. */
   title: ReactNode;
+  /** Semantic heading level used by the empty-state title. @default 3 */
   titleLevel?: 2 | 3 | 4 | 5 | 6;
+  /** Optional explanatory copy below the title. */
   description?: ReactNode;
+  /** Optional decorative icon displayed with the empty state. */
   icon?: ReactNode;
+  /** Optional caller-owned action rendered after the description. */
   action?: ReactNode;
 };
 
@@ -152,8 +194,14 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div {...props} className={`ui-empty-state ${className}`.trim()}>
-      {icon ? <div className="ui-empty-state__icon" aria-hidden>{icon}</div> : null}
-      <Heading className="ui-empty-state__title" level={titleLevel}>{title}</Heading>
+      {icon ? (
+        <div className="ui-empty-state__icon" aria-hidden>
+          {icon}
+        </div>
+      ) : null}
+      <Heading className="ui-empty-state__title" level={titleLevel}>
+        {title}
+      </Heading>
       {description ? <div className="ui-empty-state__description">{description}</div> : null}
       {action ? <div className="ui-empty-state__action">{action}</div> : null}
     </div>

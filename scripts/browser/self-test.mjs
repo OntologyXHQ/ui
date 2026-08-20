@@ -21,7 +21,9 @@ async function expectFailure(name, operation, match) {
     }
     return { id: name, observedFailure: String(error.message).split('\n')[0] };
   }
-  throw new Error(`Harness self-test "${name}" did not reject its intentionally broken browser fixture.`);
+  throw new Error(
+    `Harness self-test "${name}" did not reject its intentionally broken browser fixture.`,
+  );
 }
 
 export async function runHarnessSelfTests(browser) {
@@ -31,8 +33,16 @@ export async function runHarnessSelfTests(browser) {
     const context = await browser.newContext({ viewport: { width: 800, height: 600 } });
     const page = await context.newPage();
     try {
-      await page.setContent('<main><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" ><button></button></main>');
-      results.push(await expectFailure('axe-serious-critical-blocker', () => runAxe(page, 'broken accessibility fixture'), /axe violation/));
+      await page.setContent(
+        '<main><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" ><button></button></main>',
+      );
+      results.push(
+        await expectFailure(
+          'axe-serious-critical-blocker',
+          () => runAxe(page, 'broken accessibility fixture'),
+          /axe violation/,
+        ),
+      );
     } finally {
       await context.close();
     }
@@ -42,12 +52,16 @@ export async function runHarnessSelfTests(browser) {
     const context = await browser.newContext({ viewport: { width: 800, height: 600 } });
     const page = await context.newPage();
     try {
-      await page.setContent('<main style="background:#fff;color:#aaa;font:16px/1.5 sans-serif;padding:24px">Intentionally low contrast readable text</main>');
-      results.push(await expectFailure(
-        'axe-color-contrast-blocker',
-        () => runAxe(page, 'broken color contrast fixture'),
-        /color-contrast/,
-      ));
+      await page.setContent(
+        '<main style="background:#fff;color:#aaa;font:16px/1.5 sans-serif;padding:24px">Intentionally low contrast readable text</main>',
+      );
+      results.push(
+        await expectFailure(
+          'axe-color-contrast-blocker',
+          () => runAxe(page, 'broken color contrast fixture'),
+          /color-contrast/,
+        ),
+      );
     } finally {
       await context.close();
     }
@@ -57,14 +71,20 @@ export async function runHarnessSelfTests(browser) {
     const context = await browser.newContext({ viewport: { width: 800, height: 600 } });
     const page = await context.newPage();
     try {
-      await page.setContent('<div id="background"><button id="focused">Focused background</button></div><div role="dialog">Modal</div>');
+      await page.setContent(
+        '<div id="background"><button id="focused">Focused background</button></div><div role="dialog">Modal</div>',
+      );
       await page.locator('#focused').focus();
-      await page.locator('#background').evaluate((element) => element.setAttribute('aria-hidden', 'true'));
-      results.push(await expectFailure(
-        'focused-isolation-invariant-detector',
-        () => assertNoFocusedIsolationConflict(page, 'broken focused isolation fixture'),
-        /retained focus inside an aria-hidden\/inert ancestor/i,
-      ));
+      await page
+        .locator('#background')
+        .evaluate((element) => element.setAttribute('aria-hidden', 'true'));
+      results.push(
+        await expectFailure(
+          'focused-isolation-invariant-detector',
+          () => assertNoFocusedIsolationConflict(page, 'broken focused isolation fixture'),
+          /retained focus inside an aria-hidden\/inert ancestor/i,
+        ),
+      );
     } finally {
       await context.close();
     }
@@ -74,10 +94,18 @@ export async function runHarnessSelfTests(browser) {
     const context = await browser.newContext({ viewport: { width: 800, height: 600 } });
     const page = await context.newPage();
     try {
-      await page.setContent('<button id="focus" style="outline:none;box-shadow:none">No focus ring</button>');
+      await page.setContent(
+        '<button id="focus" style="outline:none;box-shadow:none">No focus ring</button>',
+      );
       const button = page.locator('#focus');
       await focusByTab(page, button, { maxSteps: 4 });
-      results.push(await expectFailure('visible-focus-detector', () => assertVisibleFocus(button, 'broken focus fixture'), /focus indicator/));
+      results.push(
+        await expectFailure(
+          'visible-focus-detector',
+          () => assertVisibleFocus(button, 'broken focus fixture'),
+          /focus indicator/,
+        ),
+      );
     } finally {
       await context.close();
     }
@@ -88,7 +116,13 @@ export async function runHarnessSelfTests(browser) {
     const page = await context.newPage();
     try {
       await page.setContent('<div style="width:900px;height:10px">overflow</div>');
-      results.push(await expectFailure('reflow-overflow-detector', () => assertNoGlobalHorizontalOverflow(page, 'broken reflow fixture'), /horizontal overflow/));
+      results.push(
+        await expectFailure(
+          'reflow-overflow-detector',
+          () => assertNoGlobalHorizontalOverflow(page, 'broken reflow fixture'),
+          /horizontal overflow/,
+        ),
+      );
     } finally {
       await context.close();
     }
@@ -98,8 +132,16 @@ export async function runHarnessSelfTests(browser) {
     const context = await browser.newContext({ viewport: { width: 800, height: 600 } });
     const page = await context.newPage();
     try {
-      await page.setContent('<div class="ui-studio-viewport" data-viewport="phone" style="--ui-studio-viewport-width:390px;--ui-studio-content-width:48rem"><div class="ui-root" dir="ltr" data-oxs-theme="dark" data-oxs-density="comfortable" data-oxs-motion="full" data-oxs-modality="mouse" data-oxs-pointer-precision="fine"></div></div>');
-      results.push(await expectFailure('environment-projection-detector', () => assertEnvironment(page, { dir: 'rtl' }), /Environment mismatch/));
+      await page.setContent(
+        '<div class="ui-studio-viewport" data-viewport="phone" style="--ui-studio-viewport-width:390px;--ui-studio-content-width:48rem"><div class="ui-root" dir="ltr" data-oxs-theme="dark" data-oxs-density="comfortable" data-oxs-motion="full" data-oxs-modality="mouse" data-oxs-pointer-precision="fine"></div></div>',
+      );
+      results.push(
+        await expectFailure(
+          'environment-projection-detector',
+          () => assertEnvironment(page, { dir: 'rtl' }),
+          /Environment mismatch/,
+        ),
+      );
     } finally {
       await context.close();
     }
@@ -111,9 +153,15 @@ export async function runHarnessSelfTests(browser) {
     try {
       await page.setContent('<main data-studio-entry="Button" data-studio-tab="overview"></main>');
       const missing = page.locator('[data-studio-entry="Dialog"][data-studio-tab="examples"]');
-      results.push(await expectFailure('deterministic-route-detector', async () => {
-        await missing.waitFor({ state: 'visible', timeout: 150 });
-      }, /Timeout/));
+      results.push(
+        await expectFailure(
+          'deterministic-route-detector',
+          async () => {
+            await missing.waitFor({ state: 'visible', timeout: 150 });
+          },
+          /Timeout/,
+        ),
+      );
     } finally {
       await context.close();
     }
@@ -123,7 +171,9 @@ export async function runHarnessSelfTests(browser) {
     const context = await browser.newContext({ viewport: { width: 800, height: 600 } });
     const page = await context.newPage();
     try {
-      await page.setContent('<div role="tabpanel"><section id="deep-target" data-active="true" style="width:0;height:0"></section></div>');
+      await page.setContent(
+        '<div role="tabpanel"><section id="deep-target" data-active="true" style="width:0;height:0"></section></div>',
+      );
       const target = page.locator('#deep-target');
       const state = await assertActiveCatalogDeepTarget(target, 'zero-box deep-link fixture');
       assert.equal(state.active, 'true');
@@ -138,12 +188,20 @@ export async function runHarnessSelfTests(browser) {
     const context = await browser.newContext({ viewport: { width: 800, height: 600 } });
     const page = await context.newPage();
     try {
-      await page.setContent('<div role="tabpanel" hidden><section id="hidden-deep-target" data-active="true"></section></div>');
-      results.push(await expectFailure(
-        'deep-link-hidden-panel-detector',
-        () => assertActiveCatalogDeepTarget(page.locator('#hidden-deep-target'), 'hidden deep-link fixture'),
-        /hidden tab panel/,
-      ));
+      await page.setContent(
+        '<div role="tabpanel" hidden><section id="hidden-deep-target" data-active="true"></section></div>',
+      );
+      results.push(
+        await expectFailure(
+          'deep-link-hidden-panel-detector',
+          () =>
+            assertActiveCatalogDeepTarget(
+              page.locator('#hidden-deep-target'),
+              'hidden deep-link fixture',
+            ),
+          /hidden tab panel/,
+        ),
+      );
     } finally {
       await context.close();
     }
@@ -154,11 +212,13 @@ export async function runHarnessSelfTests(browser) {
     const page = await context.newPage();
     try {
       await page.setContent('<div class="ui-root"></div>');
-      results.push(await expectFailure(
-        'public-stylesheet-detector',
-        () => assertPublicUiStylesLoaded(page),
-        /stylesheet is not active/,
-      ));
+      results.push(
+        await expectFailure(
+          'public-stylesheet-detector',
+          () => assertPublicUiStylesLoaded(page),
+          /stylesheet is not active/,
+        ),
+      );
     } finally {
       await context.close();
     }
@@ -169,18 +229,28 @@ export async function runHarnessSelfTests(browser) {
     const page = await context.newPage();
     try {
       await page.setContent('<section id="collapsed" style="height:24px"></section>');
-      results.push(await expectFailure(
-        'mobile-documentation-viewport-collapse-detector',
-        () => assertMinimumBlockSize(page.locator('#collapsed'), 176, 'Broken mobile documentation viewport'),
-        /collapsed below its 176px minimum browser block-size budget/,
-      ));
+      results.push(
+        await expectFailure(
+          'mobile-documentation-viewport-collapse-detector',
+          () =>
+            assertMinimumBlockSize(
+              page.locator('#collapsed'),
+              176,
+              'Broken mobile documentation viewport',
+            ),
+          /collapsed below its 176px minimum browser block-size budget/,
+        ),
+      );
     } finally {
       await context.close();
     }
   }
 
   {
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true });
+    const context = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      hasTouch: true,
+    });
     const page = await context.newPage();
     try {
       await page.setContent(`
@@ -209,7 +279,10 @@ export async function runHarnessSelfTests(browser) {
   }
 
   {
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true });
+    const context = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      hasTouch: true,
+    });
     const page = await context.newPage();
     try {
       await page.setContent(`
@@ -217,23 +290,27 @@ export async function runHarnessSelfTests(browser) {
         <div id="activation" role="menu" hidden>Too late</div>
         <script>release.addEventListener('pointerup', () => { activation.hidden = false; });<\/script>
       `);
-      results.push(await expectFailure(
-        'long-press-release-only-detector',
-        () => performTouchLongPress(
-          page,
-          page.locator('#release'),
-          page.locator('#activation'),
-          { activationBudgetMs: 150, releaseSettleMs: 20 },
+      results.push(
+        await expectFailure(
+          'long-press-release-only-detector',
+          () =>
+            performTouchLongPress(page, page.locator('#release'), page.locator('#activation'), {
+              activationBudgetMs: 150,
+              releaseSettleMs: 20,
+            }),
+          /Timeout/,
         ),
-        /Timeout/,
-      ));
+      );
     } finally {
       await context.close();
     }
   }
 
   {
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true });
+    const context = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      hasTouch: true,
+    });
     const page = await context.newPage();
     try {
       await page.setContent(`
@@ -255,14 +332,18 @@ export async function runHarnessSelfTests(browser) {
       `);
       const target = page.locator('#clipped-hold');
       const before = await target.boundingBox();
-      assert.ok(before && before.y > 120, 'Nested-scroll self-test fixture did not begin clipped below its scroll viewport.');
-      const activationMs = await performTouchLongPress(
-        page,
-        target,
-        page.locator('#activation'),
-        { activationBudgetMs: 300, releaseSettleMs: 20 },
+      assert.ok(
+        before && before.y > 120,
+        'Nested-scroll self-test fixture did not begin clipped below its scroll viewport.',
       );
-      assert.ok(activationMs <= 300, 'Nested-scroll long-press observer exceeded its self-test budget.');
+      const activationMs = await performTouchLongPress(page, target, page.locator('#activation'), {
+        activationBudgetMs: 300,
+        releaseSettleMs: 20,
+      });
+      assert.ok(
+        activationMs <= 300,
+        'Nested-scroll long-press observer exceeded its self-test budget.',
+      );
       results.push({ id: 'long-press-scroll-and-hit-test-owner', activationMs });
     } finally {
       await context.close();
@@ -270,7 +351,10 @@ export async function runHarnessSelfTests(browser) {
   }
 
   {
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true });
+    const context = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      hasTouch: true,
+    });
     const page = await context.newPage();
     try {
       await page.setContent(`
@@ -297,16 +381,22 @@ export async function runHarnessSelfTests(browser) {
       const target = page.locator('#covered-hold');
       const initialHit = await target.evaluate((element) => {
         const rect = element.getBoundingClientRect();
-        return document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2)?.id;
+        return document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2)
+          ?.id;
       });
-      assert.equal(initialHit, 'cover', 'Occlusion self-test fixture did not begin covered at the target center.');
-      const activationMs = await performTouchLongPress(
-        page,
-        target,
-        page.locator('#activation'),
-        { activationBudgetMs: 300, releaseSettleMs: 20 },
+      assert.equal(
+        initialHit,
+        'cover',
+        'Occlusion self-test fixture did not begin covered at the target center.',
       );
-      assert.ok(activationMs <= 300, 'Occlusion-centering long-press observer exceeded its self-test budget.');
+      const activationMs = await performTouchLongPress(page, target, page.locator('#activation'), {
+        activationBudgetMs: 300,
+        releaseSettleMs: 20,
+      });
+      assert.ok(
+        activationMs <= 300,
+        'Occlusion-centering long-press observer exceeded its self-test budget.',
+      );
       results.push({ id: 'long-press-center-away-from-occluder', activationMs });
     } finally {
       await context.close();

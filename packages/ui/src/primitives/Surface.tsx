@@ -47,7 +47,11 @@ export const Surface = forwardRef<HTMLDivElement, SurfaceProps>(function Surface
     .filter(Boolean)
     .join(' ');
 
-  return <div ref={ref} className={classes} {...props}>{children}</div>;
+  return (
+    <div ref={ref} className={classes} {...props}>
+      {children}
+    </div>
+  );
 });
 
 export type DividerProps = Omit<
@@ -88,7 +92,9 @@ export function Divider({
         `ui-divider--tone-${tone}`,
         `ui-divider--thickness-${thickness}`,
         className,
-      ].filter(Boolean).join(' ')}
+      ]
+        .filter(Boolean)
+        .join(' ')}
     />
   );
 }

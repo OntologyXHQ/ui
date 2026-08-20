@@ -28,15 +28,23 @@ function layerIn(documentRef: Document) {
   return { root, runtime, portal, layer };
 }
 
-function register(owner: OverlayCoordinator, layer: HTMLElement, counters: { key: number; pointer: number }) {
+function register(
+  owner: OverlayCoordinator,
+  layer: HTMLElement,
+  counters: { key: number; pointer: number },
+) {
   return owner.register({
     id: `entry-${Math.random()}`,
     layer,
     modal: false,
     lockScroll: false,
     restoreFocus: null,
-    onKeyDown: () => { counters.key += 1; },
-    onPointerDown: () => { counters.pointer += 1; },
+    onKeyDown: () => {
+      counters.key += 1;
+    },
+    onPointerDown: () => {
+      counters.pointer += 1;
+    },
   });
 }
 
@@ -53,17 +61,41 @@ describe('overlay realm authority', () => {
     const aId = 'root-a';
     const bId = 'root-b';
 
-    a.register({ id: aId, layer: aLayer, modal: false, lockScroll: false, restoreFocus: null, onKeyDown: () => { aEvents.key += 1; }, onPointerDown: () => { aEvents.pointer += 1; } });
-    b.register({ id: bId, layer: bLayer, modal: false, lockScroll: false, restoreFocus: null, onKeyDown: () => { bEvents.key += 1; }, onPointerDown: () => { bEvents.pointer += 1; } });
+    a.register({
+      id: aId,
+      layer: aLayer,
+      modal: false,
+      lockScroll: false,
+      restoreFocus: null,
+      onKeyDown: () => {
+        aEvents.key += 1;
+      },
+      onPointerDown: () => {
+        aEvents.pointer += 1;
+      },
+    });
+    b.register({
+      id: bId,
+      layer: bLayer,
+      modal: false,
+      lockScroll: false,
+      restoreFocus: null,
+      onKeyDown: () => {
+        bEvents.key += 1;
+      },
+      onPointerDown: () => {
+        bEvents.pointer += 1;
+      },
+    });
 
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     document.dispatchEvent(new Event('pointerdown', { bubbles: true }));
     expect(aEvents).toEqual({ key: 0, pointer: 0 });
     expect(bEvents).toEqual({ key: 1, pointer: 1 });
     expect(documentOverlayBroker(document).registrationCount()).toBeGreaterThanOrEqual(2);
-    expect(Number(aFixture.portal.style.getPropertyValue('--oxs-overlay-document-depth'))).toBeLessThan(
-      Number(bFixture.portal.style.getPropertyValue('--oxs-overlay-document-depth')),
-    );
+    expect(
+      Number(aFixture.portal.style.getPropertyValue('--oxs-overlay-document-depth')),
+    ).toBeLessThan(Number(bFixture.portal.style.getPropertyValue('--oxs-overlay-document-depth')));
 
     b.unregister(bId);
     expect(bFixture.portal.style.getPropertyValue('--oxs-overlay-document-depth')).toBe('');
@@ -93,13 +125,23 @@ describe('overlay realm authority', () => {
     expect(mainEvents.key).toBe(1);
     expect(frameEvents.key).toBe(0);
 
-    frameDocument.dispatchEvent(new frameRealm.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    frameDocument.dispatchEvent(
+      new frameRealm.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+    );
     expect(mainEvents.key).toBe(1);
     expect(frameEvents.key).toBe(1);
 
     const modalRealm = coordinator();
     const frameLayer = layerIn(frameDocument);
-    modalRealm.register({ id: 'frame-modal', layer: frameLayer.layer, modal: true, lockScroll: true, restoreFocus: null, onKeyDown: () => {}, onPointerDown: () => {} });
+    modalRealm.register({
+      id: 'frame-modal',
+      layer: frameLayer.layer,
+      modal: true,
+      lockScroll: true,
+      restoreFocus: null,
+      onKeyDown: () => {},
+      onPointerDown: () => {},
+    });
     expect(frameLayer.runtime).toHaveAttribute('inert');
     expect(frameLayer.runtime).toHaveAttribute('aria-hidden', 'true');
     expect(frameLayer.root.style.overflow).toBe('hidden');
@@ -113,7 +155,15 @@ describe('overlay realm authority', () => {
     const { root, runtime, layer } = layerIn(document);
     runtime.setAttribute('inert', '');
     runtime.setAttribute('aria-hidden', 'false');
-    owner.register({ id: 'modal', layer, modal: true, lockScroll: true, restoreFocus: null, onKeyDown: () => {}, onPointerDown: () => {} });
+    owner.register({
+      id: 'modal',
+      layer,
+      modal: true,
+      lockScroll: true,
+      restoreFocus: null,
+      onKeyDown: () => {},
+      onPointerDown: () => {},
+    });
     expect(root.style.overflow).toBe('hidden');
     expect(runtime).toHaveAttribute('inert');
     expect(runtime).toHaveAttribute('aria-hidden', 'true');

@@ -20,7 +20,11 @@ function renderUi(node: ReactNode) {
 
 describe('developer compositions', () => {
   it('associates card title/description without inventing child interaction', () => {
-    renderUi(<Card title="Account" description="Local profile"><span>Body</span></Card>);
+    renderUi(
+      <Card title="Account" description="Local profile">
+        <span>Body</span>
+      </Card>,
+    );
     const group = screen.getByRole('group', { name: 'Account' });
     expect(group).toHaveAccessibleDescription('Local profile');
     expect(screen.getByText('Body')).toBeInTheDocument();
@@ -58,7 +62,6 @@ describe('developer compositions', () => {
     expect(terminal).toHaveAttribute('tabindex', '0');
   });
 
-
   it('uses real 2D geometry for TileGrid arrow navigation', () => {
     renderUi(
       <TileGrid label="Spatial apps" keyboardNavigation>
@@ -70,13 +73,23 @@ describe('developer compositions', () => {
     );
     const items = ['A', 'B', 'C', 'D'].map((name) => screen.getByRole('button', { name }));
     const rects = [
-      { left: 0, top: 0 }, { left: 120, top: 0 }, { left: 0, top: 120 }, { left: 120, top: 120 },
+      { left: 0, top: 0 },
+      { left: 120, top: 0 },
+      { left: 0, top: 120 },
+      { left: 120, top: 120 },
     ];
     items.forEach((item, index) => {
       const { left, top } = rects[index]!;
       vi.spyOn(item, 'getBoundingClientRect').mockReturnValue({
-        x: left, y: top, left, top, right: left + 100, bottom: top + 100,
-        width: 100, height: 100, toJSON: () => ({}),
+        x: left,
+        y: top,
+        left,
+        top,
+        right: left + 100,
+        bottom: top + 100,
+        width: 100,
+        height: 100,
+        toJSON: () => ({}),
       });
     });
     items[0]!.focus();
@@ -134,8 +147,14 @@ describe('developer compositions', () => {
         ]}
       />,
     );
-    expect(screen.getByRole('button', { name: 'Section A' })).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByRole('button', { name: 'Section B' })).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByRole('button', { name: 'Section A' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: 'Section B' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
   });
 
   it('provides generic page landmarks and logical sidebar ownership', () => {
@@ -166,7 +185,10 @@ describe('developer compositions', () => {
         ]}
       />,
     );
-    expect(screen.getByRole('button', { name: 'Appearance' })).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('button', { name: 'Appearance' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
     expect(screen.getByRole('button', { name: 'Secure' })).toBeDisabled();
     expect(screen.getByText('Theme')).not.toHaveAttribute('hidden');
   });

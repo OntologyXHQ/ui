@@ -261,14 +261,16 @@ Acceptance: List/ListItem/ListSection/ListSeparator use native ul/li/section sem
 
 ---
 
-## UIR10 — Overlays and feedback — TODO
+## UIR10 — Overlays and feedback — DONE
 
-- `UI-1001` Rebuild Dialog/Sheet ownership, initial focus, dismissal, nested modal and restoration semantics.
-- `UI-1002` Rebuild Popover/Menu/Listbox/Tooltip positioning and collision behavior around the shared floating/overlay engine.
-- `UI-1003` Rebuild Scrim and modality isolation without feature-owned portals.
-- `UI-1004` Rebuild Toast lifecycle/upsert/timing/live-region policy.
-- `UI-1005` Rebuild progress/loading/skeleton/feedback semantics with reduced-motion behavior.
-- `UI-1006` Certify nested overlays, scroll lock, escape arbitration, outside interaction and RTL geometry.
+- `UI-1001` Rebuild Dialog/Sheet ownership, initial focus, dismissal, nested modal and restoration semantics. **DONE**
+- `UI-1002` Rebuild Popover/Menu/Listbox/Tooltip positioning and collision behavior around the shared floating/overlay engine. **DONE**
+- `UI-1003` Rebuild Scrim and modality isolation without feature-owned portals. **DONE**
+- `UI-1004` Rebuild Toast lifecycle/upsert/timing/live-region policy. **DONE**
+- `UI-1005` Rebuild progress/loading/skeleton/feedback semantics with reduced-motion behavior. **DONE**
+- `UI-1006` Certify nested overlays, scroll lock, escape arbitration, outside interaction and RTL geometry. **DONE**
+
+Acceptance: Dialog/AlertDialog/Sheet/BottomSheet share one root/document overlay lifecycle for focus entry/restoration, modal isolation, scroll lock and top-most Escape/outside arbitration; Popover/Menu/ContextMenu/Tooltip share owner-realm floating geometry, collision observation and command/typeahead semantics; Scrim remains presentation-only and never creates a private portal; ToastHost owns controlled stable-id/upsert timing with owner-Window timers, pause semantics and one labelled polite live region; Badge/StatusIndicator/Progress/Spinner/Skeleton/EmptyState/Snackbar/Banner preserve semantic native/loading/feedback behavior with reduced-motion-safe presentation. Twenty exports are reaccepted by dedicated behavior/G6 evidence. Public visual maturity advances to accepted=65/candidate=35; UIR11 Scroll and motion is next.
 
 ---
 

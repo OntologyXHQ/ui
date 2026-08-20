@@ -4,7 +4,8 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'DragDropProvider',
     layer: 'components',
-    category: 'Drag and drop', order: 80,
+    category: 'Drag and drop',
+    order: 80,
     summary: 'Shared drag/drop session owner for reusable UI interactions.',
     usage:
       'Wrap a surface that contains drag sources and drop targets; backend data transfer remains outside this visual contract.',

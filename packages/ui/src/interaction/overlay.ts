@@ -41,15 +41,17 @@ export function useOverlayLifecycle({
 
     const layer = layerRef?.current ?? surfaceRef.current;
     const surface = surfaceRef.current;
-    const ownerDocument = layer?.ownerDocument ?? surface?.ownerDocument ?? anchorRef?.current?.ownerDocument ?? null;
+    const ownerDocument =
+      layer?.ownerDocument ?? surface?.ownerDocument ?? anchorRef?.current?.ownerDocument ?? null;
     const ownerWindow = ownerDocument?.defaultView ?? null;
     if (!ownerDocument || !layer) return;
 
     const activeElement = ownerDocument.activeElement;
     const HTMLElementCtor = ownerWindow?.HTMLElement;
-    const restoreTarget = HTMLElementCtor && activeElement instanceof HTMLElementCtor
-      ? (activeElement as HTMLElement)
-      : null;
+    const restoreTarget =
+      HTMLElementCtor && activeElement instanceof HTMLElementCtor
+        ? (activeElement as HTMLElement)
+        : null;
 
     // Focus enters the concrete modal realm before inert/aria-hidden isolation is applied.
     if (modal && surface && !surface.contains(ownerDocument.activeElement)) {
@@ -108,7 +110,20 @@ export function useOverlayLifecycle({
         });
       }
     };
-  }, [anchorRef, autoFocus, coordinator, escape, id, layerRef, lockScroll, modal, open, outsidePress, restoreFocus, surfaceRef]);
+  }, [
+    anchorRef,
+    autoFocus,
+    coordinator,
+    escape,
+    id,
+    layerRef,
+    lockScroll,
+    modal,
+    open,
+    outsidePress,
+    restoreFocus,
+    surfaceRef,
+  ]);
 
   return {
     depth,

@@ -1,5 +1,13 @@
 import type { PropsWithChildren, ReactNode } from 'react';
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { useUiPortalHost, viewportPointToPortalHost } from '../foundations/portal';
 import type {
@@ -78,15 +86,20 @@ export function DragDropProvider({ children }: PropsWithChildren) {
         ? targets.findIndex((target) => target.id === current.targetId)
         : -1;
       const delta = direction === 'next' ? 1 : -1;
-      const nextIndex = currentIndex < 0
-        ? direction === 'next' ? 0 : targets.length - 1
-        : (currentIndex + delta + targets.length) % targets.length;
+      const nextIndex =
+        currentIndex < 0
+          ? direction === 'next'
+            ? 0
+            : targets.length - 1
+          : (currentIndex + delta + targets.length) % targets.length;
       const target = targets[nextIndex];
       const rect = target.element.getBoundingClientRect();
       const point = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
       const operation = operationForTarget(target, current.item);
       commitSession({ ...current, point, targetId: target.id, operation });
-      setAnnouncement(`${current.item.label ?? current.item.id} over ${target.label ?? target.id}. ${operation} operation.`);
+      setAnnouncement(
+        `${current.item.label ?? current.item.id} over ${target.label ?? target.id}. ${operation} operation.`,
+      );
       target.element.focus({ preventScroll: true });
     },
     [commitSession],
@@ -104,7 +117,9 @@ export function DragDropProvider({ children }: PropsWithChildren) {
     const target = current.targetId ? targetsRef.current.get(current.targetId) : undefined;
     if (target && current.operation !== 'none' && target.accepts?.(current.item) !== false) {
       target.onDrop(current.item, current.operation);
-      setAnnouncement(`Dropped ${current.item.label ?? current.item.id} on ${target.label ?? target.id}.`);
+      setAnnouncement(
+        `Dropped ${current.item.label ?? current.item.id} on ${target.label ?? target.id}.`,
+      );
     } else {
       setAnnouncement(`No valid drop target for ${current.item.label ?? current.item.id}.`);
     }
@@ -127,7 +142,9 @@ export function DragDropProvider({ children }: PropsWithChildren) {
         return;
       }
       const active = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      const direction = active ? window.getComputedStyle(active).direction : document.documentElement.dir;
+      const direction = active
+        ? window.getComputedStyle(active).direction
+        : document.documentElement.dir;
       let step: 'next' | 'previous' | null = null;
       if (event.key === 'ArrowDown') step = 'next';
       if (event.key === 'ArrowUp') step = 'previous';
@@ -189,7 +206,10 @@ export function useDragDropRuntime(): DragDropRuntime {
 function DragPreviewLayer({
   session,
   portalHost,
-}: { session: DragSession; portalHost: HTMLElement }) {
+}: {
+  session: DragSession;
+  portalHost: HTMLElement;
+}) {
   const content = renderPreview(session.preview, session.item);
   const local = viewportPointToPortalHost(portalHost, session.point);
   return createPortal(
@@ -231,7 +251,8 @@ function findDropTarget(
   for (const target of targets) {
     if (target.accepts?.(item) === false) continue;
     const rect = target.element.getBoundingClientRect();
-    if (point.x < rect.left || point.x > rect.right || point.y < rect.top || point.y > rect.bottom) continue;
+    if (point.x < rect.left || point.x > rect.right || point.y < rect.top || point.y > rect.bottom)
+      continue;
     const area = Math.max(1, rect.width * rect.height);
     if (area < selectedArea) {
       selected = target;
@@ -242,13 +263,22 @@ function findDropTarget(
 }
 
 function operationForTarget(target: RegisteredTarget, item: DragItem): DragOperation {
-  const operation = typeof target.operation === 'function' ? target.operation(item) : target.operation;
+  const operation =
+    typeof target.operation === 'function' ? target.operation(item) : target.operation;
   return operation ?? 'copy';
 }
 
-export function autoScrollDelta(pointer: number, start: number, end: number, edgeSize = 40, maxStep = 18): number {
-  if (pointer < start + edgeSize) return -Math.ceil(((start + edgeSize - pointer) / edgeSize) * maxStep);
-  if (pointer > end - edgeSize) return Math.ceil(((pointer - (end - edgeSize)) / edgeSize) * maxStep);
+export function autoScrollDelta(
+  pointer: number,
+  start: number,
+  end: number,
+  edgeSize = 40,
+  maxStep = 18,
+): number {
+  if (pointer < start + edgeSize)
+    return -Math.ceil(((start + edgeSize - pointer) / edgeSize) * maxStep);
+  if (pointer > end - edgeSize)
+    return Math.ceil(((pointer - (end - edgeSize)) / edgeSize) * maxStep);
   return 0;
 }
 
@@ -257,8 +287,10 @@ function autoScrollAt(point: DragPoint) {
   let element = document.elementFromPoint(point.x, point.y) as HTMLElement | null;
   while (element) {
     const style = window.getComputedStyle(element);
-    const scrollableY = /(auto|scroll)/.test(style.overflowY) && element.scrollHeight > element.clientHeight;
-    const scrollableX = /(auto|scroll)/.test(style.overflowX) && element.scrollWidth > element.clientWidth;
+    const scrollableY =
+      /(auto|scroll)/.test(style.overflowY) && element.scrollHeight > element.clientHeight;
+    const scrollableX =
+      /(auto|scroll)/.test(style.overflowX) && element.scrollWidth > element.clientWidth;
     if (scrollableY || scrollableX) {
       const rect = element.getBoundingClientRect();
       const dx = scrollableX ? autoScrollDelta(point.x, rect.left, rect.right) : 0;

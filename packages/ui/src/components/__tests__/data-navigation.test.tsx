@@ -39,8 +39,24 @@ describe('data and navigation components', () => {
     const onNav = vi.fn();
     renderUi(
       <>
-        <Tabs label="Sections" value="one" onValueChange={onTab} items={[{ value: 'one', label: 'One' }, { value: 'two', label: 'Two' }]} />
-        <AdaptiveNavigation label="Destinations" value="home" onValueChange={onNav} items={[{ value: 'home', label: 'Home' }, { value: 'search', label: 'Search' }]} />
+        <Tabs
+          label="Sections"
+          value="one"
+          onValueChange={onTab}
+          items={[
+            { value: 'one', label: 'One' },
+            { value: 'two', label: 'Two' },
+          ]}
+        />
+        <AdaptiveNavigation
+          label="Destinations"
+          value="home"
+          onValueChange={onNav}
+          items={[
+            { value: 'home', label: 'Home' },
+            { value: 'search', label: 'Search' },
+          ]}
+        />
       </>,
     );
     fireEvent.click(screen.getByRole('tab', { name: 'Two' }));
@@ -65,7 +81,6 @@ describe('data and navigation components', () => {
     expect(tab).toHaveAttribute('id', 'two-tab');
     expect(tab).toHaveAttribute('aria-controls', 'two-panel');
   });
-
 
   it('keeps manual Tabs focus independent from selection until activation', () => {
     const onValueChange = vi.fn();
@@ -108,7 +123,10 @@ describe('data and navigation components', () => {
         </TabPanel>
       </>,
     );
-    expect(screen.getByRole('tab', { name: 'Display' })).toHaveAttribute('aria-controls', ids.panelId);
+    expect(screen.getByRole('tab', { name: 'Display' })).toHaveAttribute(
+      'aria-controls',
+      ids.panelId,
+    );
     expect(screen.getByRole('tabpanel')).toHaveAttribute('aria-labelledby', ids.tabId);
   });
 
@@ -138,7 +156,9 @@ describe('data and navigation components', () => {
     expect(spinners[0].querySelector('.ui-ox-loading-mark__cross')).toBeInTheDocument();
     expect(spinners[0].querySelectorAll('.ui-ox-loading-mark__cross-stroke')).toHaveLength(2);
     expect(spinners[0].querySelectorAll('.ui-ox-loading-mark__echo')).toHaveLength(2);
-    expect(spinners[0].querySelector('[data-oxs-loading-choreography="write-heartbeat-release"]')).toBeInTheDocument();
+    expect(
+      spinners[0].querySelector('[data-oxs-loading-choreography="write-heartbeat-release"]'),
+    ).toBeInTheDocument();
   });
 
   it('normalizes invalid progress maxima instead of emitting NaN semantics', () => {
@@ -153,7 +173,9 @@ describe('data and navigation components', () => {
     renderUi(
       <>
         <Progress label="Download" value={40} showValue />
-        <Toolbar label="Editor actions"><button type="button">Save</button></Toolbar>
+        <Toolbar label="Editor actions">
+          <button type="button">Save</button>
+        </Toolbar>
         <Badge tone="success">Ready</Badge>
       </>,
     );

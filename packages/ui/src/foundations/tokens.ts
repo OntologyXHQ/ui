@@ -73,31 +73,10 @@ export const UI_TOKEN_GROUPS = {
     'space-xl',
     'space-2xl',
   ],
-  shape: [
-    'radius-sm',
-    'radius-md',
-    'radius-lg',
-    'radius-xl',
-    'radius-full',
-  ],
-  material: [
-    'material-blur',
-    'material-saturation',
-    'elevation-1',
-    'elevation-2',
-    'elevation-3',
-  ],
-  layout: [
-    'layout-gutter',
-    'layout-gap',
-    'layout-readable',
-    'layout-content',
-    'layout-wide',
-  ],
-  focus: [
-    'focus-ring-width',
-    'focus-ring-offset',
-  ],
+  shape: ['radius-sm', 'radius-md', 'radius-lg', 'radius-xl', 'radius-full'],
+  material: ['material-blur', 'material-saturation', 'elevation-1', 'elevation-2', 'elevation-3'],
+  layout: ['layout-gutter', 'layout-gap', 'layout-readable', 'layout-content', 'layout-wide'],
+  focus: ['focus-ring-width', 'focus-ring-offset'],
 } as const;
 
 export type UiTokenGroup = keyof typeof UI_TOKEN_GROUPS;
@@ -111,7 +90,9 @@ export const UI_CUSTOMIZABLE_TOKENS: readonly UiCustomizableToken[] = Object.fre
 export type UiTokenValue = string;
 export type UiTokenOverrides = Partial<Record<UiCustomizableToken, UiTokenValue>>;
 
-export function uiTokenStyle(overrides: UiTokenOverrides | undefined): Record<string, UiTokenValue> {
+export function uiTokenStyle(
+  overrides: UiTokenOverrides | undefined,
+): Record<string, UiTokenValue> {
   if (!overrides) return {};
 
   const style: Record<string, UiTokenValue> = {};

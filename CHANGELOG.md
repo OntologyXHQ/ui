@@ -1,3 +1,10 @@
+## UIR10 — overlays and feedback closeout
+
+- Reaccepted twenty overlay/feedback exports around shared UiRoot/Document overlay authority, owner-realm floating geometry and timers, semantic Scrim ownership, stable toast upsert/live-region timing, native progress and reduced-motion-safe loading feedback.
+- Closed the remaining UIR08/09 lint/a11y and browser-axis evidence debt without rolling back the applied selection/navigation work.
+- Added the permanent UIR10 G0 contract, expanded behavior coverage, real Studio fixtures and three dedicated G6 browser certifications. Catalog frontier is accepted=65/candidate=35 and UIR11 is next.
+- Preserved fix-forward delivery: validation failures keep the applied state; unresolved three-way merge conflicts remain zero-write.
+
 ## UIR08 + UIR09 — selection/disclosure and navigation/data closeout
 
 - Reaccepted the complete UIR08 selection/disclosure family: native Checkbox/Radio form-reset semantics, realm-owned Switch gesture settlement, ToggleButton/ToggleGroup/Segmented normalization, manual/automatic Tabs relationships, Select typeahead/form validity/focus, and semantic Disclosure/Accordion headings/regions.

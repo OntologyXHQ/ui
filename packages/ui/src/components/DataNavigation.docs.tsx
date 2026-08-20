@@ -263,7 +263,7 @@ export const uiDocs = defineUiDocsGroup([
     summary: 'Compact semantic-tone label/count indicator.',
     usage:
       'Use for short metadata and counts; use StatusIndicator for state with meaning beyond a label.',
-    status: 'candidate',
+    status: 'accepted',
     accessibility:
       'Plain text remains readable by assistive technology unless the caller explicitly hides it.',
     rtl: 'Inline content follows surrounding bidi flow.',
@@ -278,12 +278,16 @@ export const uiDocs = defineUiDocsGroup([
     order: 60,
     summary: 'Tone-aware status dot with visible or visually-hidden label.',
     usage: 'Use for presence/health/state summaries that need an accessible status name.',
-    status: 'candidate',
+    status: 'accepted',
     accessibility:
       'Static status is ordinary labelled content by default; set announce when a state transition genuinely needs a polite live-region announcement.',
     rtl: 'Dot and label use logical inline order.',
     touch: 'Non-interactive.',
     responsive: 'Intrinsic and wrap-safe.',
+
+    examples: [
+      { id: 'feedback-contract', title: 'Feedback semantics', component: 'FeedbackExample' },
+    ],
   },
   {
     exportName: 'Progress',
@@ -293,11 +297,15 @@ export const uiDocs = defineUiDocsGroup([
     summary:
       'Determinate or indeterminate native progress contract with optional visible percentage.',
     usage: 'Use for bounded work progress; omit value for indeterminate work.',
-    status: 'candidate',
+    status: 'accepted',
     accessibility: 'Built on native progress semantics with an accessible label.',
     rtl: 'Label/value header follows logical order.',
     touch: 'Non-interactive.',
     responsive: 'Track fills available inline size.',
+
+    examples: [
+      { id: 'feedback-contract', title: 'Feedback semantics', component: 'FeedbackExample' },
+    ],
   },
   {
     exportName: 'Spinner',
@@ -308,7 +316,7 @@ export const uiDocs = defineUiDocsGroup([
       'OntologyX O+X indeterminate activity mark with inline through hero-scale presentation and reduced-motion settlement.',
     usage:
       'Use sm/md/lg for local transient activity and hero for first-entry or boot loading; the shared OX mark is also used by loading controls so product surfaces do not invent parallel spinners.',
-    status: 'candidate',
+    status: 'accepted',
     accessibility:
       'Decorative/static activity is hidden from the accessibility tree by default; set announce to expose a polite loading status when the owning region needs it.',
     rtl: 'Direction-neutral.',
@@ -333,11 +341,15 @@ export const uiDocs = defineUiDocsGroup([
     summary: 'Decorative lightweight placeholder for text, rectangle and avatar-like shapes.',
     usage:
       'Use to preserve layout while nearby content is loading; announce loading state on the owning region instead.',
-    status: 'candidate',
+    status: 'accepted',
     accessibility: 'Hidden from the accessibility tree so it does not become fake content.',
     rtl: 'Direction-neutral geometry.',
     touch: 'Non-interactive.',
     responsive: 'Width presets remain container-relative.',
+
+    examples: [
+      { id: 'feedback-contract', title: 'Feedback semantics', component: 'FeedbackExample' },
+    ],
   },
   {
     exportName: 'EmptyState',
@@ -347,11 +359,15 @@ export const uiDocs = defineUiDocsGroup([
     summary: 'Generic empty-content composition with optional icon, description and action.',
     usage:
       'Use for empty collections/results without embedding product-specific copy or recovery logic.',
-    status: 'candidate',
+    status: 'accepted',
     accessibility: 'Keeps semantic text/action ownership with caller-provided content.',
     rtl: 'Centered composition is bidi-safe.',
     touch: 'Optional action consumes the normal component target contract.',
     responsive: 'Constrained readable copy adapts to narrow containers.',
+
+    examples: [
+      { id: 'feedback-contract', title: 'Feedback semantics', component: 'FeedbackExample' },
+    ],
   },
 ] as const);
 

@@ -110,12 +110,14 @@ export function UiEnvironmentProvider({
   realmDocument,
 }: UiEnvironmentProviderProps) {
   const parent = useContext(UiEnvironmentContext);
-  const activeWindow = realmWindow === undefined
-    ? (typeof window === 'undefined' ? null : window)
-    : realmWindow;
-  const activeDocument = realmDocument === undefined
-    ? (typeof document === 'undefined' ? null : document)
-    : realmDocument;
+  const activeWindow =
+    realmWindow === undefined ? (typeof window === 'undefined' ? null : window) : realmWindow;
+  const activeDocument =
+    realmDocument === undefined
+      ? typeof document === 'undefined'
+        ? null
+        : document
+      : realmDocument;
   const systemLight = useMediaQuery('(prefers-color-scheme: light)', false, activeWindow);
   const coarsePointer = useMediaQuery('(pointer: coarse)', false, activeWindow);
   const documentDirection = useDocumentDirection(activeDocument);
@@ -259,7 +261,9 @@ function startModalityStore(realmWindow: Window, store: ModalityStore) {
     publish('keyboard');
   };
   const onPointerDown = (event: PointerEvent) => {
-    publish(event.pointerType === 'touch' ? 'touch' : event.pointerType === 'pen' ? 'pen' : 'mouse');
+    publish(
+      event.pointerType === 'touch' ? 'touch' : event.pointerType === 'pen' ? 'pen' : 'mouse',
+    );
   };
   const onPointerMove = (event: PointerEvent) => {
     if (event.pointerType === 'mouse') publish('mouse');
@@ -326,11 +330,16 @@ function currentDirectionStore(realmDocument: Document | null | undefined) {
   return store;
 }
 
-function subscribeDocumentDirection(realmDocument: Document | null | undefined, listener: () => void) {
+function subscribeDocumentDirection(
+  realmDocument: Document | null | undefined,
+  listener: () => void,
+) {
   const store = currentDirectionStore(realmDocument);
   if (!store || !realmDocument) return () => {};
   store.listeners.add(listener);
-  const MutationObserverConstructor = (realmDocument.defaultView as (Window & typeof globalThis) | null)?.MutationObserver;
+  const MutationObserverConstructor = (
+    realmDocument.defaultView as (Window & typeof globalThis) | null
+  )?.MutationObserver;
   if (!store.observer && typeof MutationObserverConstructor === 'function') {
     store.observer = new MutationObserverConstructor(() => {
       const next = readDocumentDirection(realmDocument);
@@ -338,7 +347,10 @@ function subscribeDocumentDirection(realmDocument: Document | null | undefined, 
       store.value = next;
       for (const current of store.listeners) current();
     });
-    store.observer.observe(realmDocument.documentElement, { attributes: true, attributeFilter: ['dir'] });
+    store.observer.observe(realmDocument.documentElement, {
+      attributes: true,
+      attributeFilter: ['dir'],
+    });
   }
   return () => {
     store.listeners.delete(listener);
@@ -381,7 +393,9 @@ export function resolveUiDirection(
   return 'ltr';
 }
 
-export function uiEnvironmentStyle(environment: UiEnvironmentSnapshot): Record<string, string | number> {
+export function uiEnvironmentStyle(
+  environment: UiEnvironmentSnapshot,
+): Record<string, string | number> {
   return {
     ...uiTokenStyle(environment.tokens),
     ...logicalInsetStyle('--oxs-safe', environment.safeArea),

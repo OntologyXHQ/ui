@@ -7,7 +7,10 @@ import type {
 } from 'react';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useGestureArena } from '../gestures/runtime';
-import { releasePointerCaptureIfSupported, setPointerCaptureIfSupported } from '../gestures/pointerCapture';
+import {
+  releasePointerCaptureIfSupported,
+  setPointerCaptureIfSupported,
+} from '../gestures/pointerCapture';
 
 export type PressSource = 'keyboard' | 'mouse' | 'pen' | 'touch';
 
@@ -151,7 +154,17 @@ export function usePress({
         }, longPressDelay);
       }
     },
-    [clearLongPressTimer, clearSuppressionTimer, disabled, gestureArena, longPressDelay, owner, priority, setPressed, suppressNextClick],
+    [
+      clearLongPressTimer,
+      clearSuppressionTimer,
+      disabled,
+      gestureArena,
+      longPressDelay,
+      owner,
+      priority,
+      setPressed,
+      suppressNextClick,
+    ],
   );
 
   const onPointerMove = useCallback(
@@ -179,7 +192,9 @@ export function usePress({
 
       clearLongPressTimer();
       const shouldActivate =
-        !longPressFiredRef.current && pressedRef.current && gestureArena.claim(event.pointerId, owner);
+        !longPressFiredRef.current &&
+        pressedRef.current &&
+        gestureArena.claim(event.pointerId, owner);
       const pointerType = session.pointerType;
       if (!shouldActivate) suppressNextClick();
       clearPointerSession();
@@ -230,14 +245,16 @@ export function usePress({
     [disabled, keyboardActivation, setPressed],
   );
 
-
-  const onClickCapture = useCallback((event: ReactMouseEvent<HTMLElement>) => {
-    if (!suppressNextClickRef.current) return;
-    clearSuppressionTimer();
-    suppressNextClickRef.current = false;
-    event.preventDefault();
-    event.stopPropagation();
-  }, [clearSuppressionTimer]);
+  const onClickCapture = useCallback(
+    (event: ReactMouseEvent<HTMLElement>) => {
+      if (!suppressNextClickRef.current) return;
+      clearSuppressionTimer();
+      suppressNextClickRef.current = false;
+      event.preventDefault();
+      event.stopPropagation();
+    },
+    [clearSuppressionTimer],
+  );
 
   const onBlur = useCallback(
     (_event: ReactFocusEvent<HTMLElement>) => {
@@ -281,6 +298,7 @@ export function usePress({
 }
 
 function normalizePointerSource(pointerType: string): PressSource {
-  if (pointerType === 'touch' || pointerType === 'pen' || pointerType === 'mouse') return pointerType;
+  if (pointerType === 'touch' || pointerType === 'pen' || pointerType === 'mouse')
+    return pointerType;
   return 'mouse';
 }

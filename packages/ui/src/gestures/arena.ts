@@ -96,7 +96,9 @@ export class GestureArena {
   }
 
   dispose() {
-    const candidates = [...this.pointers.values()].flatMap((arena) => [...arena.candidates.values()]);
+    const candidates = [...this.pointers.values()].flatMap((arena) => [
+      ...arena.candidates.values(),
+    ]);
     this.pointers.clear();
     for (const candidate of candidates) candidate.onCancel?.();
   }

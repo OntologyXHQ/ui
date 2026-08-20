@@ -17,31 +17,43 @@ function walk(directory, predicate) {
   return result;
 }
 
-const productionSource = walk(SRC, (file) => /\.(ts|tsx)$/.test(file))
-  .filter((file) => !file.includes(`${path.sep}__tests__${path.sep}`) && !file.includes('.docs.'));
+const productionSource = walk(SRC, (file) => /\.(ts|tsx)$/.test(file)).filter(
+  (file) => !file.includes(`${path.sep}__tests__${path.sep}`) && !file.includes('.docs.'),
+);
 const cssFiles = walk(STYLE_ROOT, (file) => file.endsWith('.css'));
 
-const deviceSniffing = /navigator\.(?:userAgent|platform)|\bscreen\.(?:width|height)|\bdevicePixelRatio\b/;
+const deviceSniffing =
+  /navigator\.(?:userAgent|platform)|\bscreen\.(?:width|height)|\bdevicePixelRatio\b/;
 for (const file of productionSource) {
   const text = fs.readFileSync(file, 'utf8');
   if (deviceSniffing.test(text)) {
-    issues.push(`${path.relative(ROOT, file)}: environment/adaptation must not use device identity/sniffing`);
+    issues.push(
+      `${path.relative(ROOT, file)}: environment/adaptation must not use device identity/sniffing`,
+    );
   }
 }
 
 for (const file of cssFiles) {
   const text = fs.readFileSync(file, 'utf8');
   if (/@media[^\{]*(?:min|max)-(?:width|height)\s*:/i.test(text)) {
-    issues.push(`${path.relative(ROOT, file)}: responsive layout must use container queries, not viewport-size media queries`);
+    issues.push(
+      `${path.relative(ROOT, file)}: responsive layout must use container queries, not viewport-size media queries`,
+    );
   }
   if (/data-oxs-density=['"]auto['"]/.test(text)) {
-    issues.push(`${path.relative(ROOT, file)}: CSS must consume resolved density, not the auto preference`);
+    issues.push(
+      `${path.relative(ROOT, file)}: CSS must consume resolved density, not the auto preference`,
+    );
   }
   if (/data-oxs-motion=['"]system['"]/.test(text)) {
-    issues.push(`${path.relative(ROOT, file)}: CSS must consume resolved motion state, not the system preference`);
+    issues.push(
+      `${path.relative(ROOT, file)}: CSS must consume resolved motion state, not the system preference`,
+    );
   }
   if (/\b(?:margin|padding|border)-(?:left|right)\s*:/.test(text)) {
-    issues.push(`${path.relative(ROOT, file)}: public styling must use logical inline properties instead of physical left/right box properties`);
+    issues.push(
+      `${path.relative(ROOT, file)}: public styling must use logical inline properties instead of physical left/right box properties`,
+    );
   }
 }
 
@@ -60,12 +72,15 @@ for (const variable of [
   '--oxs-environment-inset-block-end',
   '--oxs-environment-inset-inline-start',
 ]) {
-  if (!tokens.includes(`${variable}:`)) issues.push(`tokens.css is missing environment inset variable ${variable}`);
+  if (!tokens.includes(`${variable}:`))
+    issues.push(`tokens.css is missing environment inset variable ${variable}`);
 }
 
 const componentsCss = fs.readFileSync(path.join(STYLE_ROOT, 'components.css'), 'utf8');
 if (/var\(--oxs-safe-(?:block|inline)/.test(componentsCss)) {
-  issues.push('Components must consume combined environment insets when avoiding host occlusion; raw safe-area variables are reserved for SafeArea/System ownership');
+  issues.push(
+    'Components must consume combined environment insets when avoiding host occlusion; raw safe-area variables are reserved for SafeArea/System ownership',
+  );
 }
 
 if (issues.length) {
@@ -74,4 +89,6 @@ if (issues.length) {
   process.exit(1);
 }
 
-console.log('G0 environment contract passed: resolved preference/runtime split · container-first adaptation · logical styling · separate safe-area/occlusion inputs · no device sniffing.');
+console.log(
+  'G0 environment contract passed: resolved preference/runtime split · container-first adaptation · logical styling · separate safe-area/occlusion inputs · no device sniffing.',
+);

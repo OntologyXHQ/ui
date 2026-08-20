@@ -9,7 +9,4 @@ import type { HTMLAttributes, SVGAttributes } from 'react';
  */
 export type PrimitiveHtmlProps<T extends HTMLElement> = Omit<HTMLAttributes<T>, 'style' | 'color'>;
 
-export type PrimitiveSvgProps = Omit<
-  SVGAttributes<SVGSVGElement>,
-  'children' | 'style' | 'color'
->;
+export type PrimitiveSvgProps = Omit<SVGAttributes<SVGSVGElement>, 'children' | 'style' | 'color'>;

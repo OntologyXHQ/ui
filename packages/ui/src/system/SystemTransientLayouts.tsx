@@ -42,7 +42,11 @@ export function SystemOsd({
     >
       <Card className="ui-system-osd__card" padding="sm" emphasis="strong">
         <div className="ui-system-osd__row">
-          {icon ? <span className="ui-system-osd__icon" aria-hidden>{icon}</span> : null}
+          {icon ? (
+            <span className="ui-system-osd__icon" aria-hidden>
+              {icon}
+            </span>
+          ) : null}
           <div className="ui-system-osd__content">
             <StatusIndicator label={label} tone={tone} />
             {status ? <div className="ui-system-osd__status">{status}</div> : null}

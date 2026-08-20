@@ -8,7 +8,11 @@ import {
   physicalHorizontalFromLogical,
 } from '../logicalPosition';
 
-function setMetric(element: HTMLElement, key: 'clientHeight' | 'scrollHeight' | 'clientWidth' | 'scrollWidth', value: number) {
+function setMetric(
+  element: HTMLElement,
+  key: 'clientHeight' | 'scrollHeight' | 'clientWidth' | 'scrollWidth',
+  value: number,
+) {
   Object.defineProperty(element, key, { configurable: true, value });
 }
 
@@ -71,7 +75,12 @@ describe('ScrollView runtime contracts', () => {
     const up = vi.fn();
     render(
       <UiRoot>
-        <ScrollView ariaLabel="Callback scroll" onPointerDown={down} onPointerMove={move} onPointerUp={up}>
+        <ScrollView
+          ariaLabel="Callback scroll"
+          onPointerDown={down}
+          onPointerMove={move}
+          onPointerUp={up}
+        >
           Content
         </ScrollView>
       </UiRoot>,
@@ -106,5 +115,4 @@ describe('ScrollView runtime contracts', () => {
     outer.scrollTop = 100;
     expect(fireEvent.wheel(inner, { deltaY: -40, deltaMode: 0 })).toBe(false);
   });
-
 });

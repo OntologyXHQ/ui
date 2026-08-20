@@ -54,7 +54,9 @@ function GuidanceGrid({ entry }: { entry: UiCatalogEntry }) {
         <Surface key={label} material="subtle" radius="md" className="ui-studio-guidance-card">
           <Stack gap="xs">
             <Label emphasis="strong">{label}</Label>
-            <Text tone="secondary" selectable>{value}</Text>
+            <Text tone="secondary" selectable>
+              {value}
+            </Text>
           </Stack>
         </Surface>
       ))}
@@ -67,31 +69,66 @@ function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
   return (
     <Stack gap="xl">
       <Stack gap="md" className="ui-studio-entry-hero">
-        <Label tone="accent" emphasis="strong">Component profile</Label>
+        <Label tone="accent" emphasis="strong">
+          Component profile
+        </Label>
         <Row gap="sm" className="ui-studio-entry-badges">
           <Badge tone="accent">{entry.layer}</Badge>
           <Badge>{entry.category}</Badge>
-          <Badge tone={entry.status === 'accepted' ? 'success' : entry.status === 'deprecated' ? 'danger' : 'warning'}>{entry.status}</Badge>
+          <Badge
+            tone={
+              entry.status === 'accepted'
+                ? 'success'
+                : entry.status === 'deprecated'
+                  ? 'danger'
+                  : 'warning'
+            }
+          >
+            {entry.status}
+          </Badge>
         </Row>
-        <Heading level={1} size="display">{entry.exportName}</Heading>
-        <Text className="ui-studio-entry-summary" variant="body-strong" tone="secondary" selectable wrap="pretty">{entry.summary}</Text>
-        <Text tone="tertiary" selectable wrap="pretty">{entry.usage}</Text>
+        <Heading level={1} size="display">
+          {entry.exportName}
+        </Heading>
+        <Text
+          className="ui-studio-entry-summary"
+          variant="body-strong"
+          tone="secondary"
+          selectable
+          wrap="pretty"
+        >
+          {entry.summary}
+        </Text>
+        <Text tone="tertiary" selectable wrap="pretty">
+          {entry.usage}
+        </Text>
       </Stack>
 
       <CatalogComponentPreview entry={entry} />
 
       <Surface material="subtle" radius="md" className="ui-studio-import-card">
         <Stack gap="xs">
-          <Label tone="accent" emphasis="strong">Canonical import</Label>
-          <Code wrap="normal" className="ui-studio-code-anywhere">{`import { ${entry.exportName} } from '@ontologyx/ui';`}</Code>
+          <Label tone="accent" emphasis="strong">
+            Canonical import
+          </Label>
+          <Code
+            wrap="normal"
+            className="ui-studio-code-anywhere"
+          >{`import { ${entry.exportName} } from '@ontologyx/ui';`}</Code>
         </Stack>
       </Surface>
 
       <Stack gap="md">
         <Stack gap="2xs">
-          <Label tone="accent" emphasis="strong">Behavior guidance</Label>
-          <Heading level={2} size="title">Use it without breaking the platform contract</Heading>
-          <Text tone="tertiary" wrap="pretty">Accessibility, direction, touch and adaptation stay visible in the same reading flow.</Text>
+          <Label tone="accent" emphasis="strong">
+            Behavior guidance
+          </Label>
+          <Heading level={2} size="title">
+            Use it without breaking the platform contract
+          </Heading>
+          <Text tone="tertiary" wrap="pretty">
+            Accessibility, direction, touch and adaptation stay visible in the same reading flow.
+          </Text>
         </Stack>
         <GuidanceGrid entry={entry} />
       </Stack>
@@ -100,12 +137,16 @@ function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
         <Stack gap="sm">
           <Row justify="between" align="center" gap="sm">
             <Label emphasis="strong">Documentation coverage</Label>
-            <Badge tone={gaps.length ? 'warning' : 'success'}>{gaps.length ? `${gaps.length} gaps` : 'complete'}</Badge>
+            <Badge tone={gaps.length ? 'warning' : 'success'}>
+              {gaps.length ? `${gaps.length} gaps` : 'complete'}
+            </Badge>
           </Row>
           {gaps.length ? (
             <Text tone="secondary">Missing or incomplete: {gaps.join(', ')}.</Text>
           ) : (
-            <Text tone="secondary">Guidance, API metadata, playground metadata and examples are present.</Text>
+            <Text tone="secondary">
+              Guidance, API metadata, playground metadata and examples are present.
+            </Text>
           )}
         </Stack>
       </Surface>
@@ -117,10 +158,15 @@ function ApiPanel({ entry }: { entry: UiCatalogEntry }) {
   return (
     <Stack gap="lg">
       <Stack gap="2xs">
-        <Label tone="accent" emphasis="strong">Generated API</Label>
-        <Heading level={2} size="title">Props from TypeScript</Heading>
+        <Label tone="accent" emphasis="strong">
+          Generated API
+        </Label>
+        <Heading level={2} size="title">
+          Props from TypeScript
+        </Heading>
         <Text tone="tertiary" wrap="pretty">
-          OntologyX UI-owned props only. Native DOM props stay native instead of flooding the generated reference.
+          OntologyX UI-owned props only. Native DOM props stay native instead of flooding the
+          generated reference.
         </Text>
       </Stack>
       {entry.props.length ? (
@@ -133,52 +179,120 @@ function ApiPanel({ entry }: { entry: UiCatalogEntry }) {
           <table className="ui-studio-api-table" aria-label={`${entry.exportName} props`}>
             <thead>
               <tr>
-                <th scope="col"><Label emphasis="strong">Prop</Label></th>
-                <th scope="col"><Label emphasis="strong">Type</Label></th>
-                <th scope="col"><Label emphasis="strong">Default</Label></th>
-                <th scope="col"><Label emphasis="strong">Description</Label></th>
+                <th scope="col">
+                  <Label emphasis="strong">Prop</Label>
+                </th>
+                <th scope="col">
+                  <Label emphasis="strong">Type</Label>
+                </th>
+                <th scope="col">
+                  <Label emphasis="strong">Default</Label>
+                </th>
+                <th scope="col">
+                  <Label emphasis="strong">Description</Label>
+                </th>
               </tr>
             </thead>
             <tbody>
               {entry.props.map((prop) => (
                 <tr key={prop.name} data-deprecated={prop.deprecated || undefined}>
                   <td>
-                    <Code>{prop.name}</Code>{prop.optional ? <Text as="span" variant="caption" tone="tertiary">?</Text> : null}
-                    {prop.deprecated ? <Badge size="sm" tone="danger">deprecated</Badge> : null}
+                    <Code>{prop.name}</Code>
+                    {prop.optional ? (
+                      <Text as="span" variant="caption" tone="tertiary">
+                        ?
+                      </Text>
+                    ) : null}
+                    {prop.deprecated ? (
+                      <Badge size="sm" tone="danger">
+                        deprecated
+                      </Badge>
+                    ) : null}
                   </td>
-                  <td><Code wrap="normal" className="ui-studio-code-anywhere">{prop.type}</Code></td>
-                  <td>{prop.default ? <Code wrap="normal" className="ui-studio-code-anywhere">{prop.default}</Code> : <Text tone="tertiary">—</Text>}</td>
-                  <td><Text tone={prop.description ? 'secondary' : 'tertiary'} wrap="pretty">{prop.description || 'No JSDoc yet.'}</Text></td>
+                  <td>
+                    <Code wrap="normal" className="ui-studio-code-anywhere">
+                      {prop.type}
+                    </Code>
+                  </td>
+                  <td>
+                    {prop.default ? (
+                      <Code wrap="normal" className="ui-studio-code-anywhere">
+                        {prop.default}
+                      </Code>
+                    ) : (
+                      <Text tone="tertiary">—</Text>
+                    )}
+                  </td>
+                  <td>
+                    <Text tone={prop.description ? 'secondary' : 'tertiary'} wrap="pretty">
+                      {prop.description || 'No JSDoc yet.'}
+                    </Text>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </Box>
-      ) : <Text tone="tertiary">No OntologyX UI-owned public props were extracted for this export.</Text>}
+      ) : (
+        <Text tone="tertiary">
+          No OntologyX UI-owned public props were extracted for this export.
+        </Text>
+      )}
     </Stack>
   );
 }
 
-function ExamplesPanel({ entry, requestedExample }: { entry: UiCatalogEntry; requestedExample: string | null }) {
+function ExamplesPanel({
+  entry,
+  requestedExample,
+}: {
+  entry: UiCatalogEntry;
+  requestedExample: string | null;
+}) {
   return (
     <Stack gap="lg">
       <Stack gap="2xs">
-        <Label tone="accent" emphasis="strong">Source-owned examples</Label>
-        <Heading level={2} size="title">Examples</Heading>
-        <Text tone="tertiary" wrap="pretty">Real public-package examples stay in the document flow so comparison never requires switching context.</Text>
+        <Label tone="accent" emphasis="strong">
+          Source-owned examples
+        </Label>
+        <Heading level={2} size="title">
+          Examples
+        </Heading>
+        <Text tone="tertiary" wrap="pretty">
+          Real public-package examples stay in the document flow so comparison never requires
+          switching context.
+        </Text>
       </Stack>
-      {entry.examples.length ? entry.examples.map((example) => (
-        <section key={example.id} id={`example-${example.id}`} className="ui-studio-deep-target" data-active={requestedExample === example.id || undefined}>
-          <Stack gap="sm">
-            <Row justify="end">
-              <Button size="sm" variant="quiet" onClick={() => updateCatalogRoute({ tab: 'examples', example: example.id, state: null }, 'replace')}>
-                Deep link
-              </Button>
-            </Row>
-            <CatalogExample example={example} />
-          </Stack>
-        </section>
-      )) : <Text tone="tertiary">No colocated examples are documented for this export yet.</Text>}
+      {entry.examples.length ? (
+        entry.examples.map((example) => (
+          <section
+            key={example.id}
+            id={`example-${example.id}`}
+            className="ui-studio-deep-target"
+            data-active={requestedExample === example.id || undefined}
+          >
+            <Stack gap="sm">
+              <Row justify="end">
+                <Button
+                  size="sm"
+                  variant="quiet"
+                  onClick={() =>
+                    updateCatalogRoute(
+                      { tab: 'examples', example: example.id, state: null },
+                      'replace',
+                    )
+                  }
+                >
+                  Deep link
+                </Button>
+              </Row>
+              <CatalogExample example={example} />
+            </Stack>
+          </section>
+        ))
+      ) : (
+        <Text tone="tertiary">No colocated examples are documented for this export yet.</Text>
+      )}
     </Stack>
   );
 }
@@ -187,16 +301,30 @@ function PlaygroundSection({ entry }: { entry: UiCatalogEntry }) {
   return (
     <Stack gap="lg">
       <Stack gap="2xs">
-        <Label tone="accent" emphasis="strong">Interactive inspection</Label>
-        <Heading level={2} size="title">Playground & state matrix</Heading>
-        <Text tone="tertiary" wrap="pretty">Tune safe scalar props and inspect canonical states without leaving this component page.</Text>
+        <Label tone="accent" emphasis="strong">
+          Interactive inspection
+        </Label>
+        <Heading level={2} size="title">
+          Playground & state matrix
+        </Heading>
+        <Text tone="tertiary" wrap="pretty">
+          Tune safe scalar props and inspect canonical states without leaving this component page.
+        </Text>
       </Stack>
       <CatalogPlayground key={entry.id} entry={entry} />
     </Stack>
   );
 }
 
-function EntryWorkbench({ entry, tab, requestedExample }: { entry: UiCatalogEntry; tab: CatalogTab; requestedExample: string | null }) {
+function EntryWorkbench({
+  entry,
+  tab,
+  requestedExample,
+}: {
+  entry: UiCatalogEntry;
+  tab: CatalogTab;
+  requestedExample: string | null;
+}) {
   return (
     <Surface
       className="ui-studio-detail"
@@ -208,19 +336,43 @@ function EntryWorkbench({ entry, tab, requestedExample }: { entry: UiCatalogEntr
       data-studio-layout="stacked"
     >
       <Stack gap="2xl" className="ui-studio-detail__flow">
-        <Box as="section" id="studio-section-overview" className="ui-studio-detail__section" data-active={tab === 'overview' || undefined} data-studio-section="overview">
+        <Box
+          as="section"
+          id="studio-section-overview"
+          className="ui-studio-detail__section"
+          data-active={tab === 'overview' || undefined}
+          data-studio-section="overview"
+        >
           <OverviewPanel entry={entry} />
         </Box>
         <Divider />
-        <Box as="section" id="studio-section-api" className="ui-studio-detail__section" data-active={tab === 'api' || undefined} data-studio-section="api">
+        <Box
+          as="section"
+          id="studio-section-api"
+          className="ui-studio-detail__section"
+          data-active={tab === 'api' || undefined}
+          data-studio-section="api"
+        >
           <ApiPanel entry={entry} />
         </Box>
         <Divider />
-        <Box as="section" id="studio-section-examples" className="ui-studio-detail__section" data-active={tab === 'examples' || undefined} data-studio-section="examples">
+        <Box
+          as="section"
+          id="studio-section-examples"
+          className="ui-studio-detail__section"
+          data-active={tab === 'examples' || undefined}
+          data-studio-section="examples"
+        >
           <ExamplesPanel entry={entry} requestedExample={requestedExample} />
         </Box>
         <Divider />
-        <Box as="section" id="studio-section-playground" className="ui-studio-detail__section" data-active={tab === 'playground' || undefined} data-studio-section="playground">
+        <Box
+          as="section"
+          id="studio-section-playground"
+          className="ui-studio-detail__section"
+          data-active={tab === 'playground' || undefined}
+          data-studio-section="playground"
+        >
           <PlaygroundSection entry={entry} />
         </Box>
       </Stack>
@@ -240,8 +392,14 @@ export function CatalogPage() {
   const route = readCatalogRoute();
   const active = selectedEntry(route.entry);
   const visible = useMemo(() => filterCatalog(uiCatalog, query), [query]);
-  const propCount = useMemo(() => uiCatalog.reduce((total, entry) => total + entry.props.length, 0), []);
-  const exampleCount = useMemo(() => uiCatalog.reduce((total, entry) => total + entry.examples.length, 0), []);
+  const propCount = useMemo(
+    () => uiCatalog.reduce((total, entry) => total + entry.props.length, 0),
+    [],
+  );
+  const exampleCount = useMemo(
+    () => uiCatalog.reduce((total, entry) => total + entry.examples.length, 0),
+    [],
+  );
 
   useEffect(() => {
     if (active && route.entry !== active.id) {
@@ -270,7 +428,12 @@ export function CatalogPage() {
   return (
     <Box as="main" className="ui-studio-shell">
       <Box as="aside" className="ui-studio-shell__sidebar">
-        <StudioSidebar entries={visible} activeId={active.id} query={query} onQueryChange={setQuery} />
+        <StudioSidebar
+          entries={visible}
+          activeId={active.id}
+          query={query}
+          onQueryChange={setQuery}
+        />
       </Box>
       <Box as="section" className="ui-studio-shell__workspace">
         <AppBar
@@ -286,7 +449,10 @@ export function CatalogPage() {
           }
         />
         <StudioEnvironmentToolbar />
-        <ScrollView className="ui-studio-workspace-scroll" ariaLabel={`${active.exportName} UI documentation`}>
+        <ScrollView
+          className="ui-studio-workspace-scroll"
+          ariaLabel={`${active.exportName} UI documentation`}
+        >
           <Box className="ui-studio-workspace-content">
             <CatalogErrorBoundary label={`${active.exportName} generated detail page`}>
               <EntryWorkbench entry={active} tab={route.tab} requestedExample={route.example} />

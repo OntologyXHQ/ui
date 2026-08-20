@@ -1,27 +1,31 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { UiRoot } from '../../adaptive';
-import {
-  Code,
-  Divider,
-  Heading,
-  Icon,
-  Label,
-  Surface,
-  Text,
-  defineUiIcon,
-} from '..';
+import { Code, Divider, Heading, Icon, Label, Surface, Text, defineUiIcon } from '..';
 
 describe('accepted visual primitive contract', () => {
   it('keeps typography semantic, token-classed and explicit about long-token wrapping', () => {
     render(
       <UiRoot direction="rtl">
-        <Text as="span" tone="warning" wrap="pretty" overflowWrap="anywhere" selectable data-testid="text">
+        <Text
+          as="span"
+          tone="warning"
+          wrap="pretty"
+          overflowWrap="anywhere"
+          selectable
+          data-testid="text"
+        >
           mixed فارسی English
         </Text>
-        <Heading level={4} size="title" overflowWrap="anywhere">Semantic heading</Heading>
-        <Label emphasis="strong" data-testid="label">Metadata</Label>
-        <Code as="kbd" dir="ltr" overflowWrap="anywhere">Ctrl+K</Code>
+        <Heading level={4} size="title" overflowWrap="anywhere">
+          Semantic heading
+        </Heading>
+        <Label emphasis="strong" data-testid="label">
+          Metadata
+        </Label>
+        <Code as="kbd" dir="ltr" overflowWrap="anywhere">
+          Ctrl+K
+        </Code>
       </UiRoot>,
     );
 
@@ -163,21 +167,31 @@ describe('accepted visual primitive contract', () => {
 
   it('rejects invalid icon family topology before render', () => {
     expect(() => defineUiIcon({ paths: [] })).toThrow(/at least one non-empty SVG path/);
-    expect(() => defineUiIcon({
-      defaultState: 'idle',
-      states: { idle: ['M4 12h16'] },
-      transitions: [{ from: 'idle', to: 'idle', transientState: 'loop' }],
-    })).toThrow(/distinct stable states/);
+    expect(() =>
+      defineUiIcon({
+        defaultState: 'idle',
+        states: { idle: ['M4 12h16'] },
+        transitions: [{ from: 'idle', to: 'idle', transientState: 'loop' }],
+      }),
+    ).toThrow(/distinct stable states/);
   });
 
   it('keeps visual APIs type-bounded and removes the legacy generic animated icon knob', () => {
     if (false) {
-      <Text as="span" title="native span prop">typed</Text>;
+      <Text as="span" title="native span prop">
+        typed
+      </Text>;
       // @ts-expect-error paragraph semantics do not accept anchor-only href
-      <Text as="p" href="/nope">bad</Text>;
-      <Code as="kbd" title="shortcut">Ctrl+K</Code>;
+      <Text as="p" href="/nope">
+        bad
+      </Text>;
+      <Code as="kbd" title="shortcut">
+        Ctrl+K
+      </Code>;
       // @ts-expect-error code/kbd/samp do not accept anchor-only href
-      <Code as="kbd" href="/nope">bad</Code>;
+      <Code as="kbd" href="/nope">
+        bad
+      </Code>;
       // @ts-expect-error generic spin animation was removed; stateful icon families own motion
       <Icon name="settings" animated />;
       // @ts-expect-error Icon explicitly reserves decorative/labeled aria-hidden semantics from raw SVG props

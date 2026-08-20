@@ -1,13 +1,5 @@
 import type { ReactNode } from 'react';
-import {
-  AppBar,
-  Badge,
-  Card,
-  ContentState,
-  List,
-  ListItem,
-  ScrollView,
-} from '../components';
+import { AppBar, Badge, Card, ContentState, List, ListItem, ScrollView } from '../components';
 
 export type SystemNotificationItem = {
   id: string;
@@ -56,7 +48,10 @@ export function SystemNotificationCenter({
                 secondary={item.body}
                 metadata={item.metadata}
                 leading={item.leading}
-                trailing={item.trailing ?? (item.unread ? <Badge tone="accent">{unreadLabel}</Badge> : undefined)}
+                trailing={
+                  item.trailing ??
+                  (item.unread ? <Badge tone="accent">{unreadLabel}</Badge> : undefined)
+                }
                 onActivate={item.onActivate}
               />
             ))}

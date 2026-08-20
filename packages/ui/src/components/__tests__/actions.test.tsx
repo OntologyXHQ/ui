@@ -11,7 +11,19 @@ function renderUi(node: ReactNode) {
 describe('accepted UIR06 action contracts', () => {
   it('preserves native form type semantics and loading cancellation while separating emphasis from destructive intent', () => {
     const submit = vi.fn((event: FormEvent<HTMLFormElement>) => event.preventDefault());
-    renderUi(<form onSubmit={submit}><Button type="submit" variant="primary">Save</Button><Button intent="destructive" variant="secondary">Delete</Button><Button loading loadingLabel="Saving changes">Saving</Button></form>);
+    renderUi(
+      <form onSubmit={submit}>
+        <Button type="submit" variant="primary">
+          Save
+        </Button>
+        <Button intent="destructive" variant="secondary">
+          Delete
+        </Button>
+        <Button loading loadingLabel="Saving changes">
+          Saving
+        </Button>
+      </form>,
+    );
     const save = screen.getByRole('button', { name: 'Save' });
     const remove = screen.getByRole('button', { name: 'Delete' });
     const loading = screen.getByRole('button', { name: 'Saving changes' });
@@ -24,7 +36,14 @@ describe('accepted UIR06 action contracts', () => {
   });
 
   it('links IconButton tooltip text without using it as the accessible-name source and preserves toggle semantics', () => {
-    renderUi(<IconButton icon="settings" label="Settings" tooltip="Open workspace settings" defaultPressed />);
+    renderUi(
+      <IconButton
+        icon="settings"
+        label="Settings"
+        tooltip="Open workspace settings"
+        defaultPressed
+      />,
+    );
     const button = screen.getByRole('button', { name: 'Settings' });
     const tooltip = screen.getByRole('tooltip');
     expect(button).toHaveAttribute('aria-describedby', tooltip.id);
@@ -34,7 +53,15 @@ describe('accepted UIR06 action contracts', () => {
   });
 
   it('keeps ActionGroup semantic-only and Toolbar owns one roving tab stop including pinned overflow', () => {
-    renderUi(<Toolbar label="Editor" overflow={<Button>More</Button>}><ActionGroup label="Editing"><Button>Undo</Button><Button>Redo</Button><Button disabled>Cut</Button></ActionGroup></Toolbar>);
+    renderUi(
+      <Toolbar label="Editor" overflow={<Button>More</Button>}>
+        <ActionGroup label="Editing">
+          <Button>Undo</Button>
+          <Button>Redo</Button>
+          <Button disabled>Cut</Button>
+        </ActionGroup>
+      </Toolbar>,
+    );
     expect(screen.getByRole('group', { name: 'Editing' })).toBeInTheDocument();
     const toolbar = screen.getByRole('toolbar', { name: 'Editor' });
     const undo = screen.getByRole('button', { name: 'Undo' });

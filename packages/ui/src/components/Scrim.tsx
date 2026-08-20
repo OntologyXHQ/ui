@@ -1,10 +1,15 @@
 export type ScrimTone = 'standard' | 'strong';
 
 export type ScrimProps = {
+  /** Whether the backdrop currently participates in the owning overlay. */
   active: boolean;
+  /** Backdrop strength without changing modality semantics. @default standard */
   tone?: ScrimTone;
+  /** Optional dismissal request; lifecycle authority remains with the overlay owner. */
   onDismiss?: () => void;
+  /** Accessible label used when the scrim itself is dismissible. @default Dismiss overlay */
   dismissLabel?: string;
+  /** Additional class name for composition without owning overlay behavior. */
   className?: string;
 };
 

@@ -41,7 +41,12 @@ describe('System touch keyboard', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'q' }));
     expect(onCommand).toHaveBeenLastCalledWith({
-      type: 'insert-text', surfaceId: 'keyboard-main', sessionId: 'session-a', keyId: 'en-r1-q', text: 'q', repeat: false,
+      type: 'insert-text',
+      surfaceId: 'keyboard-main',
+      sessionId: 'session-a',
+      keyId: 'en-r1-q',
+      text: 'q',
+      repeat: false,
     });
   });
 
@@ -51,7 +56,9 @@ describe('System touch keyboard', () => {
     fireEvent.click(shift);
     expect(shift).toHaveAttribute('aria-pressed', 'true');
     fireEvent.click(screen.getByRole('button', { name: 'Q' }));
-    expect(onCommand).toHaveBeenCalledWith(expect.objectContaining({ type: 'insert-text', text: 'Q' }));
+    expect(onCommand).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'insert-text', text: 'Q' }),
+    );
     expect(shift).toHaveAttribute('aria-pressed', 'false');
 
     fireEvent.click(shift);
@@ -65,7 +72,14 @@ describe('System touch keyboard', () => {
     vi.useFakeTimers();
     renderKeyboard();
     const e = screen.getByRole('button', { name: 'e' });
-    fireEvent.pointerDown(e, { pointerId: 31, pointerType: 'touch', button: 0, isPrimary: true, clientX: 0, clientY: 0 });
+    fireEvent.pointerDown(e, {
+      pointerId: 31,
+      pointerType: 'touch',
+      button: 0,
+      isPrimary: true,
+      clientX: 0,
+      clientY: 0,
+    });
     act(() => vi.advanceTimersByTime(560));
     expect(screen.getByRole('group', { name: 'Alternates for e' })).toBeInTheDocument();
 
@@ -74,7 +88,14 @@ describe('System touch keyboard', () => {
     renderKeyboard({ ...baseState, secure: true });
     expect(screen.getByText('Secure')).toBeInTheDocument();
     const secureE = screen.getByRole('button', { name: 'e' });
-    fireEvent.pointerDown(secureE, { pointerId: 32, pointerType: 'touch', button: 0, isPrimary: true, clientX: 0, clientY: 0 });
+    fireEvent.pointerDown(secureE, {
+      pointerId: 32,
+      pointerType: 'touch',
+      button: 0,
+      isPrimary: true,
+      clientX: 0,
+      clientY: 0,
+    });
     act(() => vi.advanceTimersByTime(560));
     expect(screen.queryByRole('group', { name: 'Alternates for e' })).not.toBeInTheDocument();
   });
@@ -83,13 +104,31 @@ describe('System touch keyboard', () => {
     vi.useFakeTimers();
     const onCommand = renderKeyboard();
     const backspace = screen.getByRole('button', { name: 'Backspace' });
-    fireEvent.pointerDown(backspace, { pointerId: 41, pointerType: 'touch', button: 0, isPrimary: true, clientX: 0, clientY: 0 });
+    fireEvent.pointerDown(backspace, {
+      pointerId: 41,
+      pointerType: 'touch',
+      button: 0,
+      isPrimary: true,
+      clientX: 0,
+      clientY: 0,
+    });
     act(() => vi.advanceTimersByTime(760));
-    const repeatsBeforeRelease = (onCommand.mock.calls as [SystemKeyboardCommand][]).filter(([command]) => command.type === 'backspace').length;
+    const repeatsBeforeRelease = (onCommand.mock.calls as [SystemKeyboardCommand][]).filter(
+      ([command]) => command.type === 'backspace',
+    ).length;
     expect(repeatsBeforeRelease).toBeGreaterThan(1);
-    fireEvent.pointerUp(backspace, { pointerId: 41, pointerType: 'touch', button: 0, isPrimary: true, clientX: 0, clientY: 0 });
+    fireEvent.pointerUp(backspace, {
+      pointerId: 41,
+      pointerType: 'touch',
+      button: 0,
+      isPrimary: true,
+      clientX: 0,
+      clientY: 0,
+    });
     act(() => vi.advanceTimersByTime(250));
-    const repeatsAfterRelease = (onCommand.mock.calls as [SystemKeyboardCommand][]).filter(([command]) => command.type === 'backspace').length;
+    const repeatsAfterRelease = (onCommand.mock.calls as [SystemKeyboardCommand][]).filter(
+      ([command]) => command.type === 'backspace',
+    ).length;
     expect(repeatsAfterRelease).toBe(repeatsBeforeRelease);
   });
 
@@ -99,7 +138,9 @@ describe('System touch keyboard', () => {
     expect(keyboard).toHaveAttribute('dir', 'rtl');
     expect(screen.getByRole('button', { name: 'ض' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Switch language' }));
-    expect(onCommand).toHaveBeenLastCalledWith(expect.objectContaining({ type: 'request-language', language: 'en' }));
+    expect(onCommand).toHaveBeenLastCalledWith(
+      expect.objectContaining({ type: 'request-language', language: 'en' }),
+    );
   });
 
   it('uses a numeric-only plane for numeric purpose and hides entirely when native visibility is false', () => {
@@ -108,7 +149,9 @@ describe('System touch keyboard', () => {
     expect(screen.queryByRole('button', { name: 'q' })).not.toBeInTheDocument();
 
     const { container } = render(
-      <UiRoot><SystemKeyboardHost state={{ ...baseState, visible: false }} onCommand={() => undefined} /></UiRoot>,
+      <UiRoot>
+        <SystemKeyboardHost state={{ ...baseState, visible: false }} onCommand={() => undefined} />
+      </UiRoot>,
     );
     expect(container.querySelector('[data-oxs-system-keyboard]')).toBeNull();
   });

@@ -299,6 +299,7 @@ export function ActionGroup({
   ...props
 }: ActionGroupProps) {
   return (
+    // biome-ignore lint/a11y/useSemanticElements: ActionGroup groups arbitrary commands; fieldset would incorrectly imply form controls.
     <div
       {...props}
       className={`ui-action-group ui-action-group--${orientation} ${className}`.trim()}
@@ -393,7 +394,7 @@ export function AppBar({
 }: AppBarProps) {
   const titleId = useId();
   return (
-    <header {...props} className={`ui-app-bar ${className}`.trim()} aria-labelledby={titleId}>
+    <header {...props} className={`ui-app-bar ${className}`.trim()}>
       {leading ? <div className="ui-app-bar__leading">{leading}</div> : null}
       <div className="ui-app-bar__copy">
         <Heading level={titleLevel} size="heading" className="ui-app-bar__title" id={titleId}>

@@ -54,20 +54,26 @@ type LayoutBoundaryProps = {
   gridSpan?: GridSpan;
 };
 
-type PolymorphicLayoutBaseProps<T extends BoxElement, OwnKeys extends PropertyKey = never> =
-  LayoutBoundaryProps & {
-    /** Chooses the native semantic element while preserving that element's native prop typing. */
-    as?: T;
-    /** Structural escape hatch for host/layout integration; visual values still belong in typed props/tokens. */
-    className?: string;
-  } & Omit<
+type PolymorphicLayoutBaseProps<
+  T extends BoxElement,
+  OwnKeys extends PropertyKey = never,
+> = LayoutBoundaryProps & {
+  /** Chooses the native semantic element while preserving that element's native prop typing. */
+  as?: T;
+  /** Structural escape hatch for host/layout integration; visual values still belong in typed props/tokens. */
+  className?: string;
+} & Omit<
     ComponentPropsWithoutRef<T>,
     OwnKeys | keyof LayoutBoundaryProps | 'as' | 'children' | 'className' | 'style' | 'color'
   >;
 
 type BoundaryValues = Required<
-  Pick<LayoutBoundaryProps, 'overflow' | 'minInlineSize' | 'minBlockSize' | 'flex' | 'alignSelf' | 'gridSpan'>
-> & Pick<LayoutBoundaryProps, 'overflowInline' | 'overflowBlock'>;
+  Pick<
+    LayoutBoundaryProps,
+    'overflow' | 'minInlineSize' | 'minBlockSize' | 'flex' | 'alignSelf' | 'gridSpan'
+  >
+> &
+  Pick<LayoutBoundaryProps, 'overflowInline' | 'overflowBlock'>;
 
 function boundaryClasses({
   overflow,
@@ -120,7 +126,9 @@ function renderElement<T extends BoxElement>(
   return createElement(as, { ...props, className }, children);
 }
 
-export type BoxProps<T extends BoxElement = 'div'> = PropsWithChildren<PolymorphicLayoutBaseProps<T>>;
+export type BoxProps<T extends BoxElement = 'div'> = PropsWithChildren<
+  PolymorphicLayoutBaseProps<T>
+>;
 
 export function Box<T extends BoxElement = 'div'>({
   as = 'div' as T,
@@ -190,7 +198,16 @@ export function Stack<T extends BoxElement = 'div'>({
     gap,
     align,
     justify,
-    { overflow, overflowInline, overflowBlock, minInlineSize, minBlockSize, flex, alignSelf, gridSpan },
+    {
+      overflow,
+      overflowInline,
+      overflowBlock,
+      minInlineSize,
+      minBlockSize,
+      flex,
+      alignSelf,
+      gridSpan,
+    },
     className,
   );
   return renderElement(as, classes, props as Record<string, unknown>, children);
@@ -222,7 +239,16 @@ export function Row<T extends BoxElement = 'div'>({
     gap,
     align,
     justify,
-    { overflow, overflowInline, overflowBlock, minInlineSize, minBlockSize, flex, alignSelf, gridSpan },
+    {
+      overflow,
+      overflowInline,
+      overflowBlock,
+      minInlineSize,
+      minBlockSize,
+      flex,
+      alignSelf,
+      gridSpan,
+    },
     className,
   );
   return renderElement(as, classes, props as Record<string, unknown>, children);
@@ -254,7 +280,16 @@ export function Wrap<T extends BoxElement = 'div'>({
     gap,
     align,
     justify,
-    { overflow, overflowInline, overflowBlock, minInlineSize, minBlockSize, flex, alignSelf, gridSpan },
+    {
+      overflow,
+      overflowInline,
+      overflowBlock,
+      minInlineSize,
+      minBlockSize,
+      flex,
+      alignSelf,
+      gridSpan,
+    },
     className,
   );
   return renderElement(as, classes, props as Record<string, unknown>, children);

@@ -64,7 +64,8 @@ for (const token of [
 }
 for (const token of [
   '<Heading className="ui-disclosure__heading"',
-  'role="region"',
+  '<section',
+  'aria-labelledby={triggerId}',
   'data-ui-accordion-trigger',
   "['ArrowDown', 'ArrowUp', 'Home', 'End']",
 ]) {

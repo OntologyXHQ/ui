@@ -32,7 +32,7 @@ export function List({
       <li className="ui-list__state-item">
         <div
           className="ui-list__state"
-          role={state === 'error' ? 'alert' : state === 'loading' ? 'status' : undefined}
+          role={state === 'error' ? 'alert' : 'status'}
           aria-label={stateLabel}
         >
           {stateContent ?? stateLabel}

@@ -18,7 +18,9 @@ async function filesUnder(directory) {
 const before = await filesUnder(dist);
 const cssFiles = before.filter((file) => file.endsWith('.css'));
 if (cssFiles.length !== 1) {
-  throw new Error(`Expected exactly one library CSS asset, found: ${cssFiles.map((file) => path.relative(dist, file)).join(', ') || 'none'}`);
+  throw new Error(
+    `Expected exactly one library CSS asset, found: ${cssFiles.map((file) => path.relative(dist, file)).join(', ') || 'none'}`,
+  );
 }
 
 const originalCss = cssFiles[0];
@@ -37,11 +39,13 @@ for (const file of jsFiles) {
   await writeFile(file, text);
 }
 
-
 const indexTypes = path.join(dist, 'index.d.ts');
 try {
   const declaration = await readFile(indexTypes, 'utf8');
-  await writeFile(indexTypes, declaration.replace(/^import ['"]\.\/styles\/index\.css['"];?\s*$/m, ''));
+  await writeFile(
+    indexTypes,
+    declaration.replace(/^import ['"]\.\/styles\/index\.css['"];?\s*$/m, ''),
+  );
 } catch (error) {
   if (error?.code !== 'ENOENT') throw error;
 }

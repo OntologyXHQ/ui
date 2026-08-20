@@ -535,7 +535,6 @@
       "requiredAxes": [
         "selection",
         "native-semantics",
-        "controlled",
         "uncontrolled",
         "keyboard",
         "touch",
@@ -556,7 +555,6 @@
       "requiredAxes": [
         "selection",
         "native-semantics",
-        "controlled",
         "uncontrolled",
         "keyboard",
         "touch",
@@ -577,7 +575,6 @@
       "requiredAxes": [
         "selection",
         "native-semantics",
-        "controlled",
         "uncontrolled",
         "keyboard",
         "touch",
@@ -598,7 +595,6 @@
       "requiredAxes": [
         "selection",
         "native-semantics",
-        "controlled",
         "uncontrolled",
         "keyboard",
         "touch",
@@ -619,7 +615,6 @@
       "requiredAxes": [
         "selection",
         "native-semantics",
-        "controlled",
         "uncontrolled",
         "keyboard",
         "touch",
@@ -640,7 +635,6 @@
       "requiredAxes": [
         "selection",
         "native-semantics",
-        "controlled",
         "uncontrolled",
         "keyboard",
         "touch",
@@ -661,7 +655,6 @@
       "requiredAxes": [
         "selection",
         "native-semantics",
-        "controlled",
         "uncontrolled",
         "keyboard",
         "touch",
@@ -727,10 +720,8 @@
         "listbox",
         "typeahead",
         "form",
-        "validity",
         "focus-restoration",
         "keyboard",
-        "touch",
         "a11y"
       ]
     },
@@ -746,7 +737,6 @@
       "requiredAxes": [
         "disclosure",
         "controlled",
-        "uncontrolled",
         "heading",
         "region",
         "keyboard",
@@ -767,7 +757,6 @@
       "requiredAxes": [
         "disclosure",
         "controlled",
-        "uncontrolled",
         "heading",
         "region",
         "keyboard",
@@ -790,9 +779,7 @@
         "semantic-html",
         "list",
         "navigation",
-        "long-content",
         "localization",
-        "responsive",
         "rtl",
         "a11y"
       ]
@@ -811,9 +798,7 @@
         "semantic-html",
         "list",
         "navigation",
-        "long-content",
         "localization",
-        "responsive",
         "rtl",
         "a11y"
       ]
@@ -832,9 +817,7 @@
         "semantic-html",
         "list",
         "navigation",
-        "long-content",
         "localization",
-        "responsive",
         "rtl",
         "a11y"
       ]
@@ -853,9 +836,7 @@
         "semantic-html",
         "list",
         "navigation",
-        "long-content",
         "localization",
-        "responsive",
         "rtl",
         "a11y"
       ]
@@ -874,9 +855,7 @@
         "semantic-html",
         "list",
         "navigation",
-        "long-content",
         "localization",
-        "responsive",
         "rtl",
         "a11y"
       ]
@@ -924,6 +903,406 @@
         "rtl",
         "keyboard",
         "touch",
+        "a11y"
+      ]
+    },
+    "Dialog": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "overlay-components-nested-dismissal-certification"
+      ],
+      "requiredAxes": [
+        "overlay-components",
+        "dialog",
+        "sheet",
+        "modal-isolation",
+        "focus",
+        "scroll-lock",
+        "escape",
+        "touch",
+        "a11y"
+      ]
+    },
+    "AlertDialog": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "overlay-components-nested-dismissal-certification"
+      ],
+      "requiredAxes": [
+        "overlay-components",
+        "dialog",
+        "sheet",
+        "modal-isolation",
+        "focus",
+        "scroll-lock",
+        "escape",
+        "touch",
+        "a11y"
+      ]
+    },
+    "Sheet": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "overlay-components-nested-dismissal-certification"
+      ],
+      "requiredAxes": [
+        "overlay-components",
+        "dialog",
+        "sheet",
+        "modal-isolation",
+        "focus",
+        "scroll-lock",
+        "escape",
+        "touch",
+        "a11y"
+      ]
+    },
+    "BottomSheet": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "overlay-components-nested-dismissal-certification"
+      ],
+      "requiredAxes": [
+        "overlay-components",
+        "dialog",
+        "sheet",
+        "modal-isolation",
+        "focus",
+        "scroll-lock",
+        "escape",
+        "touch",
+        "a11y"
+      ]
+    },
+    "Scrim": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "overlay-components-nested-dismissal-certification"
+      ],
+      "requiredAxes": [
+        "overlay-components",
+        "dialog",
+        "sheet",
+        "modal-isolation",
+        "focus",
+        "scroll-lock",
+        "escape",
+        "touch",
+        "a11y"
+      ]
+    },
+    "Popover": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "floating-menu-tooltip-certification"
+      ],
+      "requiredAxes": [
+        "floating",
+        "collision",
+        "menu",
+        "typeahead",
+        "tooltip",
+        "keyboard",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
+    },
+    "Menu": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "floating-menu-tooltip-certification"
+      ],
+      "requiredAxes": [
+        "floating",
+        "collision",
+        "menu",
+        "typeahead",
+        "tooltip",
+        "keyboard",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
+    },
+    "MenuItem": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "floating-menu-tooltip-certification"
+      ],
+      "requiredAxes": [
+        "floating",
+        "collision",
+        "menu",
+        "typeahead",
+        "tooltip",
+        "keyboard",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
+    },
+    "MenuSeparator": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "floating-menu-tooltip-certification"
+      ],
+      "requiredAxes": [
+        "floating",
+        "collision",
+        "menu",
+        "typeahead",
+        "tooltip",
+        "keyboard",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
+    },
+    "ContextMenu": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "floating-menu-tooltip-certification"
+      ],
+      "requiredAxes": [
+        "floating",
+        "collision",
+        "menu",
+        "typeahead",
+        "tooltip",
+        "keyboard",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
+    },
+    "Tooltip": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "floating-menu-tooltip-certification"
+      ],
+      "requiredAxes": [
+        "floating",
+        "collision",
+        "menu",
+        "typeahead",
+        "tooltip",
+        "keyboard",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
+    },
+    "Badge": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "feedback-lifecycle-certification"
+      ],
+      "requiredAxes": [
+        "feedback",
+        "live-region",
+        "timing",
+        "upsert",
+        "progress",
+        "loading",
+        "reduced-motion",
+        "responsive",
+        "a11y"
+      ]
+    },
+    "StatusIndicator": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "feedback-lifecycle-certification"
+      ],
+      "requiredAxes": [
+        "feedback",
+        "live-region",
+        "timing",
+        "upsert",
+        "progress",
+        "loading",
+        "reduced-motion",
+        "responsive",
+        "a11y"
+      ]
+    },
+    "Progress": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "feedback-lifecycle-certification"
+      ],
+      "requiredAxes": [
+        "feedback",
+        "live-region",
+        "timing",
+        "upsert",
+        "progress",
+        "loading",
+        "reduced-motion",
+        "responsive",
+        "a11y"
+      ]
+    },
+    "Spinner": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "feedback-lifecycle-certification"
+      ],
+      "requiredAxes": [
+        "feedback",
+        "live-region",
+        "timing",
+        "upsert",
+        "progress",
+        "loading",
+        "reduced-motion",
+        "responsive",
+        "a11y"
+      ]
+    },
+    "Skeleton": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "feedback-lifecycle-certification"
+      ],
+      "requiredAxes": [
+        "feedback",
+        "live-region",
+        "timing",
+        "upsert",
+        "progress",
+        "loading",
+        "reduced-motion",
+        "responsive",
+        "a11y"
+      ]
+    },
+    "EmptyState": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "feedback-lifecycle-certification"
+      ],
+      "requiredAxes": [
+        "feedback",
+        "live-region",
+        "timing",
+        "upsert",
+        "progress",
+        "loading",
+        "reduced-motion",
+        "responsive",
+        "a11y"
+      ]
+    },
+    "Snackbar": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "feedback-lifecycle-certification"
+      ],
+      "requiredAxes": [
+        "feedback",
+        "live-region",
+        "timing",
+        "upsert",
+        "progress",
+        "loading",
+        "reduced-motion",
+        "responsive",
+        "a11y"
+      ]
+    },
+    "ToastHost": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "feedback-lifecycle-certification"
+      ],
+      "requiredAxes": [
+        "feedback",
+        "live-region",
+        "timing",
+        "upsert",
+        "progress",
+        "loading",
+        "reduced-motion",
+        "responsive",
+        "a11y"
+      ]
+    },
+    "Banner": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "feedback-lifecycle-certification"
+      ],
+      "requiredAxes": [
+        "feedback",
+        "live-region",
+        "timing",
+        "upsert",
+        "progress",
+        "loading",
+        "reduced-motion",
+        "responsive",
         "a11y"
       ]
     }

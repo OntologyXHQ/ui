@@ -4,7 +4,8 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'CursorRegion',
     layer: 'components',
-    category: 'Interaction', order: 80,
+    category: 'Interaction',
+    order: 80,
     summary: 'Declares a semantic cursor role for a bounded interaction region.',
     usage: 'Use semantic cursor roles instead of feature-owned CSS cursor values.',
     status: 'candidate',

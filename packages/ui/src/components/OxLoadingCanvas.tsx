@@ -46,7 +46,14 @@ function interpolate(from: number, to: number, progress: number) {
   return from + (to - from) * progress;
 }
 
-function segment(progress: number, start: number, end: number, from: number, to: number, easing = easeInOutCubic) {
+function segment(
+  progress: number,
+  start: number,
+  end: number,
+  from: number,
+  to: number,
+  easing = easeInOutCubic,
+) {
   if (progress <= start) return from;
   if (progress >= end) return to;
   return interpolate(from, to, easing((progress - start) / (end - start)));
@@ -70,7 +77,13 @@ function orbitAt(progress: number) {
   return ORBIT_KEYFRAMES.at(-1) ?? { length: 7, offset: -100 };
 }
 
-function writeProgress(progress: number, start: number, written: number, release: number, hidden: number) {
+function writeProgress(
+  progress: number,
+  start: number,
+  written: number,
+  release: number,
+  hidden: number,
+) {
   if (progress <= start) return 0;
   if (progress < written) return segment(progress, start, written, 0, 1, easeOutCubic);
   if (progress <= release) return 1;
@@ -87,7 +100,15 @@ function heartbeatScale(progress: number) {
   return 1;
 }
 
-function echoState(progress: number, start: number, peak: number, end: number, peakOpacity: number, fromScale: number, toScale: number) {
+function echoState(
+  progress: number,
+  start: number,
+  peak: number,
+  end: number,
+  peakOpacity: number,
+  fromScale: number,
+  toScale: number,
+) {
   if (progress <= start || progress >= end) return { opacity: 0, scale: toScale };
   if (progress <= peak) {
     const local = easeOutCubic((progress - start) / (peak - start));
@@ -168,8 +189,22 @@ function drawCanvasMark(canvas: HTMLCanvasElement, progress: number, reduced: bo
     context.stroke();
 
     context.lineWidth = crossStroke;
-    drawLineProgress(context, centerX - 3.6 * unit, centerY - 3.6 * unit, centerX + 3.6 * unit, centerY + 3.6 * unit, 1);
-    drawLineProgress(context, centerX + 3.6 * unit, centerY - 3.6 * unit, centerX - 3.6 * unit, centerY + 3.6 * unit, 1);
+    drawLineProgress(
+      context,
+      centerX - 3.6 * unit,
+      centerY - 3.6 * unit,
+      centerX + 3.6 * unit,
+      centerY + 3.6 * unit,
+      1,
+    );
+    drawLineProgress(
+      context,
+      centerX + 3.6 * unit,
+      centerY - 3.6 * unit,
+      centerX - 3.6 * unit,
+      centerY + 3.6 * unit,
+      1,
+    );
     return;
   }
 
@@ -209,8 +244,22 @@ function drawCanvasMark(canvas: HTMLCanvasElement, progress: number, reduced: bo
   context.lineWidth = crossStroke;
   const strokeA = writeProgress(normalized, 0.08, 0.29, 0.72, 0.94);
   const strokeB = writeProgress(normalized, 0.17, 0.36, 0.69, 0.9);
-  drawLineProgress(context, centerX - 3.6 * unit, centerY - 3.6 * unit, centerX + 3.6 * unit, centerY + 3.6 * unit, strokeA);
-  drawLineProgress(context, centerX + 3.6 * unit, centerY - 3.6 * unit, centerX - 3.6 * unit, centerY + 3.6 * unit, strokeB);
+  drawLineProgress(
+    context,
+    centerX - 3.6 * unit,
+    centerY - 3.6 * unit,
+    centerX + 3.6 * unit,
+    centerY + 3.6 * unit,
+    strokeA,
+  );
+  drawLineProgress(
+    context,
+    centerX + 3.6 * unit,
+    centerY - 3.6 * unit,
+    centerX - 3.6 * unit,
+    centerY + 3.6 * unit,
+    strokeB,
+  );
   context.restore();
   context.globalAlpha = 1;
 }
@@ -236,15 +285,18 @@ export function OxLoadingCanvas() {
     syncCanvasBackingStore(canvas);
     draw(0);
     const ResizeObserverCtor = realmWindow.ResizeObserver;
-    const resizeObserver = ResizeObserverCtor ? new ResizeObserverCtor((entries) => {
-      syncCanvasBackingStore(canvas, entries[0]);
-      draw();
-    }) : null;
+    const resizeObserver = ResizeObserverCtor
+      ? new ResizeObserverCtor((entries) => {
+          syncCanvasBackingStore(canvas, entries[0]);
+          draw();
+        })
+      : null;
     resizeObserver?.observe(canvas);
 
-    const unsubscribe = runtime.preference === 'reduced'
-      ? () => undefined
-      : runtime.clock.subscribe((frame) => draw((frame.elapsedMs % OX_PERIOD_MS) / OX_PERIOD_MS));
+    const unsubscribe =
+      runtime.preference === 'reduced'
+        ? () => undefined
+        : runtime.clock.subscribe((frame) => draw((frame.elapsedMs % OX_PERIOD_MS) / OX_PERIOD_MS));
 
     return () => {
       unsubscribe();

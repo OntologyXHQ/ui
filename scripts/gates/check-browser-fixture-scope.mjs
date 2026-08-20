@@ -68,9 +68,16 @@ while ((cursor = source.indexOf(needle, cursor)) !== -1) {
   const open = cursor + needle.length - 1;
   const end = scanCallEnd(open);
   const call = source.slice(cursor, end + 1);
-  const statementStart = Math.max(source.lastIndexOf(';', cursor - 1), source.lastIndexOf('{', cursor - 1), source.lastIndexOf('}', cursor - 1)) + 1;
+  const statementStart =
+    Math.max(
+      source.lastIndexOf(';', cursor - 1),
+      source.lastIndexOf('{', cursor - 1),
+      source.lastIndexOf('}', cursor - 1),
+    ) + 1;
   const prefix = source.slice(statementStart, cursor).trim();
-  const consumesResult = /(?:^|\b)(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=\s*await\s*$/.test(prefix) || /^[A-Za-z_$][\w$]*\s*=\s*await\s*$/.test(prefix);
+  const consumesResult =
+    /(?:^|\b)(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=\s*await\s*$/.test(prefix) ||
+    /^[A-Za-z_$][\w$]*\s*=\s*await\s*$/.test(prefix);
   if (/\bexample\s*:/.test(call) && !consumesResult) {
     const line = source.slice(0, cursor).split('\n').length;
     failures.push(`line ${line}: example deep link ignores gotoCatalog's canonical fixture scope`);
@@ -91,22 +98,33 @@ for (const pattern of unscopedDomPatterns) {
 }
 
 const overlayAuthorityStart = source.indexOf("'overlay-authority-cross-root-certification'");
-const motionAuthorityStart = source.indexOf("'motion-authority-realm-interruption-certification'", overlayAuthorityStart);
+const motionAuthorityStart = source.indexOf(
+  "'motion-authority-realm-interruption-certification'",
+  overlayAuthorityStart,
+);
 if (overlayAuthorityStart !== -1 && motionAuthorityStart !== -1) {
   const authority = source.slice(overlayAuthorityStart, motionAuthorityStart);
-  for (const stale of ['triggerA.evaluate((element) => element.closest', 'triggerB.evaluate((element) => element.closest']) {
+  for (const stale of [
+    'triggerA.evaluate((element) => element.closest',
+    'triggerB.evaluate((element) => element.closest',
+  ]) {
     if (authority.includes(stale)) {
-      failures.push('overlay authority certification re-resolves an accessibility-role trigger after modal isolation; inspect stable UiRoot DOM identity instead');
+      failures.push(
+        'overlay authority certification re-resolves an accessibility-role trigger after modal isolation; inspect stable UiRoot DOM identity instead',
+      );
       break;
     }
   }
   for (const required of [
     "workbench.locator('.ui-doc-overlay-authority-root--a')",
     "workbench.locator('.ui-doc-overlay-authority-root--b')",
-    "waitForStudioExampleControl(page, triggerA",
-    "waitForStudioExampleControl(page, triggerB",
+    'waitForStudioExampleControl(page, triggerA',
+    'waitForStudioExampleControl(page, triggerB',
   ]) {
-    if (!authority.includes(required)) failures.push(`overlay authority certification lost stable post-isolation evidence: ${required}`);
+    if (!authority.includes(required))
+      failures.push(
+        `overlay authority certification lost stable post-isolation evidence: ${required}`,
+      );
   }
 }
 
@@ -116,4 +134,6 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log('G0 browser fixture-scope gate passed: every example journey consumes canonical #example-<id> scope, fixture DOM polling is explicitly scoped, and modal-isolation evidence uses stable DOM identities after accessibility removal.');
+console.log(
+  'G0 browser fixture-scope gate passed: every example journey consumes canonical #example-<id> scope, fixture DOM polling is explicitly scoped, and modal-isolation evidence uses stable DOM identities after accessibility removal.',
+);

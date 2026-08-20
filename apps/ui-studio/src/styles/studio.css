@@ -1365,3 +1365,12 @@ body { overflow: hidden; background: #091019; color-scheme: dark light; }
   padding: var(--ui-space-sm);
   min-width: 0;
 }
+
+/* UIR10 certification fixtures use public components; these rules only size the Studio stage. */
+.ui-doc-scrim-stage {
+  position: relative;
+  min-block-size: 8rem;
+  overflow: hidden;
+  border-radius: var(--oxs-radius-lg);
+}
+.ui-doc-scrim-stage .ui-scrim { position: absolute; inset: 0; }

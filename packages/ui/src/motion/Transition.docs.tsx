@@ -6,7 +6,8 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'MotionTransition',
     layer: 'components',
-    category: 'Interaction', order: 80,
+    category: 'Interaction',
+    order: 80,
     summary: 'General enter/exit transition wrapper.',
     usage:
       'Use the smallest semantic transition that communicates state change; reduced-motion behavior is built into the motion runtime.',
@@ -16,12 +17,15 @@ export const uiDocs = defineUiDocsGroup([
     rtl: 'Directional slide behavior must use semantic direction where relevant.',
     touch: 'Transitions remain interruptible during direct interaction.',
     responsive: 'Animation derives from content state, not fixed viewport assumptions.',
-    examples: [{ id: 'authority', title: 'Motion runtime authority', component: 'MotionAuthorityExample' }],
+    examples: [
+      { id: 'authority', title: 'Motion runtime authority', component: 'MotionAuthorityExample' },
+    ],
   },
   {
     exportName: 'FadeTransition',
     layer: 'components',
-    category: 'Interaction', order: 80,
+    category: 'Interaction',
+    order: 80,
     summary: 'Fade transition alias.',
     usage: 'Use for low-spatial emphasis changes.',
     status: 'candidate',
@@ -33,7 +37,8 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'ScaleTransition',
     layer: 'components',
-    category: 'Interaction', order: 80,
+    category: 'Interaction',
+    order: 80,
     summary: 'Scale transition alias.',
     usage: 'Use for bounded surface appearance/disappearance.',
     status: 'candidate',
@@ -45,7 +50,8 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'SlideTransition',
     layer: 'components',
-    category: 'Interaction', order: 80,
+    category: 'Interaction',
+    order: 80,
     summary: 'Sliding transition alias.',
     usage: 'Use when spatial direction communicates navigation or reveal.',
     status: 'candidate',
@@ -57,7 +63,8 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'RevealTransition',
     layer: 'components',
-    category: 'Interaction', order: 80,
+    category: 'Interaction',
+    order: 80,
     summary: 'Reveal transition alias.',
     usage: 'Use for progressive disclosure where clipping communicates hierarchy.',
     status: 'candidate',
@@ -69,7 +76,8 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'CollapseTransition',
     layer: 'components',
-    category: 'Interaction', order: 80,
+    category: 'Interaction',
+    order: 80,
     summary: 'Collapse/expand transition alias.',
     usage: 'Use for layout disclosure with measured bounds.',
     status: 'candidate',
@@ -81,7 +89,8 @@ export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'ReplaceTransition',
     layer: 'components',
-    category: 'Interaction', order: 80,
+    category: 'Interaction',
+    order: 80,
     summary: 'Content replacement transition alias.',
     usage: 'Use for related state replacement without layering independent screens.',
     status: 'candidate',
@@ -91,7 +100,6 @@ export const uiDocs = defineUiDocsGroup([
     responsive: 'Container-independent.',
   },
 ] as const);
-
 
 export function MotionAuthorityExample() {
   return (
@@ -111,7 +119,12 @@ function MotionRealmProbe({ label }: { label: string }) {
       <Stack gap="xs">
         <Text>{label}: realm scheduler + interruption + reduced-motion settlement.</Text>
         <Button onClick={() => setPresent((value) => !value)}>Toggle motion</Button>
-        <MotionTransition present={present} kind="scale" spring="expressive" data-motion-probe-surface>
+        <MotionTransition
+          present={present}
+          kind="scale"
+          spring="expressive"
+          data-motion-probe-surface
+        >
           <div className="ui-doc-example-chip">Motion target</div>
         </MotionTransition>
       </Stack>

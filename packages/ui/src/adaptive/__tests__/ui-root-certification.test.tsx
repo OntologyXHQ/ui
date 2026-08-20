@@ -63,11 +63,7 @@ describe('UiRoot certification', () => {
         tokens={{ 'radius-md': '18px' }}
       >
         <div>Outer content</div>
-        <UiRoot
-          density="compact"
-          occlusion={{ blockEnd: '40px' }}
-          tokens={{ 'radius-md': '6px' }}
-        >
+        <UiRoot density="compact" occlusion={{ blockEnd: '40px' }} tokens={{ 'radius-md': '6px' }}>
           <div>Inner content</div>
         </UiRoot>
       </UiRoot>,
@@ -121,7 +117,13 @@ describe('UiRoot certification', () => {
 
   it('server-renders and hydrates system/auto preferences without a recoverable hydration mismatch', async () => {
     const tree = (
-      <UiRoot theme="system" direction="auto" density="auto" pointerPrecision="auto" motion="system">
+      <UiRoot
+        theme="system"
+        direction="auto"
+        density="auto"
+        pointerPrecision="auto"
+        motion="system"
+      >
         <button type="button">Hydrated action</button>
       </UiRoot>
     );
@@ -164,7 +166,13 @@ describe('UiRoot certification', () => {
     const outerRoot = createRoot(outerHost);
     await act(async () => {
       outerRoot.render(
-        <UiRoot theme="system" direction="auto" density="auto" pointerPrecision="auto" motion="system">
+        <UiRoot
+          theme="system"
+          direction="auto"
+          density="auto"
+          pointerPrecision="auto"
+          motion="system"
+        >
           Parent realm
         </UiRoot>,
       );
@@ -185,7 +193,13 @@ describe('UiRoot certification', () => {
     const iframeRoot = createRoot(iframeHost);
     await act(async () => {
       iframeRoot.render(
-        <UiRoot theme="system" direction="auto" density="auto" pointerPrecision="auto" motion="system">
+        <UiRoot
+          theme="system"
+          direction="auto"
+          density="auto"
+          pointerPrecision="auto"
+          motion="system"
+        >
           Child realm
         </UiRoot>,
       );

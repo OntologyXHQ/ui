@@ -4,7 +4,13 @@ import { SystemSurface } from './SystemScaffold';
 
 export type SystemKeyboardLanguage = 'en' | 'fa';
 export type SystemKeyboardLayoutMode = 'letters' | 'symbols' | 'numeric';
-export type SystemKeyboardContentPurpose = 'text' | 'password' | 'numeric' | 'email' | 'url' | 'search';
+export type SystemKeyboardContentPurpose =
+  | 'text'
+  | 'password'
+  | 'numeric'
+  | 'email'
+  | 'url'
+  | 'search';
 export type SystemKeyboardShiftState = 'off' | 'once' | 'caps';
 export type SystemKeyboardKeyKind =
   | 'character'
@@ -55,13 +61,45 @@ export type SystemKeyboardSurfaceState = {
 };
 
 export type SystemKeyboardCommand =
-  | { type: 'insert-text'; surfaceId: string; sessionId: string; keyId: string; text: string; repeat?: boolean }
+  | {
+      type: 'insert-text';
+      surfaceId: string;
+      sessionId: string;
+      keyId: string;
+      text: string;
+      repeat?: boolean;
+    }
   | { type: 'backspace'; surfaceId: string; sessionId: string; keyId: string; repeat?: boolean }
   | { type: 'enter'; surfaceId: string; sessionId: string; keyId: string }
-  | { type: 'move'; surfaceId: string; sessionId: string; keyId: string; direction: 'start' | 'end'; repeat?: boolean }
-  | { type: 'request-layout'; surfaceId: string; sessionId: string; keyId: string; layout: SystemKeyboardLayoutMode }
-  | { type: 'request-language'; surfaceId: string; sessionId: string; keyId: string; language: SystemKeyboardLanguage }
-  | { type: 'modifier'; surfaceId: string; sessionId: string; keyId: string; shift: SystemKeyboardShiftState };
+  | {
+      type: 'move';
+      surfaceId: string;
+      sessionId: string;
+      keyId: string;
+      direction: 'start' | 'end';
+      repeat?: boolean;
+    }
+  | {
+      type: 'request-layout';
+      surfaceId: string;
+      sessionId: string;
+      keyId: string;
+      layout: SystemKeyboardLayoutMode;
+    }
+  | {
+      type: 'request-language';
+      surfaceId: string;
+      sessionId: string;
+      keyId: string;
+      language: SystemKeyboardLanguage;
+    }
+  | {
+      type: 'modifier';
+      surfaceId: string;
+      sessionId: string;
+      keyId: string;
+      shift: SystemKeyboardShiftState;
+    };
 
 type SystemKeyboardCommandPayload = SystemKeyboardCommand extends infer Command
   ? Command extends SystemKeyboardCommand
@@ -86,7 +124,15 @@ const EN_LETTERS: SystemKeyboardLayoutModel = {
   rows: [
     chars('en-r1', 'qwertyuiop', { e: ['é', 'è', 'ê'], i: ['í', 'ì'], o: ['ó', 'ò', 'ö'] }),
     chars('en-r2', 'asdfghjkl', { a: ['á', 'à', 'ä'], s: ['ß'] }),
-    [key('shift', 'modifier', '⇧', { action: 'shift', ariaLabel: 'Shift' }), ...chars('en-r3', 'zxcvbnm'), key('backspace', 'action', '⌫', { action: 'backspace', ariaLabel: 'Backspace', repeatable: true })],
+    [
+      key('shift', 'modifier', '⇧', { action: 'shift', ariaLabel: 'Shift' }),
+      ...chars('en-r3', 'zxcvbnm'),
+      key('backspace', 'action', '⌫', {
+        action: 'backspace',
+        ariaLabel: 'Backspace',
+        repeatable: true,
+      }),
+    ],
   ],
 };
 
@@ -98,7 +144,14 @@ const FA_LETTERS: SystemKeyboardLayoutModel = {
   rows: [
     charsFromValues('fa-r1', ['ض', 'ص', 'ث', 'ق', 'ف', 'غ', 'ع', 'ه', 'خ', 'ح', 'ج', 'چ']),
     charsFromValues('fa-r2', ['ش', 'س', 'ی', 'ب', 'ل', 'ا', 'ت', 'ن', 'م', 'ک', 'گ']),
-    [...charsFromValues('fa-r3', ['ظ', 'ط', 'ز', 'ر', 'ذ', 'د', 'پ', 'و', 'ژ']), key('backspace', 'action', '⌫', { action: 'backspace', ariaLabel: 'پاک کردن', repeatable: true })],
+    [
+      ...charsFromValues('fa-r3', ['ظ', 'ط', 'ز', 'ر', 'ذ', 'د', 'پ', 'و', 'ژ']),
+      key('backspace', 'action', '⌫', {
+        action: 'backspace',
+        ariaLabel: 'پاک کردن',
+        repeatable: true,
+      }),
+    ],
   ],
 };
 
@@ -110,7 +163,14 @@ const SYMBOLS: SystemKeyboardLayoutModel = {
   rows: [
     charsFromValues('symbols-r1', ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'], 'symbol'),
     charsFromValues('symbols-r2', ['@', '#', '$', '%', '&', '*', '-', '+', '(', ')'], 'symbol'),
-    [...charsFromValues('symbols-r3', ['!', '?', ':', ';', "'", '"', '/', '\\'], 'symbol'), key('backspace', 'action', '⌫', { action: 'backspace', ariaLabel: 'Backspace', repeatable: true })],
+    [
+      ...charsFromValues('symbols-r3', ['!', '?', ':', ';', "'", '"', '/', '\\'], 'symbol'),
+      key('backspace', 'action', '⌫', {
+        action: 'backspace',
+        ariaLabel: 'Backspace',
+        repeatable: true,
+      }),
+    ],
   ],
 };
 
@@ -123,7 +183,15 @@ const NUMERIC: SystemKeyboardLayoutModel = {
     charsFromValues('numeric-r1', ['1', '2', '3'], 'numeric'),
     charsFromValues('numeric-r2', ['4', '5', '6'], 'numeric'),
     charsFromValues('numeric-r3', ['7', '8', '9'], 'numeric'),
-    [key('decimal', 'numeric', '.', { value: '.' }), key('zero', 'numeric', '0', { value: '0' }), key('backspace', 'action', '⌫', { action: 'backspace', ariaLabel: 'Backspace', repeatable: true })],
+    [
+      key('decimal', 'numeric', '.', { value: '.' }),
+      key('zero', 'numeric', '0', { value: '0' }),
+      key('backspace', 'action', '⌫', {
+        action: 'backspace',
+        ariaLabel: 'Backspace',
+        repeatable: true,
+      }),
+    ],
   ],
 };
 
@@ -148,7 +216,9 @@ function chars(
   values: string,
   alternates: Record<string, readonly string[]> = {},
 ): readonly SystemKeyboardKeyModel[] {
-  return [...values].map((value) => key(`${prefix}-${value}`, 'character', value, { value, alternates: alternates[value] }));
+  return [...values].map((value) =>
+    key(`${prefix}-${value}`, 'character', value, { value, alternates: alternates[value] }),
+  );
 }
 
 function charsFromValues(
@@ -173,17 +243,39 @@ function purposeKeys(state: SystemKeyboardSurfaceState): readonly SystemKeyboard
   if (state.layout !== 'symbols') {
     keys.push(key('symbols', 'modifier', '?123', { action: 'symbols', ariaLabel: 'Symbols' }));
   } else {
-    keys.push(key('letters', 'modifier', state.language === 'fa' ? 'اب‌پ' : 'ABC', { action: 'symbols', ariaLabel: 'Letters' }));
+    keys.push(
+      key('letters', 'modifier', state.language === 'fa' ? 'اب‌پ' : 'ABC', {
+        action: 'symbols',
+        ariaLabel: 'Letters',
+      }),
+    );
   }
-  keys.push(key('language', 'language', state.language === 'fa' ? 'فا/EN' : 'EN/فا', { action: 'switch-language', ariaLabel: 'Switch language' }));
+  keys.push(
+    key('language', 'language', state.language === 'fa' ? 'فا/EN' : 'EN/فا', {
+      action: 'switch-language',
+      ariaLabel: 'Switch language',
+    }),
+  );
   if (state.contentPurpose === 'email') keys.push(key('email-at', 'symbol', '@', { value: '@' }));
   if (state.contentPurpose === 'url') keys.push(key('url-slash', 'symbol', '/', { value: '/' }));
   keys.push(key('space', 'action', 'space', { action: 'space', ariaLabel: 'Space' }));
-  if (state.contentPurpose === 'email' || state.contentPurpose === 'url') keys.push(key('purpose-dot', 'symbol', '.', { value: '.' }));
+  if (state.contentPurpose === 'email' || state.contentPurpose === 'url')
+    keys.push(key('purpose-dot', 'symbol', '.', { value: '.' }));
   keys.push(
-    key('move-start', 'navigation', '←', { action: 'move-start', ariaLabel: 'Move toward start', repeatable: true }),
-    key('move-end', 'navigation', '→', { action: 'move-end', ariaLabel: 'Move toward end', repeatable: true }),
-    key('enter', 'action', state.contentPurpose === 'search' ? 'Search' : '↵', { action: 'enter', ariaLabel: state.contentPurpose === 'search' ? 'Search' : 'Enter' }),
+    key('move-start', 'navigation', '←', {
+      action: 'move-start',
+      ariaLabel: 'Move toward start',
+      repeatable: true,
+    }),
+    key('move-end', 'navigation', '→', {
+      action: 'move-end',
+      ariaLabel: 'Move toward end',
+      repeatable: true,
+    }),
+    key('enter', 'action', state.contentPurpose === 'search' ? 'Search' : '↵', {
+      action: 'enter',
+      ariaLabel: state.contentPurpose === 'search' ? 'Search' : 'Enter',
+    }),
   );
   return keys;
 }
@@ -198,7 +290,10 @@ function shifted(value: string, shift: SystemKeyboardShiftState, language: Syste
   return language === 'en' && shift !== 'off' ? value.toLocaleUpperCase('en') : value;
 }
 
-function nextLanguage(current: SystemKeyboardLanguage, available: readonly SystemKeyboardLanguage[]) {
+function nextLanguage(
+  current: SystemKeyboardLanguage,
+  available: readonly SystemKeyboardLanguage[],
+) {
   const usable = available.length ? available : (['en', 'fa'] as const);
   const index = usable.indexOf(current);
   return usable[(index + 1 + usable.length) % usable.length] ?? current;
@@ -239,7 +334,11 @@ export function SystemKeyboardHost({
 
   const emit = (command: SystemKeyboardCommandPayload) => {
     if (!state.sessionId) return;
-    onCommand({ ...command, surfaceId: state.surfaceId, sessionId: state.sessionId } as SystemKeyboardCommand);
+    onCommand({
+      ...command,
+      surfaceId: state.surfaceId,
+      sessionId: state.sessionId,
+    } as SystemKeyboardCommand);
   };
 
   const activate = (model: SystemKeyboardKeyModel, repeat = false) => {
@@ -259,10 +358,18 @@ export function SystemKeyboardHost({
         break;
       }
       case 'symbols':
-        emit({ type: 'request-layout', keyId: model.id, layout: state.layout === 'symbols' ? 'letters' : 'symbols' });
+        emit({
+          type: 'request-layout',
+          keyId: model.id,
+          layout: state.layout === 'symbols' ? 'letters' : 'symbols',
+        });
         break;
       case 'switch-language':
-        emit({ type: 'request-language', keyId: model.id, language: nextLanguage(state.language, availableLanguages) });
+        emit({
+          type: 'request-language',
+          keyId: model.id,
+          language: nextLanguage(state.language, availableLanguages),
+        });
         break;
       case 'backspace':
         emit({ type: 'backspace', keyId: model.id, repeat });
@@ -321,16 +428,24 @@ export function SystemKeyboardHost({
         data-oxs-system-keyboard-active={active || undefined}
       >
         <div className="ui-system-keyboard__status">
-          <span className="ui-system-keyboard__status-copy">{state.language.toUpperCase()} · {state.contentPurpose}</span>
+          <span className="ui-system-keyboard__status-copy">
+            {state.language.toUpperCase()} · {state.contentPurpose}
+          </span>
           <div className="ui-system-keyboard__status-badges">
-            {shift !== 'off' ? <Badge tone="accent">{shift === 'caps' ? 'Caps' : 'Shift'}</Badge> : null}
+            {shift !== 'off' ? (
+              <Badge tone="accent">{shift === 'caps' ? 'Caps' : 'Shift'}</Badge>
+            ) : null}
             {state.layout === 'symbols' ? <Badge>Symbols</Badge> : null}
             {secure ? <Badge tone="warning">Secure</Badge> : null}
           </div>
         </div>
 
         {!secure && alternateKey?.alternates?.length ? (
-          <div className="ui-system-keyboard__alternates" role="group" aria-label={`Alternates for ${alternateKey.label}`}>
+          <div
+            className="ui-system-keyboard__alternates"
+            role="group"
+            aria-label={`Alternates for ${alternateKey.label}`}
+          >
             {alternateKey.alternates.map((value) => (
               <Button
                 key={value}
@@ -339,7 +454,13 @@ export function SystemKeyboardHost({
                 className="ui-system-keyboard__alternate"
                 onClick={() => {
                   if (!state.sessionId) return;
-                  onCommand({ type: 'insert-text', surfaceId: state.surfaceId, sessionId: state.sessionId, keyId: `${alternateKey.id}-alternate-${value}`, text: value });
+                  onCommand({
+                    type: 'insert-text',
+                    surfaceId: state.surfaceId,
+                    sessionId: state.sessionId,
+                    keyId: `${alternateKey.id}-alternate-${value}`,
+                    text: value,
+                  });
                   setAlternateKeyId(null);
                   if (shift === 'once') setShift('off');
                 }}
@@ -364,7 +485,9 @@ export function SystemKeyboardHost({
                   selected={model.action === 'shift' ? shift !== 'off' : false}
                   onActivate={() => activate(model)}
                   onLongPress={() => longPress(model)}
-                  onPressChange={(pressed) => { if (!pressed) stopRepeat(); }}
+                  onPressChange={(pressed) => {
+                    if (!pressed) stopRepeat();
+                  }}
                 />
               ))}
             </div>
@@ -378,10 +501,18 @@ export function SystemKeyboardHost({
                 shift={shift}
                 language={state.language}
                 secure={secure}
-                selected={model.action === 'shift' ? shift !== 'off' : model.action === 'symbols' ? state.layout === 'symbols' : false}
+                selected={
+                  model.action === 'shift'
+                    ? shift !== 'off'
+                    : model.action === 'symbols'
+                      ? state.layout === 'symbols'
+                      : false
+                }
                 onActivate={() => activate(model)}
                 onLongPress={() => longPress(model)}
-                onPressChange={(pressed) => { if (!pressed) stopRepeat(); }}
+                onPressChange={(pressed) => {
+                  if (!pressed) stopRepeat();
+                }}
               />
             ))}
           </div>
@@ -417,7 +548,13 @@ function KeyboardButton({
   return (
     <Button
       size="lg"
-      variant={selected ? 'primary' : model.kind === 'character' || model.kind === 'numeric' || model.kind === 'symbol' ? 'secondary' : 'quiet'}
+      variant={
+        selected
+          ? 'primary'
+          : model.kind === 'character' || model.kind === 'numeric' || model.kind === 'symbol'
+            ? 'secondary'
+            : 'quiet'
+      }
       className={`ui-system-keyboard__key ui-system-keyboard__key--${model.kind} ${model.action ? `ui-system-keyboard__key--${model.action}` : ''}`.trim()}
       disabled={!active}
       aria-label={model.ariaLabel ?? label}

@@ -45,7 +45,9 @@ export function StudioSidebar({
     <Surface className="ui-studio-sidebar" material="glass" radius="lg" elevation={1}>
       <Stack className="ui-studio-sidebar__header" gap="sm">
         <Stack gap="3xs">
-          <Label tone="accent" emphasis="strong">OntologyX UI Studio</Label>
+          <Label tone="accent" emphasis="strong">
+            OntologyX UI Studio
+          </Label>
           <Text tone="tertiary">Generated · self-hosted · rebaseline</Text>
         </Stack>
         <SearchField
@@ -78,11 +80,22 @@ export function StudioSidebar({
                         key={entry.id}
                         primary={entry.exportName}
                         secondary={entry.summary}
-                        metadata={<Badge size="sm" tone={statusTone(entry.status)}>{entry.status}</Badge>}
+                        metadata={
+                          <Badge size="sm" tone={statusTone(entry.status)}>
+                            {entry.status}
+                          </Badge>
+                        }
                         selected={entry.id === activeId}
                         selectionSemantics="current"
                         actionLabel={`Open ${entry.exportName}`}
-                        onActivate={() => updateCatalogRoute({ entry: entry.id, tab: 'overview', example: null, state: null })}
+                        onActivate={() =>
+                          updateCatalogRoute({
+                            entry: entry.id,
+                            tab: 'overview',
+                            example: null,
+                            state: null,
+                          })
+                        }
                         className="ui-studio-sidebar__entry"
                       />
                     ))}

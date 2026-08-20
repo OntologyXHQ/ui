@@ -74,7 +74,10 @@ export function SystemApplicationBrowser({
   ));
 
   return (
-    <section className={`ui-system-application-browser ${className}`.trim()} aria-label={browserLabel}>
+    <section
+      className={`ui-system-application-browser ${className}`.trim()}
+      aria-label={browserLabel}
+    >
       <div className="ui-system-application-browser__header">
         <AppBar title={title} subtitle={subtitle} actions={actions} />
         <SearchField
@@ -90,7 +93,12 @@ export function SystemApplicationBrowser({
           data-autofocus
         />
       </div>
-      <ScrollView className="ui-system-application-browser__scroll" ariaLabel={collectionLabel} keyboard={interactive} overscroll="elastic">
+      <ScrollView
+        className="ui-system-application-browser__scroll"
+        ariaLabel={collectionLabel}
+        keyboard={interactive}
+        overscroll="elastic"
+      >
         {visibleApps.length === 0 ? (
           <ContentState kind="empty" title={emptyTitle} description={emptyDescription} />
         ) : presentation === 'grid' ? (
@@ -102,14 +110,19 @@ export function SystemApplicationBrowser({
             {items}
           </TileGrid>
         ) : (
-          <List label={collectionLabel} className="ui-system-application-browser__list">{items}</List>
+          <List label={collectionLabel} className="ui-system-application-browser__list">
+            {items}
+          </List>
         )}
       </ScrollView>
     </section>
   );
 }
 
-export function filterSystemApplicationItems(apps: readonly SystemApplicationItem[], query: string) {
+export function filterSystemApplicationItems(
+  apps: readonly SystemApplicationItem[],
+  query: string,
+) {
   const tokens = normalizeSearchText(query).split(/\s+/u).filter(Boolean);
   if (tokens.length === 0) return [...apps];
   return apps.filter((app) => {
@@ -119,7 +132,9 @@ export function filterSystemApplicationItems(apps: readonly SystemApplicationIte
         app.id,
         typeof app.description === 'string' ? app.description : '',
         ...(app.keywords ?? []),
-      ].filter(Boolean).join(' '),
+      ]
+        .filter(Boolean)
+        .join(' '),
     );
     return tokens.every((token) => haystack.includes(token));
   });

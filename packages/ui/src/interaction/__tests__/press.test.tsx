@@ -68,7 +68,12 @@ describe('press pointer-capture capability', () => {
     const target = screen.getByTestId('press-target');
 
     fireEvent.pointerDown(target, {
-      pointerId: 17, pointerType: 'touch', button: 0, isPrimary: true, clientX: 4, clientY: 4,
+      pointerId: 17,
+      pointerType: 'touch',
+      button: 0,
+      isPrimary: true,
+      clientX: 4,
+      clientY: 4,
     });
     fireEvent.pointerCancel(target, { pointerId: 17, pointerType: 'touch', isPrimary: true });
     fireEvent.click(target);

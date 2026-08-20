@@ -3487,6 +3487,7 @@ export const browserScenarios = [
       'clear',
       'suggestions',
       'focus',
+      'focus-restoration',
       'keyboard',
       'touch',
       'target-size',
@@ -3838,7 +3839,18 @@ export const browserScenarios = [
 
   scenario(
     'selection-controls-certification',
-    ['selection', 'native-form', 'reset', 'mixed', 'keyboard', 'touch', 'rtl', 'a11y'],
+    [
+      'selection',
+      'native-form',
+      'native-semantics',
+      'uncontrolled',
+      'reset',
+      'mixed',
+      'keyboard',
+      'touch',
+      'rtl',
+      'a11y',
+    ],
     async ({ browser, baseUrl }) => {
       const context = await browser.newContext({ viewport: { width: 980, height: 760 } });
       const page = await context.newPage();
@@ -3978,9 +3990,14 @@ export const browserScenarios = [
       'tabs',
       'select',
       'manual-activation',
+      'automatic-activation',
+      'roving-focus',
+      'relationships',
       'typeahead',
+      'listbox',
       'form',
       'focus',
+      'focus-restoration',
       'keyboard',
       'rtl',
       'a11y',
@@ -4028,6 +4045,19 @@ export const browserScenarios = [
           'manual-tabs-tab-activity',
           'TabPanel lost owning-tab relationship.',
         );
+        const automatic = tabsExample.getByRole('tablist', {
+          name: 'Automatic sections',
+          exact: true,
+        });
+        const automaticOverview = automatic.getByRole('tab', { name: 'Overview', exact: true });
+        const automaticActivity = automatic.getByRole('tab', { name: 'Activity', exact: true });
+        await automaticOverview.focus();
+        await page.keyboard.press('ArrowLeft');
+        assert.equal(
+          await automaticActivity.getAttribute('aria-selected'),
+          'true',
+          'Automatic Tabs did not activate the logically roved tab.',
+        );
 
         const selectExample = await gotoCatalog(page, baseUrl, {
           entry: 'Select',
@@ -4037,10 +4067,11 @@ export const browserScenarios = [
         const trigger = selectExample.getByRole('combobox', { name: 'Density', exact: true });
         await trigger.focus();
         await page.keyboard.press('c');
+        await page.keyboard.press('c');
         assert.match(
           await trigger.textContent(),
           /Compact/,
-          'Closed Select typeahead did not commit the matching option.',
+          'Repeated-key closed Select typeahead did not cycle to the matching option.',
         );
         await page.keyboard.press('ArrowDown');
         assert.equal(
@@ -4242,6 +4273,7 @@ export const browserScenarios = [
       'geometry',
       'roving-focus',
       'reorder',
+      'focus-continuity',
       'rtl',
       'keyboard',
       'touch',
@@ -4296,5 +4328,315 @@ export const browserScenarios = [
       }
     },
     { accepts: ['TileGrid', 'Tile'] },
+  ),
+
+  scenario(
+    'overlay-components-nested-dismissal-certification',
+    [
+      'overlay-components',
+      'dialog',
+      'sheet',
+      'modal-isolation',
+      'focus',
+      'scroll-lock',
+      'escape',
+      'touch',
+      'a11y',
+    ],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 900, height: 720 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const dialogExample = await gotoCatalog(page, baseUrl, {
+          entry: 'Dialog',
+          tab: 'examples',
+          example: 'overview',
+          motion: 'reduced',
+          pointer: 'coarse',
+        });
+        const opener = dialogExample.getByRole('button', { name: 'Open dialog', exact: true });
+        await opener.click();
+        const dialog = page.getByRole('dialog', { name: 'Example dialog', exact: true });
+        assert.equal(
+          await dialog.isVisible(),
+          true,
+          'Dialog did not enter the shared overlay layer.',
+        );
+        assert.equal(
+          await dialog.getAttribute('aria-modal'),
+          'true',
+          'Dialog lost modal semantics.',
+        );
+        await page.keyboard.press('Escape');
+        await dialog.waitFor({ state: 'detached' });
+        assert.equal(
+          await opener.evaluate((element) => element.ownerDocument.activeElement === element),
+          true,
+          'Dialog did not restore focus after Escape dismissal.',
+        );
+
+        const alertExample = await gotoCatalog(page, baseUrl, {
+          entry: 'AlertDialog',
+          tab: 'examples',
+          example: 'overview',
+          motion: 'reduced',
+        });
+        await alertExample.getByRole('button', { name: 'Remove item', exact: true }).click();
+        const alert = page.getByRole('alertdialog', { name: 'Remove item?', exact: true });
+        assert.equal(await alert.isVisible(), true, 'AlertDialog lost alertdialog semantics.');
+        await alert.getByRole('button', { name: 'Cancel', exact: true }).click();
+
+        const sheetExample = await gotoCatalog(page, baseUrl, {
+          entry: 'Sheet',
+          tab: 'examples',
+          example: 'preview',
+          motion: 'reduced',
+        });
+        await sheetExample.getByRole('button', { name: 'Open sheet', exact: true }).click();
+        assert.equal(
+          await page.getByRole('dialog', { name: 'Preview sheet', exact: true }).isVisible(),
+          true,
+        );
+        await page.keyboard.press('Escape');
+
+        const bottomExample = await gotoCatalog(page, baseUrl, {
+          entry: 'BottomSheet',
+          tab: 'examples',
+          example: 'preview',
+          pointer: 'coarse',
+          motion: 'reduced',
+        });
+        await bottomExample.getByRole('button', { name: 'Open bottom sheet', exact: true }).click();
+        const bottom = page.getByRole('dialog', { name: 'Preview bottom sheet', exact: true });
+        assert.equal(await bottom.isVisible(), true, 'BottomSheet did not share dialog semantics.');
+        assert.equal(
+          await bottom.locator('button[aria-label="Drag sheet"]').count(),
+          1,
+          'BottomSheet lost its touch drag affordance.',
+        );
+
+        const scrimExample = await gotoCatalog(page, baseUrl, {
+          entry: 'Scrim',
+          tab: 'examples',
+          example: 'ownership',
+        });
+        const scrim = scrimExample.getByRole('button', {
+          name: 'Dismiss preview overlay',
+          exact: true,
+        });
+        assert.equal(
+          await scrim.getAttribute('tabindex'),
+          '-1',
+          'Scrim entered sequential focus order.',
+        );
+        await scrim.click({ position: { x: 4, y: 4 } });
+        assert.equal(
+          await scrimExample.locator('.ui-scrim').isDisabled(),
+          true,
+          'Scrim dismissal did not return ownership to its caller.',
+        );
+
+        const axe = await runAxe(page, 'UIR10 overlay components');
+        diagnostics.assertClean('UIR10 overlay components');
+        return { axe };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['Dialog', 'AlertDialog', 'Sheet', 'BottomSheet', 'Scrim'] },
+  ),
+  scenario(
+    'floating-menu-tooltip-certification',
+    ['floating', 'collision', 'menu', 'typeahead', 'tooltip', 'keyboard', 'rtl', 'touch', 'a11y'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 720, height: 560 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const menuExample = await gotoCatalog(page, baseUrl, {
+          entry: 'Menu',
+          tab: 'examples',
+          example: 'preview',
+          dir: 'rtl',
+        });
+        const menuTrigger = menuExample.getByRole('button', { name: 'Open menu', exact: true });
+        await menuTrigger.click();
+        const menu = page.getByRole('menu', { name: 'Preview menu', exact: true });
+        assert.equal(await menu.isVisible(), true, 'Menu did not open through shared Popover.');
+        const items = menu.getByRole('menuitem');
+        assert.equal(await items.count(), 2, 'Menu item/separator structure drifted.');
+        await page.keyboard.type('r');
+        assert.equal(
+          await items.nth(1).evaluate((element) => element.ownerDocument.activeElement === element),
+          true,
+          'Menu typeahead did not move focus to the matching item.',
+        );
+        await page.keyboard.press('Escape');
+
+        const popoverExample = await gotoCatalog(page, baseUrl, {
+          entry: 'Popover',
+          tab: 'examples',
+          example: 'preview',
+          dir: 'rtl',
+        });
+        await popoverExample.getByRole('button', { name: 'Toggle popover', exact: true }).click();
+        const popover = page.getByRole('dialog', { name: 'Preview popover', exact: true });
+        assert.equal(
+          await popover.getAttribute('data-ready'),
+          'true',
+          'Popover floating geometry did not settle.',
+        );
+        await assertWithinViewport(popover, 'UIR10 collision-aware Popover');
+
+        const tooltipExample = await gotoCatalog(page, baseUrl, {
+          entry: 'Tooltip',
+          tab: 'examples',
+          example: 'preview',
+          dir: 'rtl',
+          pointer: 'fine',
+        });
+        const tooltipTrigger = tooltipExample.getByRole('button', {
+          name: 'Hover or focus me',
+          exact: true,
+        });
+        await tooltipTrigger.focus();
+        const tooltip = page.getByRole('tooltip');
+        await tooltip.waitFor({ state: 'visible' });
+        assert.ok(
+          (await tooltipTrigger.getAttribute('aria-describedby'))?.includes(
+            await tooltip.getAttribute('id'),
+          ),
+          'Tooltip did not wire its supplemental description to the trigger.',
+        );
+
+        const contextExample = await gotoCatalog(page, baseUrl, {
+          entry: 'ContextMenu',
+          tab: 'examples',
+          example: 'preview',
+          pointer: 'coarse',
+        });
+        const contextTrigger = contextExample.getByRole('button', {
+          name: 'Right-click or long-press',
+          exact: true,
+        });
+        await contextTrigger.focus();
+        await page.keyboard.press('Shift+F10');
+        assert.equal(
+          await page.getByRole('menu', { name: 'File actions', exact: true }).isVisible(),
+          true,
+        );
+
+        const axe = await runAxe(page, 'UIR10 floating menu tooltip');
+        diagnostics.assertClean('UIR10 floating menu tooltip');
+        return { axe };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['Popover', 'Menu', 'MenuItem', 'MenuSeparator', 'ContextMenu', 'Tooltip'] },
+  ),
+  scenario(
+    'feedback-lifecycle-certification',
+    [
+      'feedback',
+      'live-region',
+      'timing',
+      'upsert',
+      'progress',
+      'loading',
+      'reduced-motion',
+      'responsive',
+      'a11y',
+    ],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 760, height: 620 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const feedback = await gotoCatalog(page, baseUrl, {
+          entry: 'Badge',
+          tab: 'examples',
+          example: 'overview',
+          motion: 'reduced',
+        });
+        assert.equal(await feedback.getByText('12', { exact: true }).isVisible(), true);
+        assert.equal(await feedback.getByText('Connected', { exact: true }).isVisible(), true);
+        const progress = feedback.getByRole('progressbar', { name: 'Sync', exact: true });
+        assert.equal(
+          await progress.getAttribute('value'),
+          '64',
+          'Progress lost its native determinate value.',
+        );
+        assert.equal(await feedback.locator('.ui-skeleton[aria-hidden="true"]').count(), 1);
+        assert.equal(
+          await feedback
+            .getByRole('heading', { name: 'Nothing here yet', exact: true })
+            .isVisible(),
+          true,
+        );
+
+        const toast = await gotoCatalog(page, baseUrl, {
+          entry: 'ToastHost',
+          tab: 'examples',
+          example: 'overview',
+          motion: 'reduced',
+        });
+        const host = toast.getByRole('region', { name: 'Notifications', exact: true });
+        assert.equal(await host.getAttribute('aria-live'), 'polite');
+        assert.equal(await host.getAttribute('aria-relevant'), 'additions text');
+        await toast.getByRole('button', { name: 'Push toast', exact: true }).click();
+        const queued = host
+          .locator('[data-toast-id]')
+          .filter({ hasText: 'Background sync completed' });
+        assert.equal(
+          await queued.count(),
+          1,
+          'Toast queue did not render one stable feedback item.',
+        );
+
+        const snackbar = await gotoCatalog(page, baseUrl, {
+          entry: 'Snackbar',
+          tab: 'examples',
+          example: 'overview',
+          motion: 'reduced',
+        });
+        assert.equal(
+          await snackbar.getByRole('status').isVisible(),
+          true,
+          'Snackbar lost status semantics.',
+        );
+        const banner = await gotoCatalog(page, baseUrl, {
+          entry: 'Banner',
+          tab: 'examples',
+          example: 'overview',
+          motion: 'reduced',
+        });
+        assert.equal(
+          await banner.getByRole('status').isVisible(),
+          true,
+          'Banner lost persistent status semantics.',
+        );
+
+        const axe = await runAxe(page, 'UIR10 feedback lifecycle');
+        diagnostics.assertClean('UIR10 feedback lifecycle');
+        return { axe };
+      } finally {
+        await context.close();
+      }
+    },
+    {
+      accepts: [
+        'Badge',
+        'StatusIndicator',
+        'Progress',
+        'Spinner',
+        'Skeleton',
+        'EmptyState',
+        'Snackbar',
+        'ToastHost',
+        'Banner',
+      ],
+    },
   ),
 ];

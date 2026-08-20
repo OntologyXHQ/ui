@@ -196,7 +196,7 @@ export function RadioGroup({
   useEffect(() => {
     if (value !== undefined) return;
     const form =
-      groupRef.current?.querySelector('input[type="radio"]')?.form ??
+      groupRef.current?.querySelector<HTMLInputElement>('input[type="radio"]')?.form ??
       groupRef.current?.closest('form');
     if (!form) return;
     const reset = () => setCurrent(defaultValue ?? '');
@@ -274,7 +274,6 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
         disabled={unavailable}
         aria-labelledby={labelId}
         aria-describedby={description ? descriptionId : undefined}
-        aria-readonly={group.readOnly || undefined}
         onClick={(event) => {
           if (group.readOnly) event.preventDefault();
           onClick?.(event);
@@ -717,6 +716,7 @@ export function SegmentedControl({
       {options.map((option) => {
         const selected = option.value === selectedValue;
         return (
+          // biome-ignore lint/a11y/useSemanticElements: SegmentedControl is an ARIA radio composite, not a native form radio group.
           <button
             key={option.value}
             type="button"
@@ -797,6 +797,7 @@ export function ToggleGroup({
   });
 
   return (
+    // biome-ignore lint/a11y/useSemanticElements: ToggleGroup groups independent toggle buttons; fieldset would imply native form controls.
     <div
       {...props}
       ref={groupRef}

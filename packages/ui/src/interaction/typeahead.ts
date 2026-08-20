@@ -30,7 +30,8 @@ export class TypeaheadController {
 
     const normalizedKey = normalizeTypeaheadText(key);
     const previous = nowMs - this.updatedAtMs > this.resetAfterMs ? '' : this.query;
-    const repeated = previous.length > 0 && [...previous].every((character) => character === normalizedKey);
+    const repeated =
+      previous.length > 0 && [...previous].every((character) => character === normalizedKey);
     const query = repeated ? normalizedKey : `${previous}${normalizedKey}`;
     this.query = query;
     this.updatedAtMs = nowMs;
@@ -43,7 +44,8 @@ export class TypeaheadController {
     let match = matches[0];
     if ((repeated || preferNextMatch) && matches.length > 1) {
       const currentMatchIndex = matches.findIndex((candidate) => candidate.index === currentIndex);
-      if (currentMatchIndex >= 0) match = matches[(currentMatchIndex + 1) % matches.length] ?? match;
+      if (currentMatchIndex >= 0)
+        match = matches[(currentMatchIndex + 1) % matches.length] ?? match;
     } else if (preferNextMatch && currentIndex >= 0) {
       match = matches.find((candidate) => candidate.index > currentIndex) ?? matches[0];
     }

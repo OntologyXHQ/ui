@@ -20,9 +20,11 @@ if (!(await exists(indexPath))) {
 } else {
   const html = await readFile(indexPath, 'utf8');
   for (const forbidden of ['localhost:', '/src/main.tsx', '@ontologyx/ui-docs']) {
-    if (html.includes(forbidden)) failures.push(`production index leaks development marker ${JSON.stringify(forbidden)}`);
+    if (html.includes(forbidden))
+      failures.push(`production index leaks development marker ${JSON.stringify(forbidden)}`);
   }
-  if (!html.includes('OntologyX UI Studio')) failures.push('production index is missing Studio identity');
+  if (!html.includes('OntologyX UI Studio'))
+    failures.push('production index is missing Studio identity');
 }
 
 const assetsDir = path.join(dist, 'assets');
@@ -36,8 +38,10 @@ if (!(await exists(assetsDir))) {
   if (!css.length) failures.push('production Studio emitted no CSS asset');
   for (const name of [...js, ...css]) {
     const size = (await stat(path.join(assetsDir, name))).size;
-    if (name.endsWith('.js') && size > 900_000) failures.push(`${name} exceeds the 900 kB uncompressed Studio JS budget`);
-    if (name.endsWith('.css') && size > 180_000) failures.push(`${name} exceeds the 180 kB uncompressed Studio CSS budget`);
+    if (name.endsWith('.js') && size > 900_000)
+      failures.push(`${name} exceeds the 900 kB uncompressed Studio JS budget`);
+    if (name.endsWith('.css') && size > 180_000)
+      failures.push(`${name} exceeds the 180 kB uncompressed Studio CSS budget`);
   }
 }
 
@@ -46,4 +50,6 @@ if (failures.length) {
   for (const failure of failures) console.error(` - ${failure}`);
   process.exit(1);
 }
-console.log('OntologyX UI Studio production artifact passed: static entry · no dev leakage · JS/CSS assets · production budgets.');
+console.log(
+  'OntologyX UI Studio production artifact passed: static entry · no dev leakage · JS/CSS assets · production budgets.',
+);
