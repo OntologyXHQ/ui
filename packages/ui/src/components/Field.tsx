@@ -1,24 +1,38 @@
-import type { HTMLAttributes, PropsWithChildren, ReactNode } from 'react';
+import type { FieldsetHTMLAttributes, HTMLAttributes, PropsWithChildren, ReactNode } from 'react';
 import { useId } from 'react';
 import { Heading } from '../primitives';
 import type { ControlSize } from './Button';
 
 export type FieldStateProps = {
+  /** Visible or visually-hidden accessible label owned by the field. */
   label: ReactNode;
+  /** Supplemental guidance associated with the native control through aria-describedby. */
   description?: ReactNode;
+  /** Validation error associated through aria-describedby/aria-errormessage. */
   error?: ReactNode;
+  /** Visually hides the label while preserving the native label relationship. @default false */
   hideLabel?: boolean;
+  /** Projects native required semantics and a visual required indicator. @default false */
   required?: boolean;
+  /** Visual copy shown for non-required fields. Hidden from the accessibility tree. @default Optional */
   optionalLabel?: ReactNode;
+  /** Projects native disabled semantics and disabled field presentation. @default false */
   disabled?: boolean;
+  /** Projects native read-only semantics without disabling selection or form submission. @default false */
   readOnly?: boolean;
+  /** Shared control target/height scale. @default md */
   fieldSize?: ControlSize;
+  /** Logical-leading visual slot. Decorative unless leadingLabel is supplied. */
   leading?: ReactNode;
   /** Accessible label for a meaningful leading visual. Omit to keep the slot decorative. */
   leadingLabel?: string;
+  /** Visible logical prefix associated with the control description. */
   prefix?: ReactNode;
+  /** Visible logical suffix associated with the control description. */
   suffix?: ReactNode;
+  /** Logical-trailing control/content slot. Interactive children retain their own semantics. */
   trailing?: ReactNode;
+  /** Optional action adjacent to support/error copy; the child owns its own interaction semantics. */
   supportingAction?: ReactNode;
 };
 
@@ -55,7 +69,8 @@ export function useFieldIds({
   const prefixId = prefix ? `${controlId}-prefix` : undefined;
   const suffixId = suffix ? `${controlId}-suffix` : undefined;
   const resolvedDescribedBy =
-    [describedBy, prefixId, suffixId, descriptionId, errorId].filter(Boolean).join(' ') || undefined;
+    [describedBy, prefixId, suffixId, descriptionId, errorId].filter(Boolean).join(' ') ||
+    undefined;
 
   return {
     controlId,
@@ -108,6 +123,7 @@ export function FieldFrame({
       ]
         .filter(Boolean)
         .join(' ')}
+      data-required={required || undefined}
       data-disabled={disabled || undefined}
       data-readonly={readOnly || undefined}
       data-invalid={Boolean(error) || undefined}
@@ -136,19 +152,34 @@ export function FieldFrame({
 
       <div className="ui-field__control">
         {leading ? (
-          <span
-            className="ui-field__slot ui-field__slot--leading"
-            aria-hidden={leadingLabel ? undefined : true}
-            role={leadingLabel ? 'img' : undefined}
-            aria-label={leadingLabel}
-          >
-            {leading}
+          leadingLabel ? (
+            <span
+              className="ui-field__slot ui-field__slot--leading"
+              role="img"
+              aria-label={leadingLabel}
+            >
+              {leading}
+            </span>
+          ) : (
+            <span className="ui-field__slot ui-field__slot--leading" aria-hidden="true">
+              {leading}
+            </span>
+          )
+        ) : null}
+        {prefix ? (
+          <span id={ids.prefixId} className="ui-field__affix ui-field__affix--prefix">
+            {prefix}
           </span>
         ) : null}
-        {prefix ? <span id={ids.prefixId} className="ui-field__affix ui-field__affix--prefix">{prefix}</span> : null}
         {children}
-        {suffix ? <span id={ids.suffixId} className="ui-field__affix ui-field__affix--suffix">{suffix}</span> : null}
-        {trailing ? <span className="ui-field__slot ui-field__slot--trailing">{trailing}</span> : null}
+        {suffix ? (
+          <span id={ids.suffixId} className="ui-field__affix ui-field__affix--suffix">
+            {suffix}
+          </span>
+        ) : null}
+        {trailing ? (
+          <span className="ui-field__slot ui-field__slot--trailing">{trailing}</span>
+        ) : null}
       </div>
 
       {description || error || supportingAction ? (
@@ -169,16 +200,21 @@ export function FieldFrame({
               </span>
             ) : null}
           </div>
-          {supportingAction ? <div className="ui-field__support-action">{supportingAction}</div> : null}
+          {supportingAction ? (
+            <div className="ui-field__support-action">{supportingAction}</div>
+          ) : null}
         </div>
       ) : null}
     </div>
   );
 }
 
-export type FieldGroupProps = Omit<HTMLAttributes<HTMLDivElement>, 'title'> & {
+export type FieldGroupProps = Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, 'title'> & {
+  /** Native legend for the related field group. Omit only when an external accessible name is supplied. */
   label?: ReactNode;
+  /** Supplemental group guidance associated through aria-describedby. */
   description?: ReactNode;
+  /** Logical visual arrangement of the child fields; native fieldset semantics stay unchanged. @default vertical */
   orientation?: 'vertical' | 'horizontal';
 };
 
@@ -188,24 +224,24 @@ export function FieldGroup({
   orientation = 'vertical',
   className = '',
   children,
+  'aria-describedby': ariaDescribedBy,
   ...props
 }: PropsWithChildren<FieldGroupProps>) {
   const generatedId = useId();
   const labelId = label ? `oxs-field-group-${generatedId}` : undefined;
   const descriptionId = description ? `oxs-field-group-description-${generatedId}` : undefined;
+  const describedBy = [ariaDescribedBy, descriptionId].filter(Boolean).join(' ') || undefined;
 
   return (
-    <div
+    <fieldset
       {...props}
-      role="group"
-      aria-labelledby={labelId}
-      aria-describedby={descriptionId}
+      aria-describedby={describedBy}
       className={`ui-field-group ui-field-group--${orientation} ${className}`.trim()}
     >
       {label ? (
-        <div id={labelId} className="ui-field-group__label">
+        <legend id={labelId} className="ui-field-group__label">
           {label}
-        </div>
+        </legend>
       ) : null}
       {description ? (
         <div id={descriptionId} className="ui-field-group__description">
@@ -213,14 +249,18 @@ export function FieldGroup({
         </div>
       ) : null}
       <div className="ui-field-group__content">{children}</div>
-    </div>
+    </fieldset>
   );
 }
 
 export type FieldSectionProps = Omit<HTMLAttributes<HTMLElement>, 'title'> & {
+  /** Accessible section heading. */
   title: ReactNode;
+  /** Native heading level used by the public Heading primitive. @default 3 */
   titleLevel?: 2 | 3 | 4 | 5 | 6;
+  /** Supplemental section guidance associated through aria-describedby. */
   description?: ReactNode;
+  /** Optional section-level action region; child controls retain their own semantics. */
   action?: ReactNode;
 };
 

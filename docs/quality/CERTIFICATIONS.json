@@ -401,6 +401,127 @@
         "target-size",
         "a11y"
       ]
+    },
+    "FieldGroup": {
+      "owner": "UIR07",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/fields.test.tsx"
+      ],
+      "browserScenarios": [
+        "field-native-form-certification"
+      ],
+      "requiredAxes": [
+        "fields",
+        "field-group",
+        "semantics",
+        "description",
+        "responsive",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
+    },
+    "FieldSection": {
+      "owner": "UIR07",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/fields.test.tsx"
+      ],
+      "browserScenarios": [
+        "field-native-form-certification"
+      ],
+      "requiredAxes": [
+        "fields",
+        "field-section",
+        "semantics",
+        "heading",
+        "description",
+        "responsive",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
+    },
+    "TextField": {
+      "owner": "UIR07",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/fields.test.tsx",
+        "packages/ui/src/editing/__tests__/editing.test.tsx"
+      ],
+      "browserScenarios": [
+        "field-native-form-certification",
+        "editable-text-host-occlusion-certification"
+      ],
+      "requiredAxes": [
+        "fields",
+        "text-field",
+        "native-form",
+        "controlled",
+        "uncontrolled",
+        "autofill",
+        "validation",
+        "reset",
+        "submission",
+        "selection",
+        "composition",
+        "secure-input",
+        "ime",
+        "host-adapter",
+        "occlusion",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
+    },
+    "SearchField": {
+      "owner": "UIR07",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/fields.test.tsx",
+        "packages/ui/src/editing/__tests__/editing.test.tsx"
+      ],
+      "browserScenarios": [
+        "search-field-composition-certification"
+      ],
+      "requiredAxes": [
+        "fields",
+        "search-field",
+        "searchbox",
+        "composition",
+        "clear",
+        "suggestions",
+        "focus",
+        "keyboard",
+        "touch",
+        "target-size",
+        "rtl",
+        "a11y"
+      ]
+    },
+    "TextArea": {
+      "owner": "UIR07",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/fields.test.tsx",
+        "packages/ui/src/editing/__tests__/editing.test.tsx"
+      ],
+      "browserScenarios": [
+        "field-native-form-certification",
+        "editable-text-host-occlusion-certification"
+      ],
+      "requiredAxes": [
+        "fields",
+        "text-area",
+        "native-form",
+        "selection",
+        "composition",
+        "reset",
+        "submission",
+        "multiline",
+        "ime",
+        "host-adapter",
+        "occlusion",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
     }
   }
 }

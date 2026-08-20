@@ -1,50 +1,81 @@
+import { Button, FieldGroup, FieldSection, Stack, TextField } from '@ontologyx/ui';
 import { defineUiDocsGroup } from '../docs/defineUiDocs';
-import { FieldGroup, FieldSection, TextField } from '@ontologyx/ui';
 
 export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'FieldGroup',
     layer: 'components',
-    category: 'Fields', order: 30,
+    category: 'Fields',
+    order: 30,
     summary: 'Accessible grouping for related developer-facing form controls.',
     usage:
-      'Use when several fields form one logical choice or data-entry group; it owns group labeling, not individual field chrome.',
-    status: 'candidate',
-    accessibility: 'Connects group label and description to a semantic group relationship.',
-    rtl: 'Uses logical layout and inherits the scoped UI direction.',
-    touch: 'Adds no private interaction layer; child Components own their touch contracts.',
-    responsive: 'Vertical by default and capable of container-driven horizontal composition.',
+      'Use when several fields form one logical choice or data-entry group; it owns native fieldset/legend grouping and shared description relationships, not individual field chrome or validation.',
+    status: 'accepted',
+    accessibility:
+      'Uses a native fieldset/legend relationship with aria-describedby for shared guidance while each child keeps its own native label, required and validation semantics.',
+    rtl: 'Uses logical layout and inherits the scoped UI direction without reordering semantic field order.',
+    touch:
+      'Adds no private interaction layer; child Components preserve their own touch target and editing contracts.',
+    responsive:
+      'Vertical by default and capable of explicit horizontal composition without silently hiding fields.',
+    examples: [
+      {
+        id: 'group-contract',
+        title: 'Related fields',
+        description:
+          'A semantic field group keeps shared guidance separate from each native input relationship.',
+        component: 'FieldGroupExample',
+      },
+    ],
   },
   {
     exportName: 'FieldSection',
     layer: 'components',
-    category: 'Fields', order: 30,
-    summary: 'Section-level form composition with title, description and an optional action region.',
+    category: 'Fields',
+    order: 30,
+    summary:
+      'Section-level form composition with title, description and an optional action region.',
     usage:
       'Use for meaningful form sections such as profile, connectivity or account details; avoid using it as generic surface chrome.',
-    status: 'candidate',
-    accessibility: 'Uses a real section with an explicit labelled-by relationship.',
-    rtl: 'Header/action composition is logical-direction safe.',
-    touch: 'Action ownership remains with child Components.',
-    responsive: 'Header and content reflow inside narrow containers.',
+    status: 'accepted',
+    accessibility:
+      'Uses a real section with explicit labelled-by/described-by relationships and a bounded semantic Heading level.',
+    rtl: 'Header/action composition is logical-direction safe and does not reorder section content.',
+    touch: 'Section actions retain the accepted Button/IconButton interaction contracts.',
+    responsive:
+      'Header, action and field content reflow inside narrow containers without hiding form controls.',
     examples: [
       {
-        id: 'overview',
-        title: 'Form composition',
-        description: 'Field section and group composition using the same field Components as application code.',
-        component: 'FieldCompositionExample',
+        id: 'section-contract',
+        title: 'Form section',
+        description:
+          'A labelled form section composes accepted field and action controls without taking ownership of their state.',
+        component: 'FieldSectionExample',
       },
     ],
   },
 ] as const);
 
-export function FieldCompositionExample() {
+export function FieldGroupExample() {
   return (
-    <FieldSection title="Profile" description="Shared field chrome keeps relationships consistent.">
-      <FieldGroup label="Identity" description="A logical group of related fields.">
-        <TextField label="Display name" defaultValue="OXS" required />
-        <TextField label="Handle" prefix="@" placeholder="handle" />
-      </FieldGroup>
+    <FieldGroup label="Identity" description="Names used by workspace surfaces.">
+      <TextField label="Display name" defaultValue="OntologyX" required />
+      <TextField label="Handle" prefix="@" defaultValue="ontologyx" />
+    </FieldGroup>
+  );
+}
+
+export function FieldSectionExample() {
+  return (
+    <FieldSection
+      title="Profile"
+      description="Section ownership stops at structure and relationships."
+      action={<Button variant="secondary">Reset profile</Button>}
+    >
+      <Stack gap="sm">
+        <TextField label="Display name" defaultValue="OntologyX" />
+        <TextField label="Contact email" type="email" defaultValue="hello@example.com" />
+      </Stack>
     </FieldSection>
   );
 }

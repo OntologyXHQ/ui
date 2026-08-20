@@ -2,10 +2,30 @@ import './styles/index.css';
 
 export * from './adaptive';
 export * from './components';
-export * from './primitives';
-export * from './system';
-
-
+// Developer-facing visual capabilities whose engines live in shared runtimes.
+export type { CursorRegionProps, CursorRoleAttributes } from './cursor/CursorRegion';
+export { CursorRegion, cursorRoleAttributes, useCursorRole } from './cursor/CursorRegion';
+export type {
+  CursorAnimationPreference,
+  CursorRole,
+  CursorRuntimeConfig,
+  PointerModality,
+  SystemCursorRole,
+} from './cursor/types';
+export { SYSTEM_CURSOR_ROLES } from './cursor/types';
+// Explicit shell/platform integration seams kept on the canonical surface.
+export type { UiClipboardAdapter } from './editing/clipboard';
+export { configureUiClipboardAdapter } from './editing/clipboard';
+export type { EditableTextBridge } from './editing/runtime';
+export type {
+  EditableContentPurpose,
+  EditableEnterKeyHint,
+  EditableInputMode,
+  EditableSelection,
+  EditableTextSessionDescriptor,
+  EditableTextSessionSnapshot,
+  EditableTextState,
+} from './editing/types';
 // Public configuration/value contracts used by UiRoot and visual SDK consumers.
 export type {
   UiColorScheme,
@@ -21,21 +41,15 @@ export type {
   UiSafeAreaInsets,
   UiTheme,
 } from './foundations/environment';
-export type { UiCustomizableToken, UiTokenGroup, UiTokenOverrides, UiTokenValue } from './foundations/tokens';
-export { UI_CUSTOMIZABLE_TOKENS, UI_TOKEN_GROUPS } from './foundations/tokens';
-export type { FrameRateTarget, MotionPreference, SpringPreset } from './motion';
 export type {
-  CursorAnimationPreference,
-  CursorRole,
-  CursorRuntimeConfig,
-  PointerModality,
-  SystemCursorRole,
-} from './cursor/types';
-export { SYSTEM_CURSOR_ROLES } from './cursor/types';
-
-// Developer-facing visual capabilities whose engines live in shared runtimes.
-export type { CursorRegionProps, CursorRoleAttributes } from './cursor/CursorRegion';
-export { CursorRegion, cursorRoleAttributes, useCursorRole } from './cursor/CursorRegion';
+  UiCustomizableToken,
+  UiTokenGroup,
+  UiTokenOverrides,
+  UiTokenValue,
+} from './foundations/tokens';
+export { UI_CUSTOMIZABLE_TOKENS, UI_TOKEN_GROUPS } from './foundations/tokens';
+export { useDragReveal } from './gestures/useDragReveal';
+export type { FrameRateTarget, MotionPreference, SpringPreset } from './motion';
 export type { SharedBoundsProps } from './motion/SharedBounds';
 export { SharedBounds } from './motion/SharedBounds';
 export type {
@@ -52,8 +66,5 @@ export {
   ScaleTransition,
   SlideTransition,
 } from './motion/Transition';
-
-// Explicit shell/platform integration seams kept on the canonical surface.
-export type { UiClipboardAdapter } from './editing/clipboard';
-export { configureUiClipboardAdapter } from './editing/clipboard';
-export { useDragReveal } from './gestures/useDragReveal';
+export * from './primitives';
+export * from './system';

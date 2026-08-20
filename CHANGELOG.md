@@ -1,4 +1,17 @@
+- Fixed generated catalog JSON semantic freshness after formatting.
 # Changelog
+- UIR07 TypeScript docs follow-up: native-form action rows now use the accepted `Wrap` primitive instead of passing a nonexistent `wrap` prop to the intentionally non-wrapping `Row` contract; source-wide UIR07 docs are audited against the UIR03 Layout API.
+- UIR07 Biome/generated-output follow-up: removed the final unused imports and iterable-callback lint error, and taught the catalog generator to emit identifier-safe module member access so generated Studio catalog imports are lint-clean at the source.
+- UIR07 Biome semantic follow-up: FieldGroup now renders native `fieldset`/`legend`, meaningful/decorative leading slots use explicit ARIA branches, and SearchField relies on native `type="search"` semantics without a redundant role.
+
+## Unreleased — UIR07 Fields, forms and text input
+
+- Reaccepted FieldGroup, FieldSection, TextField, SearchField and TextArea with dedicated examples, behavior ownership and three browser certifications; catalog maturity advances to accepted=26/candidate=74 and UIR08 becomes next.
+- Preserved native controlled/uncontrolled input, autocomplete, required/disabled/read-only validity, FormData submission and reset behavior; explicit errors now publish aria-errormessage while field structure keeps labels/descriptions/affixes connected.
+- Made SearchField composition-safe: clear/suggestion actions suspend during IME composition, ArrowDown does not leak a suggestion request, clear restores focus synchronously without borrowing ambient requestAnimationFrame, and trailing actions keep the accepted 44px target contract.
+- Hardened secure text input: secure/password purpose always renders as password, copy/cut/drag export is cancelled, and composition preedit is redacted from both local editing observers and UiRoot host bridges.
+- Formalized the host-neutral editable-text session descriptor (single/multiline, inputMode, enterKeyHint, read-only) without carrying committed text values or claiming native IME/keyboard lifecycle; realm-local synthetic clipboard input uses the owning Window.
+- Fields now consume only combined logical environment insets as scroll margins so host-supplied keyboard occlusion can inform reveal/scroll geometry without moving keyboard ownership into React. Fixed TextArea duplicate editing keydown dispatch and added a permanent G0 field/text-input drift gate.
 
 - Re-audited the entire G6 suite for stacked-Studio fixture ownership: every deep-linked example journey now consumes the canonical `#example-<id>` scope, legacy layout/visual queries and DOM polling are scoped, and a new G0 gate prevents this class of duplicate-preview drift from returning.
 ## UIR06 v6 — stacked Studio post-isolation browser evidence repair

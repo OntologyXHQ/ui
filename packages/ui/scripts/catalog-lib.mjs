@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
+import { isDeepStrictEqual } from 'node:util';
 
 const require = createRequire(import.meta.url);
 const ts = require('@typescript/typescript6');
@@ -143,7 +144,9 @@ function parseDocsFile(file) {
       }
     }
     if (typeof doc.order !== 'number' || !Number.isFinite(doc.order)) {
-      throw new Error(`${path.basename(file)}: ${doc.exportName ?? '<unknown>'} is missing numeric order`);
+      throw new Error(
+        `${path.basename(file)}: ${doc.exportName ?? '<unknown>'} is missing numeric order`,
+      );
     }
     doc.examples ??= [];
     doc.__file = file;
@@ -479,8 +482,11 @@ export function renderTypeScript(catalog) {
       lines.push(`        id: ${JSON.stringify(example.id)},`);
       lines.push(`        title: ${JSON.stringify(example.title)},`);
       lines.push(`        description: ${JSON.stringify(example.description ?? '')},`);
+      const componentAccess = /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(example.component)
+        ? `module.${example.component}`
+        : `module[${JSON.stringify(example.component)}]`;
       lines.push(
-        `        load: () => import(${JSON.stringify(entry.docsModule)}).then((module) => ({ default: module[${JSON.stringify(example.component)}] })),`,
+        `        load: () => import(${JSON.stringify(entry.docsModule)}).then((module) => ({ default: ${componentAccess} })),`,
       );
       lines.push('      },');
     }
@@ -503,7 +509,20 @@ export function writeCatalog({ uiRoot, studioRoot, check = false }) {
   if (check) {
     const stale = [];
     for (const [file, content] of expected) {
-      if (!fs.existsSync(file) || fs.readFileSync(file, 'utf8') !== content) stale.push(file);
+      if (!fs.existsSync(file)) {
+        stale.push(file);
+        continue;
+      }
+      const actual = fs.readFileSync(file, 'utf8');
+      if (file === jsonPath) {
+        try {
+          if (!isDeepStrictEqual(JSON.parse(actual), JSON.parse(content))) stale.push(file);
+        } catch {
+          stale.push(file);
+        }
+        continue;
+      }
+      if (actual !== content) stale.push(file);
     }
     if (stale.length > 0) {
       throw new Error(

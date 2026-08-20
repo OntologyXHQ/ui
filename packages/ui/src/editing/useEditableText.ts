@@ -1,15 +1,20 @@
 import type {
   CompositionEvent,
-  FormEvent,
-  InputHTMLAttributes,
-  KeyboardEvent,
   FocusEvent,
+  FormEvent,
+  KeyboardEvent,
   RefObject,
   SyntheticEvent,
 } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 import { useEditableTextRuntime } from './runtime';
-import type { EditableContentPurpose, EditableTextSessionSnapshot, EditableTextState } from './types';
+import type {
+  EditableContentPurpose,
+  EditableEnterKeyHint,
+  EditableInputMode,
+  EditableTextSessionSnapshot,
+  EditableTextState,
+} from './types';
 
 export type EditableTextElement = HTMLInputElement | HTMLTextAreaElement;
 
@@ -18,14 +23,27 @@ export type EditableTextContractOptions<T extends EditableTextElement = HTMLInpu
   sessionId: string;
   contentPurpose: EditableContentPurpose;
   secure: boolean;
+  multiline?: boolean;
+  inputMode: EditableInputMode;
+  enterKeyHint?: EditableEnterKeyHint;
+  readOnly?: boolean;
   onEditingStateChange?: (state: EditableTextState) => void;
 };
 
+/**
+ * Publishes focused text-session metadata to the owning UiRoot bridge while leaving native DOM/IME
+ * composition and keyboard lifecycle in the browser/platform host. No committed text value crosses
+ * this bridge, and secure sessions redact composition preedit text.
+ */
 export function useEditableTextContract<T extends EditableTextElement>({
   inputRef,
   sessionId,
   contentPurpose,
   secure,
+  multiline = false,
+  inputMode,
+  enterKeyHint,
+  readOnly = false,
   onEditingStateChange,
 }: EditableTextContractOptions<T>) {
   const runtime = useEditableTextRuntime();
@@ -49,6 +67,12 @@ export function useEditableTextContract<T extends EditableTextElement>({
     if (!input) return null;
     return {
       id: sessionId,
+      descriptor: {
+        multiline,
+        inputMode,
+        enterKeyHint,
+        readOnly,
+      },
       state: {
         valueLength: input.value.length,
         selection: {
@@ -57,12 +81,12 @@ export function useEditableTextContract<T extends EditableTextElement>({
           direction: input.selectionDirection ?? 'none',
         },
         composing: composingRef.current,
-        preedit: preeditRef.current,
+        preedit: secure ? '' : preeditRef.current,
         contentPurpose,
         secure,
       },
     };
-  }, [contentPurpose, inputRef, secure, sessionId]);
+  }, [contentPurpose, enterKeyHint, inputMode, inputRef, multiline, readOnly, secure, sessionId]);
 
   const publishState = useCallback(() => {
     const snapshot = readSnapshot();
@@ -87,6 +111,8 @@ export function useEditableTextContract<T extends EditableTextElement>({
     invalidateAsyncRequests();
     if (!activeRef.current) return;
     activeRef.current = false;
+    composingRef.current = false;
+    preeditRef.current = '';
     runtime.end(sessionId);
   }, [invalidateAsyncRequests, runtime, sessionId]);
 
@@ -112,18 +138,18 @@ export function useEditableTextContract<T extends EditableTextElement>({
     (event: CompositionEvent<T>) => {
       invalidateAsyncRequests();
       composingRef.current = true;
-      preeditRef.current = event.data ?? '';
+      preeditRef.current = secure ? '' : (event.data ?? '');
       publishState();
     },
-    [invalidateAsyncRequests, publishState],
+    [invalidateAsyncRequests, publishState, secure],
   );
 
   const onCompositionUpdate = useCallback(
     (event: CompositionEvent<T>) => {
-      preeditRef.current = event.data ?? '';
+      preeditRef.current = secure ? '' : (event.data ?? '');
       publishState();
     },
-    [publishState],
+    [publishState, secure],
   );
 
   const onCompositionEnd = useCallback(
@@ -179,7 +205,8 @@ export function useEditableTextContract<T extends EditableTextElement>({
       const pasteStart = input.selectionStart ?? 0;
       const pasteEnd = input.selectionEnd ?? pasteStart;
       const valueBefore = input.value;
-      void runtime.readClipboardText()
+      void runtime
+        .readClipboardText()
         .then((text) => {
           if (
             requestId !== asyncRequestRef.current ||
@@ -189,7 +216,8 @@ export function useEditableTextContract<T extends EditableTextElement>({
             input.value !== valueBefore ||
             (input.selectionStart ?? 0) !== pasteStart ||
             (input.selectionEnd ?? pasteStart) !== pasteEnd
-          ) return;
+          )
+            return;
           input.setRangeText(text, pasteStart, pasteEnd, 'end');
           dispatchEditingInput(input, 'insertFromPaste', text);
           publishState();
@@ -207,6 +235,8 @@ export function useEditableTextContract<T extends EditableTextElement>({
       asyncRequestRef.current += 1;
       if (!activeRef.current) return;
       activeRef.current = false;
+      composingRef.current = false;
+      preeditRef.current = '';
       runtimeRef.current.end(sessionIdRef.current);
     },
     [],
@@ -225,18 +255,23 @@ export function useEditableTextContract<T extends EditableTextElement>({
   };
 }
 
-export function inputModeForContentPurpose(
-  purpose: EditableContentPurpose,
-): InputHTMLAttributes<HTMLInputElement>['inputMode'] {
+export function inputModeForContentPurpose(purpose: EditableContentPurpose): EditableInputMode {
   switch (purpose) {
-    case 'search': return 'search';
-    case 'url': return 'url';
-    case 'email': return 'email';
-    case 'number': return 'numeric';
-    case 'decimal': return 'decimal';
-    case 'telephone': return 'tel';
+    case 'search':
+      return 'search';
+    case 'url':
+      return 'url';
+    case 'email':
+      return 'email';
+    case 'number':
+      return 'numeric';
+    case 'decimal':
+      return 'decimal';
+    case 'telephone':
+      return 'tel';
     case 'text':
-    case 'password': return 'text';
+    case 'password':
+      return 'text';
   }
 }
 
@@ -245,7 +280,9 @@ function dispatchEditingInput(
   inputType: 'deleteByCut' | 'insertFromPaste',
   data: string | null,
 ) {
+  const InputEventConstructor = input.ownerDocument.defaultView?.InputEvent;
+  if (!InputEventConstructor) return;
   input.dispatchEvent(
-    new InputEvent('input', { bubbles: true, composed: true, inputType, data }),
+    new InputEventConstructor('input', { bubbles: true, composed: true, inputType, data }),
   );
 }

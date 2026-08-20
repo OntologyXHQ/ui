@@ -1,10 +1,11 @@
 import type {
   ClipboardEvent,
   CompositionEvent,
+  DragEvent,
   FocusEvent,
   InputHTMLAttributes,
-  InputEvent as ReactInputEvent,
   KeyboardEvent,
+  InputEvent as ReactInputEvent,
   ReactNode,
   Ref,
   SyntheticEvent,
@@ -18,22 +19,30 @@ import {
   useEditableTextContract,
 } from '../editing';
 import { Icon, Row } from '../primitives';
-import { Button, type ControlSize } from './Button';
+import { Button } from './Button';
 import { FieldFrame, type FieldStateProps, useFieldIds } from './Field';
 import { IconButton } from './IconButton';
 
 type SharedTextFieldProps = Omit<FieldStateProps, 'leading' | 'trailing'> & {
+  /** Logical-leading field content. Decorative unless leadingLabel is provided. */
   leading?: ReactNode;
+  /** Logical-trailing field content. Interactive children keep their own semantics. */
   trailing?: ReactNode;
+  /** Host-neutral text-purpose hint used by native inputMode and editing-session metadata. @default text */
   contentPurpose?: EditableContentPurpose;
+  /** Observes value length, selection and composition state without exposing committed text. */
   onEditingStateChange?: (state: EditableTextState) => void;
+  /** Bidi direction for editable text independently from surrounding field chrome. @default auto */
   textDirection?: 'auto' | 'ltr' | 'rtl';
 };
 
 export type TextFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'size' | 'prefix'> &
   SharedTextFieldProps & {
+    /** Forces password rendering and secure editing-session redaction/copy protection. @default false */
     secure?: boolean;
+    /** Visible logical prefix associated with the control description. */
     prefix?: ReactNode;
+    /** Visible logical suffix associated with the control description. */
     suffix?: ReactNode;
   };
 
@@ -53,6 +62,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     contentPurpose = 'text',
     description,
     disabled = false,
+    enterKeyHint,
     error,
     fieldSize = 'md',
     hideLabel = false,
@@ -67,6 +77,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     onCompositionUpdate,
     onCopy,
     onCut,
+    onDragStart,
     onEditingStateChange,
     onFocus,
     onInput,
@@ -89,12 +100,17 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
   const localRef = useRef<HTMLInputElement | null>(null);
   const ids = useFieldIds({ id, description, error, prefix, suffix, describedBy: ariaDescribedBy });
   const resolvedSecure = secure || contentPurpose === 'password' || type === 'password';
-  const resolvedType = type ?? (resolvedSecure ? 'password' : 'text');
+  const resolvedType = resolvedSecure ? 'password' : (type ?? 'text');
+  const resolvedInputMode = inputMode ?? inputModeForContentPurpose(contentPurpose);
   const editing = useEditableTextContract({
     inputRef: localRef,
     sessionId: ids.controlId,
     contentPurpose,
     secure: resolvedSecure,
+    multiline: false,
+    inputMode: resolvedInputMode,
+    enterKeyHint,
+    readOnly,
     onEditingStateChange,
   });
 
@@ -150,6 +166,13 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     }
     onCut?.(event);
   };
+  const handleDragStart = (event: DragEvent<HTMLInputElement>) => {
+    if (resolvedSecure) {
+      event.preventDefault();
+      return;
+    }
+    onDragStart?.(event);
+  };
 
   return (
     <FieldFrame
@@ -181,8 +204,10 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
         required={required}
         type={resolvedType}
         dir={textDirection}
-        inputMode={inputMode ?? inputModeForContentPurpose(contentPurpose)}
+        inputMode={resolvedInputMode}
+        enterKeyHint={enterKeyHint}
         aria-invalid={error ? true : undefined}
+        aria-errormessage={error ? ids.errorId : undefined}
         aria-describedby={ids.describedBy}
         data-oxs-cursor-role={disabled ? 'not-allowed' : 'text'}
         data-oxs-content-purpose={contentPurpose}
@@ -197,6 +222,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
         onKeyDown={handleKeyDown}
         onCopy={handleCopy}
         onCut={handleCut}
+        onDragStart={handleDragStart}
       />
     </FieldFrame>
   );
@@ -213,13 +239,21 @@ export type SearchFieldProps = Omit<
   | 'onChange'
   | 'label'
 > & {
+  /** Accessible field label. @default Search */
   label?: ReactNode;
+  /** Controlled search value; SearchField intentionally keeps search ownership explicit. */
   value: string;
+  /** Receives committed search value changes and clear actions. */
   onValueChange: (value: string) => void;
+  /** Accessible name for the clear action. @default Clear search */
   clearLabel?: string;
+  /** Tab order for the clear action when a product intentionally removes it from sequential focus. @default 0 */
   clearTabIndex?: number;
+  /** Declares that external suggestion results are available without making SearchField own a popup. @default false */
   suggestionsAvailable?: boolean;
+  /** Accessible name for the external suggestions request action. @default Show suggestions */
   suggestionsLabel?: string;
+  /** Requests caller-owned suggestions; ArrowDown and the action trigger this only outside composition. */
   onSuggestionsRequest?: () => void;
 };
 
@@ -229,6 +263,9 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(functi
     clearTabIndex = 0,
     disabled = false,
     label = 'Search',
+    onCompositionEnd,
+    onCompositionStart,
+    onCompositionUpdate,
     onKeyDown,
     onSuggestionsRequest,
     onValueChange,
@@ -241,6 +278,8 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(functi
   forwardedRef,
 ) {
   const localRef = useRef<HTMLInputElement | null>(null);
+  const composingRef = useRef(false);
+  const [composing, setComposing] = useState(false);
 
   const setRef = (node: HTMLInputElement | null) => {
     localRef.current = node;
@@ -248,8 +287,9 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(functi
   };
 
   const clear = () => {
+    if (composingRef.current || disabled || readOnly) return;
     onValueChange('');
-    requestAnimationFrame(() => localRef.current?.focus());
+    localRef.current?.focus({ preventScroll: true });
   };
 
   return (
@@ -258,16 +298,28 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(functi
       {...props}
       type="search"
       contentPurpose="search"
-      role="searchbox"
       label={label}
       disabled={disabled}
       readOnly={readOnly}
       value={value}
-      onChange={(event) => onValueChange(event.target.value)}
+      onChange={(event) => onValueChange(event.currentTarget.value)}
+      onCompositionStart={(event) => {
+        composingRef.current = true;
+        setComposing(true);
+        onCompositionStart?.(event);
+      }}
+      onCompositionUpdate={onCompositionUpdate}
+      onCompositionEnd={(event) => {
+        onCompositionEnd?.(event);
+        composingRef.current = false;
+        setComposing(false);
+      }}
       onKeyDown={(event) => {
         onKeyDown?.(event);
         if (
           !event.defaultPrevented &&
+          !composingRef.current &&
+          !event.nativeEvent.isComposing &&
           suggestionsAvailable &&
           onSuggestionsRequest &&
           event.key === 'ArrowDown'
@@ -288,6 +340,7 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(functi
                 variant="quiet"
                 onClick={clear}
                 tabIndex={clearTabIndex}
+                disabled={composing}
               />
             ) : null}
             {suggestionsAvailable && onSuggestionsRequest && !disabled ? (
@@ -297,6 +350,7 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(functi
                 onClick={onSuggestionsRequest}
                 className="ui-search-field__suggestions"
                 aria-label={suggestionsLabel}
+                disabled={composing}
               >
                 {suggestionsLabel}
               </Button>
@@ -310,10 +364,15 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(functi
 
 export type TextAreaProps = Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'prefix'> &
   Omit<SharedTextFieldProps, 'contentPurpose'> & {
+    /** Host-neutral text-purpose hint; password is intentionally unavailable for multiline controls. @default text */
     contentPurpose?: Exclude<EditableContentPurpose, 'password'>;
+    /** Visible logical prefix associated with the control description. */
     prefix?: ReactNode;
+    /** Visible logical suffix associated with the control description. */
     suffix?: ReactNode;
+    /** Native logical resize policy. @default block */
     resize?: 'none' | 'block' | 'inline' | 'both';
+    /** Shows non-live character guidance beside the support region. @default false */
     showCharacterCount?: boolean;
   };
 
@@ -325,6 +384,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
     defaultValue,
     description,
     disabled = false,
+    enterKeyHint,
     error,
     fieldSize = 'md',
     hideLabel = false,
@@ -364,11 +424,16 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
   const [valueLength, setValueLength] = useState(initialLength);
   const displayedValueLength = value !== undefined ? String(value).length : valueLength;
   const ids = useFieldIds({ id, description, error, prefix, suffix, describedBy: ariaDescribedBy });
+  const resolvedInputMode = inputMode ?? inputModeForContentPurpose(contentPurpose);
   const editing = useEditableTextContract({
     inputRef: localRef,
     sessionId: ids.controlId,
     contentPurpose,
     secure: false,
+    multiline: true,
+    inputMode: resolvedInputMode,
+    enterKeyHint,
+    readOnly,
     onEditingStateChange,
   });
 
@@ -422,8 +487,10 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
         maxLength={maxLength}
         dir={textDirection}
         data-resize={resize}
-        inputMode={inputMode ?? inputModeForContentPurpose(contentPurpose)}
+        inputMode={resolvedInputMode}
+        enterKeyHint={enterKeyHint}
         aria-invalid={error ? true : undefined}
+        aria-errormessage={error ? ids.errorId : undefined}
         aria-describedby={ids.describedBy}
         data-oxs-cursor-role={disabled ? 'not-allowed' : 'text'}
         data-oxs-content-purpose={contentPurpose}

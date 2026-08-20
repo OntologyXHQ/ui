@@ -29,7 +29,10 @@ describe('field and form components', () => {
     expect(input).toBeRequired();
     expect(input).toHaveAttribute('readonly');
     expect(input).toHaveAttribute('aria-invalid', 'true');
-    expect(input.getAttribute('aria-describedby')).toContain(screen.getByText('Local account name').id);
+    expect(input).toHaveAttribute('aria-errormessage', screen.getByRole('alert').id);
+    expect(input.getAttribute('aria-describedby')).toContain(
+      screen.getByText('Local account name').id,
+    );
     expect(input.getAttribute('aria-describedby')).toContain(screen.getByRole('alert').id);
   });
 
@@ -122,18 +125,12 @@ describe('field and form components', () => {
 
     rerender(
       <UiRoot>
-        <Select
-          label="Mode"
-          name="mode"
-          disabled
-          options={[{ value: 'alpha', label: 'Alpha' }]}
-        />
+        <Select label="Mode" name="mode" disabled options={[{ value: 'alpha', label: 'Alpha' }]} />
       </UiRoot>,
     );
     expect(container.querySelector('select[name="mode"]')).toBeDisabled();
     await user.keyboard('{Tab}');
   });
-
 
   it('keeps Select focus on the trigger so Tab continues to the next control after an open listbox', async () => {
     const user = userEvent.setup();
@@ -199,12 +196,16 @@ describe('field and form components', () => {
     );
 
     expect(screen.getByRole('region', { name: 'Profile' })).toBeInTheDocument();
-    expect(screen.getByRole('group', { name: 'Names' })).toBeInTheDocument();
+    const group = screen.getByRole('group', { name: 'Names' });
+    expect(group.tagName).toBe('FIELDSET');
+    expect(group.querySelector('legend')).toHaveTextContent('Names');
   });
 
   it('keeps read-only SearchField immutable by removing its clear action', () => {
     const onValueChange = vi.fn();
-    render(<SearchField label="Locked search" value="query" readOnly onValueChange={onValueChange} />);
+    render(
+      <SearchField label="Locked search" value="query" readOnly onValueChange={onValueChange} />,
+    );
     expect(screen.queryByRole('button', { name: 'Clear search' })).not.toBeInTheDocument();
     expect(screen.getByRole('searchbox', { name: 'Locked search' })).toHaveAttribute('readonly');
     expect(onValueChange).not.toHaveBeenCalled();
@@ -226,4 +227,67 @@ describe('field and form components', () => {
     expect(new Set(options.map((option) => option.id)).size).toBe(options.length);
   });
 
+  it('preserves controlled and uncontrolled native values across form reset semantics', async () => {
+    const user = userEvent.setup();
+    function Harness() {
+      const [controlled, setControlled] = useState('controlled');
+      return (
+        <form onReset={() => setControlled('controlled')}>
+          <TextField label="Uncontrolled" name="uncontrolled" defaultValue="initial" required />
+          <TextField
+            label="Controlled"
+            name="controlled"
+            value={controlled}
+            onChange={(event) => setControlled(event.currentTarget.value)}
+          />
+          <button type="reset">Reset</button>
+        </form>
+      );
+    }
+    render(<Harness />);
+    const uncontrolled = screen.getByLabelText('Uncontrolled') as HTMLInputElement;
+    const controlled = screen.getByLabelText('Controlled') as HTMLInputElement;
+    await user.clear(uncontrolled);
+    await user.type(uncontrolled, 'changed');
+    await user.clear(controlled);
+    await user.type(controlled, 'changed-controlled');
+    await user.click(screen.getByRole('button', { name: 'Reset' }));
+    expect(uncontrolled.value).toBe('initial');
+    expect(controlled.value).toBe('controlled');
+  });
+
+  it('keeps SearchField clear and suggestion actions inert during composition', async () => {
+    const user = userEvent.setup();
+    const onSuggestionsRequest = vi.fn();
+    function Harness() {
+      const [value, setValue] = useState('query');
+      return (
+        <SearchField
+          label="Search"
+          value={value}
+          onValueChange={setValue}
+          suggestionsAvailable
+          onSuggestionsRequest={onSuggestionsRequest}
+        />
+      );
+    }
+    render(<Harness />);
+    const input = screen.getByRole('searchbox', { name: 'Search' });
+    fireEvent.compositionStart(input, { data: '候' });
+    expect(screen.getByRole('button', { name: 'Clear search' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Show suggestions' })).toBeDisabled();
+    fireEvent.keyDown(input, { key: 'ArrowDown', isComposing: true });
+    expect(onSuggestionsRequest).not.toHaveBeenCalled();
+    fireEvent.compositionEnd(input, { data: '候' });
+    await user.click(screen.getByRole('button', { name: 'Clear search' }));
+    expect(input).toHaveValue('');
+    expect(input).toHaveFocus();
+  });
+
+  it('forwards TextArea keyboard events exactly once through the editable-text contract', () => {
+    const onKeyDown = vi.fn();
+    render(<TextArea label="Notes" onKeyDown={onKeyDown} />);
+    fireEvent.keyDown(screen.getByLabelText('Notes'), { key: 'ArrowDown' });
+    expect(onKeyDown).toHaveBeenCalledTimes(1);
+  });
 });

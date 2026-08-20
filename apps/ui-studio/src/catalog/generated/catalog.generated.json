@@ -2254,19 +2254,19 @@
     "category": "Fields",
     "order": 30,
     "summary": "Accessible grouping for related developer-facing form controls.",
-    "usage": "Use when several fields form one logical choice or data-entry group; it owns group labeling, not individual field chrome.",
-    "status": "candidate",
-    "accessibility": "Connects group label and description to a semantic group relationship.",
-    "rtl": "Uses logical layout and inherits the scoped UI direction.",
-    "touch": "Adds no private interaction layer; child Components own their touch contracts.",
-    "responsive": "Vertical by default and capable of container-driven horizontal composition.",
+    "usage": "Use when several fields form one logical choice or data-entry group; it owns native fieldset/legend grouping and shared description relationships, not individual field chrome or validation.",
+    "status": "accepted",
+    "accessibility": "Uses a native fieldset/legend relationship with aria-describedby for shared guidance while each child keeps its own native label, required and validation semantics.",
+    "rtl": "Uses logical layout and inherits the scoped UI direction without reordering semantic field order.",
+    "touch": "Adds no private interaction layer; child Components preserve their own touch target and editing contracts.",
+    "responsive": "Vertical by default and capable of explicit horizontal composition without silently hiding fields.",
     "playground": null,
     "props": [
       {
         "name": "description",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Supplemental group guidance associated through aria-describedby.",
         "deprecated": false,
         "default": null
       },
@@ -2274,7 +2274,7 @@
         "name": "label",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Native legend for the related field group. Omit only when an external accessible name is supplied.",
         "deprecated": false,
         "default": null
       },
@@ -2282,12 +2282,19 @@
         "name": "orientation",
         "type": "'vertical' | 'horizontal'",
         "optional": true,
-        "description": "",
+        "description": "Logical visual arrangement of the child fields; native fieldset semantics stay unchanged.",
         "deprecated": false,
-        "default": "'vertical'"
+        "default": "vertical"
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "group-contract",
+        "title": "Related fields",
+        "description": "A semantic field group keeps shared guidance separate from each native input relationship.",
+        "component": "FieldGroupExample"
+      }
+    ]
   },
   {
     "id": "FieldSection",
@@ -2297,18 +2304,18 @@
     "order": 30,
     "summary": "Section-level form composition with title, description and an optional action region.",
     "usage": "Use for meaningful form sections such as profile, connectivity or account details; avoid using it as generic surface chrome.",
-    "status": "candidate",
-    "accessibility": "Uses a real section with an explicit labelled-by relationship.",
-    "rtl": "Header/action composition is logical-direction safe.",
-    "touch": "Action ownership remains with child Components.",
-    "responsive": "Header and content reflow inside narrow containers.",
+    "status": "accepted",
+    "accessibility": "Uses a real section with explicit labelled-by/described-by relationships and a bounded semantic Heading level.",
+    "rtl": "Header/action composition is logical-direction safe and does not reorder section content.",
+    "touch": "Section actions retain the accepted Button/IconButton interaction contracts.",
+    "responsive": "Header, action and field content reflow inside narrow containers without hiding form controls.",
     "playground": null,
     "props": [
       {
         "name": "action",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional section-level action region; child controls retain their own semantics.",
         "deprecated": false,
         "default": null
       },
@@ -2316,7 +2323,7 @@
         "name": "description",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Supplemental section guidance associated through aria-describedby.",
         "deprecated": false,
         "default": null
       },
@@ -2324,7 +2331,7 @@
         "name": "title",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Accessible section heading.",
         "deprecated": false,
         "default": null
       },
@@ -2332,17 +2339,17 @@
         "name": "titleLevel",
         "type": "2 | 3 | 4 | 5 | 6",
         "optional": true,
-        "description": "",
+        "description": "Native heading level used by the public Heading primitive.",
         "deprecated": false,
         "default": "3"
       }
     ],
     "examples": [
       {
-        "id": "overview",
-        "title": "Form composition",
-        "description": "Field section and group composition using the same field Components as application code.",
-        "component": "FieldCompositionExample"
+        "id": "section-contract",
+        "title": "Form section",
+        "description": "A labelled form section composes accepted field and action controls without taking ownership of their state.",
+        "component": "FieldSectionExample"
       }
     ]
   },
@@ -4478,13 +4485,13 @@
     "layer": "components",
     "category": "Fields",
     "order": 30,
-    "summary": "Search-specialized TextField with clear behavior and an optional suggestions-request seam.",
-    "usage": "Use for search/filter entry; suggestions are requested through a callback so the field does not own a second popup engine.",
-    "status": "candidate",
-    "accessibility": "Carries searchbox semantics, an accessible default label and labelled clear/suggestions actions.",
-    "rtl": "Search text and affordances preserve logical ordering and bidi behavior.",
-    "touch": "Clear and suggestions actions use the shared IconButton hit-target policy.",
-    "responsive": "Designed for full-width narrow containers and adaptive toolbars.",
+    "summary": "Controlled searchbox with composition-safe clear behavior and a caller-owned suggestions seam.",
+    "usage": "Use for search/filter entry. SearchField owns clear/search affordances but never owns suggestion data or a popup; callers provide the value and suggestions request behavior.",
+    "status": "accepted",
+    "accessibility": "Carries native searchbox semantics, a real label, and labelled clear/suggestions actions that remain unavailable while composition is active.",
+    "rtl": "Search text and affordances preserve logical ordering and independent bidi text direction.",
+    "touch": "Clear and suggestions actions preserve the accepted IconButton/Button target floor inside the field.",
+    "responsive": "Fits narrow toolbars/containers without shrinking trailing actions below their target contract.",
     "playground": {
       "preferredWidth": "medium",
       "controls": [
@@ -4504,15 +4511,15 @@
         "name": "clearLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible name for the clear action.",
         "deprecated": false,
-        "default": "'Clear search'"
+        "default": "Clear search"
       },
       {
         "name": "clearTabIndex",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Tab order for the clear action when a product intentionally removes it from sequential focus.",
         "deprecated": false,
         "default": "0"
       },
@@ -4520,15 +4527,15 @@
         "name": "contentPurpose",
         "type": "EditableContentPurpose",
         "optional": true,
-        "description": "",
+        "description": "Host-neutral text-purpose hint used by native inputMode and editing-session metadata.",
         "deprecated": false,
-        "default": null
+        "default": "text"
       },
       {
         "name": "description",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Supplemental guidance associated with the native control through aria-describedby.",
         "deprecated": false,
         "default": null
       },
@@ -4536,7 +4543,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Projects native disabled semantics and disabled field presentation.",
         "deprecated": false,
         "default": "false"
       },
@@ -4544,7 +4551,7 @@
         "name": "error",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Validation error associated through aria-describedby/aria-errormessage.",
         "deprecated": false,
         "default": null
       },
@@ -4552,31 +4559,31 @@
         "name": "fieldSize",
         "type": "ControlSize",
         "optional": true,
-        "description": "",
+        "description": "Shared control target/height scale.",
         "deprecated": false,
-        "default": null
+        "default": "md"
       },
       {
         "name": "hideLabel",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Visually hides the label while preserving the native label relationship.",
         "deprecated": false,
-        "default": null
+        "default": "false"
       },
       {
         "name": "label",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Accessible field label.",
         "deprecated": false,
-        "default": "'Search'"
+        "default": "Search"
       },
       {
         "name": "leading",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Logical-leading field content. Decorative unless leadingLabel is provided.",
         "deprecated": false,
         "default": null
       },
@@ -4592,7 +4599,7 @@
         "name": "onEditingStateChange",
         "type": "(state: EditableTextState) => void",
         "optional": true,
-        "description": "",
+        "description": "Observes value length, selection and composition state without exposing committed text.",
         "deprecated": false,
         "default": null
       },
@@ -4600,7 +4607,7 @@
         "name": "onSuggestionsRequest",
         "type": "() => void",
         "optional": true,
-        "description": "",
+        "description": "Requests caller-owned suggestions; ArrowDown and the action trigger this only outside composition.",
         "deprecated": false,
         "default": null
       },
@@ -4608,7 +4615,7 @@
         "name": "onValueChange",
         "type": "(value: string) => void",
         "optional": false,
-        "description": "",
+        "description": "Receives committed search value changes and clear actions.",
         "deprecated": false,
         "default": null
       },
@@ -4616,15 +4623,15 @@
         "name": "optionalLabel",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Visual copy shown for non-required fields. Hidden from the accessibility tree.",
         "deprecated": false,
-        "default": null
+        "default": "Optional"
       },
       {
         "name": "prefix",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Visible logical prefix associated with the control description.",
         "deprecated": false,
         "default": null
       },
@@ -4632,7 +4639,7 @@
         "name": "readOnly",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Projects native read-only semantics without disabling selection or form submission.",
         "deprecated": false,
         "default": "false"
       },
@@ -4640,23 +4647,23 @@
         "name": "required",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Projects native required semantics and a visual required indicator.",
         "deprecated": false,
-        "default": null
+        "default": "false"
       },
       {
         "name": "secure",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Forces password rendering and secure editing-session redaction/copy protection.",
         "deprecated": false,
-        "default": null
+        "default": "false"
       },
       {
         "name": "suffix",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Visible logical suffix associated with the control description.",
         "deprecated": false,
         "default": null
       },
@@ -4664,7 +4671,7 @@
         "name": "suggestionsAvailable",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Declares that external suggestion results are available without making SearchField own a popup.",
         "deprecated": false,
         "default": "false"
       },
@@ -4672,15 +4679,15 @@
         "name": "suggestionsLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible name for the external suggestions request action.",
         "deprecated": false,
-        "default": "'Show suggestions'"
+        "default": "Show suggestions"
       },
       {
         "name": "supportingAction",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional action adjacent to support/error copy; the child owns its own interaction semantics.",
         "deprecated": false,
         "default": null
       },
@@ -4688,15 +4695,15 @@
         "name": "textDirection",
         "type": "'auto' | 'ltr' | 'rtl'",
         "optional": true,
-        "description": "",
+        "description": "Bidi direction for editable text independently from surrounding field chrome.",
         "deprecated": false,
-        "default": null
+        "default": "auto"
       },
       {
         "name": "trailing",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Logical-trailing field content. Interactive children keep their own semantics.",
         "deprecated": false,
         "default": null
       },
@@ -4704,12 +4711,19 @@
         "name": "value",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Controlled search value; SearchField intentionally keeps search ownership explicit.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "composition-safe-search",
+        "title": "Composition-safe search",
+        "description": "Clear and suggestions requests pause while an IME composition is active, then resume without stealing focus.",
+        "component": "SearchFieldCompositionExample"
+      }
+    ]
   },
   {
     "id": "SegmentedControl",
@@ -4873,7 +4887,7 @@
         "name": "description",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Supplemental guidance associated with the native control through aria-describedby.",
         "deprecated": false,
         "default": null
       },
@@ -4881,7 +4895,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Projects native disabled semantics and disabled field presentation.",
         "deprecated": false,
         "default": "false"
       },
@@ -4889,7 +4903,7 @@
         "name": "error",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Validation error associated through aria-describedby/aria-errormessage.",
         "deprecated": false,
         "default": null
       },
@@ -4897,9 +4911,9 @@
         "name": "fieldSize",
         "type": "ControlSize",
         "optional": true,
-        "description": "",
+        "description": "Shared control target/height scale.",
         "deprecated": false,
-        "default": "'md'"
+        "default": "md"
       },
       {
         "name": "form",
@@ -4913,7 +4927,7 @@
         "name": "hideLabel",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Visually hides the label while preserving the native label relationship.",
         "deprecated": false,
         "default": "false"
       },
@@ -4929,7 +4943,7 @@
         "name": "label",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Visible or visually-hidden accessible label owned by the field.",
         "deprecated": false,
         "default": null
       },
@@ -4937,7 +4951,7 @@
         "name": "leading",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Logical-leading visual slot. Decorative unless leadingLabel is supplied.",
         "deprecated": false,
         "default": null
       },
@@ -4985,9 +4999,9 @@
         "name": "optionalLabel",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Visual copy shown for non-required fields. Hidden from the accessibility tree.",
         "deprecated": false,
-        "default": null
+        "default": "Optional"
       },
       {
         "name": "options",
@@ -5009,7 +5023,7 @@
         "name": "prefix",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Visible logical prefix associated with the control description.",
         "deprecated": false,
         "default": null
       },
@@ -5017,7 +5031,7 @@
         "name": "readOnly",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Projects native read-only semantics without disabling selection or form submission.",
         "deprecated": false,
         "default": "false"
       },
@@ -5025,7 +5039,7 @@
         "name": "required",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Projects native required semantics and a visual required indicator.",
         "deprecated": false,
         "default": "false"
       },
@@ -5033,7 +5047,7 @@
         "name": "suffix",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Visible logical suffix associated with the control description.",
         "deprecated": false,
         "default": null
       },
@@ -5041,7 +5055,7 @@
         "name": "supportingAction",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional action adjacent to support/error copy; the child owns its own interaction semantics.",
         "deprecated": false,
         "default": null
       },
@@ -5049,7 +5063,7 @@
         "name": "trailing",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Logical-trailing control/content slot. Interactive children retain their own semantics.",
         "deprecated": false,
         "default": null
       },
@@ -7719,28 +7733,28 @@
     "layer": "components",
     "category": "Fields",
     "order": 30,
-    "summary": "Multiline field sharing the same editing, validation and field-frame contracts.",
-    "usage": "Use for multiline text. Resize policy is explicit and optional character guidance is owned by the field support region.",
-    "status": "candidate",
-    "accessibility": "Native textarea semantics with protected label/description/error relationships; optional character count stays visible without announcing every keystroke.",
-    "rtl": "Supports content bidi direction independently of logical field chrome.",
-    "touch": "Selection/composition flows through the shared editable-text runtime.",
-    "responsive": "Block resize and width remain container-safe.",
+    "summary": "Multiline native field sharing the field-frame and host text-session contracts.",
+    "usage": "Use for multiline text. Keep validation and controlled state in application code; resize, character guidance, selection and composition remain native/browser-owned.",
+    "status": "accepted",
+    "accessibility": "Uses native textarea label/required/read-only/disabled semantics with explicit description/error relationships; character guidance is visible but not a per-keystroke live region.",
+    "rtl": "Supports content bidi direction independently of logical field chrome and resize policy.",
+    "touch": "Selection/composition flow through the same root-scoped editable-text session without replacing native textarea gestures.",
+    "responsive": "Logical block resize and occlusion-aware scroll margins remain safe inside narrow containers.",
     "playground": null,
     "props": [
       {
         "name": "contentPurpose",
         "type": "Exclude<EditableContentPurpose, 'password'>",
         "optional": true,
-        "description": "",
+        "description": "Host-neutral text-purpose hint; password is intentionally unavailable for multiline controls.",
         "deprecated": false,
-        "default": "'text'"
+        "default": "text"
       },
       {
         "name": "description",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Supplemental guidance associated with the native control through aria-describedby.",
         "deprecated": false,
         "default": null
       },
@@ -7748,7 +7762,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Projects native disabled semantics and disabled field presentation.",
         "deprecated": false,
         "default": "false"
       },
@@ -7756,7 +7770,7 @@
         "name": "error",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Validation error associated through aria-describedby/aria-errormessage.",
         "deprecated": false,
         "default": null
       },
@@ -7764,15 +7778,15 @@
         "name": "fieldSize",
         "type": "ControlSize",
         "optional": true,
-        "description": "",
+        "description": "Shared control target/height scale.",
         "deprecated": false,
-        "default": "'md'"
+        "default": "md"
       },
       {
         "name": "hideLabel",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Visually hides the label while preserving the native label relationship.",
         "deprecated": false,
         "default": "false"
       },
@@ -7780,7 +7794,7 @@
         "name": "label",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Visible or visually-hidden accessible label owned by the field.",
         "deprecated": false,
         "default": null
       },
@@ -7788,7 +7802,7 @@
         "name": "leading",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Logical-leading field content. Decorative unless leadingLabel is provided.",
         "deprecated": false,
         "default": null
       },
@@ -7804,7 +7818,7 @@
         "name": "onEditingStateChange",
         "type": "(state: EditableTextState) => void",
         "optional": true,
-        "description": "",
+        "description": "Observes value length, selection and composition state without exposing committed text.",
         "deprecated": false,
         "default": null
       },
@@ -7812,15 +7826,15 @@
         "name": "optionalLabel",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Visual copy shown for non-required fields. Hidden from the accessibility tree.",
         "deprecated": false,
-        "default": null
+        "default": "Optional"
       },
       {
         "name": "prefix",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Visible logical prefix associated with the control description.",
         "deprecated": false,
         "default": null
       },
@@ -7828,7 +7842,7 @@
         "name": "readOnly",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Projects native read-only semantics without disabling selection or form submission.",
         "deprecated": false,
         "default": "false"
       },
@@ -7836,7 +7850,7 @@
         "name": "required",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Projects native required semantics and a visual required indicator.",
         "deprecated": false,
         "default": "false"
       },
@@ -7844,15 +7858,15 @@
         "name": "resize",
         "type": "'none' | 'block' | 'inline' | 'both'",
         "optional": true,
-        "description": "",
+        "description": "Native logical resize policy.",
         "deprecated": false,
-        "default": "'block'"
+        "default": "block"
       },
       {
         "name": "showCharacterCount",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Shows non-live character guidance beside the support region.",
         "deprecated": false,
         "default": "false"
       },
@@ -7860,7 +7874,7 @@
         "name": "suffix",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Visible logical suffix associated with the control description.",
         "deprecated": false,
         "default": null
       },
@@ -7868,7 +7882,7 @@
         "name": "supportingAction",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional action adjacent to support/error copy; the child owns its own interaction semantics.",
         "deprecated": false,
         "default": null
       },
@@ -7876,25 +7890,25 @@
         "name": "textDirection",
         "type": "'auto' | 'ltr' | 'rtl'",
         "optional": true,
-        "description": "",
+        "description": "Bidi direction for editable text independently from surrounding field chrome.",
         "deprecated": false,
-        "default": "'auto'"
+        "default": "auto"
       },
       {
         "name": "trailing",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Logical-trailing field content. Interactive children keep their own semantics.",
         "deprecated": false,
         "default": null
       }
     ],
     "examples": [
       {
-        "id": "multiline",
-        "title": "Multiline",
-        "description": "Character guidance and multiline editing share the canonical field frame.",
-        "component": "TextAreaExample"
+        "id": "multiline-native",
+        "title": "Multiline native contract",
+        "description": "Textarea selection, character guidance and native form/reset behavior share the canonical field frame.",
+        "component": "TextAreaNativeExample"
       }
     ]
   },
@@ -7904,28 +7918,28 @@
     "layer": "components",
     "category": "Fields",
     "order": 30,
-    "summary": "Single-line field built on the shared field frame and editable-text runtime.",
-    "usage": "Use for generic text entry; label, support/error relationships, affixes, actions and editing-state publication stay inside the shared field contract.",
-    "status": "candidate",
-    "accessibility": "Native input semantics with protected required/read-only/invalid relationships; meaningful affixes join aria-describedby, and secure fields block copy/cut from both keyboard and context-menu paths.",
-    "rtl": "Field chrome uses logical edges while text content can independently use auto, LTR or RTL bidi direction.",
-    "touch": "Uses the shared editable-text session and touch-safe field target sizing.",
-    "responsive": "Fills available container width without device-name breakpoints.",
+    "summary": "Single-line native field with shared relationships and a host-neutral editable-text session bridge.",
+    "usage": "Use for generic single-line text entry. Keep validation/product state outside the component; native form, label, affix, selection, composition and secure-session rules remain intact.",
+    "status": "accepted",
+    "accessibility": "Uses native input/label/required/read-only/disabled/validation semantics, aria-errormessage for explicit errors, and descriptive relationships for guidance and meaningful affixes.",
+    "rtl": "Field chrome uses logical edges while editable content can independently use auto, LTR or RTL bidi direction.",
+    "touch": "Preserves the shared field target floor and root-scoped text-session bridge without taking ownership of a native IME or keyboard.",
+    "responsive": "Fills the available container and publishes occlusion-aware logical scroll margins from UiRoot environment insets.",
     "playground": null,
     "props": [
       {
         "name": "contentPurpose",
         "type": "EditableContentPurpose",
         "optional": true,
-        "description": "",
+        "description": "Host-neutral text-purpose hint used by native inputMode and editing-session metadata.",
         "deprecated": false,
-        "default": "'text'"
+        "default": "text"
       },
       {
         "name": "description",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Supplemental guidance associated with the native control through aria-describedby.",
         "deprecated": false,
         "default": null
       },
@@ -7933,7 +7947,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Projects native disabled semantics and disabled field presentation.",
         "deprecated": false,
         "default": "false"
       },
@@ -7941,7 +7955,7 @@
         "name": "error",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Validation error associated through aria-describedby/aria-errormessage.",
         "deprecated": false,
         "default": null
       },
@@ -7949,15 +7963,15 @@
         "name": "fieldSize",
         "type": "ControlSize",
         "optional": true,
-        "description": "",
+        "description": "Shared control target/height scale.",
         "deprecated": false,
-        "default": "'md'"
+        "default": "md"
       },
       {
         "name": "hideLabel",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Visually hides the label while preserving the native label relationship.",
         "deprecated": false,
         "default": "false"
       },
@@ -7965,7 +7979,7 @@
         "name": "label",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Visible or visually-hidden accessible label owned by the field.",
         "deprecated": false,
         "default": null
       },
@@ -7973,7 +7987,7 @@
         "name": "leading",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Logical-leading field content. Decorative unless leadingLabel is provided.",
         "deprecated": false,
         "default": null
       },
@@ -7989,7 +8003,7 @@
         "name": "onEditingStateChange",
         "type": "(state: EditableTextState) => void",
         "optional": true,
-        "description": "",
+        "description": "Observes value length, selection and composition state without exposing committed text.",
         "deprecated": false,
         "default": null
       },
@@ -7997,15 +8011,15 @@
         "name": "optionalLabel",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Visual copy shown for non-required fields. Hidden from the accessibility tree.",
         "deprecated": false,
-        "default": null
+        "default": "Optional"
       },
       {
         "name": "prefix",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Visible logical prefix associated with the control description.",
         "deprecated": false,
         "default": null
       },
@@ -8013,7 +8027,7 @@
         "name": "readOnly",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Projects native read-only semantics without disabling selection or form submission.",
         "deprecated": false,
         "default": "false"
       },
@@ -8021,7 +8035,7 @@
         "name": "required",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Projects native required semantics and a visual required indicator.",
         "deprecated": false,
         "default": "false"
       },
@@ -8029,7 +8043,7 @@
         "name": "secure",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Forces password rendering and secure editing-session redaction/copy protection.",
         "deprecated": false,
         "default": "false"
       },
@@ -8037,7 +8051,7 @@
         "name": "suffix",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Visible logical suffix associated with the control description.",
         "deprecated": false,
         "default": null
       },
@@ -8045,7 +8059,7 @@
         "name": "supportingAction",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional action adjacent to support/error copy; the child owns its own interaction semantics.",
         "deprecated": false,
         "default": null
       },
@@ -8053,25 +8067,31 @@
         "name": "textDirection",
         "type": "'auto' | 'ltr' | 'rtl'",
         "optional": true,
-        "description": "",
+        "description": "Bidi direction for editable text independently from surrounding field chrome.",
         "deprecated": false,
-        "default": "'auto'"
+        "default": "auto"
       },
       {
         "name": "trailing",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Logical-trailing field content. Interactive children keep their own semantics.",
         "deprecated": false,
         "default": null
       }
     ],
     "examples": [
       {
-        "id": "overview",
-        "title": "Field states",
-        "description": "Required, affixed, invalid and search states from one shared field frame.",
-        "component": "TextFieldStatesExample"
+        "id": "native-form",
+        "title": "Native form contract",
+        "description": "Controlled/uncontrolled values, required validation, autocomplete, reset and FormData submission remain native.",
+        "component": "TextFieldNativeFormExample"
+      },
+      {
+        "id": "host-session",
+        "title": "Host text session + occlusion",
+        "description": "UiRoot exposes a metadata-only editing bridge while transient keyboard occlusion stays a separate logical host input.",
+        "component": "EditableHostSessionExample"
       }
     ]
   },

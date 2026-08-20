@@ -120,13 +120,22 @@ describe('UI editable text contract', () => {
       </UiRoot>,
     );
     fireEvent.focus(screen.getByLabelText('Transient field'));
-    rerender(<UiRoot editingBridge={{ end }}><div>Gone</div></UiRoot>);
+    rerender(
+      <UiRoot editingBridge={{ end }}>
+        <div>Gone</div>
+      </UiRoot>,
+    );
     expect(end).toHaveBeenCalledTimes(1);
   });
 
   it('drops a delayed paste response after the field value or selection changes', async () => {
     let resolvePaste!: (value: string) => void;
-    const readText = vi.fn(() => new Promise<string>((resolve) => { resolvePaste = resolve; }));
+    const readText = vi.fn(
+      () =>
+        new Promise<string>((resolve) => {
+          resolvePaste = resolve;
+        }),
+    );
     render(
       <UiRoot clipboardAdapter={{ isAvailable: () => true, readText, writeText: () => true }}>
         <TextField label="Race target" defaultValue="hello" />
@@ -150,18 +159,28 @@ describe('UI editable text contract', () => {
     const rightWrites: string[] = [];
     render(
       <>
-        <UiRoot clipboardAdapter={{
-          isAvailable: () => true,
-          readText: async () => '',
-          writeText: (text) => { leftWrites.push(text); return true; },
-        }}>
+        <UiRoot
+          clipboardAdapter={{
+            isAvailable: () => true,
+            readText: async () => '',
+            writeText: (text) => {
+              leftWrites.push(text);
+              return true;
+            },
+          }}
+        >
           <TextField label="Left" defaultValue="alpha" />
         </UiRoot>
-        <UiRoot clipboardAdapter={{
-          isAvailable: () => true,
-          readText: async () => '',
-          writeText: (text) => { rightWrites.push(text); return true; },
-        }}>
+        <UiRoot
+          clipboardAdapter={{
+            isAvailable: () => true,
+            readText: async () => '',
+            writeText: (text) => {
+              rightWrites.push(text);
+              return true;
+            },
+          }}
+        >
           <TextField label="Right" defaultValue="beta" />
         </UiRoot>
       </>,
@@ -176,6 +195,42 @@ describe('UI editable text contract', () => {
     expect(rightWrites).toEqual(['beta']);
   });
 
+  it('redacts secure composition preedit from observers and the host bridge', () => {
+    const begin = vi.fn();
+    const update = vi.fn();
+    const observed = vi.fn();
+    render(
+      <UiRoot editingBridge={{ begin, update }}>
+        <TextField
+          label="Secret composition"
+          defaultValue="secret"
+          secure
+          type="text"
+          contentPurpose="password"
+          onEditingStateChange={observed}
+        />
+      </UiRoot>,
+    );
+    const input = screen.getByLabelText('Secret composition') as HTMLInputElement;
+    expect(input.type).toBe('password');
+    fireEvent.focus(input);
+    fireEvent.compositionStart(input, { data: '秘密' });
+    fireEvent.compositionUpdate(input, { data: '秘密候補' });
+    expect(observed).toHaveBeenCalledWith(
+      expect.objectContaining({ secure: true, composing: true, preedit: '' }),
+    );
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({ state: expect.objectContaining({ secure: true, preedit: '' }) }),
+    );
+    expect(JSON.stringify(update.mock.calls)).not.toContain('秘密');
+  });
+
+  it('blocks native drag export from secure fields', () => {
+    render(<TextField label="Drag secret" defaultValue="secret" secure />);
+    const input = screen.getByLabelText('Drag secret') as HTMLInputElement;
+    input.select();
+    expect(fireEvent.dragStart(input)).toBe(false);
+  });
 });
 
 it('publishes a backend-neutral editing session through UiRoot', () => {
@@ -192,7 +247,16 @@ it('publishes a backend-neutral editing session through UiRoot', () => {
   input.setSelectionRange(1, 2);
   fireEvent.select(input);
   fireEvent.blur(input);
-  expect(begin).toHaveBeenCalledWith(expect.objectContaining({ state: expect.objectContaining({ valueLength: 3 }) }));
-  expect(update).toHaveBeenCalledWith(expect.objectContaining({ state: expect.objectContaining({ selection: expect.objectContaining({ start: 1, end: 2 }) }) }));
+  expect(begin).toHaveBeenCalledWith(
+    expect.objectContaining({
+      descriptor: expect.objectContaining({ multiline: false, inputMode: 'text', readOnly: false }),
+      state: expect.objectContaining({ valueLength: 3 }),
+    }),
+  );
+  expect(update).toHaveBeenCalledWith(
+    expect.objectContaining({
+      state: expect.objectContaining({ selection: expect.objectContaining({ start: 1, end: 2 }) }),
+    }),
+  );
   expect(end).toHaveBeenCalledTimes(1);
 });

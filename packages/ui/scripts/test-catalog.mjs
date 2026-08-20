@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { buildCatalog } from './catalog-lib.mjs';
+import { buildCatalog, writeCatalog } from './catalog-lib.mjs';
 
 const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ontologyx-ui-catalog-'));
 const src = path.join(root, 'src');
@@ -51,16 +51,44 @@ try {
   if (!fixture.props.some((prop) => prop.name === 'elevated' && prop.optional))
     throw new Error('fixture optional prop metadata missing');
   if (fixture.order !== 10) throw new Error('fixture source-owned navigation order missing');
-  console.log('OntologyX UI catalog fixture passed: public export + colocated docs + source-owned order + local static spread auto-discovered.');
+
+  const studioRoot = path.join(root, 'studio');
+  writeCatalog({ uiRoot: root, studioRoot });
+  const generatedJson = path.join(
+    studioRoot,
+    'src',
+    'catalog',
+    'generated',
+    'catalog.generated.json',
+  );
+  const generatedData = JSON.parse(fs.readFileSync(generatedJson, 'utf8'));
+  fs.writeFileSync(generatedJson, `${JSON.stringify(generatedData)}\n`);
+  writeCatalog({ uiRoot: root, studioRoot, check: true });
+
+  generatedData[0].summary = 'Semantically stale fixture summary';
+  fs.writeFileSync(generatedJson, `${JSON.stringify(generatedData, null, 4)}\n`);
+  let semanticStaleDetected = false;
+  try {
+    writeCatalog({ uiRoot: root, studioRoot, check: true });
+  } catch (error) {
+    semanticStaleDetected =
+      error instanceof Error && error.message.includes('catalog.generated.json');
+  }
+  if (!semanticStaleDetected) {
+    throw new Error('catalog JSON semantic freshness failed to detect changed generated data');
+  }
+
+  console.log(
+    'OntologyX UI catalog fixture passed: public export + colocated docs + source-owned order + local static spread auto-discovered + formatter-stable JSON semantic freshness.',
+  );
 } finally {
   fs.rmSync(root, { recursive: true, force: true });
 }
 
-
 const realUiRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const realCatalog = buildCatalog({ uiRoot: realUiRoot });
-const forbiddenCanonicalEntries = realCatalog.filter((entry) =>
-  /RuntimeProvider$/.test(entry.exportName) || /Pattern$/.test(entry.exportName),
+const forbiddenCanonicalEntries = realCatalog.filter(
+  (entry) => /RuntimeProvider$/.test(entry.exportName) || /Pattern$/.test(entry.exportName),
 );
 if (forbiddenCanonicalEntries.length > 0) {
   throw new Error(
@@ -71,7 +99,9 @@ if (forbiddenCanonicalEntries.length > 0) {
 }
 const invalidOrder = realCatalog.filter((entry) => !Number.isFinite(entry.order));
 if (invalidOrder.length > 0) {
-  throw new Error(`Canonical catalog entries missing source-owned order: ${invalidOrder.map((entry) => entry.exportName).join(', ')}`);
+  throw new Error(
+    `Canonical catalog entries missing source-owned order: ${invalidOrder.map((entry) => entry.exportName).join(', ')}`,
+  );
 }
 console.log(
   `OntologyX UI canonical catalog boundary passed: ${realCatalog.length} SDK visual entries with no runtime providers or legacy patterns.`,

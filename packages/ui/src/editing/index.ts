@@ -5,11 +5,16 @@ export {
   type UiClipboardAdapter,
   writeUiClipboardText,
 } from './clipboard';
+export type { EditableTextBridge } from './runtime';
+export { useEditableTextRuntime } from './runtime';
 export type {
   EditableContentPurpose,
+  EditableEnterKeyHint,
+  EditableInputMode,
   EditableSelection,
-  EditableTextState,
+  EditableTextSessionDescriptor,
   EditableTextSessionSnapshot,
+  EditableTextState,
 } from './types';
 export { EDITABLE_CONTENT_PURPOSES } from './types';
 export {
@@ -18,5 +23,3 @@ export {
   inputModeForContentPurpose,
   useEditableTextContract,
 } from './useEditableText';
-export type { EditableTextBridge } from './runtime';
-export { useEditableTextRuntime } from './runtime';

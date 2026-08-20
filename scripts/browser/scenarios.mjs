@@ -2,17 +2,17 @@ import assert from 'node:assert/strict';
 import {
   assertEnvironment,
   assertMinimumBlockSize,
-  assertPublicUiStylesLoaded,
   assertNoGlobalHorizontalOverflow,
+  assertPublicUiStylesLoaded,
   assertVisibleFocus,
   assertWithinViewport,
   attachRuntimeDiagnostics,
   focusByTab,
-  waitForStudioExampleControl,
   gotoCatalog,
   performPointerCancel,
   performTouchLongPress,
   runAxe,
+  waitForStudioExampleControl,
 } from './harness.mjs';
 
 function scenario(id, axes, run, { accepts = [] } = {}) {
@@ -24,7 +24,10 @@ export const browserScenarios = [
     'studio-route-environment-a11y',
     ['route', 'a11y', 'theme', 'ltr', 'desktop'],
     async ({ browser, baseUrl }) => {
-      const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, colorScheme: 'dark' });
+      const context = await browser.newContext({
+        viewport: { width: 1280, height: 900 },
+        colorScheme: 'dark',
+      });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
@@ -75,16 +78,40 @@ export const browserScenarios = [
             apiScrollRegion: (() => {
               const region = element.querySelector('.ui-studio-api-table-wrap');
               return region instanceof HTMLElement
-                ? { role: region.getAttribute('role'), label: region.getAttribute('aria-label'), tabIndex: region.tabIndex }
+                ? {
+                    role: region.getAttribute('role'),
+                    label: region.getAttribute('aria-label'),
+                    tabIndex: region.tabIndex,
+                  }
                 : null;
             })(),
           };
         });
-        assert.equal(stacked.layout, 'stacked', 'Studio catalog did not publish the stacked reading-flow contract.');
-        assert.equal(stacked.tablists, 0, 'Studio catalog chrome regressed to a tabbed documentation layout.');
-        assert.deepEqual(stacked.sections.map((section) => section.id), ['overview', 'api', 'examples', 'playground'], 'Studio stacked section order drifted.');
-        assert.ok(stacked.sections.every((section) => section.visible), 'Studio stacked documentation did not keep every section mounted and visible.');
-        assert.ok(stacked.sections.every((section, index) => index === 0 || section.top > stacked.sections[index - 1].top), 'Studio stacked documentation sections are not laid out in reading order.');
+        assert.equal(
+          stacked.layout,
+          'stacked',
+          'Studio catalog did not publish the stacked reading-flow contract.',
+        );
+        assert.equal(
+          stacked.tablists,
+          0,
+          'Studio catalog chrome regressed to a tabbed documentation layout.',
+        );
+        assert.deepEqual(
+          stacked.sections.map((section) => section.id),
+          ['overview', 'api', 'examples', 'playground'],
+          'Studio stacked section order drifted.',
+        );
+        assert.ok(
+          stacked.sections.every((section) => section.visible),
+          'Studio stacked documentation did not keep every section mounted and visible.',
+        );
+        assert.ok(
+          stacked.sections.every(
+            (section, index) => index === 0 || section.top > stacked.sections[index - 1].top,
+          ),
+          'Studio stacked documentation sections are not laid out in reading order.',
+        );
         assert.deepEqual(
           stacked.apiScrollRegion,
           { role: 'region', label: 'Button API reference', tabIndex: 0 },
@@ -110,7 +137,10 @@ export const browserScenarios = [
       ];
       const observations = [];
       for (const testCase of cases) {
-        const context = await browser.newContext({ viewport: { width: 1100, height: 820 }, colorScheme: testCase.colorScheme });
+        const context = await browser.newContext({
+          viewport: { width: 1100, height: 820 },
+          colorScheme: testCase.colorScheme,
+        });
         const page = await context.newPage();
         const diagnostics = attachRuntimeDiagnostics(page);
         try {
@@ -123,7 +153,8 @@ export const browserScenarios = [
           await example.waitFor({ state: 'visible' });
           const substrate = await example.evaluate((fixture) => {
             const element = fixture.closest('.ui-root');
-            if (!(element instanceof HTMLElement)) throw new Error('Foundation token fixture lost its owning UiRoot.');
+            if (!(element instanceof HTMLElement))
+              throw new Error('Foundation token fixture lost its owning UiRoot.');
             const style = getComputedStyle(element);
             const roles = [
               '--oxs-color-accent',
@@ -138,14 +169,20 @@ export const browserScenarios = [
               '--oxs-color-warning-text',
             ];
             return {
-              values: Object.fromEntries(roles.map((name) => [name, style.getPropertyValue(name).trim()])),
+              values: Object.fromEntries(
+                roles.map((name) => [name, style.getPropertyValue(name).trim()]),
+              ),
               backgroundImage: style.backgroundImage,
             };
           });
           for (const [name, value] of Object.entries(substrate.values)) {
             assert.ok(value, `${testCase.id} theme did not resolve semantic token ${name}.`);
           }
-          assert.equal(substrate.backgroundImage, 'none', `${testCase.id} UiRoot foundation leaked ornamental background imagery.`);
+          assert.equal(
+            substrate.backgroundImage,
+            'none',
+            `${testCase.id} UiRoot foundation leaked ornamental background imagery.`,
+          );
           const axe = await runAxe(page, `${testCase.id} foundation token substrate`);
           diagnostics.assertClean(`${testCase.id} foundation token substrate`);
           observations.push({ id: testCase.id, axe, neutralRoot: true });
@@ -165,7 +202,11 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        const workbench = await gotoCatalog(page, baseUrl, { entry: 'Tabs', tab: 'examples', example: 'overview' });
+        const workbench = await gotoCatalog(page, baseUrl, {
+          entry: 'Tabs',
+          tab: 'examples',
+          example: 'overview',
+        });
         const overview = workbench.getByRole('tab', { name: 'Overview', exact: true });
         await focusByTab(page, overview);
         await assertVisibleFocus(overview, 'Tabs component Overview control');
@@ -173,12 +214,24 @@ export const browserScenarios = [
         await page.keyboard.press('ArrowRight');
         const activity = workbench.getByRole('tab', { name: 'Activity', exact: true });
         await activity.waitFor({ state: 'visible' });
-        assert.equal(await activity.getAttribute('aria-selected'), 'true', 'ArrowRight did not automatically activate the component Activity tab.');
-        assert.equal(await activity.evaluate((element) => element.ownerDocument.activeElement === element), true, 'Roving focus did not move to the component Activity tab.');
+        assert.equal(
+          await activity.getAttribute('aria-selected'),
+          'true',
+          'ArrowRight did not automatically activate the component Activity tab.',
+        );
+        assert.equal(
+          await activity.evaluate((element) => element.ownerDocument.activeElement === element),
+          true,
+          'Roving focus did not move to the component Activity tab.',
+        );
         await assertVisibleFocus(activity, 'Tabs component Activity control');
 
         await page.keyboard.press('ArrowLeft');
-        assert.equal(await overview.getAttribute('aria-selected'), 'true', 'ArrowLeft did not return component selection to Overview.');
+        assert.equal(
+          await overview.getAttribute('aria-selected'),
+          'true',
+          'ArrowLeft did not return component selection to Overview.',
+        );
         diagnostics.assertClean('keyboard/roving journey');
         return { componentTabs: 'reachable', activation: 'automatic' };
       } finally {
@@ -195,7 +248,11 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        const example = await gotoCatalog(page, baseUrl, { entry: 'Dialog', tab: 'examples', example: 'overview' });
+        const example = await gotoCatalog(page, baseUrl, {
+          entry: 'Dialog',
+          tab: 'examples',
+          example: 'overview',
+        });
         const trigger = example.getByRole('button', { name: 'Open dialog', exact: true });
         await waitForStudioExampleControl(page, trigger, 'Dialog trigger');
         await focusByTab(page, trigger);
@@ -204,8 +261,16 @@ export const browserScenarios = [
 
         const dialog = page.getByRole('dialog', { name: 'Example dialog' });
         await dialog.waitFor({ state: 'visible' });
-        assert.equal(await dialog.getAttribute('aria-modal'), 'true', 'Modal Dialog did not expose aria-modal=true.');
-        assert.equal(await dialog.evaluate((element) => element.contains(document.activeElement)), true, 'Focus was not moved into the opened Dialog.');
+        assert.equal(
+          await dialog.getAttribute('aria-modal'),
+          'true',
+          'Modal Dialog did not expose aria-modal=true.',
+        );
+        assert.equal(
+          await dialog.evaluate((element) => element.contains(document.activeElement)),
+          true,
+          'Focus was not moved into the opened Dialog.',
+        );
 
         const isolated = await page.locator('.ui-studio-shell').evaluate((element) => {
           const boundary = element.closest('[inert]');
@@ -214,12 +279,20 @@ export const browserScenarios = [
             ariaHidden: boundary?.getAttribute('aria-hidden') ?? null,
           };
         });
-        assert.deepEqual(isolated, { inert: true, ariaHidden: 'true' }, 'Modal overlay did not isolate the nearest Studio boundary with inert + aria-hidden.');
+        assert.deepEqual(
+          isolated,
+          { inert: true, ariaHidden: 'true' },
+          'Modal overlay did not isolate the nearest Studio boundary with inert + aria-hidden.',
+        );
         const axe = await runAxe(page, 'Open Dialog');
 
         await page.keyboard.press('Escape');
         await dialog.waitFor({ state: 'detached' });
-        assert.equal(await trigger.evaluate((element) => document.activeElement === element), true, 'Escape did not restore focus to the Dialog trigger.');
+        assert.equal(
+          await trigger.evaluate((element) => document.activeElement === element),
+          true,
+          'Escape did not restore focus to the Dialog trigger.',
+        );
         const restored = await page.locator('.ui-studio-shell').evaluate((element) => {
           const boundary = element.closest('[inert], [aria-hidden="true"]');
           return {
@@ -227,7 +300,11 @@ export const browserScenarios = [
             ariaHidden: boundary?.getAttribute('aria-hidden') ?? null,
           };
         });
-        assert.deepEqual(restored, { inert: false, ariaHidden: null }, 'Modal isolation leaked after Dialog dismissal.');
+        assert.deepEqual(
+          restored,
+          { inert: false, ariaHidden: null },
+          'Modal isolation leaked after Dialog dismissal.',
+        );
         diagnostics.assertClean('Dialog lifecycle journey');
         return { axe, focusRestored: true, modalIsolationRestored: true };
       } finally {
@@ -244,7 +321,11 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        const example = await gotoCatalog(page, baseUrl, { entry: 'Popover', tab: 'examples', example: 'modal-focus' });
+        const example = await gotoCatalog(page, baseUrl, {
+          entry: 'Popover',
+          tab: 'examples',
+          example: 'modal-focus',
+        });
         const trigger = example.getByRole('button', { name: 'Open modal popover', exact: true });
         await waitForStudioExampleControl(page, trigger, 'Modal Popover trigger');
         await focusByTab(page, trigger);
@@ -254,9 +335,8 @@ export const browserScenarios = [
         await popover.waitFor({ state: 'visible' });
         const state = await popover.evaluate((element) => {
           const active = document.activeElement;
-          const hiddenAncestor = active instanceof HTMLElement
-            ? active.closest('[aria-hidden="true"], [inert]')
-            : null;
+          const hiddenAncestor =
+            active instanceof HTMLElement ? active.closest('[aria-hidden="true"], [inert]') : null;
           return {
             focusInside: active instanceof HTMLElement && element.contains(active),
             hiddenAncestor: Boolean(hiddenAncestor),
@@ -279,7 +359,16 @@ export const browserScenarios = [
 
   scenario(
     'uiroot-nested-runtime-certification',
-    ['foundations', 'uiroot', 'nested-roots', 'inheritance', 'portal', 'modal-isolation', 'focus', 'a11y'],
+    [
+      'foundations',
+      'uiroot',
+      'nested-roots',
+      'inheritance',
+      'portal',
+      'modal-isolation',
+      'focus',
+      'a11y',
+    ],
     async ({ browser, baseUrl }) => {
       const context = await browser.newContext({
         viewport: { width: 1100, height: 860 },
@@ -330,27 +419,31 @@ export const browserScenarios = [
             },
           };
         });
-        assert.deepEqual(environment, {
-          outer: {
-            scope: 'nested',
-            theme: 'dark',
-            direction: 'rtl',
-            density: 'comfortable',
-            radius: '18px',
-            safeBlockStart: '12px',
-            portalCount: 1,
+        assert.deepEqual(
+          environment,
+          {
+            outer: {
+              scope: 'nested',
+              theme: 'dark',
+              direction: 'rtl',
+              density: 'comfortable',
+              radius: '18px',
+              safeBlockStart: '12px',
+              portalCount: 1,
+            },
+            inner: {
+              scope: 'nested',
+              theme: 'dark',
+              direction: 'rtl',
+              density: 'compact',
+              radius: '6px',
+              safeBlockStart: '12px',
+              occlusionBlockEnd: '40px',
+              portalCount: 1,
+            },
           },
-          inner: {
-            scope: 'nested',
-            theme: 'dark',
-            direction: 'rtl',
-            density: 'compact',
-            radius: '6px',
-            safeBlockStart: '12px',
-            occlusionBlockEnd: '40px',
-            portalCount: 1,
-          },
-        }, 'Nested UiRoot did not inherit/override its environment contract deterministically.');
+          'Nested UiRoot did not inherit/override its environment contract deterministically.',
+        );
 
         const outerAction = example.getByRole('button', { name: 'Outer action', exact: true });
         const trigger = example.getByRole('button', { name: 'Open nested dialog', exact: true });
@@ -368,9 +461,8 @@ export const browserScenarios = [
           const portal = element.closest('[data-oxs-portal-root]');
           const ownerRoot = portal?.parentElement;
           const active = document.activeElement;
-          const hiddenFocusedAncestor = active instanceof HTMLElement
-            ? active.closest('[aria-hidden="true"], [inert]')
-            : null;
+          const hiddenFocusedAncestor =
+            active instanceof HTMLElement ? active.closest('[aria-hidden="true"], [inert]') : null;
           return {
             portalOwnedByInner: Boolean(inner && ownerRoot === inner),
             outerActionIsolated: Boolean(
@@ -381,16 +473,24 @@ export const browserScenarios = [
             hiddenFocusedAncestor: Boolean(hiddenFocusedAncestor),
           };
         });
-        assert.deepEqual(ownership, {
-          portalOwnedByInner: true,
-          outerActionIsolated: false,
-          focusInsideDialog: true,
-          hiddenFocusedAncestor: false,
-        }, 'Nested modal escaped its nearest UiRoot ownership boundary.');
+        assert.deepEqual(
+          ownership,
+          {
+            portalOwnedByInner: true,
+            outerActionIsolated: false,
+            focusInsideDialog: true,
+            hiddenFocusedAncestor: false,
+          },
+          'Nested modal escaped its nearest UiRoot ownership boundary.',
+        );
 
         await dialog.getByRole('button', { name: 'Done', exact: true }).click();
         await dialog.waitFor({ state: 'hidden' });
-        assert.equal(await trigger.evaluate((element) => document.activeElement === element), true, 'Nested UiRoot did not restore focus to its trigger.');
+        assert.equal(
+          await trigger.evaluate((element) => document.activeElement === element),
+          true,
+          'Nested UiRoot did not restore focus to its trigger.',
+        );
         await outerAction.click();
         const axe = await runAxe(page, 'UiRoot nested certification');
         diagnostics.assertClean('UiRoot nested certification');
@@ -406,7 +506,10 @@ export const browserScenarios = [
     'box-layout-boundary-certification',
     ['layout', 'polymorphism', 'overflow', 'min-size', 'flex-child', 'grid-span', 'rtl', 'a11y'],
     async ({ browser, baseUrl }) => {
-      const context = await browser.newContext({ viewport: { width: 760, height: 760 }, colorScheme: 'dark' });
+      const context = await browser.newContext({
+        viewport: { width: 760, height: 760 },
+        colorScheme: 'dark',
+      });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
@@ -431,15 +534,39 @@ export const browserScenarios = [
             direction: style.direction,
           };
         });
-        assert.equal(boundary.tagName, 'SECTION', 'Box polymorphism did not preserve the requested semantic section element.');
-        assert.equal(boundary.overflow, 'auto', 'Box overflow contract did not reach browser layout.');
-        assert.equal(boundary.minInlineSize, '0px', 'Box minInlineSize="zero" did not prevent intrinsic overflow pressure.');
-        assert.equal(boundary.flexGrow, '1', 'Box flex="grow" did not participate in its Row parent.');
-        assert.equal(boundary.direction, 'rtl', 'Box did not inherit the resolved logical direction.');
+        assert.equal(
+          boundary.tagName,
+          'SECTION',
+          'Box polymorphism did not preserve the requested semantic section element.',
+        );
+        assert.equal(
+          boundary.overflow,
+          'auto',
+          'Box overflow contract did not reach browser layout.',
+        );
+        assert.equal(
+          boundary.minInlineSize,
+          '0px',
+          'Box minInlineSize="zero" did not prevent intrinsic overflow pressure.',
+        );
+        assert.equal(
+          boundary.flexGrow,
+          '1',
+          'Box flex="grow" did not participate in its Row parent.',
+        );
+        assert.equal(
+          boundary.direction,
+          'rtl',
+          'Box did not inherit the resolved logical direction.',
+        );
 
         const fullSpan = example.locator('[aria-label="Full-span Box"]');
         const span = await fullSpan.evaluate((element) => getComputedStyle(element).gridColumnEnd);
-        assert.equal(span, '-1', 'Box gridSpan="full" did not span the full Grid inline track range.');
+        assert.equal(
+          span,
+          '-1',
+          'Box gridSpan="full" did not span the full Grid inline track range.',
+        );
         await assertNoGlobalHorizontalOverflow(page, 'Box layout boundary');
         const axe = await runAxe(page, 'Box layout boundary certification');
         diagnostics.assertClean('Box layout boundary certification');
@@ -453,9 +580,23 @@ export const browserScenarios = [
 
   scenario(
     'logical-flow-layout-certification',
-    ['layout', 'stack', 'row', 'wrap', 'polymorphism', 'rtl', 'logical-order', 'responsive', 'reflow', 'a11y'],
+    [
+      'layout',
+      'stack',
+      'row',
+      'wrap',
+      'polymorphism',
+      'rtl',
+      'logical-order',
+      'responsive',
+      'reflow',
+      'a11y',
+    ],
     async ({ browser, baseUrl }) => {
-      const context = await browser.newContext({ viewport: { width: 520, height: 760 }, colorScheme: 'light' });
+      const context = await browser.newContext({
+        viewport: { width: 520, height: 760 },
+        colorScheme: 'light',
+      });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
@@ -482,7 +623,11 @@ export const browserScenarios = [
         });
         assert.equal(stackState.display, 'flex', 'Stack did not render as a flex layout.');
         assert.equal(stackState.flexDirection, 'column', 'Stack did not own block-axis flow.');
-        assert.ok(stackState.blockOrder[0] < stackState.blockOrder[1] && stackState.blockOrder[1] < stackState.blockOrder[2], 'Stack visual order diverged from DOM order.');
+        assert.ok(
+          stackState.blockOrder[0] < stackState.blockOrder[1] &&
+            stackState.blockOrder[1] < stackState.blockOrder[2],
+          'Stack visual order diverged from DOM order.',
+        );
         const stackAxe = await runAxe(page, 'Stack flow certification');
 
         example = await gotoCatalog(page, baseUrl, {
@@ -502,13 +647,29 @@ export const browserScenarios = [
             text: child.textContent,
             x: child.getBoundingClientRect().x,
           }));
-          return { display: style.display, flexDirection: style.flexDirection, direction: style.direction, children };
+          return {
+            display: style.display,
+            flexDirection: style.flexDirection,
+            direction: style.direction,
+            children,
+          };
         });
         assert.equal(rowState.display, 'flex', 'Row did not render as a flex layout.');
-        assert.equal(rowState.flexDirection, 'row', 'Row must use the logical inline flow rather than reverse DOM order.');
+        assert.equal(
+          rowState.flexDirection,
+          'row',
+          'Row must use the logical inline flow rather than reverse DOM order.',
+        );
         assert.equal(rowState.direction, 'rtl', 'Row did not resolve RTL from UiRoot.');
-        assert.deepEqual(rowState.children.map((child) => child.text), ['First', 'Second', 'Third'], 'Row DOM/content order changed under RTL.');
-        assert.ok(rowState.children[0].x > rowState.children[1].x, 'RTL Row did not place the first DOM child at inline-start.');
+        assert.deepEqual(
+          rowState.children.map((child) => child.text),
+          ['First', 'Second', 'Third'],
+          'Row DOM/content order changed under RTL.',
+        );
+        assert.ok(
+          rowState.children[0].x > rowState.children[1].x,
+          'RTL Row did not place the first DOM child at inline-start.',
+        );
         const rowAxe = await runAxe(page, 'Row RTL certification');
 
         example = await gotoCatalog(page, baseUrl, {
@@ -524,17 +685,29 @@ export const browserScenarios = [
         await wrap.waitFor({ state: 'visible' });
         const wrapState = await wrap.evaluate((element) => {
           const style = getComputedStyle(element);
-          const rows = [...new Set([...element.children].map((child) => Math.round(child.getBoundingClientRect().y)))];
+          const rows = [
+            ...new Set(
+              [...element.children].map((child) => Math.round(child.getBoundingClientRect().y)),
+            ),
+          ];
           return { display: style.display, flexWrap: style.flexWrap, rows: rows.length };
         });
         assert.equal(wrapState.display, 'flex', 'Wrap did not render as flex.');
         assert.equal(wrapState.flexWrap, 'wrap', 'Wrap did not enable intrinsic wrapping.');
-        assert.ok(wrapState.rows >= 2, `Wrap did not reflow into multiple rows in a compact container (rows=${wrapState.rows}).`);
+        assert.ok(
+          wrapState.rows >= 2,
+          `Wrap did not reflow into multiple rows in a compact container (rows=${wrapState.rows}).`,
+        );
         await assertNoGlobalHorizontalOverflow(page, 'Wrap compact reflow');
         const wrapAxe = await runAxe(page, 'Wrap reflow certification');
 
         diagnostics.assertClean('logical flow layout certification');
-        return { stack: stackState, row: rowState, wrap: wrapState, axe: [stackAxe, rowAxe, wrapAxe] };
+        return {
+          stack: stackState,
+          row: rowState,
+          wrap: wrapState,
+          axe: [stackAxe, rowAxe, wrapAxe],
+        };
       } finally {
         await context.close();
       }
@@ -544,9 +717,22 @@ export const browserScenarios = [
 
   scenario(
     'grid-track-strategy-certification',
-    ['layout', 'grid', 'tracks', 'auto-fit', 'minmax', 'grid-span', 'responsive', 'polymorphism', 'a11y'],
+    [
+      'layout',
+      'grid',
+      'tracks',
+      'auto-fit',
+      'minmax',
+      'grid-span',
+      'responsive',
+      'polymorphism',
+      'a11y',
+    ],
     async ({ browser, baseUrl }) => {
-      const context = await browser.newContext({ viewport: { width: 1500, height: 900 }, colorScheme: 'dark' });
+      const context = await browser.newContext({
+        viewport: { width: 1500, height: 900 },
+        colorScheme: 'dark',
+      });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
@@ -579,36 +765,70 @@ export const browserScenarios = [
           `Studio phone preset did not resolve near 390px (${JSON.stringify(studioGeometry)}).`,
         );
         assert.ok(
-          (studioGeometry.workspace?.width ?? 0) > 200 && (studioGeometry.exampleCanvas?.width ?? 0) > 100,
+          (studioGeometry.workspace?.width ?? 0) > 200 &&
+            (studioGeometry.exampleCanvas?.width ?? 0) > 100,
           `Studio simulated viewport collapsed the active example before Grid layout could be certified: ${JSON.stringify(studioGeometry)}`,
         );
         const intrinsic = example.getByRole('region', { name: 'Certified intrinsic Grid' });
         await intrinsic.waitFor({ state: 'visible' });
-        const readIntrinsicState = (locator) => locator.evaluate((element) => {
-          const style = getComputedStyle(element);
-          const columns = style.gridTemplateColumns.split(/\s+/).filter(Boolean);
-          return {
-            tagName: element.tagName,
-            display: style.display,
-            columns,
-            minInlineSize: style.minInlineSize,
-          };
-        });
+        const readIntrinsicState = (locator) =>
+          locator.evaluate((element) => {
+            const style = getComputedStyle(element);
+            const columns = style.gridTemplateColumns.split(/\s+/).filter(Boolean);
+            return {
+              tagName: element.tagName,
+              display: style.display,
+              columns,
+              minInlineSize: style.minInlineSize,
+            };
+          });
         const phoneIntrinsicState = await readIntrinsicState(intrinsic);
-        assert.equal(phoneIntrinsicState.tagName, 'SECTION', 'Grid polymorphism did not preserve semantic section output.');
-        assert.equal(phoneIntrinsicState.display, 'grid', 'Grid did not reach browser Grid layout.');
-        assert.ok(phoneIntrinsicState.columns.length >= 1, 'auto-fit Grid did not form an intrinsic track in the compact container.');
-        assert.equal(phoneIntrinsicState.minInlineSize, '0px', 'Grid did not preserve nested-layout min-inline-size safety.');
+        assert.equal(
+          phoneIntrinsicState.tagName,
+          'SECTION',
+          'Grid polymorphism did not preserve semantic section output.',
+        );
+        assert.equal(
+          phoneIntrinsicState.display,
+          'grid',
+          'Grid did not reach browser Grid layout.',
+        );
+        assert.ok(
+          phoneIntrinsicState.columns.length >= 1,
+          'auto-fit Grid did not form an intrinsic track in the compact container.',
+        );
+        assert.equal(
+          phoneIntrinsicState.minInlineSize,
+          '0px',
+          'Grid did not preserve nested-layout min-inline-size safety.',
+        );
 
         const fixed = example.getByRole('region', { name: 'Certified fixed Grid' });
         const fixedState = await fixed.evaluate((element) => ({
-          columns: getComputedStyle(element).gridTemplateColumns.split(/\s+/).filter(Boolean).length,
-          children: [...element.children].map((child) => child.textContent?.replace(/\s+/g, ' ').trim()),
+          columns: getComputedStyle(element).gridTemplateColumns.split(/\s+/).filter(Boolean)
+            .length,
+          children: [...element.children].map((child) =>
+            child.textContent?.replace(/\s+/g, ' ').trim(),
+          ),
         }));
-        assert.equal(fixedState.columns, 4, 'Grid columns={4} did not produce exactly four finite tracks.');
-        assert.deepEqual(fixedState.children, ['Span 2', 'Peer A', 'Peer B'], 'Grid visual contract must preserve DOM/content order.');
-        const span = await example.getByLabel('Two-column Grid item').evaluate((element) => getComputedStyle(element).gridColumnEnd);
-        assert.match(span, /span\s+2/, 'Box gridSpan={2} did not participate in the fixed Grid track model.');
+        assert.equal(
+          fixedState.columns,
+          4,
+          'Grid columns={4} did not produce exactly four finite tracks.',
+        );
+        assert.deepEqual(
+          fixedState.children,
+          ['Span 2', 'Peer A', 'Peer B'],
+          'Grid visual contract must preserve DOM/content order.',
+        );
+        const span = await example
+          .getByLabel('Two-column Grid item')
+          .evaluate((element) => getComputedStyle(element).gridColumnEnd);
+        assert.match(
+          span,
+          /span\s+2/,
+          'Box gridSpan={2} did not participate in the fixed Grid track model.',
+        );
         await assertNoGlobalHorizontalOverflow(page, 'Grid compact track strategies');
 
         example = await gotoCatalog(page, baseUrl, {
@@ -648,7 +868,10 @@ export const browserScenarios = [
     'container-semantic-width-certification',
     ['layout', 'container', 'semantic-width', 'readable', 'responsive', 'polymorphism', 'a11y'],
     async ({ browser, baseUrl }) => {
-      const context = await browser.newContext({ viewport: { width: 1720, height: 900 }, colorScheme: 'light' });
+      const context = await browser.newContext({
+        viewport: { width: 1720, height: 900 },
+        colorScheme: 'light',
+      });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
@@ -664,22 +887,43 @@ export const browserScenarios = [
         const readable = example.getByRole('region', { name: 'Certified readable Container' });
         const full = example.getByRole('region', { name: 'Certified full Container' });
         await readable.waitFor({ state: 'visible' });
-        const geometry = await Promise.all([readable, full].map((locator) => locator.evaluate((element) => {
-          const style = getComputedStyle(element);
-          const rect = element.getBoundingClientRect();
-          return {
-            tagName: element.tagName,
-            width: rect.width,
-            maxInlineSize: style.maxInlineSize,
-            marginInlineStart: style.marginInlineStart,
-            marginInlineEnd: style.marginInlineEnd,
-          };
-        })));
-        assert.equal(geometry[0].tagName, 'SECTION', 'Container polymorphism did not preserve section semantics.');
-        assert.equal(geometry[0].maxInlineSize, '704px', 'Container width="readable" is not backed by the 44rem semantic token.');
-        assert.ok(geometry[1].width > geometry[0].width + 80, 'Full Container did not expand beyond the readable semantic tier.');
-        assert.ok(Number.parseFloat(geometry[0].marginInlineStart) > 0, 'Readable Container was not centered on the inline axis.');
-        assert.ok(Number.parseFloat(geometry[0].marginInlineEnd) > 0, 'Readable Container did not retain symmetric inline centering.');
+        const geometry = await Promise.all(
+          [readable, full].map((locator) =>
+            locator.evaluate((element) => {
+              const style = getComputedStyle(element);
+              const rect = element.getBoundingClientRect();
+              return {
+                tagName: element.tagName,
+                width: rect.width,
+                maxInlineSize: style.maxInlineSize,
+                marginInlineStart: style.marginInlineStart,
+                marginInlineEnd: style.marginInlineEnd,
+              };
+            }),
+          ),
+        );
+        assert.equal(
+          geometry[0].tagName,
+          'SECTION',
+          'Container polymorphism did not preserve section semantics.',
+        );
+        assert.equal(
+          geometry[0].maxInlineSize,
+          '704px',
+          'Container width="readable" is not backed by the 44rem semantic token.',
+        );
+        assert.ok(
+          geometry[1].width > geometry[0].width + 80,
+          'Full Container did not expand beyond the readable semantic tier.',
+        );
+        assert.ok(
+          Number.parseFloat(geometry[0].marginInlineStart) > 0,
+          'Readable Container was not centered on the inline axis.',
+        );
+        assert.ok(
+          Number.parseFloat(geometry[0].marginInlineEnd) > 0,
+          'Readable Container did not retain symmetric inline centering.',
+        );
         await assertNoGlobalHorizontalOverflow(page, 'Container semantic widths');
         const axe = await runAxe(page, 'Container semantic width certification');
         diagnostics.assertClean('Container semantic width certification');
@@ -695,7 +939,10 @@ export const browserScenarios = [
     'inset-logical-spacing-certification',
     ['layout', 'inset', 'logical-spacing', 'precedence', 'rtl', 'polymorphism', 'a11y'],
     async ({ browser, baseUrl }) => {
-      const context = await browser.newContext({ viewport: { width: 900, height: 760 }, colorScheme: 'dark' });
+      const context = await browser.newContext({
+        viewport: { width: 900, height: 760 },
+        colorScheme: 'dark',
+      });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
@@ -723,15 +970,32 @@ export const browserScenarios = [
             physicalRight: style.paddingRight,
           };
         });
-        assert.equal(state.tagName, 'SECTION', 'Inset polymorphism did not preserve section semantics.');
+        assert.equal(
+          state.tagName,
+          'SECTION',
+          'Inset polymorphism did not preserve section semantics.',
+        );
         assert.equal(state.direction, 'rtl', 'Inset did not inherit the resolved RTL direction.');
         assert.deepEqual(
-          { inlineStart: state.inlineStart, inlineEnd: state.inlineEnd, blockStart: state.blockStart, blockEnd: state.blockEnd },
+          {
+            inlineStart: state.inlineStart,
+            inlineEnd: state.inlineEnd,
+            blockStart: state.blockStart,
+            blockEnd: state.blockEnd,
+          },
           { inlineStart: '48px', inlineEnd: '24px', blockStart: '8px', blockEnd: '0px' },
           'Inset all → axis → edge precedence did not resolve to the expected token values.',
         );
-        assert.equal(state.physicalRight, '48px', 'RTL logical inline-start did not map to the physical right edge in browser layout.');
-        assert.equal(state.physicalLeft, '24px', 'RTL logical inline-end did not map to the physical left edge in browser layout.');
+        assert.equal(
+          state.physicalRight,
+          '48px',
+          'RTL logical inline-start did not map to the physical right edge in browser layout.',
+        );
+        assert.equal(
+          state.physicalLeft,
+          '24px',
+          'RTL logical inline-end did not map to the physical left edge in browser layout.',
+        );
         const axe = await runAxe(page, 'Inset logical spacing certification');
         diagnostics.assertClean('Inset logical spacing certification');
         return { axe, state };
@@ -744,9 +1008,20 @@ export const browserScenarios = [
 
   scenario(
     'safe-area-logical-edge-certification',
-    ['layout', 'safe-area', 'logical-edges', 'persistent-insets', 'occlusion-isolation', 'rtl', 'a11y'],
+    [
+      'layout',
+      'safe-area',
+      'logical-edges',
+      'persistent-insets',
+      'occlusion-isolation',
+      'rtl',
+      'a11y',
+    ],
     async ({ browser, baseUrl }) => {
-      const context = await browser.newContext({ viewport: { width: 900, height: 760 }, colorScheme: 'dark' });
+      const context = await browser.newContext({
+        viewport: { width: 900, height: 760 },
+        colorScheme: 'dark',
+      });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
@@ -774,7 +1049,13 @@ export const browserScenarios = [
         });
         assert.deepEqual(
           notch,
-          { direction: 'rtl', blockStart: '0px', inlineEnd: '0px', blockEnd: '12px', inlineStart: '12px' },
+          {
+            direction: 'rtl',
+            blockStart: '0px',
+            inlineEnd: '0px',
+            blockEnd: '12px',
+            inlineStart: '12px',
+          },
           'SafeArea consumed edges outside its explicit logical ownership set.',
         );
 
@@ -796,12 +1077,25 @@ export const browserScenarios = [
           return {
             blockEnd: style.paddingBlockEnd,
             safeBlockEnd: rootStyle?.getPropertyValue('--oxs-safe-block-end').trim() ?? null,
-            occlusionBlockEnd: rootStyle?.getPropertyValue('--oxs-occlusion-block-end').trim() ?? null,
+            occlusionBlockEnd:
+              rootStyle?.getPropertyValue('--oxs-occlusion-block-end').trim() ?? null,
           };
         });
-        assert.equal(keyboard.safeBlockEnd, '0px', 'Keyboard preset unexpectedly changed the persistent safe-area input.');
-        assert.equal(keyboard.occlusionBlockEnd, '280px', 'Keyboard preset did not project transient occlusion.');
-        assert.equal(keyboard.blockEnd, '0px', 'SafeArea incorrectly consumed transient keyboard occlusion.');
+        assert.equal(
+          keyboard.safeBlockEnd,
+          '0px',
+          'Keyboard preset unexpectedly changed the persistent safe-area input.',
+        );
+        assert.equal(
+          keyboard.occlusionBlockEnd,
+          '280px',
+          'Keyboard preset did not project transient occlusion.',
+        );
+        assert.equal(
+          keyboard.blockEnd,
+          '0px',
+          'SafeArea incorrectly consumed transient keyboard occlusion.',
+        );
         const axe = await runAxe(page, 'SafeArea logical edge certification');
         diagnostics.assertClean('SafeArea logical edge certification');
         return { axe, notch, keyboard };
@@ -816,7 +1110,10 @@ export const browserScenarios = [
     'spacer-logical-axis-certification',
     ['layout', 'spacer', 'logical-axis', 'decorative', 'a11y'],
     async ({ browser, baseUrl }) => {
-      const context = await browser.newContext({ viewport: { width: 900, height: 760 }, colorScheme: 'light' });
+      const context = await browser.newContext({
+        viewport: { width: 900, height: 760 },
+        colorScheme: 'light',
+      });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
@@ -845,8 +1142,16 @@ export const browserScenarios = [
           const style = getComputedStyle(element);
           return { inlineSize: style.inlineSize, blockSize: style.blockSize };
         });
-        assert.deepEqual(inline, { inlineSize: '48px', blockSize: '0px', ariaHidden: 'true', tabIndex: -1 }, 'Inline Spacer geometry/accessibility invariant failed.');
-        assert.deepEqual(block, { inlineSize: '0px', blockSize: '24px' }, 'Block Spacer geometry invariant failed.');
+        assert.deepEqual(
+          inline,
+          { inlineSize: '48px', blockSize: '0px', ariaHidden: 'true', tabIndex: -1 },
+          'Inline Spacer geometry/accessibility invariant failed.',
+        );
+        assert.deepEqual(
+          block,
+          { inlineSize: '0px', blockSize: '24px' },
+          'Block Spacer geometry invariant failed.',
+        );
         const axe = await runAxe(page, 'Spacer logical axis certification');
         diagnostics.assertClean('Spacer logical axis certification');
         return { axe, inline, block };
@@ -859,9 +1164,24 @@ export const browserScenarios = [
 
   scenario(
     'typography-semantic-bidi-reflow-certification',
-    ['visual', 'typography', 'semantics', 'bidi', 'rtl', 'font-fallback', 'long-string', 'zoom', 'reflow', 'selection', 'a11y'],
+    [
+      'visual',
+      'typography',
+      'semantics',
+      'bidi',
+      'rtl',
+      'font-fallback',
+      'long-string',
+      'zoom',
+      'reflow',
+      'selection',
+      'a11y',
+    ],
     async ({ browser, baseUrl }) => {
-      const context = await browser.newContext({ viewport: { width: 980, height: 820 }, colorScheme: 'light' });
+      const context = await browser.newContext({
+        viewport: { width: 980, height: 820 },
+        colorScheme: 'light',
+      });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
@@ -876,8 +1196,12 @@ export const browserScenarios = [
         });
         await example.evaluate((fixture) => {
           const root = fixture.closest('.ui-root');
-          if (!(root instanceof HTMLElement)) throw new Error('Text certification fixture lost its owning UiRoot.');
-          root.style.setProperty('--oxs-font-sans', '"Definitely Missing OntologyX Font", system-ui, sans-serif');
+          if (!(root instanceof HTMLElement))
+            throw new Error('Text certification fixture lost its owning UiRoot.');
+          root.style.setProperty(
+            '--oxs-font-sans',
+            '"Definitely Missing OntologyX Font", system-ui, sans-serif',
+          );
         });
         const text = example.locator('[data-visual-cert="text"]');
         await text.waitFor({ state: 'visible' });
@@ -895,11 +1219,30 @@ export const browserScenarios = [
           };
         });
         assert.equal(textState.tagName, 'P', 'Text did not preserve paragraph semantics.');
-        assert.equal(textState.direction, 'rtl', 'dir="auto" did not resolve the Persian-first mixed copy to RTL.');
-        assert.equal(textState.overflowWrap, 'anywhere', 'Text long-token wrapping policy did not reach browser CSS.');
-        assert.equal(textState.userSelect, 'text', 'Text selectable policy did not reach browser selection behavior.');
-        assert.match(textState.fontFamily, /Definitely Missing OntologyX Font/, 'Text did not consume the overridden Foundation font stack.');
-        assert.ok(textState.width > 0 && textState.scrollWidth <= Math.ceil(textState.width) + 1, 'Mixed/long Text escaped its containing width.');
+        assert.equal(
+          textState.direction,
+          'rtl',
+          'dir="auto" did not resolve the Persian-first mixed copy to RTL.',
+        );
+        assert.equal(
+          textState.overflowWrap,
+          'anywhere',
+          'Text long-token wrapping policy did not reach browser CSS.',
+        );
+        assert.equal(
+          textState.userSelect,
+          'text',
+          'Text selectable policy did not reach browser selection behavior.',
+        );
+        assert.match(
+          textState.fontFamily,
+          /Definitely Missing OntologyX Font/,
+          'Text did not consume the overridden Foundation font stack.',
+        );
+        assert.ok(
+          textState.width > 0 && textState.scrollWidth <= Math.ceil(textState.width) + 1,
+          'Mixed/long Text escaped its containing width.',
+        );
         await assertNoGlobalHorizontalOverflow(page, 'Text mixed-script compact reflow');
 
         const cdp = await context.newCDPSession(page);
@@ -911,7 +1254,13 @@ export const browserScenarios = [
         await cdp.send('Emulation.setPageScaleFactor', { pageScaleFactor: 1 });
 
         example = await gotoCatalog(page, baseUrl, {
-          entry: 'Heading', tab: 'examples', example: 'semantic-rank', theme: 'light', dir: 'rtl', viewport: 'phone', container: 'compact',
+          entry: 'Heading',
+          tab: 'examples',
+          example: 'semantic-rank',
+          theme: 'light',
+          dir: 'rtl',
+          viewport: 'phone',
+          container: 'compact',
         });
         const heading = example.locator('[data-visual-cert="heading"]');
         const headingState = await heading.evaluate((element) => ({
@@ -919,11 +1268,25 @@ export const browserScenarios = [
           fontSize: getComputedStyle(element).fontSize,
           maxInlineSize: getComputedStyle(element).maxInlineSize,
         }));
-        assert.equal(headingState.tagName, 'H3', 'Heading visual size changed native semantic rank.');
-        assert.notEqual(headingState.maxInlineSize, '11ch', 'Display/heading typography still owns a legacy content-width cap.');
+        assert.equal(
+          headingState.tagName,
+          'H3',
+          'Heading visual size changed native semantic rank.',
+        );
+        assert.notEqual(
+          headingState.maxInlineSize,
+          '11ch',
+          'Display/heading typography still owns a legacy content-width cap.',
+        );
 
         example = await gotoCatalog(page, baseUrl, {
-          entry: 'Label', tab: 'examples', example: 'metadata-label', theme: 'light', dir: 'rtl', viewport: 'phone', container: 'compact',
+          entry: 'Label',
+          tab: 'examples',
+          example: 'metadata-label',
+          theme: 'light',
+          dir: 'rtl',
+          viewport: 'phone',
+          container: 'compact',
         });
         const label = example.locator('[data-visual-cert="label"]');
         const labelState = await label.evaluate((element) => ({
@@ -931,10 +1294,20 @@ export const browserScenarios = [
           role: element.getAttribute('role'),
           tabIndex: element.tabIndex,
         }));
-        assert.deepEqual(labelState, { tagName: 'SPAN', role: null, tabIndex: -1 }, 'Label invented control/focus semantics.');
+        assert.deepEqual(
+          labelState,
+          { tagName: 'SPAN', role: null, tabIndex: -1 },
+          'Label invented control/focus semantics.',
+        );
 
         example = await gotoCatalog(page, baseUrl, {
-          entry: 'Code', tab: 'examples', example: 'native-code-semantics', theme: 'dark', dir: 'rtl', viewport: 'phone', container: 'compact',
+          entry: 'Code',
+          tab: 'examples',
+          example: 'native-code-semantics',
+          theme: 'dark',
+          dir: 'rtl',
+          viewport: 'phone',
+          container: 'compact',
         });
         const code = example.locator('[data-visual-cert="code"]');
         const codeState = await code.evaluate((element) => {
@@ -947,13 +1320,32 @@ export const browserScenarios = [
           };
         });
         assert.equal(codeState.tagName, 'KBD', 'Code did not preserve native kbd semantics.');
-        assert.equal(codeState.direction, 'ltr', 'Code explicit native bidi override was lost inside RTL.');
-        assert.equal(codeState.overflowWrap, 'anywhere', 'Code long-token reflow was not explicit.');
-        assert.match(codeState.fontFamily, /SFMono-Regular|Cascadia Code|Roboto Mono|ui-monospace|monospace/, 'Code did not consume the Foundation monospace fallback stack.');
+        assert.equal(
+          codeState.direction,
+          'ltr',
+          'Code explicit native bidi override was lost inside RTL.',
+        );
+        assert.equal(
+          codeState.overflowWrap,
+          'anywhere',
+          'Code long-token reflow was not explicit.',
+        );
+        assert.match(
+          codeState.fontFamily,
+          /SFMono-Regular|Cascadia Code|Roboto Mono|ui-monospace|monospace/,
+          'Code did not consume the Foundation monospace fallback stack.',
+        );
         await assertNoGlobalHorizontalOverflow(page, 'Code compact reflow');
         const axe = await runAxe(page, 'Typography semantic/bidi/reflow certification');
         diagnostics.assertClean('Typography semantic/bidi/reflow certification');
-        return { axe, text: textState, heading: headingState, label: labelState, code: codeState, zoom };
+        return {
+          axe,
+          text: textState,
+          heading: headingState,
+          label: labelState,
+          code: codeState,
+          zoom,
+        };
       } finally {
         await context.close();
       }
@@ -963,14 +1355,36 @@ export const browserScenarios = [
 
   scenario(
     'icon-multistate-transition-certification',
-    ['visual', 'icon', 'multi-state', 'transient-state', 'motion', 'reduced-motion', 'interruption', 'current-color', 'rtl', 'custom-glyph', 'a11y'],
+    [
+      'visual',
+      'icon',
+      'multi-state',
+      'transient-state',
+      'motion',
+      'reduced-motion',
+      'interruption',
+      'current-color',
+      'rtl',
+      'custom-glyph',
+      'a11y',
+    ],
     async ({ browser, baseUrl }) => {
-      const context = await browser.newContext({ viewport: { width: 920, height: 760 }, colorScheme: 'dark' });
+      const context = await browser.newContext({
+        viewport: { width: 920, height: 760 },
+        colorScheme: 'dark',
+      });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
         let example = await gotoCatalog(page, baseUrl, {
-          entry: 'Icon', tab: 'examples', example: 'state-transition', theme: 'dark', dir: 'ltr', motion: 'full', viewport: 'fit', container: 'compact',
+          entry: 'Icon',
+          tab: 'examples',
+          example: 'state-transition',
+          theme: 'dark',
+          dir: 'ltr',
+          motion: 'full',
+          viewport: 'fit',
+          container: 'compact',
         });
         let icon = example.locator('[data-visual-cert="stateful-icon"]');
         let toggle = example.getByRole('button', { name: 'Toggle playback icon' });
@@ -988,14 +1402,22 @@ export const browserScenarios = [
           { state: 'play', visual: 'play', phase: 'stable' },
           'Playback Icon did not begin in its declared stable state.',
         );
-        assert.equal(initial.stroke, initial.color, 'Icon stroke did not resolve through currentColor.');
+        assert.equal(
+          initial.stroke,
+          initial.color,
+          'Icon stroke did not resolve through currentColor.',
+        );
 
         await toggle.evaluate((button) => button.click());
         await page.waitForFunction(
           () => {
-            const target = document.querySelector('#example-state-transition [data-visual-cert="stateful-icon"]');
-            return target?.getAttribute('data-oxs-icon-phase') === 'transitioning'
-              && target.getAttribute('data-oxs-icon-visual-state') === 'pausing';
+            const target = document.querySelector(
+              '#example-state-transition [data-visual-cert="stateful-icon"]',
+            );
+            return (
+              target?.getAttribute('data-oxs-icon-phase') === 'transitioning' &&
+              target.getAttribute('data-oxs-icon-visual-state') === 'pausing'
+            );
           },
           undefined,
           { timeout: 1000 },
@@ -1006,22 +1428,43 @@ export const browserScenarios = [
           phase: target.getAttribute('data-oxs-icon-phase'),
           from: target.getAttribute('data-oxs-icon-from'),
           to: target.getAttribute('data-oxs-icon-to'),
-          transient: target.querySelector('.ui-icon__transition')?.getAttribute('data-oxs-icon-transient') ?? null,
+          transient:
+            target.querySelector('.ui-icon__transition')?.getAttribute('data-oxs-icon-transient') ??
+            null,
         }));
-        assert.deepEqual(firstTransition, {
-          state: 'pause', visual: 'pausing', phase: 'transitioning', from: 'play', to: 'pause', transient: 'pausing',
-        }, 'Icon did not publish the explicit play → pausing → pause transition contract.');
+        assert.deepEqual(
+          firstTransition,
+          {
+            state: 'pause',
+            visual: 'pausing',
+            phase: 'transitioning',
+            from: 'play',
+            to: 'pause',
+            transient: 'pausing',
+          },
+          'Icon did not publish the explicit play → pausing → pause transition contract.',
+        );
 
         await page.waitForFunction(
-          () => document.querySelector('#example-state-transition [data-visual-cert="stateful-icon"]')?.getAttribute('data-oxs-icon-phase') === 'stable',
+          () =>
+            document
+              .querySelector('#example-state-transition [data-visual-cert="stateful-icon"]')
+              ?.getAttribute('data-oxs-icon-phase') === 'stable',
           undefined,
           { timeout: 1000 },
         );
-        assert.equal(await icon.getAttribute('data-oxs-icon-visual-state'), 'pause', 'Icon did not settle on the destination stable state.');
+        assert.equal(
+          await icon.getAttribute('data-oxs-icon-visual-state'),
+          'pause',
+          'Icon did not settle on the destination stable state.',
+        );
 
         await toggle.evaluate((button) => button.click());
         await page.waitForFunction(
-          () => document.querySelector('#example-state-transition [data-visual-cert="stateful-icon"]')?.getAttribute('data-oxs-icon-visual-state') === 'playing',
+          () =>
+            document
+              .querySelector('#example-state-transition [data-visual-cert="stateful-icon"]')
+              ?.getAttribute('data-oxs-icon-visual-state') === 'playing',
           undefined,
           { timeout: 1000 },
         );
@@ -1029,10 +1472,14 @@ export const browserScenarios = [
         await toggle.evaluate((button) => button.click());
         await page.waitForFunction(
           () => {
-            const target = document.querySelector('#example-state-transition [data-visual-cert="stateful-icon"]');
-            return target?.getAttribute('data-oxs-icon-phase') === 'transitioning'
-              && target.getAttribute('data-oxs-icon-visual-state') === 'pausing'
-              && target.getAttribute('data-oxs-icon-state') === 'pause';
+            const target = document.querySelector(
+              '#example-state-transition [data-visual-cert="stateful-icon"]',
+            );
+            return (
+              target?.getAttribute('data-oxs-icon-phase') === 'transitioning' &&
+              target.getAttribute('data-oxs-icon-visual-state') === 'pausing' &&
+              target.getAttribute('data-oxs-icon-state') === 'pause'
+            );
           },
           undefined,
           { timeout: 1000 },
@@ -1043,16 +1490,34 @@ export const browserScenarios = [
           phase: await icon.getAttribute('data-oxs-icon-phase'),
           destination: await icon.getAttribute('data-oxs-icon-state'),
         };
-        assert.deepEqual(interrupted, { first: 'playing', second: 'pausing', phase: 'transitioning', destination: 'pause' }, 'Interrupted Icon transition did not retarget through declared transient states.');
+        assert.deepEqual(
+          interrupted,
+          { first: 'playing', second: 'pausing', phase: 'transitioning', destination: 'pause' },
+          'Interrupted Icon transition did not retarget through declared transient states.',
+        );
         await page.waitForFunction(
-          () => document.querySelector('#example-state-transition [data-visual-cert="stateful-icon"]')?.getAttribute('data-oxs-icon-phase') === 'stable',
+          () =>
+            document
+              .querySelector('#example-state-transition [data-visual-cert="stateful-icon"]')
+              ?.getAttribute('data-oxs-icon-phase') === 'stable',
           undefined,
           { timeout: 1000 },
         );
-        assert.equal(await icon.getAttribute('data-oxs-icon-state'), 'pause', 'Interrupted Icon did not settle at the newest semantic destination.');
+        assert.equal(
+          await icon.getAttribute('data-oxs-icon-state'),
+          'pause',
+          'Interrupted Icon did not settle at the newest semantic destination.',
+        );
 
         example = await gotoCatalog(page, baseUrl, {
-          entry: 'Icon', tab: 'examples', example: 'state-transition', theme: 'dark', dir: 'ltr', motion: 'reduced', viewport: 'fit', container: 'compact',
+          entry: 'Icon',
+          tab: 'examples',
+          example: 'state-transition',
+          theme: 'dark',
+          dir: 'ltr',
+          motion: 'reduced',
+          viewport: 'fit',
+          container: 'compact',
         });
         icon = example.locator('[data-visual-cert="stateful-icon"]');
         toggle = example.getByRole('button', { name: 'Toggle playback icon' });
@@ -1063,42 +1528,97 @@ export const browserScenarios = [
         await reducedToggle.click();
         await page.waitForFunction(
           (expected) => {
-            const target = document.querySelector('#example-state-transition [data-visual-cert="stateful-icon"]');
-            return target?.getAttribute('data-oxs-icon-phase') === 'stable'
-              && target.getAttribute('data-oxs-icon-state') === expected
-              && target.getAttribute('data-oxs-icon-visual-state') === expected;
+            const target = document.querySelector(
+              '#example-state-transition [data-visual-cert="stateful-icon"]',
+            );
+            return (
+              target?.getAttribute('data-oxs-icon-phase') === 'stable' &&
+              target.getAttribute('data-oxs-icon-state') === expected &&
+              target.getAttribute('data-oxs-icon-visual-state') === expected
+            );
           },
           reducedExpected,
           { timeout: 1000 },
         );
-        assert.equal(await reducedIcon.getAttribute('data-oxs-icon-state'), reducedExpected, 'Reduced-motion Icon did not settle at the requested stable state.');
-        assert.equal(await reducedIcon.getAttribute('data-oxs-icon-visual-state'), reducedExpected, 'Reduced-motion Icon leaked a persistent transient visual state.');
+        assert.equal(
+          await reducedIcon.getAttribute('data-oxs-icon-state'),
+          reducedExpected,
+          'Reduced-motion Icon did not settle at the requested stable state.',
+        );
+        assert.equal(
+          await reducedIcon.getAttribute('data-oxs-icon-visual-state'),
+          reducedExpected,
+          'Reduced-motion Icon leaked a persistent transient visual state.',
+        );
 
         example = await gotoCatalog(page, baseUrl, {
-          entry: 'Icon', tab: 'examples', example: 'static-extension', theme: 'light', dir: 'ltr', motion: 'full', viewport: 'fit', container: 'compact',
+          entry: 'Icon',
+          tab: 'examples',
+          example: 'static-extension',
+          theme: 'light',
+          dir: 'ltr',
+          motion: 'full',
+          viewport: 'fit',
+          container: 'compact',
         });
         const rtlIcon = example.locator('[data-visual-cert="rtl-icon"]');
         const ltrIcon = example.locator('[data-visual-cert="ltr-icon"]');
         const custom = example.locator('[data-visual-cert="custom-icon"]');
-        const staticState = await Promise.all([rtlIcon, ltrIcon, custom].map((locator) => locator.evaluate((element) => {
-          const style = getComputedStyle(element);
-          return {
-            transform: style.transform,
-            direction: style.direction,
-            inlineTransform: style.getPropertyValue('--oxs-icon-inline-transform').trim(),
-            paths: element.querySelectorAll('path').length,
-            role: element.getAttribute('role'),
-            focusable: element.getAttribute('focusable'),
-          };
-        })));
-        assert.equal(staticState[0].direction, 'rtl', 'Nested RTL fixture did not resolve RTL direction on the Icon itself.');
-        assert.equal(staticState[0].inlineTransform, 'scaleX(-1)', 'Nested RTL direction boundary did not publish the mirrored inline transform to Icon.');
-        assert.notEqual(staticState[0].transform, 'none', 'Directional Icon did not mirror from its nested local RTL direction.');
-        assert.equal(staticState[1].direction, 'ltr', 'Nested LTR fixture did not resolve LTR direction on the Icon itself.');
-        assert.equal(staticState[1].inlineTransform, 'none', 'Nested LTR direction boundary did not reset the inherited Icon inline transform.');
-        assert.equal(staticState[1].transform, 'none', 'Directional Icon leaked mirroring into a nested local LTR direction.');
-        assert.equal(staticState[2].paths, 1, 'Custom defineUiIcon path shorthand did not render through the shared glyph contract.');
-        assert.equal(staticState[2].role, 'img', 'Labeled custom Icon did not expose standalone image semantics.');
+        const staticState = await Promise.all(
+          [rtlIcon, ltrIcon, custom].map((locator) =>
+            locator.evaluate((element) => {
+              const style = getComputedStyle(element);
+              return {
+                transform: style.transform,
+                direction: style.direction,
+                inlineTransform: style.getPropertyValue('--oxs-icon-inline-transform').trim(),
+                paths: element.querySelectorAll('path').length,
+                role: element.getAttribute('role'),
+                focusable: element.getAttribute('focusable'),
+              };
+            }),
+          ),
+        );
+        assert.equal(
+          staticState[0].direction,
+          'rtl',
+          'Nested RTL fixture did not resolve RTL direction on the Icon itself.',
+        );
+        assert.equal(
+          staticState[0].inlineTransform,
+          'scaleX(-1)',
+          'Nested RTL direction boundary did not publish the mirrored inline transform to Icon.',
+        );
+        assert.notEqual(
+          staticState[0].transform,
+          'none',
+          'Directional Icon did not mirror from its nested local RTL direction.',
+        );
+        assert.equal(
+          staticState[1].direction,
+          'ltr',
+          'Nested LTR fixture did not resolve LTR direction on the Icon itself.',
+        );
+        assert.equal(
+          staticState[1].inlineTransform,
+          'none',
+          'Nested LTR direction boundary did not reset the inherited Icon inline transform.',
+        );
+        assert.equal(
+          staticState[1].transform,
+          'none',
+          'Directional Icon leaked mirroring into a nested local LTR direction.',
+        );
+        assert.equal(
+          staticState[2].paths,
+          1,
+          'Custom defineUiIcon path shorthand did not render through the shared glyph contract.',
+        );
+        assert.equal(
+          staticState[2].role,
+          'img',
+          'Labeled custom Icon did not expose standalone image semantics.',
+        );
         assert.equal(staticState[2].focusable, 'false', 'Icon became independently focusable.');
         const axe = await runAxe(page, 'Icon multi-state transition certification');
         diagnostics.assertClean('Icon multi-state transition certification');
@@ -1114,21 +1634,39 @@ export const browserScenarios = [
     'icon-pack-breadth-certification',
     ['visual', 'icon', 'icon-pack', 'static-pack', 'animated-pack', 'multi-state', 'a11y'],
     async ({ browser, baseUrl }) => {
-      const context = await browser.newContext({ viewport: { width: 1040, height: 820 }, colorScheme: 'dark' });
+      const context = await browser.newContext({
+        viewport: { width: 1040, height: 820 },
+        colorScheme: 'dark',
+      });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
         const example = await gotoCatalog(page, baseUrl, {
-          entry: 'Icon', tab: 'examples', example: 'icon-pack', theme: 'dark', dir: 'ltr', motion: 'full', viewport: 'fit', container: 'wide',
+          entry: 'Icon',
+          tab: 'examples',
+          example: 'icon-pack',
+          theme: 'dark',
+          dir: 'ltr',
+          motion: 'full',
+          viewport: 'fit',
+          container: 'wide',
         });
         const pack = example.locator('[data-visual-cert="icon-pack"]');
         await pack.waitFor({ state: 'visible' });
         const staticSamples = pack.locator('[data-icon-pack-static="true"]');
         const animatedSamples = pack.locator('[data-icon-pack-animated]');
-        assert.ok(await staticSamples.count() >= 12, 'Icon pack Studio evidence did not render a broad static sample.');
-        assert.ok(await animatedSamples.count() >= 6, 'Icon pack Studio evidence did not render multiple animated families.');
+        assert.ok(
+          (await staticSamples.count()) >= 12,
+          'Icon pack Studio evidence did not render a broad static sample.',
+        );
+        assert.ok(
+          (await animatedSamples.count()) >= 6,
+          'Icon pack Studio evidence did not render multiple animated families.',
+        );
         const reportedStaticCount = Number(await pack.getAttribute('data-icon-pack-static-count'));
-        const reportedAnimatedCount = Number(await pack.getAttribute('data-icon-pack-animated-count'));
+        const reportedAnimatedCount = Number(
+          await pack.getAttribute('data-icon-pack-animated-count'),
+        );
         assert.ok(
           Number.isInteger(reportedStaticCount) && reportedStaticCount >= 240,
           `Icon pack reported an invalid static export count: ${reportedStaticCount}.`,
@@ -1137,18 +1675,30 @@ export const browserScenarios = [
           Number.isInteger(reportedAnimatedCount) && reportedAnimatedCount >= 20,
           `Icon pack reported an invalid animated-family count: ${reportedAnimatedCount}.`,
         );
-        await pack.getByText(`${reportedStaticCount} static exports`, { exact: false }).waitFor({ state: 'visible' });
-        await pack.getByText(`${reportedAnimatedCount} animated state families`, { exact: false }).waitFor({ state: 'visible' });
+        await pack
+          .getByText(`${reportedStaticCount} static exports`, { exact: false })
+          .waitFor({ state: 'visible' });
+        await pack
+          .getByText(`${reportedAnimatedCount} animated state families`, { exact: false })
+          .waitFor({ state: 'visible' });
 
         const playback = pack.locator('[data-icon-pack-animated="playback"]');
-        assert.equal(await playback.getAttribute('data-oxs-icon-state'), 'play', 'Pack playback family did not expose its initial stable state.');
+        assert.equal(
+          await playback.getAttribute('data-oxs-icon-state'),
+          'play',
+          'Pack playback family did not expose its initial stable state.',
+        );
         await example.getByRole('button', { name: 'Toggle animated icon pack' }).click();
         await page.waitForFunction(
           () => {
-            const target = document.querySelector('#example-icon-pack [data-icon-pack-animated="playback"]');
-            return target?.getAttribute('data-oxs-icon-state') === 'pause'
-              && target.getAttribute('data-oxs-icon-phase') === 'stable'
-              && target.getAttribute('data-oxs-icon-visual-state') === 'pause';
+            const target = document.querySelector(
+              '#example-icon-pack [data-icon-pack-animated="playback"]',
+            );
+            return (
+              target?.getAttribute('data-oxs-icon-state') === 'pause' &&
+              target.getAttribute('data-oxs-icon-phase') === 'stable' &&
+              target.getAttribute('data-oxs-icon-visual-state') === 'pause'
+            );
           },
           undefined,
           { timeout: 1000 },
@@ -1163,10 +1713,14 @@ export const browserScenarios = [
               activity: 'active',
             };
             return Object.entries(expected).every(([selector, state]) => {
-              const target = document.querySelector(`#example-icon-pack [data-icon-pack-animated="${selector}"]`);
-              return target?.getAttribute('data-oxs-icon-phase') === 'stable'
-                && target.getAttribute('data-oxs-icon-state') === state
-                && target.getAttribute('data-oxs-icon-visual-state') === state;
+              const target = document.querySelector(
+                `#example-icon-pack [data-icon-pack-animated="${selector}"]`,
+              );
+              return (
+                target?.getAttribute('data-oxs-icon-phase') === 'stable' &&
+                target.getAttribute('data-oxs-icon-state') === state &&
+                target.getAttribute('data-oxs-icon-visual-state') === state
+              );
             });
           },
           undefined,
@@ -1180,7 +1734,9 @@ export const browserScenarios = [
           ['activity', 'active'],
         ]) {
           assert.equal(
-            await pack.locator(`[data-icon-pack-animated="${selector}"]`).getAttribute('data-oxs-icon-state'),
+            await pack
+              .locator(`[data-icon-pack-animated="${selector}"]`)
+              .getAttribute('data-oxs-icon-state'),
             expected,
             `Animated icon-pack family ${selector} did not converge to its requested stable state.`,
           );
@@ -1188,7 +1744,11 @@ export const browserScenarios = [
         await assertNoGlobalHorizontalOverflow(page, 'Icon pack breadth');
         const axe = await runAxe(page, 'Icon pack breadth certification');
         diagnostics.assertClean('Icon pack breadth certification');
-        return { axe, staticSamples: await staticSamples.count(), animatedSamples: await animatedSamples.count() };
+        return {
+          axe,
+          staticSamples: await staticSamples.count(),
+          animatedSamples: await animatedSamples.count(),
+        };
       } finally {
         await context.close();
       }
@@ -1198,14 +1758,34 @@ export const browserScenarios = [
 
   scenario(
     'surface-divider-visual-boundary-certification',
-    ['visual', 'surface', 'material', 'elevation', 'border', 'static-state', 'divider', 'separator', 'logical-inset', 'a11y'],
+    [
+      'visual',
+      'surface',
+      'material',
+      'elevation',
+      'border',
+      'static-state',
+      'divider',
+      'separator',
+      'logical-inset',
+      'a11y',
+    ],
     async ({ browser, baseUrl }) => {
-      const context = await browser.newContext({ viewport: { width: 980, height: 780 }, colorScheme: 'dark' });
+      const context = await browser.newContext({
+        viewport: { width: 980, height: 780 },
+        colorScheme: 'dark',
+      });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
         let example = await gotoCatalog(page, baseUrl, {
-          entry: 'Surface', tab: 'examples', example: 'material-boundary', theme: 'dark', dir: 'rtl', viewport: 'fit', container: 'compact',
+          entry: 'Surface',
+          tab: 'examples',
+          example: 'material-boundary',
+          theme: 'dark',
+          dir: 'rtl',
+          viewport: 'fit',
+          container: 'compact',
         });
         const surface = example.locator('[data-visual-cert="surface"]');
         await surface.waitFor({ state: 'visible' });
@@ -1223,43 +1803,113 @@ export const browserScenarios = [
             tabIndex: element.tabIndex,
           };
         });
-        assert.notEqual(surfaceState.background, 'rgba(0, 0, 0, 0)', 'Glass Surface did not resolve a semantic material background.');
-        assert.notEqual(surfaceState.backdropFilter, 'none', 'Glass Surface did not resolve its material blur/saturation token.');
-        assert.notEqual(surfaceState.boxShadow, 'none', 'Surface elevation=2 did not resolve Foundation elevation.');
-        assert.equal(surfaceState.borderWidth, '1px', 'Surface strong border did not remain token-backed hairline geometry.');
-        assert.equal(surfaceState.overflow, 'hidden', 'Surface clip did not clip visual descendants.');
-        assert.deepEqual({ role: surfaceState.role, tabIndex: surfaceState.tabIndex }, { role: null, tabIndex: -1 }, 'Surface invented interaction/accessibility semantics by default.');
+        assert.notEqual(
+          surfaceState.background,
+          'rgba(0, 0, 0, 0)',
+          'Glass Surface did not resolve a semantic material background.',
+        );
+        assert.notEqual(
+          surfaceState.backdropFilter,
+          'none',
+          'Glass Surface did not resolve its material blur/saturation token.',
+        );
+        assert.notEqual(
+          surfaceState.boxShadow,
+          'none',
+          'Surface elevation=2 did not resolve Foundation elevation.',
+        );
+        assert.equal(
+          surfaceState.borderWidth,
+          '1px',
+          'Surface strong border did not remain token-backed hairline geometry.',
+        );
+        assert.equal(
+          surfaceState.overflow,
+          'hidden',
+          'Surface clip did not clip visual descendants.',
+        );
+        assert.deepEqual(
+          { role: surfaceState.role, tabIndex: surfaceState.tabIndex },
+          { role: null, tabIndex: -1 },
+          'Surface invented interaction/accessibility semantics by default.',
+        );
 
         example = await gotoCatalog(page, baseUrl, {
-          entry: 'Divider', tab: 'examples', example: 'separator-semantics', theme: 'dark', dir: 'rtl', viewport: 'fit', container: 'compact',
+          entry: 'Divider',
+          tab: 'examples',
+          example: 'separator-semantics',
+          theme: 'dark',
+          dir: 'rtl',
+          viewport: 'fit',
+          container: 'compact',
         });
         const horizontal = example.locator('[data-visual-cert="horizontal-divider"]');
         const vertical = example.locator('[data-visual-cert="vertical-divider"]');
         const decorative = example.locator('[data-visual-cert="decorative-divider"]');
-        const dividerState = await Promise.all([horizontal, vertical, decorative].map((locator) => locator.evaluate((element) => {
-          const style = getComputedStyle(element);
-          return {
-            role: element.getAttribute('role'),
-            ariaHidden: element.getAttribute('aria-hidden'),
-            orientation: element.getAttribute('aria-orientation'),
-            inlineSize: style.inlineSize,
-            blockSize: style.blockSize,
-            marginInlineStart: style.marginInlineStart,
-            marginInlineEnd: style.marginInlineEnd,
-            marginBlockStart: style.marginBlockStart,
-            marginBlockEnd: style.marginBlockEnd,
-            background: style.backgroundColor,
-          };
-        })));
-        assert.equal(dividerState[0].role, 'separator', 'Horizontal Divider lost separator semantics.');
-        assert.equal(dividerState[0].orientation, 'horizontal', 'Horizontal Divider lost aria-orientation.');
-        assert.equal(dividerState[0].marginInlineStart, '16px', 'Divider inset="start" did not use logical inline-start spacing under RTL.');
-        assert.equal(dividerState[1].orientation, 'vertical', 'Vertical Divider lost aria-orientation.');
-        assert.equal(dividerState[1].inlineSize, '2px', 'Strong vertical Divider did not resolve the strong border thickness token.');
-        assert.equal(dividerState[1].marginBlockStart, '16px', 'Vertical Divider inset did not use logical block-start spacing.');
-        assert.equal(dividerState[1].marginBlockEnd, '16px', 'Vertical Divider inset did not use logical block-end spacing.');
-        assert.equal(dividerState[2].role, 'none', 'Decorative Divider did not remove separator semantics.');
-        assert.equal(dividerState[2].ariaHidden, 'true', 'Decorative Divider was not hidden from accessibility APIs.');
+        const dividerState = await Promise.all(
+          [horizontal, vertical, decorative].map((locator) =>
+            locator.evaluate((element) => {
+              const style = getComputedStyle(element);
+              return {
+                role: element.getAttribute('role'),
+                ariaHidden: element.getAttribute('aria-hidden'),
+                orientation: element.getAttribute('aria-orientation'),
+                inlineSize: style.inlineSize,
+                blockSize: style.blockSize,
+                marginInlineStart: style.marginInlineStart,
+                marginInlineEnd: style.marginInlineEnd,
+                marginBlockStart: style.marginBlockStart,
+                marginBlockEnd: style.marginBlockEnd,
+                background: style.backgroundColor,
+              };
+            }),
+          ),
+        );
+        assert.equal(
+          dividerState[0].role,
+          'separator',
+          'Horizontal Divider lost separator semantics.',
+        );
+        assert.equal(
+          dividerState[0].orientation,
+          'horizontal',
+          'Horizontal Divider lost aria-orientation.',
+        );
+        assert.equal(
+          dividerState[0].marginInlineStart,
+          '16px',
+          'Divider inset="start" did not use logical inline-start spacing under RTL.',
+        );
+        assert.equal(
+          dividerState[1].orientation,
+          'vertical',
+          'Vertical Divider lost aria-orientation.',
+        );
+        assert.equal(
+          dividerState[1].inlineSize,
+          '2px',
+          'Strong vertical Divider did not resolve the strong border thickness token.',
+        );
+        assert.equal(
+          dividerState[1].marginBlockStart,
+          '16px',
+          'Vertical Divider inset did not use logical block-start spacing.',
+        );
+        assert.equal(
+          dividerState[1].marginBlockEnd,
+          '16px',
+          'Vertical Divider inset did not use logical block-end spacing.',
+        );
+        assert.equal(
+          dividerState[2].role,
+          'none',
+          'Decorative Divider did not remove separator semantics.',
+        );
+        assert.equal(
+          dividerState[2].ariaHidden,
+          'true',
+          'Decorative Divider was not hidden from accessibility APIs.',
+        );
         await assertNoGlobalHorizontalOverflow(page, 'Surface/Divider visual boundary');
         const axe = await runAxe(page, 'Surface and Divider visual boundary certification');
         diagnostics.assertClean('Surface and Divider visual boundary certification');
@@ -1275,13 +1925,25 @@ export const browserScenarios = [
     'ox-loading-heartbeat-motion-certification',
     ['visual', 'brand', 'loading', 'motion', 'heartbeat', 'reduced-motion'],
     async ({ browser, baseUrl }) => {
-      const context = await browser.newContext({ viewport: { width: 920, height: 720 }, reducedMotion: 'no-preference' });
+      const context = await browser.newContext({
+        viewport: { width: 920, height: 720 },
+        reducedMotion: 'no-preference',
+      });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        const workbench = await gotoCatalog(page, baseUrl, { entry: 'Spinner', tab: 'examples', example: 'ox-loading', motion: 'full' });
+        const workbench = await gotoCatalog(page, baseUrl, {
+          entry: 'Spinner',
+          tab: 'examples',
+          example: 'ox-loading',
+          motion: 'full',
+        });
         const marks = workbench.locator('[data-oxs-loading-mark="ox"]');
-        assert.equal(await marks.count(), 1, 'Spinner canonical example must show one OX loading mark, not duplicate the control-loading treatment.');
+        assert.equal(
+          await marks.count(),
+          1,
+          'Spinner canonical example must show one OX loading mark, not duplicate the control-loading treatment.',
+        );
         const mark = marks.first();
         await mark.waitFor({ state: 'visible' });
         const bootSpinner = workbench.locator('[data-oxs-spinner-purpose="boot"]');
@@ -1292,37 +1954,58 @@ export const browserScenarios = [
           return {
             width: rect.width,
             height: rect.height,
-            orbitStrokeWidth: orbit ? Number.parseFloat(getComputedStyle(orbit).strokeWidth) : Number.NaN,
+            orbitStrokeWidth: orbit
+              ? Number.parseFloat(getComputedStyle(orbit).strokeWidth)
+              : Number.NaN,
           };
         });
-        assert.ok(bootGeometry.width >= 120 && bootGeometry.height >= 120, `Boot OX loader is too small (${bootGeometry.width}×${bootGeometry.height}).`);
-        assert.ok(bootGeometry.orbitStrokeWidth >= 2.3, `Boot OX loader lost its display-scale stroke weight (${bootGeometry.orbitStrokeWidth}).`);
-        assert.equal(await mark.getAttribute('data-oxs-loading-choreography'), 'write-heartbeat-release', 'OX loader lost its branded choreography identity.');
+        assert.ok(
+          bootGeometry.width >= 120 && bootGeometry.height >= 120,
+          `Boot OX loader is too small (${bootGeometry.width}×${bootGeometry.height}).`,
+        );
+        assert.ok(
+          bootGeometry.orbitStrokeWidth >= 2.3,
+          `Boot OX loader lost its display-scale stroke weight (${bootGeometry.orbitStrokeWidth}).`,
+        );
+        assert.equal(
+          await mark.getAttribute('data-oxs-loading-choreography'),
+          'write-heartbeat-release',
+          'OX loader lost its branded choreography identity.',
+        );
         const motion = await mark.evaluate(async (element) => {
           const orbit = element.querySelector('.ui-ox-loading-mark__orbit');
           const strokeA = element.querySelector('.ui-ox-loading-mark__cross-stroke--a');
           const strokeB = element.querySelector('.ui-ox-loading-mark__cross-stroke--b');
           const cross = element.querySelector('.ui-ox-loading-mark__cross');
           const primaryEcho = element.querySelector('.ui-ox-loading-mark__echo--primary');
-          if (!(orbit && strokeA && strokeB && cross && primaryEcho)) throw new Error('OX heartbeat fixture is incomplete.');
+          if (!(orbit && strokeA && strokeB && cross && primaryEcho))
+            throw new Error('OX heartbeat fixture is incomplete.');
           const animations = element.getAnimations({ subtree: true });
           const orbitAnimation = orbit.getAnimations()[0];
           if (!orbitAnimation?.effect || typeof orbitAnimation.effect.getKeyframes !== 'function') {
             throw new Error('OX orbit animation does not expose inspectable keyframes.');
           }
           await Promise.all(animations.map((animation) => animation.ready));
-          animations.forEach((animation) => animation.pause());
-          const duration = Number(getComputedStyle(orbit).animationDuration.replace('s', '')) * 1000;
-          const parseDasharray = (value) => String(value)
-            .split(/[\s,]+/)
-            .map((part) => Number.parseFloat(part))
-            .filter(Number.isFinite);
+          animations.forEach((animation) => {
+            animation.pause();
+          });
+          const duration =
+            Number(getComputedStyle(orbit).animationDuration.replace('s', '')) * 1000;
+          const parseDasharray = (value) =>
+            String(value)
+              .split(/[\s,]+/)
+              .map((part) => Number.parseFloat(part))
+              .filter(Number.isFinite);
           const keyframes = orbitAnimation.effect.getKeyframes();
           const firstKeyframe = keyframes[0];
           const lastKeyframe = keyframes.at(-1);
           const sample = async (time) => {
-            animations.forEach((animation) => { animation.currentTime = time; });
-            await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+            animations.forEach((animation) => {
+              animation.currentTime = time;
+            });
+            await new Promise((resolve) =>
+              requestAnimationFrame(() => requestAnimationFrame(resolve)),
+            );
             const orbitStyle = getComputedStyle(orbit);
             return {
               orbitDasharray: orbitStyle.strokeDasharray,
@@ -1357,34 +2040,68 @@ export const browserScenarios = [
             wrapped,
           };
         });
-        assert.ok(motion.animationCount >= 6, `OX loader lost part of its choreography (${motion.animationCount} animations).`);
-        assert.ok(motion.duration >= 1600 && motion.duration <= 2400, `OX heartbeat period is outside the expressive range (${motion.duration}ms).`);
-        assert.notEqual(motion.start.timing, 'linear', 'OX loading motion regressed to linear timing.');
-        assert.ok(Math.abs(motion.writing.strokeA) < Math.abs(motion.start.strokeA), 'First X stroke did not visibly write into the mark.');
-        assert.ok(Math.abs(motion.locked.strokeA) < 0.05 && Math.abs(motion.locked.strokeB) < 0.05, 'OX mark did not reach a fully written lock phase.');
-        assert.notEqual(motion.firstBeat.crossTransform, motion.locked.crossTransform, 'Primary heartbeat did not deform the X mark.');
-        assert.notEqual(motion.secondBeat.crossTransform, motion.locked.crossTransform, 'Secondary heartbeat did not produce the dub beat.');
-        assert.ok(motion.firstBeat.echoOpacity > 0.1, 'Primary heartbeat did not emit the O-ring echo.');
-        assert.notEqual(motion.release.orbitDasharray, motion.locked.orbitDasharray, 'O-ring did not release after the heartbeat lock.');
-        const dashDistance = (left, right) => Math.max(
-          ...left.map((value, index) => Math.abs(value - (right[index] ?? Number.NaN))),
+        assert.ok(
+          motion.animationCount >= 6,
+          `OX loader lost part of its choreography (${motion.animationCount} animations).`,
         );
+        assert.ok(
+          motion.duration >= 1600 && motion.duration <= 2400,
+          `OX heartbeat period is outside the expressive range (${motion.duration}ms).`,
+        );
+        assert.notEqual(
+          motion.start.timing,
+          'linear',
+          'OX loading motion regressed to linear timing.',
+        );
+        assert.ok(
+          Math.abs(motion.writing.strokeA) < Math.abs(motion.start.strokeA),
+          'First X stroke did not visibly write into the mark.',
+        );
+        assert.ok(
+          Math.abs(motion.locked.strokeA) < 0.05 && Math.abs(motion.locked.strokeB) < 0.05,
+          'OX mark did not reach a fully written lock phase.',
+        );
+        assert.notEqual(
+          motion.firstBeat.crossTransform,
+          motion.locked.crossTransform,
+          'Primary heartbeat did not deform the X mark.',
+        );
+        assert.notEqual(
+          motion.secondBeat.crossTransform,
+          motion.locked.crossTransform,
+          'Secondary heartbeat did not produce the dub beat.',
+        );
+        assert.ok(
+          motion.firstBeat.echoOpacity > 0.1,
+          'Primary heartbeat did not emit the O-ring echo.',
+        );
+        assert.notEqual(
+          motion.release.orbitDasharray,
+          motion.locked.orbitDasharray,
+          'O-ring did not release after the heartbeat lock.',
+        );
+        const dashDistance = (left, right) =>
+          Math.max(...left.map((value, index) => Math.abs(value - (right[index] ?? Number.NaN))));
         const circularDistance = (left, right, period) => {
           const raw = Math.abs(left - right) % period;
           return Math.min(raw, period - raw);
         };
         assert.ok(
-          motion.keyframeSeam.startDasharray.length === motion.keyframeSeam.endDasharray.length
-            && dashDistance(motion.keyframeSeam.startDasharray, motion.keyframeSeam.endDasharray) < 0.05,
+          motion.keyframeSeam.startDasharray.length === motion.keyframeSeam.endDasharray.length &&
+            dashDistance(motion.keyframeSeam.startDasharray, motion.keyframeSeam.endDasharray) <
+              0.05,
           'OX authored loop endpoints do not preserve the same orbit shape.',
         );
         assert.ok(
-          Math.abs(Math.abs(motion.keyframeSeam.endDashoffset - motion.keyframeSeam.startDashoffset) - 100) < 0.05,
+          Math.abs(
+            Math.abs(motion.keyframeSeam.endDashoffset - motion.keyframeSeam.startDashoffset) - 100,
+          ) < 0.05,
           'OX authored loop endpoints are not one pathLength-equivalent revolution apart.',
         );
         assert.ok(
-          motion.preSeam.orbitDasharrayParts.length === motion.start.orbitDasharrayParts.length
-            && dashDistance(motion.preSeam.orbitDasharrayParts, motion.start.orbitDasharrayParts) < 2.5,
+          motion.preSeam.orbitDasharrayParts.length === motion.start.orbitDasharrayParts.length &&
+            dashDistance(motion.preSeam.orbitDasharrayParts, motion.start.orbitDasharrayParts) <
+              2.5,
           'OX orbit shape does not converge smoothly into the loop boundary.',
         );
         assert.ok(
@@ -1392,17 +2109,21 @@ export const browserScenarios = [
           'OX orbit phase does not converge smoothly into the loop boundary.',
         );
         assert.ok(
-          motion.wrapped.orbitDasharrayParts.length === motion.start.orbitDasharrayParts.length
-            && dashDistance(motion.wrapped.orbitDasharrayParts, motion.start.orbitDasharrayParts) < 0.05,
+          motion.wrapped.orbitDasharrayParts.length === motion.start.orbitDasharrayParts.length &&
+            dashDistance(motion.wrapped.orbitDasharrayParts, motion.start.orbitDasharrayParts) <
+              0.05,
           'OX wrapped iteration does not restart at the authored orbit shape.',
         );
         assert.ok(
-          circularDistance(motion.wrapped.orbitDashoffset, motion.start.orbitDashoffset, 100) < 0.05,
+          circularDistance(motion.wrapped.orbitDashoffset, motion.start.orbitDashoffset, 100) <
+            0.05,
           'OX wrapped iteration does not restart at the equivalent orbit phase.',
         );
 
         await page.emulateMedia({ reducedMotion: 'reduce' });
-        await mark.evaluate((element) => element.closest('.ui-root')?.setAttribute('data-oxs-motion', 'reduced'));
+        await mark.evaluate((element) =>
+          element.closest('.ui-root')?.setAttribute('data-oxs-motion', 'reduced'),
+        );
         const reduced = await mark.evaluate((element) => {
           const orbit = element.querySelector('.ui-ox-loading-mark__orbit');
           const strokes = [...element.querySelectorAll('.ui-ox-loading-mark__cross-stroke')];
@@ -1410,13 +2131,21 @@ export const browserScenarios = [
           return {
             animations: element.getAnimations({ subtree: true }).length,
             orbitDasharray: getComputedStyle(orbit).strokeDasharray,
-            strokeOffsets: strokes.map((stroke) => Number.parseFloat(getComputedStyle(stroke).strokeDashoffset)),
+            strokeOffsets: strokes.map((stroke) =>
+              Number.parseFloat(getComputedStyle(stroke).strokeDashoffset),
+            ),
             echoOpacity: echoes.map((echo) => Number.parseFloat(getComputedStyle(echo).opacity)),
           };
         });
         assert.equal(reduced.animations, 0, 'Reduced-motion OX mark retained active animations.');
-        assert.ok(reduced.strokeOffsets.every((offset) => Math.abs(offset) < 0.05), 'Reduced-motion OX mark did not settle to a fully written X.');
-        assert.ok(reduced.echoOpacity.every((opacity) => opacity === 0), 'Reduced-motion OX mark retained heartbeat echoes.');
+        assert.ok(
+          reduced.strokeOffsets.every((offset) => Math.abs(offset) < 0.05),
+          'Reduced-motion OX mark did not settle to a fully written X.',
+        );
+        assert.ok(
+          reduced.echoOpacity.every((opacity) => opacity === 0),
+          'Reduced-motion OX mark retained heartbeat echoes.',
+        );
         diagnostics.assertClean('OX loading heartbeat motion');
         return { motion, reduced };
       } finally {
@@ -1429,22 +2158,50 @@ export const browserScenarios = [
     'spinner-svg-canvas-renderer-parity',
     ['visual', 'brand', 'loading', 'svg', 'canvas', 'motion', 'realm'],
     async ({ browser, baseUrl }) => {
-      const context = await browser.newContext({ viewport: { width: 920, height: 720 }, reducedMotion: 'no-preference' });
+      const context = await browser.newContext({
+        viewport: { width: 920, height: 720 },
+        reducedMotion: 'no-preference',
+      });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        const workbench = await gotoCatalog(page, baseUrl, { entry: 'Spinner', tab: 'examples', example: 'ox-loading', motion: 'full' });
+        const workbench = await gotoCatalog(page, baseUrl, {
+          entry: 'Spinner',
+          tab: 'examples',
+          example: 'ox-loading',
+          motion: 'full',
+        });
         const bootSpinner = workbench.locator('[data-oxs-spinner-purpose="boot"]');
         await bootSpinner.waitFor({ state: 'visible' });
-        assert.equal(await bootSpinner.getAttribute('data-oxs-spinner-renderer'), 'svg', 'Spinner renderer parity must start from the lightweight SVG backend.');
-        assert.equal(await bootSpinner.locator('svg[data-oxs-loading-mark="ox"]').count(), 1, 'Spinner renderer parity lost the canonical SVG mark.');
-        assert.equal(await bootSpinner.locator('canvas[data-oxs-loading-renderer="canvas"]').count(), 0, 'Canvas backend loaded before it was requested.');
+        assert.equal(
+          await bootSpinner.getAttribute('data-oxs-spinner-renderer'),
+          'svg',
+          'Spinner renderer parity must start from the lightweight SVG backend.',
+        );
+        assert.equal(
+          await bootSpinner.locator('svg[data-oxs-loading-mark="ox"]').count(),
+          1,
+          'Spinner renderer parity lost the canonical SVG mark.',
+        );
+        assert.equal(
+          await bootSpinner.locator('canvas[data-oxs-loading-renderer="canvas"]').count(),
+          0,
+          'Canvas backend loaded before it was requested.',
+        );
 
         await workbench.getByRole('button', { name: 'Canvas', exact: true }).click();
         const canvas = bootSpinner.locator('canvas[data-oxs-loading-renderer="canvas"]');
         await canvas.waitFor({ state: 'visible' });
-        assert.equal(await bootSpinner.getAttribute('data-oxs-spinner-renderer'), 'canvas', 'Spinner did not publish the selected Canvas backend.');
-        assert.equal(await bootSpinner.locator('[data-oxs-loading-mark]').count(), 1, 'Spinner renderer parity rendered SVG and Canvas marks at the same time.');
+        assert.equal(
+          await bootSpinner.getAttribute('data-oxs-spinner-renderer'),
+          'canvas',
+          'Spinner did not publish the selected Canvas backend.',
+        );
+        assert.equal(
+          await bootSpinner.locator('[data-oxs-loading-mark]').count(),
+          1,
+          'Spinner renderer parity rendered SVG and Canvas marks at the same time.',
+        );
         const canvasState = await canvas.evaluate((element) => {
           const rect = element.getBoundingClientRect();
           const ownerWindow = element.ownerDocument.defaultView;
@@ -1457,18 +2214,40 @@ export const browserScenarios = [
             choreography: element.getAttribute('data-oxs-loading-choreography'),
           };
         });
-        assert.ok(canvasState.cssWidth >= 120 && canvasState.cssHeight >= 120, 'Canvas OX boot renderer lost the hero presentation size.');
-        assert.ok(canvasState.backingWidth >= Math.floor(canvasState.cssWidth), 'Canvas OX renderer did not allocate a physical/content-box backing store.');
-        assert.equal(canvasState.realmReady, true, 'Canvas OX renderer lost its owner Window realm.');
-        assert.equal(canvasState.choreography, 'write-heartbeat-release', 'Canvas OX renderer drifted from the shared branded choreography identity.');
+        assert.ok(
+          canvasState.cssWidth >= 120 && canvasState.cssHeight >= 120,
+          'Canvas OX boot renderer lost the hero presentation size.',
+        );
+        assert.ok(
+          canvasState.backingWidth >= Math.floor(canvasState.cssWidth),
+          'Canvas OX renderer did not allocate a physical/content-box backing store.',
+        );
+        assert.equal(
+          canvasState.realmReady,
+          true,
+          'Canvas OX renderer lost its owner Window realm.',
+        );
+        assert.equal(
+          canvasState.choreography,
+          'write-heartbeat-release',
+          'Canvas OX renderer drifted from the shared branded choreography identity.',
+        );
         const firstFrame = await canvas.evaluate((element) => element.toDataURL());
         await page.waitForTimeout(140);
         const secondFrame = await canvas.evaluate((element) => element.toDataURL());
-        assert.notEqual(firstFrame, secondFrame, 'Spinner renderer parity found a static Canvas backend while full motion was requested.');
+        assert.notEqual(
+          firstFrame,
+          secondFrame,
+          'Spinner renderer parity found a static Canvas backend while full motion was requested.',
+        );
 
         await workbench.getByRole('button', { name: 'SVG', exact: true }).click();
         await bootSpinner.locator('svg[data-oxs-loading-mark="ox"]').waitFor({ state: 'visible' });
-        assert.equal(await bootSpinner.locator('canvas[data-oxs-loading-renderer="canvas"]').count(), 0, 'Canvas backend did not unmount when Spinner returned to SVG.');
+        assert.equal(
+          await bootSpinner.locator('canvas[data-oxs-loading-renderer="canvas"]').count(),
+          0,
+          'Canvas backend did not unmount when Spinner returned to SVG.',
+        );
         diagnostics.assertClean('Spinner renderer parity');
         return { canvas: canvasState, animated: true, exclusiveBackend: true };
       } finally {
@@ -1479,20 +2258,37 @@ export const browserScenarios = [
 
   scenario(
     'overlay-authority-cross-root-certification',
-    ['overlay-kernel', 'overlay', 'portal', 'modal-isolation', 'focus', 'escape', 'nested-root', 'realm', 'a11y'],
+    [
+      'overlay-kernel',
+      'overlay',
+      'portal',
+      'modal-isolation',
+      'focus',
+      'escape',
+      'nested-root',
+      'realm',
+      'a11y',
+    ],
     async ({ browser, baseUrl }) => {
       const context = await browser.newContext({ viewport: { width: 1180, height: 860 } });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        const workbench = await gotoCatalog(page, baseUrl, { entry: 'Dialog', tab: 'examples', example: 'authority' });
+        const workbench = await gotoCatalog(page, baseUrl, {
+          entry: 'Dialog',
+          tab: 'examples',
+          example: 'authority',
+        });
         const rootA = workbench.locator('.ui-doc-overlay-authority-root--a');
         const rootB = workbench.locator('.ui-doc-overlay-authority-root--b');
         const triggerA = workbench.getByRole('button', { name: 'Open modal A', exact: true });
         const triggerB = workbench.getByRole('button', { name: 'Open modal B', exact: true });
         await waitForStudioExampleControl(page, triggerA, 'Overlay authority root A trigger');
         await waitForStudioExampleControl(page, triggerB, 'Overlay authority root B trigger');
-        await Promise.all([rootA.waitFor({ state: 'visible' }), rootB.waitFor({ state: 'visible' })]);
+        await Promise.all([
+          rootA.waitFor({ state: 'visible' }),
+          rootB.waitFor({ state: 'visible' }),
+        ]);
         await triggerA.click();
         const dialogA = page.getByRole('dialog', { name: 'Authority modal A' });
         await dialogA.waitFor({ state: 'visible' });
@@ -1500,12 +2296,26 @@ export const browserScenarios = [
         // Role locators intentionally stop resolving while their owning background is inert.
         // Inspect the stable UiRoot DOM identities instead of re-resolving an inaccessible trigger.
         const [aBackgroundInert, bBackgroundInert, portalOwnedByA] = await Promise.all([
-          rootA.locator('.ui-drag-drop-runtime').evaluate((element) => element.hasAttribute('inert')),
-          rootB.locator('.ui-drag-drop-runtime').evaluate((element) => element.hasAttribute('inert')),
-          dialogA.evaluate((element) => Boolean(element.closest('[data-oxs-portal-root]')?.parentElement?.classList.contains('ui-doc-overlay-authority-root--a'))),
+          rootA
+            .locator('.ui-drag-drop-runtime')
+            .evaluate((element) => element.hasAttribute('inert')),
+          rootB
+            .locator('.ui-drag-drop-runtime')
+            .evaluate((element) => element.hasAttribute('inert')),
+          dialogA.evaluate((element) =>
+            Boolean(
+              element
+                .closest('[data-oxs-portal-root]')
+                ?.parentElement?.classList.contains('ui-doc-overlay-authority-root--a'),
+            ),
+          ),
         ]);
         const firstScope = { aBackgroundInert, bBackgroundInert, portalOwnedByA };
-        assert.deepEqual(firstScope, { aBackgroundInert: true, bBackgroundInert: false, portalOwnedByA: true }, 'Root A modal leaked isolation or portal ownership across UiRoot boundaries.');
+        assert.deepEqual(
+          firstScope,
+          { aBackgroundInert: true, bBackgroundInert: false, portalOwnedByA: true },
+          'Root A modal leaked isolation or portal ownership across UiRoot boundaries.',
+        );
 
         await triggerB.click();
         const dialogB = page.getByRole('dialog', { name: 'Authority modal B' });
@@ -1530,25 +2340,49 @@ export const browserScenarios = [
           };
         });
         const portalOwnership = {
-          distinct: aOwnership.ownerClass !== '' && bOwnership.ownerClass !== '' && aOwnership.ownerClass !== bOwnership.ownerClass,
+          distinct:
+            aOwnership.ownerClass !== '' &&
+            bOwnership.ownerClass !== '' &&
+            aOwnership.ownerClass !== bOwnership.ownerClass,
           aRoot: aOwnership.ownerClass.includes('ui-doc-overlay-authority-root--a'),
           bRoot: bOwnership.ownerClass.includes('ui-doc-overlay-authority-root--b'),
           aZ: aOwnership.z,
           bZ: bOwnership.z,
         };
-        assert.equal(portalOwnership.distinct, true, 'Independent UiRoots did not retain independent portal hosts.');
+        assert.equal(
+          portalOwnership.distinct,
+          true,
+          'Independent UiRoots did not retain independent portal hosts.',
+        );
         assert.equal(portalOwnership.aRoot, true, 'Root A overlay escaped its own portal host.');
         assert.equal(portalOwnership.bRoot, true, 'Root B overlay escaped its own portal host.');
-        assert.ok(Number.isFinite(portalOwnership.aZ) && Number.isFinite(portalOwnership.bZ) && portalOwnership.bZ > portalOwnership.aZ, 'Document overlay order did not project into cross-root visual stacking.');
+        assert.ok(
+          Number.isFinite(portalOwnership.aZ) &&
+            Number.isFinite(portalOwnership.bZ) &&
+            portalOwnership.bZ > portalOwnership.aZ,
+          'Document overlay order did not project into cross-root visual stacking.',
+        );
 
         await page.keyboard.press('Escape');
         await dialogB.waitFor({ state: 'detached' });
-        assert.equal(await dialogA.isVisible(), true, 'Document-level Escape arbitration dismissed more than the top-most overlay.');
-        assert.equal(await triggerB.evaluate((element) => element.ownerDocument.activeElement === element), true, 'Top-most cross-root overlay did not restore focus to its own trigger.');
+        assert.equal(
+          await dialogA.isVisible(),
+          true,
+          'Document-level Escape arbitration dismissed more than the top-most overlay.',
+        );
+        assert.equal(
+          await triggerB.evaluate((element) => element.ownerDocument.activeElement === element),
+          true,
+          'Top-most cross-root overlay did not restore focus to its own trigger.',
+        );
 
         await page.keyboard.press('Escape');
         await dialogA.waitFor({ state: 'detached' });
-        assert.equal(await triggerA.evaluate((element) => element.ownerDocument.activeElement === element), true, 'Lower overlay did not become event-top-most after upper-root dismissal.');
+        assert.equal(
+          await triggerA.evaluate((element) => element.ownerDocument.activeElement === element),
+          true,
+          'Lower overlay did not become event-top-most after upper-root dismissal.',
+        );
         const axe = await runAxe(page, 'Overlay authority cross-root closeout');
         diagnostics.assertClean('Overlay authority cross-root closeout');
         return { portalOwnership, escapeOrder: ['B', 'A'], axe };
@@ -1560,29 +2394,59 @@ export const browserScenarios = [
 
   scenario(
     'motion-authority-realm-interruption-certification',
-    ['motion-kernel', 'motion', 'realm', 'scheduler', 'interruption', 'reduced-motion', 'nested-root', 'frame-rate'],
+    [
+      'motion-kernel',
+      'motion',
+      'realm',
+      'scheduler',
+      'interruption',
+      'reduced-motion',
+      'nested-root',
+      'frame-rate',
+    ],
     async ({ browser, baseUrl }) => {
       const context = await browser.newContext({ viewport: { width: 1180, height: 860 } });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        let workbench = await gotoCatalog(page, baseUrl, { entry: 'MotionTransition', tab: 'examples', example: 'authority', motion: 'full' });
+        let workbench = await gotoCatalog(page, baseUrl, {
+          entry: 'MotionTransition',
+          tab: 'examples',
+          example: 'authority',
+          motion: 'full',
+        });
         let probes = workbench.locator('[data-motion-authority-probe]');
         await probes.first().waitFor({ state: 'visible' });
-        assert.equal(await probes.count(), 2, 'Motion authority fixture did not expose independent root runtimes.');
-        const fullState = await probes.evaluateAll((elements) => elements.map((element) => {
-          const root = element.closest('.ui-root');
-          return {
-            label: element.getAttribute('data-motion-authority-probe'),
-            realmReady: root?.getAttribute('data-oxs-motion-realm-ready'),
-            frameHost: root?.getAttribute('data-oxs-motion-frame-host'),
-            targetFrameRate: root?.getAttribute('data-oxs-frame-rate'),
-            preference: root?.getAttribute('data-oxs-motion'),
-          };
-        }));
-        assert.ok(fullState.every((state) => state.realmReady === 'true' && state.frameHost === 'true'), 'Motion runtime did not bind scheduling to the concrete owner Window.');
-        assert.deepEqual(fullState.map((state) => state.targetFrameRate), ['60', '120'], 'Nested UiRoot did not own an independent target frame-rate runtime.');
-        assert.ok(fullState.every((state) => state.preference === 'full'), 'Full-motion fixture did not resolve full preference.');
+        assert.equal(
+          await probes.count(),
+          2,
+          'Motion authority fixture did not expose independent root runtimes.',
+        );
+        const fullState = await probes.evaluateAll((elements) =>
+          elements.map((element) => {
+            const root = element.closest('.ui-root');
+            return {
+              label: element.getAttribute('data-motion-authority-probe'),
+              realmReady: root?.getAttribute('data-oxs-motion-realm-ready'),
+              frameHost: root?.getAttribute('data-oxs-motion-frame-host'),
+              targetFrameRate: root?.getAttribute('data-oxs-frame-rate'),
+              preference: root?.getAttribute('data-oxs-motion'),
+            };
+          }),
+        );
+        assert.ok(
+          fullState.every((state) => state.realmReady === 'true' && state.frameHost === 'true'),
+          'Motion runtime did not bind scheduling to the concrete owner Window.',
+        );
+        assert.deepEqual(
+          fullState.map((state) => state.targetFrameRate),
+          ['60', '120'],
+          'Nested UiRoot did not own an independent target frame-rate runtime.',
+        );
+        assert.ok(
+          fullState.every((state) => state.preference === 'full'),
+          'Full-motion fixture did not resolve full preference.',
+        );
 
         const outer = probes.filter({ hasText: 'Outer runtime:' });
         const toggle = outer.getByRole('button', { name: 'Toggle motion', exact: true });
@@ -1594,27 +2458,75 @@ export const browserScenarios = [
         await toggle.click();
         await page.waitForTimeout(35);
         await toggle.click();
-        await page.waitForFunction(() => {
-          const probe = [...document.querySelectorAll('#example-authority [data-motion-authority-probe]')].find((element) => element.getAttribute('data-motion-authority-probe') === 'Outer runtime');
-          const surface = probe?.querySelector('[data-motion-probe-surface]');
-          return surface?.getAttribute('data-present') === 'true' && surface?.getAttribute('data-hidden') === 'false';
-        }, null, { timeout: 1800 });
-        assert.equal(await surface.getAttribute('data-present'), 'true', 'Interrupted motion did not converge to the latest requested state.');
-        assert.equal(await surface.getAttribute('data-hidden'), 'false', 'Interrupted motion left the destination hidden.');
+        await page.waitForFunction(
+          () => {
+            const probe = [
+              ...document.querySelectorAll('#example-authority [data-motion-authority-probe]'),
+            ].find(
+              (element) => element.getAttribute('data-motion-authority-probe') === 'Outer runtime',
+            );
+            const surface = probe?.querySelector('[data-motion-probe-surface]');
+            return (
+              surface?.getAttribute('data-present') === 'true' &&
+              surface?.getAttribute('data-hidden') === 'false'
+            );
+          },
+          null,
+          { timeout: 1800 },
+        );
+        assert.equal(
+          await surface.getAttribute('data-present'),
+          'true',
+          'Interrupted motion did not converge to the latest requested state.',
+        );
+        assert.equal(
+          await surface.getAttribute('data-hidden'),
+          'false',
+          'Interrupted motion left the destination hidden.',
+        );
 
-        workbench = await gotoCatalog(page, baseUrl, { entry: 'MotionTransition', tab: 'examples', example: 'authority', motion: 'reduced' });
+        workbench = await gotoCatalog(page, baseUrl, {
+          entry: 'MotionTransition',
+          tab: 'examples',
+          example: 'authority',
+          motion: 'reduced',
+        });
         probes = workbench.locator('[data-motion-authority-probe]');
         const reducedOuter = probes.filter({ hasText: 'Outer runtime:' });
-        const reducedToggle = reducedOuter.getByRole('button', { name: 'Toggle motion', exact: true });
+        const reducedToggle = reducedOuter.getByRole('button', {
+          name: 'Toggle motion',
+          exact: true,
+        });
         const reducedSurface = reducedOuter.locator('[data-motion-probe-surface]');
-        assert.equal(await reducedOuter.evaluate((element) => element.closest('.ui-root')?.getAttribute('data-oxs-motion')), 'reduced', 'Reduced-motion route did not resolve through the motion runtime.');
+        assert.equal(
+          await reducedOuter.evaluate((element) =>
+            element.closest('.ui-root')?.getAttribute('data-oxs-motion'),
+          ),
+          'reduced',
+          'Reduced-motion route did not resolve through the motion runtime.',
+        );
         await reducedToggle.click();
-        await page.waitForFunction(() => {
-          const probe = [...document.querySelectorAll('#example-authority [data-motion-authority-probe]')].find((element) => element.getAttribute('data-motion-authority-probe') === 'Outer runtime');
-          const surface = probe?.querySelector('[data-motion-probe-surface]');
-          return surface?.getAttribute('data-present') === 'false' && surface?.getAttribute('data-hidden') === 'true';
-        }, null, { timeout: 250 });
-        assert.equal(await reducedSurface.getAttribute('data-hidden'), 'true', 'Reduced motion did not settle immediately to hidden semantics.');
+        await page.waitForFunction(
+          () => {
+            const probe = [
+              ...document.querySelectorAll('#example-authority [data-motion-authority-probe]'),
+            ].find(
+              (element) => element.getAttribute('data-motion-authority-probe') === 'Outer runtime',
+            );
+            const surface = probe?.querySelector('[data-motion-probe-surface]');
+            return (
+              surface?.getAttribute('data-present') === 'false' &&
+              surface?.getAttribute('data-hidden') === 'true'
+            );
+          },
+          null,
+          { timeout: 250 },
+        );
+        assert.equal(
+          await reducedSurface.getAttribute('data-hidden'),
+          'true',
+          'Reduced motion did not settle immediately to hidden semantics.',
+        );
         diagnostics.assertClean('Motion authority runtime closeout');
         return { fullState, interruptionConverged: true, reducedSettled: true };
       } finally {
@@ -1631,18 +2543,34 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        const selectWorkbench = await gotoCatalog(page, baseUrl, { entry: 'Select', tab: 'examples', example: 'overview' });
+        const selectWorkbench = await gotoCatalog(page, baseUrl, {
+          entry: 'Select',
+          tab: 'examples',
+          example: 'overview',
+        });
         const select = selectWorkbench.getByRole('combobox', { name: 'Density', exact: true });
         await select.waitFor({ state: 'visible' });
         await select.focus();
         await page.keyboard.press('c');
         await page.keyboard.press('c');
-        assert.match(await select.innerText(), /Compact/, 'Repeated-key Select typeahead did not cycle through the shared matcher.');
+        assert.match(
+          await select.innerText(),
+          /Compact/,
+          'Repeated-key Select typeahead did not cycle through the shared matcher.',
+        );
         await page.waitForTimeout(760);
         await page.keyboard.press('c');
-        assert.match(await select.innerText(), /Comfortable/, 'Delayed Select typeahead did not reset to the first matching choice.');
+        assert.match(
+          await select.innerText(),
+          /Comfortable/,
+          'Delayed Select typeahead did not reset to the first matching choice.',
+        );
 
-        const menuWorkbench = await gotoCatalog(page, baseUrl, { entry: 'Menu', tab: 'examples', example: 'preview' });
+        const menuWorkbench = await gotoCatalog(page, baseUrl, {
+          entry: 'Menu',
+          tab: 'examples',
+          example: 'preview',
+        });
         const trigger = menuWorkbench.getByRole('button', { name: 'Open menu', exact: true });
         await trigger.click();
         const menu = page.getByRole('menu', { name: 'Preview menu' });
@@ -1677,14 +2605,28 @@ export const browserScenarios = [
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        const example = await gotoCatalog(page, baseUrl, { entry: 'Button', tab: 'examples', example: 'contract', modality: 'mouse', pointer: 'fine' });
+        const example = await gotoCatalog(page, baseUrl, {
+          entry: 'Button',
+          tab: 'examples',
+          example: 'contract',
+          modality: 'mouse',
+          pointer: 'fine',
+        });
         const primary = example.getByRole('button', { name: 'Primary', exact: true });
         const counter = example.locator('[data-action-primary-count]');
         await primary.waitFor({ state: 'visible' });
         const beforeCancel = await counter.getAttribute('data-action-primary-count');
         await performPointerCancel(page, primary);
-        assert.equal(await counter.getAttribute('data-action-primary-count'), beforeCancel, 'Pointer release outside the target incorrectly activated Button.');
-        assert.equal(await primary.getAttribute('data-pressed'), null, 'Pressed visual state leaked after pointer cancellation.');
+        assert.equal(
+          await counter.getAttribute('data-action-primary-count'),
+          beforeCancel,
+          'Pointer release outside the target incorrectly activated Button.',
+        );
+        assert.equal(
+          await primary.getAttribute('data-pressed'),
+          null,
+          'Pressed visual state leaked after pointer cancellation.',
+        );
         await primary.click();
         assert.equal(
           await counter.getAttribute('data-action-primary-count'),
@@ -1746,21 +2688,41 @@ export const browserScenarios = [
           safeArea: { safeBlockEnd: '28px' },
           environmentInset: { insetBlockEnd: '28px' },
         });
-        const documentationViewport = page.locator('.ui-studio-workspace-scroll > .ui-scroll-view__viewport');
+        const documentationViewport = page.locator(
+          '.ui-studio-workspace-scroll > .ui-scroll-view__viewport',
+        );
         const documentationViewportHeight = await assertMinimumBlockSize(
           documentationViewport,
           176,
           'Phone Studio documentation viewport',
         );
-        const trigger = example.getByRole('button', { name: 'Right-click or long-press', exact: true });
+        const trigger = example.getByRole('button', {
+          name: 'Right-click or long-press',
+          exact: true,
+        });
         const size = await trigger.boundingBox();
-        assert.ok(size && size.height >= 44, `Coarse-pointer trigger is below the 44px browser target floor (${size?.height ?? 0}px).`);
+        assert.ok(
+          size && size.height >= 44,
+          `Coarse-pointer trigger is below the 44px browser target floor (${size?.height ?? 0}px).`,
+        );
         const menu = page.getByRole('menu', { name: 'File actions' });
-        const activationMs = await performTouchLongPress(page, trigger, menu, { activationBudgetMs: 1000 });
-        assert.equal(await menu.getByRole('menuitem').count(), 3, 'Long-press ContextMenu exposed the wrong command count.');
+        const activationMs = await performTouchLongPress(page, trigger, menu, {
+          activationBudgetMs: 1000,
+        });
+        assert.equal(
+          await menu.getByRole('menuitem').count(),
+          3,
+          'Long-press ContextMenu exposed the wrong command count.',
+        );
         const axe = await runAxe(page, 'Touch ContextMenu');
         diagnostics.assertClean('touch long-press journey');
-        return { axe, targetHeight: size.height, documentationViewportHeight, commands: 3, activationMs };
+        return {
+          axe,
+          targetHeight: size.height,
+          documentationViewportHeight,
+          commands: 3,
+          activationMs,
+        };
       } finally {
         await context.close();
       }
@@ -1769,13 +2731,40 @@ export const browserScenarios = [
 
   scenario(
     'environment-and-reflow-matrix',
-    ['rtl', 'ltr', 'theme', 'density', 'reduced-motion', 'responsive', 'adaptive-band', 'safe-area', 'occlusion', 'reflow'],
+    [
+      'rtl',
+      'ltr',
+      'theme',
+      'density',
+      'reduced-motion',
+      'responsive',
+      'adaptive-band',
+      'safe-area',
+      'occlusion',
+      'reflow',
+    ],
     async ({ browser, baseUrl }) => {
       const cases = [
         {
           id: 'narrow-rtl-reduced',
-          context: { viewport: { width: 320, height: 720 }, reducedMotion: 'reduce', colorScheme: 'light' },
-          route: { entry: 'TextField', tab: 'overview', theme: 'light', dir: 'rtl', density: 'compact', motion: 'system', modality: 'keyboard', pointer: 'coarse', viewport: 'fit', container: 'compact', insets: 'notch' },
+          context: {
+            viewport: { width: 320, height: 720 },
+            reducedMotion: 'reduce',
+            colorScheme: 'light',
+          },
+          route: {
+            entry: 'TextField',
+            tab: 'overview',
+            theme: 'light',
+            dir: 'rtl',
+            density: 'compact',
+            motion: 'system',
+            modality: 'keyboard',
+            pointer: 'coarse',
+            viewport: 'fit',
+            container: 'compact',
+            insets: 'notch',
+          },
           expected: {
             dir: 'rtl',
             directionPreference: 'rtl',
@@ -1794,14 +2783,40 @@ export const browserScenarios = [
             viewport: 'fit',
             viewportWidth: '100%',
             containerWidth: '48rem',
-            safeArea: { safeBlockStart: '32px', safeInlineEnd: '12px', safeBlockEnd: '12px', safeInlineStart: '12px' },
-            environmentInset: { insetBlockStart: '32px', insetInlineEnd: '12px', insetBlockEnd: '12px', insetInlineStart: '12px' },
+            safeArea: {
+              safeBlockStart: '32px',
+              safeInlineEnd: '12px',
+              safeBlockEnd: '12px',
+              safeInlineStart: '12px',
+            },
+            environmentInset: {
+              insetBlockStart: '32px',
+              insetInlineEnd: '12px',
+              insetBlockEnd: '12px',
+              insetInlineStart: '12px',
+            },
           },
         },
         {
           id: 'tablet-custom-keyboard-occlusion',
-          context: { viewport: { width: 1024, height: 900 }, reducedMotion: 'no-preference', colorScheme: 'dark' },
-          route: { entry: 'Button', tab: 'overview', theme: 'custom', dir: 'ltr', density: 'comfortable', motion: 'full', modality: 'pen', pointer: 'coarse', viewport: 'tablet', container: 'content', insets: 'keyboard' },
+          context: {
+            viewport: { width: 1024, height: 900 },
+            reducedMotion: 'no-preference',
+            colorScheme: 'dark',
+          },
+          route: {
+            entry: 'Button',
+            tab: 'overview',
+            theme: 'custom',
+            dir: 'ltr',
+            density: 'comfortable',
+            motion: 'full',
+            modality: 'pen',
+            pointer: 'coarse',
+            viewport: 'tablet',
+            container: 'content',
+            insets: 'keyboard',
+          },
           expected: {
             dir: 'ltr',
             directionPreference: 'ltr',
@@ -1826,8 +2841,24 @@ export const browserScenarios = [
         },
         {
           id: 'phone-auto-density-system',
-          context: { viewport: { width: 900, height: 900 }, reducedMotion: 'no-preference', colorScheme: 'dark' },
-          route: { entry: 'Button', tab: 'overview', theme: 'system', dir: 'auto', density: 'auto', motion: 'system', modality: 'mouse', pointer: 'coarse', viewport: 'phone', container: 'compact', insets: 'gesture' },
+          context: {
+            viewport: { width: 900, height: 900 },
+            reducedMotion: 'no-preference',
+            colorScheme: 'dark',
+          },
+          route: {
+            entry: 'Button',
+            tab: 'overview',
+            theme: 'system',
+            dir: 'auto',
+            density: 'auto',
+            motion: 'system',
+            modality: 'mouse',
+            pointer: 'coarse',
+            viewport: 'phone',
+            container: 'compact',
+            insets: 'gesture',
+          },
           expected: {
             dir: 'ltr',
             directionPreference: 'auto',
@@ -1861,8 +2892,15 @@ export const browserScenarios = [
           await assertEnvironment(page, testCase.expected);
           const geometry = await assertNoGlobalHorizontalOverflow(page, testCase.id);
           await assertWithinViewport(workbench, `${testCase.id} workbench`);
-          const media = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
-          if (testCase.context.reducedMotion === 'reduce') assert.equal(media, true, `${testCase.id} did not receive browser reduced-motion emulation.`);
+          const media = await page.evaluate(
+            () => matchMedia('(prefers-reduced-motion: reduce)').matches,
+          );
+          if (testCase.context.reducedMotion === 'reduce')
+            assert.equal(
+              media,
+              true,
+              `${testCase.id} did not receive browser reduced-motion emulation.`,
+            );
           observations.push({ id: testCase.id, geometry, reducedMotionMedia: media });
           diagnostics.assertClean(testCase.id);
         } finally {
@@ -1875,90 +2913,230 @@ export const browserScenarios = [
 
   scenario(
     'button-action-contract-certification',
-    ['actions', 'button', 'native-form', 'loading', 'disabled', 'pointer', 'touch', 'keyboard', 'cancellation', 'rtl', 'a11y'],
+    [
+      'actions',
+      'button',
+      'native-form',
+      'loading',
+      'disabled',
+      'pointer',
+      'touch',
+      'keyboard',
+      'cancellation',
+      'rtl',
+      'a11y',
+    ],
     async ({ browser, baseUrl }) => {
-      const context = await browser.newContext({ viewport: { width: 900, height: 760 }, hasTouch: true });
+      const context = await browser.newContext({
+        viewport: { width: 900, height: 760 },
+        hasTouch: true,
+      });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        const workbench = await gotoCatalog(page, baseUrl, { entry: 'Button', tab: 'examples', example: 'contract', dir: 'rtl', pointer: 'coarse' });
+        const workbench = await gotoCatalog(page, baseUrl, {
+          entry: 'Button',
+          tab: 'examples',
+          example: 'contract',
+          dir: 'rtl',
+          pointer: 'coarse',
+        });
         const primary = workbench.getByRole('button', { name: 'Primary', exact: true });
         const submit = workbench.getByRole('button', { name: 'Submit form', exact: true });
         const loading = workbench.getByRole('button', { name: 'Saving changes', exact: true });
         const disabled = workbench.getByRole('button', { name: 'Disabled', exact: true });
         const destructive = workbench.getByRole('button', { name: 'Delete', exact: true });
         await primary.waitFor({ state: 'visible' });
-        assert.equal(await loading.isDisabled(), true, 'Loading Button did not suppress native activation.');
-        assert.equal(await loading.getAttribute('aria-busy'), 'true', 'Loading Button did not expose aria-busy.');
-        assert.equal(await disabled.isDisabled(), true, 'Disabled Button lost native disabled semantics.');
-        assert.ok((await destructive.getAttribute('class'))?.includes('ui-button--intent-destructive'), 'Destructive intent did not project independently from emphasis.');
-        assert.equal(await submit.getAttribute('type'), 'submit', 'Explicit Button submit type was not preserved.');
+        assert.equal(
+          await loading.isDisabled(),
+          true,
+          'Loading Button did not suppress native activation.',
+        );
+        assert.equal(
+          await loading.getAttribute('aria-busy'),
+          'true',
+          'Loading Button did not expose aria-busy.',
+        );
+        assert.equal(
+          await disabled.isDisabled(),
+          true,
+          'Disabled Button lost native disabled semantics.',
+        );
+        assert.ok(
+          (await destructive.getAttribute('class'))?.includes('ui-button--intent-destructive'),
+          'Destructive intent did not project independently from emphasis.',
+        );
+        assert.equal(
+          await submit.getAttribute('type'),
+          'submit',
+          'Explicit Button submit type was not preserved.',
+        );
         await submit.focus();
         await page.keyboard.press('Enter');
-        assert.equal(await workbench.locator('[data-action-submit-count]').getAttribute('data-action-submit-count'), '1', 'Keyboard activation did not preserve native form submission.');
-        const beforeCancel = await workbench.locator('[data-action-primary-count]').getAttribute('data-action-primary-count');
+        assert.equal(
+          await workbench
+            .locator('[data-action-submit-count]')
+            .getAttribute('data-action-submit-count'),
+          '1',
+          'Keyboard activation did not preserve native form submission.',
+        );
+        const beforeCancel = await workbench
+          .locator('[data-action-primary-count]')
+          .getAttribute('data-action-primary-count');
         await performPointerCancel(page, primary);
-        assert.equal(await workbench.locator('[data-action-primary-count]').getAttribute('data-action-primary-count'), beforeCancel, 'Pointer cancellation still activated Button.');
+        assert.equal(
+          await workbench
+            .locator('[data-action-primary-count]')
+            .getAttribute('data-action-primary-count'),
+          beforeCancel,
+          'Pointer cancellation still activated Button.',
+        );
         const box = await primary.boundingBox();
         assert.ok(box, 'Primary Button has no touch geometry.');
         await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
-        assert.equal(await workbench.locator('[data-action-primary-count]').getAttribute('data-action-primary-count'), String(Number(beforeCancel) + 1), 'Touch activation diverged from Button native action behavior.');
-        assert.equal(await primary.evaluate((element) => getComputedStyle(element).direction), 'rtl', 'Button did not inherit RTL action flow.');
+        assert.equal(
+          await workbench
+            .locator('[data-action-primary-count]')
+            .getAttribute('data-action-primary-count'),
+          String(Number(beforeCancel) + 1),
+          'Touch activation diverged from Button native action behavior.',
+        );
+        assert.equal(
+          await primary.evaluate((element) => getComputedStyle(element).direction),
+          'rtl',
+          'Button did not inherit RTL action flow.',
+        );
         const axe = await runAxe(page, 'Button action contract');
         diagnostics.assertClean('Button action contract');
         return { submit: 'native', cancellation: 'preserved', touch: 'equivalent', axe };
-      } finally { await context.close(); }
+      } finally {
+        await context.close();
+      }
     },
     { accepts: ['Button'] },
   ),
 
   scenario(
     'icon-button-action-contract-certification',
-    ['actions', 'icon-button', 'label', 'tooltip', 'target-size', 'toggle', 'rtl', 'coarse-pointer', 'a11y'],
+    [
+      'actions',
+      'icon-button',
+      'label',
+      'tooltip',
+      'target-size',
+      'toggle',
+      'rtl',
+      'coarse-pointer',
+      'a11y',
+    ],
     async ({ browser, baseUrl }) => {
       const context = await browser.newContext({ viewport: { width: 760, height: 680 } });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        const workbench = await gotoCatalog(page, baseUrl, { entry: 'IconButton', tab: 'examples', example: 'contract', dir: 'rtl', pointer: 'coarse' });
+        const workbench = await gotoCatalog(page, baseUrl, {
+          entry: 'IconButton',
+          tab: 'examples',
+          example: 'contract',
+          dir: 'rtl',
+          pointer: 'coarse',
+        });
         const search = workbench.getByRole('button', { name: 'Search', exact: true });
         const pinned = workbench.getByRole('button', { name: 'Pinned', exact: true });
         const next = workbench.getByRole('button', { name: 'Next', exact: true });
         await search.waitFor({ state: 'visible' });
         const descriptionId = await search.getAttribute('aria-describedby');
         assert.ok(descriptionId, 'IconButton tooltip was not linked through aria-describedby.');
-        assert.equal(await page.locator(`#${descriptionId}`).getAttribute('role'), 'tooltip', 'IconButton tooltip relationship does not target tooltip semantics.');
+        assert.equal(
+          await page.locator(`#${descriptionId}`).getAttribute('role'),
+          'tooltip',
+          'IconButton tooltip relationship does not target tooltip semantics.',
+        );
         const searchBox = await search.boundingBox();
-        assert.ok(searchBox && searchBox.width >= 44 && searchBox.height >= 44, `Coarse-pointer IconButton target collapsed (${searchBox?.width}x${searchBox?.height}).`);
-        assert.equal(await pinned.getAttribute('aria-pressed'), 'true', 'IconButton toggle did not expose initial pressed state.');
+        assert.ok(
+          searchBox && searchBox.width >= 44 && searchBox.height >= 44,
+          `Coarse-pointer IconButton target collapsed (${searchBox?.width}x${searchBox?.height}).`,
+        );
+        assert.equal(
+          await pinned.getAttribute('aria-pressed'),
+          'true',
+          'IconButton toggle did not expose initial pressed state.',
+        );
         await pinned.click();
-        assert.equal(await pinned.getAttribute('aria-pressed'), 'false', 'IconButton toggle did not update pressed state.');
-        const iconTransform = await next.locator('svg').evaluate((element) => getComputedStyle(element).transform);
-        assert.notEqual(iconTransform, 'none', 'Directional IconButton glyph did not mirror from local RTL direction.');
+        assert.equal(
+          await pinned.getAttribute('aria-pressed'),
+          'false',
+          'IconButton toggle did not update pressed state.',
+        );
+        const iconTransform = await next
+          .locator('svg')
+          .evaluate((element) => getComputedStyle(element).transform);
+        assert.notEqual(
+          iconTransform,
+          'none',
+          'Directional IconButton glyph did not mirror from local RTL direction.',
+        );
         const axe = await runAxe(page, 'IconButton action contract');
         diagnostics.assertClean('IconButton action contract');
         return { target: searchBox, tooltip: descriptionId, rtlTransform: iconTransform, axe };
-      } finally { await context.close(); }
+      } finally {
+        await context.close();
+      }
     },
     { accepts: ['IconButton'] },
   ),
 
   scenario(
     'action-group-toolbar-certification',
-    ['actions', 'group', 'semantics', 'no-hidden-actions', 'responsive', 'toolbar', 'roving', 'keyboard', 'rtl', 'home-end', 'overflow', 'target-size', 'a11y'],
+    [
+      'actions',
+      'group',
+      'semantics',
+      'no-hidden-actions',
+      'responsive',
+      'toolbar',
+      'roving',
+      'keyboard',
+      'rtl',
+      'home-end',
+      'overflow',
+      'target-size',
+      'a11y',
+    ],
     async ({ browser, baseUrl }) => {
       const context = await browser.newContext({ viewport: { width: 820, height: 720 } });
       const page = await context.newPage();
       const diagnostics = attachRuntimeDiagnostics(page);
       try {
-        let workbench = await gotoCatalog(page, baseUrl, { entry: 'ActionGroup', tab: 'examples', example: 'contract', viewport: 'phone', container: 'compact' });
+        let workbench = await gotoCatalog(page, baseUrl, {
+          entry: 'ActionGroup',
+          tab: 'examples',
+          example: 'contract',
+          viewport: 'phone',
+          container: 'compact',
+        });
         const group = workbench.getByRole('group', { name: 'Document actions' });
         await group.waitFor({ state: 'visible' });
         const groupButtons = group.getByRole('button');
-        assert.equal(await groupButtons.count(), 3, 'ActionGroup silently hid or moved commands in a compact container.');
-        for (const label of ['Save', 'Duplicate', 'Delete']) assert.equal(await group.getByRole('button', { name: label, exact: true }).isVisible(), true, `ActionGroup hid ${label}.`);
+        assert.equal(
+          await groupButtons.count(),
+          3,
+          'ActionGroup silently hid or moved commands in a compact container.',
+        );
+        for (const label of ['Save', 'Duplicate', 'Delete'])
+          assert.equal(
+            await group.getByRole('button', { name: label, exact: true }).isVisible(),
+            true,
+            `ActionGroup hid ${label}.`,
+          );
 
-        workbench = await gotoCatalog(page, baseUrl, { entry: 'Toolbar', tab: 'examples', example: 'contract', dir: 'ltr', pointer: 'coarse' });
+        workbench = await gotoCatalog(page, baseUrl, {
+          entry: 'Toolbar',
+          tab: 'examples',
+          example: 'contract',
+          dir: 'ltr',
+          pointer: 'coarse',
+        });
         const toolbar = workbench.getByRole('toolbar', { name: 'Editor commands' });
         const undo = toolbar.getByRole('button', { name: 'Undo', exact: true });
         const redo = toolbar.getByRole('button', { name: 'Redo', exact: true });
@@ -1966,26 +3144,695 @@ export const browserScenarios = [
         const more = toolbar.getByRole('button', { name: 'More commands', exact: true });
         await undo.focus();
         await page.keyboard.press('ArrowRight');
-        assert.equal(await redo.evaluate((element) => element.ownerDocument.activeElement === element), true, 'Toolbar ArrowRight did not move logical roving focus.');
+        assert.equal(
+          await redo.evaluate((element) => element.ownerDocument.activeElement === element),
+          true,
+          'Toolbar ArrowRight did not move logical roving focus.',
+        );
         await page.keyboard.press('End');
-        assert.equal(await more.evaluate((element) => element.ownerDocument.activeElement === element), true, 'Toolbar End did not reach caller-owned overflow action.');
+        assert.equal(
+          await more.evaluate((element) => element.ownerDocument.activeElement === element),
+          true,
+          'Toolbar End did not reach caller-owned overflow action.',
+        );
         await page.keyboard.press('Home');
-        assert.equal(await undo.evaluate((element) => element.ownerDocument.activeElement === element), true, 'Toolbar Home did not restore the first enabled command.');
-        for (const target of [undo, redo, save, more]) await assertMinimumBlockSize(target, 44, 'Toolbar coarse-pointer action');
+        assert.equal(
+          await undo.evaluate((element) => element.ownerDocument.activeElement === element),
+          true,
+          'Toolbar Home did not restore the first enabled command.',
+        );
+        for (const target of [undo, redo, save, more])
+          await assertMinimumBlockSize(target, 44, 'Toolbar coarse-pointer action');
 
-        workbench = await gotoCatalog(page, baseUrl, { entry: 'Toolbar', tab: 'examples', example: 'contract', dir: 'rtl' });
+        workbench = await gotoCatalog(page, baseUrl, {
+          entry: 'Toolbar',
+          tab: 'examples',
+          example: 'contract',
+          dir: 'rtl',
+        });
         const rtlToolbar = workbench.getByRole('toolbar', { name: 'Editor commands' });
         const rtlUndo = rtlToolbar.getByRole('button', { name: 'Undo', exact: true });
         const rtlMore = rtlToolbar.getByRole('button', { name: 'More commands', exact: true });
         await rtlUndo.focus();
         await page.keyboard.press('ArrowRight');
-        assert.equal(await rtlMore.evaluate((element) => element.ownerDocument.activeElement === element), true, 'RTL Toolbar ArrowRight did not follow logical reverse traversal with looping.');
+        assert.equal(
+          await rtlMore.evaluate((element) => element.ownerDocument.activeElement === element),
+          true,
+          'RTL Toolbar ArrowRight did not follow logical reverse traversal with looping.',
+        );
         const axe = await runAxe(page, 'ActionGroup/Toolbar action contract');
         diagnostics.assertClean('ActionGroup/Toolbar action contract');
         return { groupCount: 3, roving: 'logical', overflow: 'reachable', axe };
-      } finally { await context.close(); }
+      } finally {
+        await context.close();
+      }
     },
     { accepts: ['ActionGroup', 'Toolbar'] },
   ),
 
+  scenario(
+    'field-native-form-certification',
+    [
+      'fields',
+      'field-group',
+      'field-section',
+      'text-field',
+      'text-area',
+      'native-form',
+      'controlled',
+      'uncontrolled',
+      'autofill',
+      'validation',
+      'reset',
+      'submission',
+      'selection',
+      'semantics',
+      'description',
+      'heading',
+      'responsive',
+      'rtl',
+      'touch',
+      'a11y',
+    ],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({
+        viewport: { width: 900, height: 820 },
+        hasTouch: true,
+      });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        let example = await gotoCatalog(page, baseUrl, {
+          entry: 'TextField',
+          tab: 'examples',
+          example: 'native-form',
+          dir: 'rtl',
+          pointer: 'coarse',
+          viewport: 'phone',
+          container: 'compact',
+        });
+        const workspace = example.getByRole('textbox', { name: 'Workspace name', exact: true });
+        const alias = example.getByRole('textbox', { name: 'Alias', exact: true });
+        const tenant = example.getByRole('textbox', { name: 'Tenant', exact: true });
+        const ignored = example.getByRole('textbox', {
+          name: 'Ignored disabled field',
+          exact: true,
+        });
+        const recovery = example.getByRole('textbox', { name: 'Recovery code', exact: true });
+        await workspace.waitFor({ state: 'visible' });
+        assert.equal(
+          await workspace.getAttribute('required'),
+          '',
+          'TextField lost native required semantics.',
+        );
+        assert.equal(
+          await workspace.getAttribute('autocomplete'),
+          'organization',
+          'TextField did not forward native autocomplete semantics.',
+        );
+        assert.equal(
+          await tenant.getAttribute('readonly'),
+          '',
+          'TextField lost native read-only semantics.',
+        );
+        assert.equal(await ignored.isDisabled(), true, 'TextField lost native disabled semantics.');
+        const aliasDescription = await alias.getAttribute('aria-describedby');
+        assert.ok(
+          aliasDescription,
+          'TextField prefix/suffix were not associated with the native control.',
+        );
+        const aliasDescriptions = await page.evaluate(
+          (ids) => ids.split(/\s+/).map((id) => document.getElementById(id)?.textContent ?? ''),
+          aliasDescription,
+        );
+        assert.ok(
+          aliasDescriptions.includes('@') && aliasDescriptions.includes('.local'),
+          'TextField logical affixes drifted from aria-describedby.',
+        );
+        assert.equal(
+          await example.getByRole('button', { name: 'Request new code', exact: true }).isVisible(),
+          true,
+          'TextField supporting action did not remain independently interactive.',
+        );
+        assert.equal(
+          await recovery.getAttribute('aria-invalid'),
+          'true',
+          'Explicit field error did not project aria-invalid.',
+        );
+        const errorId = await recovery.getAttribute('aria-errormessage');
+        assert.ok(errorId, 'Explicit field error did not project aria-errormessage.');
+        assert.equal(
+          await page.evaluate(
+            (id) => document.getElementById(id)?.getAttribute('role') ?? null,
+            errorId,
+          ),
+          'alert',
+          'aria-errormessage did not target the field error node.',
+        );
+        await assertMinimumBlockSize(
+          workspace.locator('xpath=..'),
+          44,
+          'Coarse-pointer TextField control',
+        );
+
+        await workspace.fill('');
+        assert.equal(
+          await workspace.evaluate((element) => element.checkValidity()),
+          false,
+          'Required TextField remained valid when empty.',
+        );
+        const autofillReplacement = 'Autofilled workspace';
+        await workspace.evaluate((element, replacement) => {
+          const view = element.ownerDocument.defaultView;
+          if (!view) throw new Error('TextField autofill fixture lost its Window realm.');
+          const setter = Object.getOwnPropertyDescriptor(
+            view.HTMLInputElement.prototype,
+            'value',
+          )?.set;
+          if (!setter) throw new Error('Native HTMLInputElement value setter is unavailable.');
+          setter.call(element, replacement);
+          element.dispatchEvent(
+            new view.InputEvent('input', {
+              bubbles: true,
+              composed: true,
+              inputType: 'insertReplacementText',
+              data: replacement,
+            }),
+          );
+          element.dispatchEvent(new view.Event('change', { bubbles: true }));
+        }, autofillReplacement);
+        assert.equal(
+          await workspace.inputValue(),
+          autofillReplacement,
+          'Native replacement/autofill-style input was intercepted or lost.',
+        );
+        assert.equal(
+          await workspace.evaluate((element) => element.checkValidity()),
+          true,
+          'Native validation did not recover after replacement input.',
+        );
+
+        await alias.fill('controlled-updated');
+        await example.getByRole('button', { name: 'Submit native form', exact: true }).click();
+        const submitted = JSON.parse(
+          await example.locator('[data-field-form-result]').textContent(),
+        );
+        assert.deepEqual(
+          submitted,
+          { workspace: autofillReplacement, alias: 'controlled-updated', tenant: 'local' },
+          'Native FormData submission diverged across uncontrolled/controlled/read-only/disabled fields.',
+        );
+        assert.equal(
+          Object.hasOwn(submitted, 'ignored'),
+          false,
+          'Disabled TextField leaked into FormData.',
+        );
+
+        await workspace.fill('changed');
+        await alias.fill('changed-controlled');
+        await example.getByRole('button', { name: 'Reset native form', exact: true }).click();
+        await page.waitForFunction(() => {
+          const fixture = document.querySelector('#example-native-form');
+          if (!(fixture instanceof HTMLElement)) return false;
+          const inputs = [...fixture.querySelectorAll('input')];
+          return (
+            inputs.some(
+              (input) => input.getAttribute('name') === 'workspace' && input.value === 'OntologyX',
+            ) &&
+            inputs.some(
+              (input) => input.getAttribute('name') === 'alias' && input.value === 'controlled',
+            )
+          );
+        });
+        assert.equal(
+          await workspace.inputValue(),
+          'OntologyX',
+          'Uncontrolled TextField did not follow native form reset.',
+        );
+        assert.equal(
+          await alias.inputValue(),
+          'controlled',
+          'Controlled TextField owner did not reconcile form reset.',
+        );
+        const textFieldAxe = await runAxe(page, 'TextField native form contract');
+
+        example = await gotoCatalog(page, baseUrl, {
+          entry: 'TextArea',
+          tab: 'examples',
+          example: 'multiline-native',
+          dir: 'rtl',
+          pointer: 'coarse',
+        });
+        const notes = example.getByRole('textbox', { name: 'Notes', exact: true });
+        assert.equal(
+          await notes.getAttribute('required'),
+          '',
+          'TextArea lost native required semantics.',
+        );
+        assert.equal(
+          await notes.getAttribute('maxlength'),
+          '160',
+          'TextArea did not preserve native maxLength.',
+        );
+        await notes.evaluate((element) => {
+          element.focus();
+          element.setSelectionRange(2, 8, 'forward');
+          element.dispatchEvent(new Event('select', { bubbles: true }));
+        });
+        const selection = await notes.evaluate((element) => ({
+          start: element.selectionStart,
+          end: element.selectionEnd,
+        }));
+        assert.deepEqual(
+          selection,
+          { start: 2, end: 8 },
+          'TextArea native selection did not survive the field wrapper.',
+        );
+        await notes.fill('Updated multiline notes');
+        await example.getByRole('button', { name: 'Submit notes', exact: true }).click();
+        assert.equal(
+          await example.locator('[data-textarea-form-result]').textContent(),
+          'Updated multiline notes',
+          'TextArea did not submit its native form value.',
+        );
+        await example.getByRole('button', { name: 'Reset notes', exact: true }).click();
+        await page.waitForFunction(
+          () =>
+            document.querySelector('#example-multiline-native textarea')?.value ===
+            'Touch-first, responsive and RTL-safe.',
+        );
+        const textAreaAxe = await runAxe(page, 'TextArea native form contract');
+
+        example = await gotoCatalog(page, baseUrl, {
+          entry: 'FieldGroup',
+          tab: 'examples',
+          example: 'group-contract',
+        });
+        const group = example.getByRole('group', { name: 'Identity', exact: true });
+        assert.equal(
+          await group.evaluate((element) => element.tagName),
+          'FIELDSET',
+          'FieldGroup must render a native fieldset.',
+        );
+        assert.equal(
+          await group.locator('legend').textContent(),
+          'Identity',
+          'FieldGroup must expose its label through a native legend.',
+        );
+        const groupDescriptionId = await group.getAttribute('aria-describedby');
+        assert.ok(groupDescriptionId, 'FieldGroup lost its description relationship.');
+        assert.equal(
+          await page.evaluate(
+            (id) => document.getElementById(id)?.textContent ?? null,
+            groupDescriptionId,
+          ),
+          'Names used by workspace surfaces.',
+          'FieldGroup description relationship drifted.',
+        );
+        const groupAxe = await runAxe(page, 'FieldGroup contract');
+
+        example = await gotoCatalog(page, baseUrl, {
+          entry: 'FieldSection',
+          tab: 'examples',
+          example: 'section-contract',
+        });
+        const section = example.getByRole('region', { name: 'Profile', exact: true });
+        const sectionDescriptionId = await section.getAttribute('aria-describedby');
+        assert.ok(sectionDescriptionId, 'FieldSection lost its description relationship.');
+        assert.equal(
+          await page.evaluate(
+            (id) => document.getElementById(id)?.textContent ?? null,
+            sectionDescriptionId,
+          ),
+          'Section ownership stops at structure and relationships.',
+          'FieldSection description relationship drifted.',
+        );
+        const sectionAxe = await runAxe(page, 'FieldSection contract');
+        diagnostics.assertClean('UIR07 native field/form journey');
+        return { textFieldAxe, textAreaAxe, groupAxe, sectionAxe, autofillReplacement, selection };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['TextField', 'TextArea', 'FieldGroup', 'FieldSection'] },
+  ),
+
+  scenario(
+    'search-field-composition-certification',
+    [
+      'fields',
+      'search-field',
+      'searchbox',
+      'composition',
+      'clear',
+      'suggestions',
+      'focus',
+      'keyboard',
+      'touch',
+      'target-size',
+      'rtl',
+      'a11y',
+    ],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({
+        viewport: { width: 720, height: 640 },
+        hasTouch: true,
+      });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const example = await gotoCatalog(page, baseUrl, {
+          entry: 'SearchField',
+          tab: 'examples',
+          example: 'composition-safe-search',
+          dir: 'rtl',
+          pointer: 'coarse',
+          viewport: 'phone',
+          container: 'compact',
+        });
+        const search = example.getByRole('searchbox', { name: 'Search applications', exact: true });
+        const clear = example.getByRole('button', { name: 'Clear search', exact: true });
+        const suggestions = example.getByRole('button', { name: 'Show suggestions', exact: true });
+        await search.waitFor({ state: 'visible' });
+        await assertMinimumBlockSize(clear, 44, 'SearchField clear action');
+        await assertMinimumBlockSize(suggestions, 44, 'SearchField suggestions action');
+        await search.focus();
+        await search.evaluate((element) => {
+          const view = element.ownerDocument.defaultView;
+          if (!view) throw new Error('SearchField lost its Window realm.');
+          element.dispatchEvent(
+            new view.CompositionEvent('compositionstart', { bubbles: true, data: '候' }),
+          );
+          element.dispatchEvent(
+            new view.CompositionEvent('compositionupdate', { bubbles: true, data: '候補' }),
+          );
+        });
+        await page.waitForFunction(
+          () =>
+            document.querySelector('#example-composition-safe-search [data-search-composing]')
+              ?.textContent === 'composing',
+        );
+        assert.equal(
+          await clear.isDisabled(),
+          true,
+          'SearchField clear action remained active during composition.',
+        );
+        assert.equal(
+          await suggestions.isDisabled(),
+          true,
+          'SearchField suggestions action remained active during composition.',
+        );
+        await page.keyboard.press('ArrowDown');
+        assert.equal(
+          await example.locator('[data-search-suggestions]').textContent(),
+          '0',
+          'SearchField requested suggestions while composition was active.',
+        );
+        assert.equal(
+          await example.locator('[data-search-value]').textContent(),
+          'Launcher',
+          'SearchField mutated committed value during composition-only evidence.',
+        );
+
+        await search.evaluate((element) => {
+          const view = element.ownerDocument.defaultView;
+          if (!view) throw new Error('SearchField lost its Window realm.');
+          element.dispatchEvent(
+            new view.CompositionEvent('compositionend', { bubbles: true, data: '候補' }),
+          );
+        });
+        await page.waitForFunction(
+          () =>
+            document.querySelector('#example-composition-safe-search [data-search-composing]')
+              ?.textContent === 'settled',
+        );
+        assert.equal(
+          await clear.isEnabled(),
+          true,
+          'SearchField clear action did not recover after composition.',
+        );
+        await clear.click();
+        assert.equal(
+          await example.locator('[data-search-value]').textContent(),
+          '∅',
+          'SearchField clear did not publish an empty controlled value.',
+        );
+        assert.equal(
+          await search.evaluate((element) => element.ownerDocument.activeElement === element),
+          true,
+          'SearchField clear did not restore input focus without a global scheduler.',
+        );
+        await search.fill('settings');
+        await suggestions.click();
+        assert.equal(
+          await example.locator('[data-search-suggestions]').textContent(),
+          '1',
+          'SearchField caller-owned suggestions seam did not resume after composition.',
+        );
+        const axe = await runAxe(page, 'SearchField composition contract');
+        diagnostics.assertClean('SearchField composition contract');
+        return { clear: 'composition-safe', suggestions: 'caller-owned', axe };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['SearchField'] },
+  ),
+
+  scenario(
+    'editable-text-host-occlusion-certification',
+    [
+      'fields',
+      'text-session',
+      'ime',
+      'composition',
+      'selection',
+      'secure-input',
+      'clipboard',
+      'host-adapter',
+      'occlusion',
+      'multiline',
+      'realm',
+      'a11y',
+    ],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 820, height: 760 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const example = await gotoCatalog(page, baseUrl, {
+          entry: 'TextField',
+          tab: 'examples',
+          example: 'host-session',
+          viewport: 'phone',
+          container: 'compact',
+        });
+        const sessionValue = (key) => example.locator(`[data-editable-session-${key}]`);
+        const waitSession = async (key, expected, label, timeoutMs = 6000) => {
+          const locator = sessionValue(key);
+          const deadline = Date.now() + timeoutMs;
+          let actual = null;
+          while (Date.now() < deadline) {
+            actual = (await locator.textContent())?.trim() ?? null;
+            if (actual === expected) return;
+            await page.waitForTimeout(50);
+          }
+          throw new Error(
+            `${label}: expected ${JSON.stringify(expected)}, observed ${JSON.stringify(actual)}.`,
+          );
+        };
+        const assertFocused = async (locator, label) => {
+          const focused = await locator.evaluate(
+            (element) => element.ownerDocument.activeElement === element,
+          );
+          assert.equal(focused, true, `${label}: browser focus did not settle on the target.`);
+        };
+
+        const ime = example.getByRole('textbox', { name: 'IME target', exact: true });
+        const secure = example.getByLabel('Secure target', { exact: true });
+        const multiline = example.getByRole('textbox', {
+          name: 'Multiline host target',
+          exact: true,
+        });
+
+        await ime.focus();
+        await assertFocused(ime, 'IME session activation');
+        await waitSession('active', 'active', 'IME session activation');
+        assert.equal(
+          await sessionValue('purpose').textContent(),
+          'email',
+          'UiRoot editing bridge lost content-purpose metadata.',
+        );
+        assert.equal(
+          await sessionValue('inputmode').textContent(),
+          'email',
+          'UiRoot editing bridge lost input-mode metadata.',
+        );
+        assert.equal(
+          await sessionValue('enterkey').textContent(),
+          'next',
+          'UiRoot editing bridge lost enter-key metadata.',
+        );
+        assert.equal(
+          await sessionValue('multiline').textContent(),
+          'false',
+          'Single-line session was misclassified as multiline.',
+        );
+
+        const imeValueLength = await ime.evaluate((element) => element.value.length);
+        const expectedImeSelection = `0:${imeValueLength}`;
+        const selectAllShortcut = process.platform === 'darwin' ? 'Meta+A' : 'Control+A';
+        await ime.press(selectAllShortcut);
+        const imeSelection = await ime.evaluate(
+          (element) => `${element.selectionStart}:${element.selectionEnd}`,
+        );
+        assert.equal(
+          imeSelection,
+          expectedImeSelection,
+          `IME select-all publication: browser selection did not settle (${imeSelection}; expected ${expectedImeSelection}).`,
+        );
+        await waitSession('selection', expectedImeSelection, 'IME select-all publication');
+
+        await ime.evaluate((element) => {
+          const view = element.ownerDocument.defaultView;
+          if (!view) throw new Error('Editable host target lost its Window realm.');
+          element.dispatchEvent(
+            new view.CompositionEvent('compositionstart', { bubbles: true, data: '候' }),
+          );
+          element.dispatchEvent(
+            new view.CompositionEvent('compositionupdate', { bubbles: true, data: '候補' }),
+          );
+        });
+        await waitSession('preedit', '候補', 'IME preedit publication');
+        await waitSession('composing', 'true', 'IME composition publication');
+
+        await ime.evaluate((element) => {
+          const view = element.ownerDocument.defaultView;
+          if (!view) throw new Error('Editable host target lost its Window realm.');
+          element.dispatchEvent(
+            new view.CompositionEvent('compositionend', { bubbles: true, data: '候補' }),
+          );
+        });
+        await waitSession('composing', 'false', 'IME composition settlement');
+        await ime.blur();
+        await waitSession('active', 'inactive', 'IME session end');
+
+        assert.equal(
+          await secure.getAttribute('type'),
+          'password',
+          'Secure TextField did not force password rendering.',
+        );
+        await secure.focus();
+        await assertFocused(secure, 'secure session activation');
+        await waitSession('active', 'active', 'secure session activation');
+        await waitSession('purpose', 'password', 'secure content-purpose publication');
+        await secure.evaluate((element) => {
+          const view = element.ownerDocument.defaultView;
+          if (!view) throw new Error('Secure field lost its Window realm.');
+          element.dispatchEvent(
+            new view.CompositionEvent('compositionstart', { bubbles: true, data: '秘密' }),
+          );
+          element.dispatchEvent(
+            new view.CompositionEvent('compositionupdate', {
+              bubbles: true,
+              data: '秘密候補',
+            }),
+          );
+        });
+        await waitSession('composing', 'true', 'secure composition publication');
+        assert.equal(
+          await sessionValue('preedit').textContent(),
+          '∅',
+          'Secure host session exposed composition preedit text.',
+        );
+
+        const exportGuards = await secure.evaluate((element) => {
+          const view = element.ownerDocument.defaultView;
+          if (!view) throw new Error('Secure field lost its Window realm.');
+          element.select();
+          return {
+            copyAllowed: element.dispatchEvent(
+              new view.ClipboardEvent('copy', { bubbles: true, cancelable: true }),
+            ),
+            cutAllowed: element.dispatchEvent(
+              new view.ClipboardEvent('cut', { bubbles: true, cancelable: true }),
+            ),
+            dragAllowed: element.dispatchEvent(
+              new view.DragEvent('dragstart', { bubbles: true, cancelable: true }),
+            ),
+          };
+        });
+        assert.deepEqual(
+          exportGuards,
+          { copyAllowed: false, cutAllowed: false, dragAllowed: false },
+          'Secure field allowed a UI-mediated text export path.',
+        );
+
+        await secure.evaluate((element) => {
+          const view = element.ownerDocument.defaultView;
+          if (!view) throw new Error('Secure field lost its Window realm.');
+          element.dispatchEvent(
+            new view.CompositionEvent('compositionend', {
+              bubbles: true,
+              data: '秘密候補',
+            }),
+          );
+        });
+        await waitSession('composing', 'false', 'secure composition settlement');
+        await secure.blur();
+        await waitSession('active', 'inactive', 'secure session end');
+
+        await multiline.focus();
+        await assertFocused(multiline, 'multiline browser focus');
+        await waitSession('active', 'active', 'multiline session activation');
+        await waitSession('multiline', 'true', 'multiline session classification');
+        assert.equal(
+          await sessionValue('enterkey').textContent(),
+          'done',
+          'Multiline host session lost enter-key hint metadata.',
+        );
+
+        const occlusion = await multiline.evaluate((element) => {
+          const field = element.closest('.ui-field');
+          const root = element.closest('.ui-root');
+          if (!(field instanceof HTMLElement) || !(root instanceof HTMLElement)) {
+            throw new Error('Host-session field lost its field/root boundary.');
+          }
+          const fieldStyle = getComputedStyle(field);
+          const rootStyle = getComputedStyle(root);
+          const probe = element.ownerDocument.createElement('div');
+          probe.style.cssText =
+            'position:absolute;visibility:hidden;padding-block-end:var(--oxs-environment-inset-block-end)';
+          root.append(probe);
+          const environmentInsetBlockEnd = getComputedStyle(probe).paddingBlockEnd;
+          probe.remove();
+          return {
+            scrollMarginBlockEnd: Number.parseFloat(fieldStyle.scrollMarginBlockEnd),
+            occlusionBlockEnd: rootStyle.getPropertyValue('--oxs-occlusion-block-end').trim(),
+            environmentInsetBlockEnd,
+          };
+        });
+        assert.equal(
+          occlusion.occlusionBlockEnd,
+          '280px',
+          'Host keyboard occlusion did not remain a separate UiRoot input.',
+        );
+        assert.equal(
+          occlusion.environmentInsetBlockEnd,
+          '280px',
+          'Combined environment inset did not include host keyboard occlusion.',
+        );
+        assert.ok(
+          occlusion.scrollMarginBlockEnd >= 280,
+          `Field did not respond to host occlusion through logical scroll margin (${occlusion.scrollMarginBlockEnd}px).`,
+        );
+        const axe = await runAxe(page, 'Editable text host/occlusion contract');
+        diagnostics.assertClean('Editable text host/occlusion contract');
+        return { exportGuards, occlusion, axe };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['TextField', 'TextArea'] },
+  ),
 ];

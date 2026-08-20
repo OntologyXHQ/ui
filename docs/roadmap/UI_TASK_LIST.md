@@ -220,16 +220,18 @@ Acceptance: Button owns native button/form/loading/press semantics with quiet/se
 
 ---
 
-## UIR07 — Fields, forms and text input — NEXT
+## UIR07 — Fields, forms and text input — DONE
 
-- `UI-0701` Rebuild Field ownership for label/description/error/required/disabled/read-only relationships.
-- `UI-0702` Rebuild TextField controlled/uncontrolled semantics, prefix/suffix/actions and native form integration.
-- `UI-0703` Rebuild SearchField semantics, clear behavior and composition-event safety.
-- `UI-0704` Define secure-input rules so secrets are not copied/exposed by UI helpers.
-- `UI-0705` Define host-neutral IME/composition/text-session contracts without pretending React owns native IME lifecycle.
-- `UI-0706` Define keyboard/occlusion inputs as host adapters and prove visual response in Studio.
-- `UI-0707` Test autofill, composition, selection, validation, reset and form submission semantics.
-- `UI-0708` Reaccept field family only after native form behavior and browser axes pass.
+- `UI-0701` Rebuild Field ownership for label/description/error/required/disabled/read-only relationships. **DONE**
+- `UI-0702` Rebuild TextField controlled/uncontrolled semantics, prefix/suffix/actions and native form integration. **DONE**
+- `UI-0703` Rebuild SearchField semantics, clear behavior and composition-event safety. **DONE**
+- `UI-0704` Define secure-input rules so secrets are not copied/exposed by UI helpers. **DONE**
+- `UI-0705` Define host-neutral IME/composition/text-session contracts without pretending React owns native IME lifecycle. **DONE**
+- `UI-0706` Define keyboard/occlusion inputs as host adapters and prove visual response in Studio. **DONE**
+- `UI-0707` Test autofill, composition, selection, validation, reset and form submission semantics. **DONE**
+- `UI-0708` Reaccept field family only after native form behavior and browser axes pass. **DONE**
+
+Acceptance: FieldGroup/FieldSection own only structural labeling/description semantics; TextField/TextArea preserve native controlled/uncontrolled, required/read-only/disabled, autocomplete, validation, selection, reset and submission behavior; SearchField keeps caller-owned value/suggestions and suspends clear/suggestion activation during composition; secure sessions force password rendering, block copy/cut/drag export and redact composition preedit from callbacks/host bridges; UiRoot editingBridge carries metadata-only begin/update/end text-session snapshots while native IME/keyboard lifecycle stays host-owned, and fields consume only the combined logical environment inset for occlusion-aware scroll margins. Dedicated tests/examples/G6 evidence promote FieldGroup, FieldSection, TextField, SearchField and TextArea. Public visual maturity advances to accepted=26/candidate=74; UIR08 Selection and disclosure controls is next.
 
 ---
 
