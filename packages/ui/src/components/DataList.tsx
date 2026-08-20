@@ -1,29 +1,67 @@
-import type { HTMLAttributes, ReactNode } from 'react';
+import type { HTMLAttributes, LiHTMLAttributes, ReactNode } from 'react';
 import { useId } from 'react';
-import { Divider } from '../primitives';
+import { Divider, Heading } from '../primitives';
 
-export type ListProps = HTMLAttributes<HTMLDivElement> & {
+export type ListState = 'ready' | 'loading' | 'empty' | 'error';
+
+export type ListProps = HTMLAttributes<HTMLUListElement> & {
+  /** Accessible collection name when surrounding context does not already label the list. */
   label?: string;
+  /** Draws lightweight separators between direct ListItem children. @default false */
   divided?: boolean;
+  /** Predictable collection replacement state. @default ready */
+  state?: ListState;
+  /** Caller-owned visible replacement content for non-ready states. */
+  stateContent?: ReactNode;
+  /** Accessible state label used when replacement content is not self-describing. */
+  stateLabel?: string;
 };
 
-export function List({ children, className = '', divided = false, label, ...props }: ListProps) {
+export function List({
+  children,
+  className = '',
+  divided = false,
+  label,
+  state = 'ready',
+  stateContent,
+  stateLabel,
+  ...props
+}: ListProps) {
+  const replacement =
+    state === 'ready' ? null : (
+      <li className="ui-list__state-item">
+        <div
+          className="ui-list__state"
+          role={state === 'error' ? 'alert' : state === 'loading' ? 'status' : undefined}
+          aria-label={stateLabel}
+        >
+          {stateContent ?? stateLabel}
+        </div>
+      </li>
+    );
   return (
-    <div
+    <ul
       {...props}
       className={`ui-list ${divided ? 'ui-list--divided' : ''} ${className}`.trim()}
-      role="list"
       aria-label={label}
+      aria-busy={state === 'loading' || undefined}
+      data-state={state}
     >
-      {children}
-    </div>
+      {replacement ?? children}
+    </ul>
   );
 }
 
 export type ListSectionProps = Omit<HTMLAttributes<HTMLElement>, 'title'> & {
+  /** Optional section heading. */
   title?: ReactNode;
+  /** Supporting text associated with the section. */
   description?: ReactNode;
+  /** Caller-owned utility content rendered beside the heading. */
   trailing?: ReactNode;
+  /** Semantic heading rank for the section title. @default 3 */
+  headingLevel?: 2 | 3 | 4 | 5 | 6;
+  /** Collection content, normally one or more List instances. */
   children: ReactNode;
 };
 
@@ -31,27 +69,38 @@ export function ListSection({
   children,
   className = '',
   description,
+  headingLevel = 3,
   title,
   trailing,
   ...props
 }: ListSectionProps) {
   const headingId = useId();
+  const descriptionId = useId();
   return (
     <section
       {...props}
-      role={props.role ?? 'group'}
       className={`ui-list-section ${className}`.trim()}
       aria-labelledby={title ? headingId : undefined}
+      aria-describedby={description ? descriptionId : undefined}
     >
       {title || description || trailing ? (
         <div className="ui-list-section__header">
           <div className="ui-list-section__copy">
             {title ? (
-              <div className="ui-list-section__title" id={headingId}>
+              <Heading
+                className="ui-list-section__title"
+                id={headingId}
+                level={headingLevel}
+                size="heading"
+              >
                 {title}
+              </Heading>
+            ) : null}
+            {description ? (
+              <div className="ui-list-section__description" id={descriptionId}>
+                {description}
               </div>
             ) : null}
-            {description ? <div className="ui-list-section__description">{description}</div> : null}
           </div>
           {trailing ? <div className="ui-list-section__trailing">{trailing}</div> : null}
         </div>
@@ -61,17 +110,28 @@ export function ListSection({
   );
 }
 
-export type ListItemProps = Omit<HTMLAttributes<HTMLDivElement>, 'onSelect' | 'title'> & {
+export type ListItemProps = Omit<LiHTMLAttributes<HTMLLIElement>, 'onSelect' | 'title'> & {
+  /** Primary visible row label. */
   primary: ReactNode;
+  /** Optional supporting copy. */
   secondary?: ReactNode;
+  /** Optional bounded metadata rendered separately from the primary action. */
   metadata?: ReactNode;
+  /** Optional decorative/semantic leading content. */
   leading?: ReactNode;
+  /** Optional trailing content rendered as a sibling of the primary action so nested interactivity is impossible. */
   trailing?: ReactNode;
+  /** Visual selected state. @default false */
   selected?: boolean;
+  /** Whether selected state is visual-only or denotes the current item. @default visual */
   selectionSemantics?: 'visual' | 'current';
+  /** Disables the primary row action without disabling independent trailing controls. @default false */
   disabled?: boolean;
+  /** Turns the main row surface into a native button action. */
   onActivate?: () => void;
+  /** Optional explicit accessible name for the primary row action. */
   actionLabel?: string;
+  /** Optional keyboard shortcut metadata for the primary row action. */
   actionAriaKeyShortcuts?: string;
 };
 
@@ -102,12 +162,11 @@ export function ListItem({
   );
 
   return (
-    <div
+    <li
       {...props}
       className={`ui-list-item ${selected ? 'ui-list-item--selected' : ''} ${className}`.trim()}
-      role="listitem"
       data-selected={selected || undefined}
-      aria-current={selected && selectionSemantics === 'current' ? true : undefined}
+      aria-current={selected && selectionSemantics === 'current' ? 'true' : undefined}
       data-disabled={disabled || undefined}
     >
       {onActivate ? (
@@ -131,12 +190,19 @@ export function ListItem({
           {trailing ? <span className="ui-list-item__trailing">{trailing}</span> : null}
         </div>
       )}
-    </div>
+    </li>
   );
 }
 
-export type ListSeparatorProps = { inset?: 'none' | 'content' };
+export type ListSeparatorProps = {
+  /** Logical inset policy for the visual divider. @default content */
+  inset?: 'none' | 'content';
+};
 
 export function ListSeparator({ inset = 'content' }: ListSeparatorProps) {
-  return <Divider decorative className={`ui-list-separator ui-list-separator--${inset}`} />;
+  return (
+    <li className={`ui-list-separator ui-list-separator--${inset}`} role="presentation">
+      <Divider decorative />
+    </li>
+  );
 }

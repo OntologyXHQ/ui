@@ -2531,3 +2531,40 @@
     --oxs-grid-tile-min: 8.25rem;
   }
 }
+
+/* UIR08 selection/disclosure + UIR09 semantic collection hardening. */
+.ui-disclosure__heading.ui-heading {
+  margin: 0;
+  font: inherit;
+  line-height: inherit;
+}
+
+.ui-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ui-list-item,
+.ui-list-separator,
+.ui-list__state-item {
+  list-style: none;
+}
+
+.ui-list__state-item {
+  padding: var(--oxs-space-md);
+}
+
+.ui-list__state {
+  color: var(--oxs-color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.ui-navigation__item[href] {
+  text-decoration: none;
+}
+
+.ui-navigation__item[aria-disabled='true'] {
+  opacity: var(--oxs-control-disabled-opacity);
+  pointer-events: none;
+}

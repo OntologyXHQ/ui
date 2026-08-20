@@ -96,7 +96,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
         `ui-button--${size}`,
         fullWidth ? 'ui-button--full' : '',
         className,
-      ].filter(Boolean).join(' ')}
+      ]
+        .filter(Boolean)
+        .join(' ')}
       disabled={unavailable}
       aria-busy={loading || undefined}
       data-disabled={disabled || undefined}
@@ -110,26 +112,44 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       onPointerMove={composePointerHandler(pressProps.onPointerMove, onPointerMove)}
       onPointerUp={composePointerHandler(pressProps.onPointerUp, onPointerUp)}
       onPointerCancel={composePointerHandler(pressProps.onPointerCancel, onPointerCancel)}
-      onLostPointerCapture={composePointerHandler(pressProps.onLostPointerCapture, onLostPointerCapture)}
+      onLostPointerCapture={composePointerHandler(
+        pressProps.onLostPointerCapture,
+        onLostPointerCapture,
+      )}
       onBlur={(event) => {
         pressProps.onBlur?.(event);
         onBlur?.(event);
       }}
     >
       <span className="ui-button__content" aria-hidden={loading || undefined}>
-        {leading ? <span className="ui-button__slot" aria-hidden>{leading}</span> : null}
+        {leading ? (
+          <span className="ui-button__slot" aria-hidden>
+            {leading}
+          </span>
+        ) : null}
         <span className="ui-button__label">{children}</span>
-        {trailing ? <span className="ui-button__slot" aria-hidden>{trailing}</span> : null}
+        {trailing ? (
+          <span className="ui-button__slot" aria-hidden>
+            {trailing}
+          </span>
+        ) : null}
       </span>
-      {loading ? <span className="ui-button__loading" aria-hidden><OxLoadingMark className="ui-control-spinner" /></span> : null}
+      {loading ? (
+        <span className="ui-button__loading" aria-hidden>
+          <OxLoadingMark className="ui-control-spinner" />
+        </span>
+      ) : null}
       {loading ? <span className="ui-visually-hidden">{loadingLabel}</span> : null}
     </button>
   );
 });
 
 export type ToggleButtonProps = Omit<ButtonProps, 'aria-pressed'> & {
+  /** Controlled pressed state exposed through aria-pressed. */
   pressed?: boolean;
+  /** Initial uncontrolled pressed state. @default false */
   defaultPressed?: boolean;
+  /** Reports committed pressed-state changes after consumer cancellation is honored. */
   onPressedChange?: (pressed: boolean) => void;
 };
 
@@ -137,7 +157,11 @@ export const ToggleButton = forwardRef<HTMLButtonElement, ToggleButtonProps>(fun
   { defaultPressed = false, disabled = false, onClick, onPressedChange, pressed, ...props },
   ref,
 ) {
-  const [current, setCurrent] = useControllableState({ value: pressed, defaultValue: defaultPressed, onValueChange: onPressedChange });
+  const [current, setCurrent] = useControllableState({
+    value: pressed,
+    defaultValue: defaultPressed,
+    onValueChange: onPressedChange,
+  });
   return (
     <Button
       {...props}
@@ -153,20 +177,38 @@ export const ToggleButton = forwardRef<HTMLButtonElement, ToggleButtonProps>(fun
   );
 });
 
-function composePointerHandler(kernel: PointerEventHandler<HTMLElement> | undefined, consumer: PointerEventHandler<HTMLButtonElement> | undefined): PointerEventHandler<HTMLButtonElement> | undefined {
+function composePointerHandler(
+  kernel: PointerEventHandler<HTMLElement> | undefined,
+  consumer: PointerEventHandler<HTMLButtonElement> | undefined,
+): PointerEventHandler<HTMLButtonElement> | undefined {
   if (!kernel) return consumer;
   if (!consumer) return (event) => kernel(event);
-  return (event) => { kernel(event); if (!event.defaultPrevented) consumer(event); };
+  return (event) => {
+    kernel(event);
+    if (!event.defaultPrevented) consumer(event);
+  };
 }
 
-function composeKeyboardHandler(kernel: KeyboardEventHandler<HTMLElement> | undefined, consumer: KeyboardEventHandler<HTMLButtonElement> | undefined): KeyboardEventHandler<HTMLButtonElement> | undefined {
+function composeKeyboardHandler(
+  kernel: KeyboardEventHandler<HTMLElement> | undefined,
+  consumer: KeyboardEventHandler<HTMLButtonElement> | undefined,
+): KeyboardEventHandler<HTMLButtonElement> | undefined {
   if (!kernel) return consumer;
   if (!consumer) return (event) => kernel(event);
-  return (event) => { kernel(event); if (!event.defaultPrevented) consumer(event); };
+  return (event) => {
+    kernel(event);
+    if (!event.defaultPrevented) consumer(event);
+  };
 }
 
-function composeMouseHandler(kernel: MouseEventHandler<HTMLElement> | undefined, consumer: MouseEventHandler<HTMLButtonElement> | undefined): MouseEventHandler<HTMLButtonElement> | undefined {
+function composeMouseHandler(
+  kernel: MouseEventHandler<HTMLElement> | undefined,
+  consumer: MouseEventHandler<HTMLButtonElement> | undefined,
+): MouseEventHandler<HTMLButtonElement> | undefined {
   if (!kernel) return consumer;
   if (!consumer) return (event) => kernel(event);
-  return (event) => { kernel(event); if (!event.defaultPrevented) consumer(event); };
+  return (event) => {
+    kernel(event);
+    if (!event.defaultPrevented) consumer(event);
+  };
 }

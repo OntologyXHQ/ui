@@ -1,6 +1,6 @@
 import type {
-  FocusEvent as ReactFocusEvent,
   HTMLAttributes,
+  FocusEvent as ReactFocusEvent,
   KeyboardEvent as ReactKeyboardEvent,
   ReactNode,
 } from 'react';
@@ -51,8 +51,16 @@ export function Card({
         <div className="ui-card__header">
           {leading ? <div className="ui-card__leading">{leading}</div> : null}
           <div className="ui-card__copy">
-            {title ? <Heading className="ui-card__title" id={titleId} level={titleLevel}>{title}</Heading> : null}
-            {description ? <div className="ui-card__description" id={descriptionId}>{description}</div> : null}
+            {title ? (
+              <Heading className="ui-card__title" id={titleId} level={titleLevel}>
+                {title}
+              </Heading>
+            ) : null}
+            {description ? (
+              <div className="ui-card__description" id={descriptionId}>
+                {description}
+              </div>
+            ) : null}
           </div>
           {actions ? <div className="ui-card__actions">{actions}</div> : null}
         </div>
@@ -64,12 +72,20 @@ export function Card({
 }
 
 export type DisclosureProps = Omit<HTMLAttributes<HTMLDivElement>, 'title'> & {
+  /** Visible disclosure summary/action label. */
   summary: ReactNode;
+  /** Optional supporting description associated with the summary control. */
   description?: ReactNode;
+  /** Controlled expanded state. */
   open?: boolean;
+  /** Initial uncontrolled expanded state. @default false */
   defaultOpen?: boolean;
+  /** Reports expanded-state changes. */
   onOpenChange?: (open: boolean) => void;
+  /** Disables expansion while preserving visible content structure. @default false */
   disabled?: boolean;
+  /** Semantic heading rank wrapping the disclosure trigger. @default 3 */
+  headingLevel?: 2 | 3 | 4 | 5 | 6;
 };
 
 export function Disclosure({
@@ -78,6 +94,7 @@ export function Disclosure({
   defaultOpen = false,
   description,
   disabled = false,
+  headingLevel = 3,
   onOpenChange,
   open,
   summary,
@@ -90,6 +107,7 @@ export function Disclosure({
   });
   const descriptionId = useId();
   const contentId = useId();
+  const triggerId = useId();
   return (
     <div
       {...props}
@@ -97,48 +115,81 @@ export function Disclosure({
       data-open={current || undefined}
       data-disabled={disabled || undefined}
     >
-      <button
-        type="button"
-        className="ui-disclosure__summary"
-        data-oxs-cursor-role={disabled ? 'not-allowed' : 'pointer'}
-        aria-expanded={current}
-        aria-controls={contentId}
-        aria-describedby={description ? descriptionId : undefined}
-        disabled={disabled}
-        onClick={() => setCurrent((value) => !value)}
-      >
-        <span className="ui-disclosure__summary-copy">
-          <span className="ui-disclosure__title">{summary}</span>
-          {description ? <span className="ui-disclosure__description" aria-hidden="true">{description}</span> : null}
+      <Heading className="ui-disclosure__heading" level={headingLevel} size="heading">
+        <button
+          id={triggerId}
+          type="button"
+          className="ui-disclosure__summary"
+          data-oxs-cursor-role={disabled ? 'not-allowed' : 'pointer'}
+          aria-expanded={current}
+          aria-controls={contentId}
+          aria-describedby={description ? descriptionId : undefined}
+          disabled={disabled}
+          onClick={() => setCurrent((value) => !value)}
+        >
+          <span className="ui-disclosure__summary-copy">
+            <span className="ui-disclosure__title">{summary}</span>
+            {description ? (
+              <span className="ui-disclosure__description" aria-hidden="true">
+                {description}
+              </span>
+            ) : null}
+          </span>
+          <Icon className="ui-disclosure__chevron" name="chevron-end" />
+        </button>
+      </Heading>
+      {description ? (
+        <span className="ui-visually-hidden" id={descriptionId}>
+          {description}
         </span>
-        <Icon className="ui-disclosure__chevron" name="chevron-end" />
-      </button>
-      {description ? <span className="ui-visually-hidden" id={descriptionId}>{description}</span> : null}
-      <div id={contentId} className="ui-disclosure__content" hidden={!current}>{children}</div>
+      ) : null}
+      <div
+        id={contentId}
+        className="ui-disclosure__content"
+        role="region"
+        aria-labelledby={triggerId}
+        hidden={!current}
+      >
+        {children}
+      </div>
     </div>
   );
 }
 
 export type AccordionItem = {
+  /** Stable item identity used for controlled/open state. */
   value: string;
+  /** Visible trigger label. */
   summary: ReactNode;
+  /** Optional trigger description. */
   description?: ReactNode;
+  /** Panel content. */
   content: ReactNode;
+  /** Disables this item while keeping it visible. */
   disabled?: boolean;
 };
 
 export type AccordionProps = Omit<HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> & {
+  /** Ordered disclosure items. */
   items: readonly AccordionItem[];
+  /** Controlled open item values. */
   value?: readonly string[];
+  /** Initial uncontrolled open item values. */
   defaultValue?: readonly string[];
+  /** Reports normalized open-value changes. */
   onValueChange?: (value: readonly string[]) => void;
+  /** Allows more than one panel to remain expanded. @default false */
   multiple?: boolean;
+  /** Optional accessible name for the accordion collection. */
   label?: string;
+  /** Semantic heading rank wrapping every accordion trigger. @default 3 */
+  headingLevel?: 2 | 3 | 4 | 5 | 6;
 };
 
 export function Accordion({
   className = '',
   defaultValue = [],
+  headingLevel = 3,
   items,
   label,
   multiple = false,
@@ -147,19 +198,56 @@ export function Accordion({
   ...props
 }: AccordionProps) {
   const accordionId = useId().replace(/:/g, '');
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const [current, setCurrent] = useControllableState<readonly string[]>({
     value,
     defaultValue: multiple ? defaultValue : defaultValue.slice(0, 1),
     onValueChange,
   });
-  const visibleCurrent = multiple ? current : current.slice(0, 1);
+  const enabledValues = items.filter((item) => !item.disabled).map((item) => item.value);
+  const normalizedCurrent = [...new Set(current)].filter((candidate) =>
+    enabledValues.includes(candidate),
+  );
+  const visibleCurrent = multiple ? normalizedCurrent : normalizedCurrent.slice(0, 1);
   return (
-    <div {...props} className={`ui-accordion ${className}`.trim()} role={props.role ?? (label ? 'group' : undefined)} aria-label={label}>
+    <div
+      {...props}
+      ref={rootRef}
+      className={`ui-accordion ${className}`.trim()}
+      role={props.role ?? (label ? 'group' : undefined)}
+      aria-label={label}
+      onKeyDown={(event) => {
+        if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+          const triggers = [
+            ...(rootRef.current?.querySelectorAll<HTMLButtonElement>(
+              '[data-ui-accordion-trigger]:not(:disabled)',
+            ) ?? []),
+          ];
+          const index = triggers.findIndex((trigger) => trigger === event.target);
+          const nextIndex =
+            event.key === 'Home'
+              ? 0
+              : event.key === 'End'
+                ? triggers.length - 1
+                : event.key === 'ArrowDown'
+                  ? Math.min(triggers.length - 1, Math.max(0, index) + 1)
+                  : Math.max(0, index <= 0 ? 0 : index - 1);
+          const next = triggers[nextIndex];
+          if (next) {
+            event.preventDefault();
+            next.focus({ preventScroll: true });
+          }
+        }
+        if (!event.defaultPrevented) props.onKeyDown?.(event);
+      }}
+    >
       {items.map((item) => {
         const expanded = visibleCurrent.includes(item.value);
         const itemToken = safeCompositionId(item.value);
         const contentId = `oxs-accordion-${accordionId}-${itemToken}-content`;
-        const descriptionId = item.description ? `oxs-accordion-${accordionId}-${itemToken}-description` : undefined;
+        const descriptionId = item.description
+          ? `oxs-accordion-${accordionId}-${itemToken}-description`
+          : undefined;
         return (
           <div
             key={item.value}
@@ -167,33 +255,57 @@ export function Accordion({
             data-open={expanded || undefined}
             data-disabled={item.disabled || undefined}
           >
-            <button
-              type="button"
-              className="ui-disclosure__summary"
-              aria-expanded={expanded}
-              aria-controls={contentId}
-              aria-describedby={descriptionId}
-              disabled={item.disabled}
-              data-oxs-cursor-role={item.disabled ? 'not-allowed' : 'pointer'}
-              onClick={() => {
-                if (item.disabled) return;
-                setCurrent((existing) => {
-                  const normalized = multiple ? [...existing] : existing.slice(0, 1);
-                  if (expanded) return normalized.filter((entry) => entry !== item.value);
-                  return multiple
-                    ? normalized.includes(item.value) ? normalized : [...normalized, item.value]
-                    : [item.value];
-                });
-              }}
-            >
-              <span className="ui-disclosure__summary-copy">
-                <span className="ui-disclosure__title">{item.summary}</span>
-                {item.description ? <span className="ui-disclosure__description" aria-hidden="true">{item.description}</span> : null}
+            <Heading className="ui-disclosure__heading" level={headingLevel} size="heading">
+              <button
+                id={`oxs-accordion-${accordionId}-${itemToken}-trigger`}
+                type="button"
+                className="ui-disclosure__summary"
+                data-ui-accordion-trigger
+                aria-expanded={expanded}
+                aria-controls={contentId}
+                aria-describedby={descriptionId}
+                disabled={item.disabled}
+                data-oxs-cursor-role={item.disabled ? 'not-allowed' : 'pointer'}
+                onClick={() => {
+                  if (item.disabled) return;
+                  setCurrent((existing) => {
+                    const normalized = [...new Set(existing)].filter((entry) =>
+                      enabledValues.includes(entry),
+                    );
+                    if (expanded) return normalized.filter((entry) => entry !== item.value);
+                    return multiple
+                      ? normalized.includes(item.value)
+                        ? normalized
+                        : [...normalized, item.value]
+                      : [item.value];
+                  });
+                }}
+              >
+                <span className="ui-disclosure__summary-copy">
+                  <span className="ui-disclosure__title">{item.summary}</span>
+                  {item.description ? (
+                    <span className="ui-disclosure__description" aria-hidden="true">
+                      {item.description}
+                    </span>
+                  ) : null}
+                </span>
+                <Icon className="ui-disclosure__chevron" name="chevron-end" />
+              </button>
+            </Heading>
+            {item.description ? (
+              <span className="ui-visually-hidden" id={descriptionId}>
+                {item.description}
               </span>
-              <Icon className="ui-disclosure__chevron" name="chevron-end" />
-            </button>
-            {item.description ? <span className="ui-visually-hidden" id={descriptionId}>{item.description}</span> : null}
-            <div id={contentId} className="ui-disclosure__content" hidden={!expanded}>{item.content}</div>
+            ) : null}
+            <div
+              id={contentId}
+              className="ui-disclosure__content"
+              role="region"
+              aria-labelledby={`oxs-accordion-${accordionId}-${itemToken}-trigger`}
+              hidden={!expanded}
+            >
+              {item.content}
+            </div>
           </div>
         );
       })}
@@ -238,9 +350,13 @@ export function PageScaffold({
       <div className="ui-page-scaffold__body">
         {sidebar ? <aside className="ui-page-scaffold__sidebar">{sidebar}</aside> : null}
         {contentRole === 'main' ? (
-          <main className="ui-page-scaffold__content" aria-label={contentLabel}>{children}</main>
+          <main className="ui-page-scaffold__content" aria-label={contentLabel}>
+            {children}
+          </main>
         ) : (
-          <section className="ui-page-scaffold__content" role="region" aria-label={contentLabel}>{children}</section>
+          <section className="ui-page-scaffold__content" role="region" aria-label={contentLabel}>
+            {children}
+          </section>
         )}
       </div>
       {footer ? <footer className="ui-page-scaffold__footer">{footer}</footer> : null}
@@ -249,8 +365,11 @@ export function PageScaffold({
 }
 
 export type TileGridProps = HTMLAttributes<HTMLDivElement> & {
+  /** Named density preset for responsive grid tracks. @default comfortable */
   density?: 'compact' | 'comfortable' | 'roomy';
+  /** Optional accessible group name. */
   label?: string;
+  /** Enables measured 2D arrow/Home/End navigation with one roving tab stop. @default false */
   keyboardNavigation?: boolean;
 };
 
@@ -271,15 +390,22 @@ export function TileGrid({
   useLayoutEffect(() => {
     if (!keyboardNavigation) return;
     const items = tileActions(gridRef.current);
-    const active = document.activeElement instanceof HTMLElement && items.includes(document.activeElement)
-      ? document.activeElement
-      : items[0];
+    const activeElement = gridRef.current?.ownerDocument.activeElement;
+    const active =
+      activeElement && items.includes(activeElement as HTMLElement)
+        ? (activeElement as HTMLElement)
+        : items[0];
     for (const item of items) item.tabIndex = item === active ? 0 : -1;
   });
 
   const updateRovingTabStop = (event: ReactFocusEvent<HTMLDivElement>) => {
-    if (keyboardNavigation && event.target instanceof HTMLElement && event.target.matches(TILE_ACTION_SELECTOR)) {
-      for (const item of tileActions(gridRef.current)) item.tabIndex = item === event.target ? 0 : -1;
+    const target = event.target;
+    if (
+      keyboardNavigation &&
+      target instanceof event.currentTarget.ownerDocument.defaultView!.HTMLElement &&
+      target.matches(TILE_ACTION_SELECTOR)
+    ) {
+      for (const item of tileActions(gridRef.current)) item.tabIndex = item === target ? 0 : -1;
     }
     onFocusCapture?.(event);
   };
@@ -309,7 +435,11 @@ function tileActions(root: HTMLElement | null) {
 function moveTileGridFocus(event: ReactKeyboardEvent<HTMLDivElement>, root: HTMLElement | null) {
   const items = tileActions(root);
   if (!items.length) return;
-  const active = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const activeElement = root?.ownerDocument.activeElement;
+  const active =
+    activeElement && items.includes(activeElement as HTMLElement)
+      ? (activeElement as HTMLElement)
+      : null;
   const index = active ? items.indexOf(active) : -1;
   if (event.key === 'Home' || event.key === 'End') {
     event.preventDefault();
@@ -321,12 +451,17 @@ function moveTileGridFocus(event: ReactKeyboardEvent<HTMLDivElement>, root: HTML
   event.preventDefault();
   const current = index >= 0 ? items[index] : items[0];
   const measurements = items.map((item) => ({ item, rect: item.getBoundingClientRect() }));
-  const currentRect = measurements.find(({ item }) => item === current)?.rect ?? current.getBoundingClientRect();
+  const currentRect =
+    measurements.find(({ item }) => item === current)?.rect ?? current.getBoundingClientRect();
   const cx = currentRect.left + currentRect.width / 2;
   const cy = currentRect.top + currentRect.height / 2;
-  const rtl = root ? getComputedStyle(root).direction === 'rtl' : false;
+  const rtl = root?.ownerDocument.defaultView?.getComputedStyle(root).direction === 'rtl';
   const logicalKey = rtl
-    ? event.key === 'ArrowLeft' ? 'ArrowRight' : event.key === 'ArrowRight' ? 'ArrowLeft' : event.key
+    ? event.key === 'ArrowLeft'
+      ? 'ArrowRight'
+      : event.key === 'ArrowRight'
+        ? 'ArrowLeft'
+        : event.key
     : event.key;
   const candidates = measurements
     .filter(({ item }) => item !== current)
@@ -335,12 +470,18 @@ function moveTileGridFocus(event: ReactKeyboardEvent<HTMLDivElement>, root: HTML
       const y = rect.top + rect.height / 2;
       const dx = x - cx;
       const dy = y - cy;
-      const valid = logicalKey === 'ArrowRight' ? dx > 1
-        : logicalKey === 'ArrowLeft' ? dx < -1
-        : logicalKey === 'ArrowDown' ? dy > 1
-        : dy < -1;
-      const primary = logicalKey === 'ArrowRight' || logicalKey === 'ArrowLeft' ? Math.abs(dx) : Math.abs(dy);
-      const secondary = logicalKey === 'ArrowRight' || logicalKey === 'ArrowLeft' ? Math.abs(dy) : Math.abs(dx);
+      const valid =
+        logicalKey === 'ArrowRight'
+          ? dx > 1
+          : logicalKey === 'ArrowLeft'
+            ? dx < -1
+            : logicalKey === 'ArrowDown'
+              ? dy > 1
+              : dy < -1;
+      const primary =
+        logicalKey === 'ArrowRight' || logicalKey === 'ArrowLeft' ? Math.abs(dx) : Math.abs(dy);
+      const secondary =
+        logicalKey === 'ArrowRight' || logicalKey === 'ArrowLeft' ? Math.abs(dy) : Math.abs(dx);
       return { item, valid, score: primary + secondary * 2.5 };
     })
     .filter((candidate) => candidate.valid)
@@ -351,13 +492,14 @@ function moveTileGridFocus(event: ReactKeyboardEvent<HTMLDivElement>, root: HTML
     return;
   }
 
-  const hasMeasurableGeometry = measurements.some(({ rect }) =>
-    rect.width !== 0
-    || rect.height !== 0
-    || rect.left !== 0
-    || rect.top !== 0
-    || rect.right !== 0
-    || rect.bottom !== 0,
+  const hasMeasurableGeometry = measurements.some(
+    ({ rect }) =>
+      rect.width !== 0 ||
+      rect.height !== 0 ||
+      rect.left !== 0 ||
+      rect.top !== 0 ||
+      rect.right !== 0 ||
+      rect.bottom !== 0,
   );
   if (hasMeasurableGeometry) return;
 
@@ -366,22 +508,37 @@ function moveTileGridFocus(event: ReactKeyboardEvent<HTMLDivElement>, root: HTML
   // measurable 2D layout exists. Once geometry exists, an arrow at a spatial
   // edge is a no-op rather than leaking focus into the next logical row.
   const logicalDelta = logicalKey === 'ArrowRight' || logicalKey === 'ArrowDown' ? 1 : -1;
-  const fallbackIndex = Math.min(items.length - 1, Math.max(0, (index >= 0 ? index : 0) + logicalDelta));
+  const fallbackIndex = Math.min(
+    items.length - 1,
+    Math.max(0, (index >= 0 ? index : 0) + logicalDelta),
+  );
   items[fallbackIndex]?.focus({ preventScroll: true });
 }
 
 export type TileProps = Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'onClick' | 'tabIndex'> & {
+  /** Visible tile title. */
   title: ReactNode;
+  /** Optional supporting copy. */
   description?: ReactNode;
+  /** Optional leading visual/content. */
   leading?: ReactNode;
+  /** Optional trailing control/content rendered outside the primary tile action. */
   trailing?: ReactNode;
+  /** Optional bounded badge/metadata. */
   badge?: ReactNode;
+  /** Visual selected state. @default false */
   selected?: boolean;
+  /** Whether selection is visual-only or denotes the current item. @default visual */
   selectionSemantics?: 'visual' | 'current';
+  /** Disables the primary tile action. @default false */
   disabled?: boolean;
+  /** Explicit roving tab index supplied by TileGrid. */
   tabIndex?: number;
+  /** Pending action state using the shared Button loading contract. @default false */
   pending?: boolean;
+  /** Accessible loading name while pending. @default Working */
   pendingLabel?: string;
+  /** Turns the tile primary surface into an actionable Button. */
   onActivate?: () => void;
 };
 
@@ -436,7 +593,9 @@ export function Tile({
             {mainContent}
           </Button>
         ) : (
-          <div className="ui-tile__content" tabIndex={tabIndex}>{mainContent}</div>
+          <div className="ui-tile__content" tabIndex={tabIndex}>
+            {mainContent}
+          </div>
         )}
         {trailing ? <span className="ui-tile__trailing">{trailing}</span> : null}
       </div>
@@ -456,16 +615,23 @@ export function ApplicationItem({
   pendingLabel = 'Opening application',
   ...props
 }: ApplicationItemProps) {
-  const graphic = typeof icon === 'string'
-    ? <Icon name={icon} size="lg" />
-    : <img className="ui-application-item__image" src={icon.src} alt="" draggable={false} />;
+  const graphic =
+    typeof icon === 'string' ? (
+      <Icon name={icon} size="lg" />
+    ) : (
+      <img className="ui-application-item__image" src={icon.src} alt="" draggable={false} />
+    );
   return (
     <Tile
       {...props}
       className={`ui-application-item ${props.className ?? ''}`.trim()}
       title={name}
       pendingLabel={pendingLabel}
-      leading={<span className="ui-application-item__icon" aria-hidden>{graphic}</span>}
+      leading={
+        <span className="ui-application-item__icon" aria-hidden>
+          {graphic}
+        </span>
+      }
     />
   );
 }
@@ -492,14 +658,21 @@ export function ContentState({
   titleLevel = 3,
   ...props
 }: ContentStateProps) {
-  const role = props.role ?? (kind === 'error' ? 'alert' : kind === 'loading' ? 'status' : undefined);
+  const role =
+    props.role ?? (kind === 'error' ? 'alert' : kind === 'loading' ? 'status' : undefined);
   return (
-    <div {...props} className={`ui-content-state ui-content-state--${kind} ${className}`.trim()} role={role}>
+    <div
+      {...props}
+      className={`ui-content-state ui-content-state--${kind} ${className}`.trim()}
+      role={role}
+    >
       <div className="ui-content-state__visual" aria-hidden>
         {kind === 'loading' && !icon ? <Spinner label="Loading" /> : icon}
       </div>
       <div className="ui-content-state__copy">
-        <Heading className="ui-content-state__title" level={titleLevel}>{title}</Heading>
+        <Heading className="ui-content-state__title" level={titleLevel}>
+          {title}
+        </Heading>
         {description ? <div className="ui-content-state__description">{description}</div> : null}
         {status ? <div className="ui-content-state__status">{status}</div> : null}
       </div>

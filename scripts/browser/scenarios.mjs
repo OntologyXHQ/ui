@@ -3835,4 +3835,466 @@ export const browserScenarios = [
     },
     { accepts: ['TextField', 'TextArea'] },
   ),
+
+  scenario(
+    'selection-controls-certification',
+    ['selection', 'native-form', 'reset', 'mixed', 'keyboard', 'touch', 'rtl', 'a11y'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 980, height: 760 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const native = await gotoCatalog(page, baseUrl, {
+          entry: 'Checkbox',
+          tab: 'examples',
+          example: 'native-contract',
+          dir: 'rtl',
+          pointer: 'coarse',
+        });
+        const preview = native.getByRole('checkbox', { name: 'Show previews', exact: true });
+        const mixed = native.getByRole('checkbox', { name: 'Mixed import state', exact: true });
+        const dark = native.getByRole('radio', { name: 'Dark', exact: true });
+        const system = native.getByRole('radio', { name: 'System', exact: true });
+        await preview.click();
+        await dark.click();
+        assert.equal(
+          await preview.isChecked(),
+          false,
+          'Checkbox did not commit native activation.',
+        );
+        assert.equal(
+          await dark.isChecked(),
+          true,
+          'RadioGroup did not commit mutually-exclusive selection.',
+        );
+        assert.equal(
+          await mixed.getAttribute('aria-checked'),
+          'mixed',
+          'Indeterminate checkbox lost mixed semantics.',
+        );
+        await mixed.click();
+        assert.equal(
+          await mixed.getAttribute('aria-checked'),
+          'mixed',
+          'Read-only mixed checkbox mutated through click.',
+        );
+        await native.getByRole('button', { name: 'Reset choices', exact: true }).click();
+        assert.equal(
+          await preview.isChecked(),
+          true,
+          'Uncontrolled checkbox did not recover its default on form reset.',
+        );
+        assert.equal(
+          await system.isChecked(),
+          true,
+          'Uncontrolled RadioGroup did not recover its default on form reset.',
+        );
+        const previewRow = native
+          .locator('.ui-choice')
+          .filter({ hasText: 'Show previews' })
+          .first();
+        await assertMinimumBlockSize(previewRow, 44, 'coarse-pointer Checkbox row');
+
+        const state = await gotoCatalog(page, baseUrl, {
+          entry: 'Switch',
+          tab: 'examples',
+          example: 'state-contract',
+          dir: 'rtl',
+          pointer: 'coarse',
+        });
+        const toggle = state.getByRole('switch', { name: 'Live updates', exact: true });
+        const before = await toggle.getAttribute('aria-checked');
+        await toggle.press('Space');
+        assert.notEqual(
+          await toggle.getAttribute('aria-checked'),
+          before,
+          'Switch keyboard activation did not toggle state.',
+        );
+        await assertMinimumBlockSize(toggle, 44, 'coarse-pointer Switch');
+
+        const groups = await gotoCatalog(page, baseUrl, {
+          entry: 'SegmentedControl',
+          tab: 'examples',
+          example: 'group-contract',
+          dir: 'rtl',
+        });
+        const compact = groups.getByRole('radio', { name: 'Compact', exact: true });
+        const comfortable = groups.getByRole('radio', { name: 'Comfortable', exact: true });
+        await compact.focus();
+        await page.keyboard.press('ArrowLeft');
+        assert.equal(
+          await comfortable.evaluate((element) => element.ownerDocument.activeElement === element),
+          true,
+          'RTL segmented roving focus did not move logically.',
+        );
+        assert.equal(
+          await comfortable.getAttribute('aria-checked'),
+          'true',
+          'Segmented focus did not commit its radio selection.',
+        );
+        const grid = groups.getByRole('button', { name: 'Grid', exact: true });
+        await grid.click();
+        assert.equal(
+          await grid.getAttribute('aria-pressed'),
+          'true',
+          'ToggleGroup did not expose pressed state.',
+        );
+
+        const buttonExample = await gotoCatalog(page, baseUrl, {
+          entry: 'ToggleButton',
+          tab: 'examples',
+          example: 'toggle-contract',
+        });
+        const pin = buttonExample.getByRole('button', { name: 'Pin panel', exact: true });
+        await pin.click();
+        assert.equal(
+          await pin.getAttribute('aria-pressed'),
+          'true',
+          'ToggleButton did not commit pressed state.',
+        );
+        const axe = await runAxe(page, 'UIR08 selection controls');
+        diagnostics.assertClean('UIR08 selection controls');
+        return { axe };
+      } finally {
+        await context.close();
+      }
+    },
+    {
+      accepts: [
+        'Checkbox',
+        'RadioGroup',
+        'Radio',
+        'Switch',
+        'ToggleButton',
+        'SegmentedControl',
+        'ToggleGroup',
+      ],
+    },
+  ),
+  scenario(
+    'tabs-select-certification',
+    [
+      'selection',
+      'tabs',
+      'select',
+      'manual-activation',
+      'typeahead',
+      'form',
+      'focus',
+      'keyboard',
+      'rtl',
+      'a11y',
+    ],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 980, height: 780 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const tabsExample = await gotoCatalog(page, baseUrl, {
+          entry: 'Tabs',
+          tab: 'examples',
+          example: 'tabs-contract',
+          dir: 'rtl',
+        });
+        const manual = tabsExample.getByRole('tablist', { name: 'Manual sections', exact: true });
+        const overview = manual.getByRole('tab', { name: 'Overview', exact: true });
+        const activity = manual.getByRole('tab', { name: 'Activity', exact: true });
+        await overview.focus();
+        await page.keyboard.press('ArrowLeft');
+        assert.equal(
+          await activity.evaluate((element) => element.ownerDocument.activeElement === element),
+          true,
+          'Manual Tabs roving focus did not follow RTL logical direction.',
+        );
+        assert.equal(
+          await overview.getAttribute('aria-selected'),
+          'true',
+          'Manual Tabs changed selection before activation.',
+        );
+        await page.keyboard.press('Enter');
+        assert.equal(
+          await activity.getAttribute('aria-selected'),
+          'true',
+          'Manual Tabs did not activate focused tab on Enter.',
+        );
+        assert.equal(
+          await activity.getAttribute('aria-controls'),
+          'manual-tabs-panel-activity',
+          'Tabs lost deterministic panel relationship.',
+        );
+        const activePanel = tabsExample.locator('#manual-tabs-panel-activity');
+        assert.equal(
+          await activePanel.getAttribute('aria-labelledby'),
+          'manual-tabs-tab-activity',
+          'TabPanel lost owning-tab relationship.',
+        );
+
+        const selectExample = await gotoCatalog(page, baseUrl, {
+          entry: 'Select',
+          tab: 'examples',
+          example: 'contract',
+        });
+        const trigger = selectExample.getByRole('combobox', { name: 'Density', exact: true });
+        await trigger.focus();
+        await page.keyboard.press('c');
+        assert.match(
+          await trigger.textContent(),
+          /Compact/,
+          'Closed Select typeahead did not commit the matching option.',
+        );
+        await page.keyboard.press('ArrowDown');
+        assert.equal(
+          await trigger.getAttribute('aria-expanded'),
+          'true',
+          'Select did not open from ArrowDown.',
+        );
+        const cozy = page.getByRole('option', { name: /Cozy/ }).first();
+        await cozy.click();
+        assert.match(
+          await trigger.textContent(),
+          /Cozy/,
+          'Pointer option activation did not commit Select value.',
+        );
+        assert.equal(
+          await trigger.evaluate((element) => element.ownerDocument.activeElement === element),
+          true,
+          'Select option activation did not preserve visible-trigger focus.',
+        );
+        await selectExample.getByRole('button', { name: 'Reset density', exact: true }).click();
+        assert.match(
+          await trigger.textContent(),
+          /Comfortable/,
+          'Select form reset did not restore default value.',
+        );
+        const axe = await runAxe(page, 'UIR08 Tabs and Select');
+        diagnostics.assertClean('UIR08 Tabs and Select');
+        return { axe };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['Tabs', 'TabPanel', 'Select'] },
+  ),
+  scenario(
+    'disclosure-accordion-certification',
+    ['disclosure', 'heading', 'region', 'controlled', 'keyboard', 'touch', 'rtl', 'a11y'],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 920, height: 720 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const disclosure = await gotoCatalog(page, baseUrl, {
+          entry: 'Disclosure',
+          tab: 'examples',
+          example: 'disclosure-contract',
+          dir: 'rtl',
+          pointer: 'coarse',
+        });
+        const trigger = disclosure.getByRole('button', { name: 'Advanced options', exact: true });
+        assert.equal(
+          await trigger.evaluate((element) => element.parentElement?.tagName),
+          'H3',
+          'Disclosure trigger is not wrapped by its semantic heading.',
+        );
+        await trigger.click();
+        const region = disclosure.getByRole('region', { name: 'Advanced options', exact: true });
+        assert.equal(await region.isVisible(), true, 'Disclosure labelled region did not expand.');
+        await assertMinimumBlockSize(trigger, 44, 'Disclosure coarse-pointer trigger');
+
+        const accordion = await gotoCatalog(page, baseUrl, {
+          entry: 'Accordion',
+          tab: 'examples',
+          example: 'accordion-contract',
+          dir: 'rtl',
+        });
+        const appearance = accordion.getByRole('button', { name: 'Appearance', exact: true });
+        const behavior = accordion.getByRole('button', { name: 'Behavior', exact: true });
+        await appearance.focus();
+        await page.keyboard.press('ArrowDown');
+        assert.equal(
+          await behavior.evaluate((element) => element.ownerDocument.activeElement === element),
+          true,
+          'Accordion header navigation did not skip the disabled peer.',
+        );
+        await page.keyboard.press('Enter');
+        assert.equal(
+          await behavior.getAttribute('aria-expanded'),
+          'true',
+          'Accordion keyboard activation did not expand focused header.',
+        );
+        assert.equal(
+          await accordion.getByRole('region', { name: 'Behavior', exact: true }).isVisible(),
+          true,
+          'Accordion region relationship did not expose expanded content.',
+        );
+        const axe = await runAxe(page, 'UIR08 disclosure and accordion');
+        diagnostics.assertClean('UIR08 disclosure and accordion');
+        return { axe };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['Disclosure', 'Accordion'] },
+  ),
+  scenario(
+    'list-navigation-data-certification',
+    [
+      'navigation-data',
+      'semantic-html',
+      'list',
+      'navigation',
+      'states',
+      'localization',
+      'rtl',
+      'a11y',
+    ],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 980, height: 760 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const collection = await gotoCatalog(page, baseUrl, {
+          entry: 'List',
+          tab: 'examples',
+          example: 'collection-contract',
+          dir: 'rtl',
+        });
+        const list = collection.getByRole('list', { name: 'Recent locations', exact: true });
+        assert.equal(
+          await list.evaluate((element) => element.tagName),
+          'UL',
+          'List is not native ul semantics.',
+        );
+        const items = list.getByRole('listitem');
+        assert.ok(
+          (await items.count()) >= 3,
+          'Semantic collection did not expose native list items.',
+        );
+        const filesAction = list.getByRole('button', { name: /Files/ }).first();
+        assert.equal(
+          await filesAction.evaluate((element) =>
+            Boolean(element.querySelector('[aria-label="More file actions"]')),
+          ),
+          false,
+          'Trailing ListItem action nested inside the primary row action.',
+        );
+        await collection.getByRole('button', { name: 'loading', exact: true }).click();
+        assert.equal(
+          await list.getAttribute('aria-busy'),
+          'true',
+          'List loading state did not expose aria-busy.',
+        );
+        assert.equal(
+          await collection
+            .getByRole('status', { name: 'Loading locations', exact: true })
+            .isVisible(),
+          true,
+          'List loading state lost status semantics.',
+        );
+        await collection.getByRole('button', { name: 'error', exact: true }).click();
+        assert.equal(
+          await collection
+            .getByRole('alert', { name: 'Locations unavailable', exact: true })
+            .isVisible(),
+          true,
+          'List error state lost alert semantics.',
+        );
+
+        const navigation = await gotoCatalog(page, baseUrl, {
+          entry: 'AdaptiveNavigation',
+          tab: 'examples',
+          example: 'navigation-contract',
+          dir: 'rtl',
+        });
+        const home = navigation.getByRole('link', { name: 'Home', exact: true });
+        assert.equal(
+          await home.getAttribute('href'),
+          '#home',
+          'href destination did not preserve native anchor semantics.',
+        );
+        assert.equal(
+          await home.getAttribute('aria-current'),
+          'page',
+          'Current destination lost aria-current.',
+        );
+        const settings = navigation.getByRole('button', { name: 'Settings', exact: true });
+        await settings.click();
+        assert.equal(
+          await settings.getAttribute('aria-current'),
+          'page',
+          'Action destination did not become current after activation.',
+        );
+        await assertNoGlobalHorizontalOverflow(page, 'UIR09 semantic list/navigation');
+        const axe = await runAxe(page, 'UIR09 semantic list/navigation');
+        diagnostics.assertClean('UIR09 semantic list/navigation');
+        return { axe };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['List', 'ListItem', 'ListSection', 'ListSeparator', 'AdaptiveNavigation'] },
+  ),
+  scenario(
+    'tile-grid-spatial-navigation-certification',
+    [
+      'navigation-data',
+      'tile-grid',
+      'geometry',
+      'roving-focus',
+      'reorder',
+      'rtl',
+      'keyboard',
+      'touch',
+      'a11y',
+    ],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 1040, height: 760 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const example = await gotoCatalog(page, baseUrl, {
+          entry: 'TileGrid',
+          tab: 'examples',
+          example: 'spatial-grid',
+          dir: 'rtl',
+          pointer: 'coarse',
+        });
+        const alpha = example.getByRole('button', { name: /Alpha/ }).first();
+        const beta = example.getByRole('button', { name: /^Beta/ }).first();
+        const gamma = example.getByRole('button', { name: /^Gamma/ }).first();
+        await alpha.focus();
+        await page.keyboard.press('ArrowRight');
+        assert.equal(
+          await beta.evaluate((element) => element.ownerDocument.activeElement === element),
+          true,
+          'RTL TileGrid ArrowRight did not move to the logical next measured tile.',
+        );
+        await assertVisibleFocus(beta, 'TileGrid logical next tile');
+        await beta.focus();
+        await example.locator('[data-tile-reorder]').evaluate((element) => element.click());
+        assert.equal(
+          await beta.evaluate((element) => element.ownerDocument.activeElement === element),
+          true,
+          'TileGrid reorder did not preserve focus identity.',
+        );
+        const enabled = [alpha, beta, gamma];
+        const tabStops = await Promise.all(
+          enabled.map((locator) => locator.getAttribute('tabindex')),
+        );
+        assert.equal(
+          tabStops.filter((value) => value === '0').length,
+          1,
+          'TileGrid did not preserve exactly one roving tab stop after reorder.',
+        );
+        await assertMinimumBlockSize(beta, 44, 'coarse-pointer Tile action');
+        await assertNoGlobalHorizontalOverflow(page, 'UIR09 TileGrid localized content');
+        const axe = await runAxe(page, 'UIR09 TileGrid spatial navigation');
+        diagnostics.assertClean('UIR09 TileGrid spatial navigation');
+        return { tabStops, axe };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['TileGrid', 'Tile'] },
+  ),
 ];

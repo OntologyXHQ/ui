@@ -522,6 +522,410 @@
         "touch",
         "a11y"
       ]
+    },
+    "Checkbox": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/selection-disclosure.test.tsx",
+        "packages/ui/src/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "selection-controls-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "native-semantics",
+        "controlled",
+        "uncontrolled",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reset",
+        "a11y"
+      ]
+    },
+    "RadioGroup": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/selection-disclosure.test.tsx",
+        "packages/ui/src/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "selection-controls-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "native-semantics",
+        "controlled",
+        "uncontrolled",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reset",
+        "a11y"
+      ]
+    },
+    "Radio": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/selection-disclosure.test.tsx",
+        "packages/ui/src/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "selection-controls-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "native-semantics",
+        "controlled",
+        "uncontrolled",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reset",
+        "a11y"
+      ]
+    },
+    "Switch": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/selection-disclosure.test.tsx",
+        "packages/ui/src/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "selection-controls-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "native-semantics",
+        "controlled",
+        "uncontrolled",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reset",
+        "a11y"
+      ]
+    },
+    "ToggleButton": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/selection-disclosure.test.tsx",
+        "packages/ui/src/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "selection-controls-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "native-semantics",
+        "controlled",
+        "uncontrolled",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reset",
+        "a11y"
+      ]
+    },
+    "SegmentedControl": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/selection-disclosure.test.tsx",
+        "packages/ui/src/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "selection-controls-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "native-semantics",
+        "controlled",
+        "uncontrolled",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reset",
+        "a11y"
+      ]
+    },
+    "ToggleGroup": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/selection-disclosure.test.tsx",
+        "packages/ui/src/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "selection-controls-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "native-semantics",
+        "controlled",
+        "uncontrolled",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reset",
+        "a11y"
+      ]
+    },
+    "Tabs": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/navigation-data.test.tsx",
+        "packages/ui/src/components/__tests__/data-navigation.test.tsx"
+      ],
+      "browserScenarios": [
+        "tabs-select-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "tabs",
+        "manual-activation",
+        "automatic-activation",
+        "roving-focus",
+        "relationships",
+        "rtl",
+        "keyboard",
+        "a11y"
+      ]
+    },
+    "TabPanel": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/navigation-data.test.tsx",
+        "packages/ui/src/components/__tests__/data-navigation.test.tsx"
+      ],
+      "browserScenarios": [
+        "tabs-select-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "tabs",
+        "manual-activation",
+        "automatic-activation",
+        "roving-focus",
+        "relationships",
+        "rtl",
+        "keyboard",
+        "a11y"
+      ]
+    },
+    "Select": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/selection-disclosure.test.tsx",
+        "packages/ui/src/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "tabs-select-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "select",
+        "listbox",
+        "typeahead",
+        "form",
+        "validity",
+        "focus-restoration",
+        "keyboard",
+        "touch",
+        "a11y"
+      ]
+    },
+    "Disclosure": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/selection-disclosure.test.tsx",
+        "packages/ui/src/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "disclosure-accordion-certification"
+      ],
+      "requiredAxes": [
+        "disclosure",
+        "controlled",
+        "uncontrolled",
+        "heading",
+        "region",
+        "keyboard",
+        "touch",
+        "rtl",
+        "a11y"
+      ]
+    },
+    "Accordion": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/selection-disclosure.test.tsx",
+        "packages/ui/src/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "disclosure-accordion-certification"
+      ],
+      "requiredAxes": [
+        "disclosure",
+        "controlled",
+        "uncontrolled",
+        "heading",
+        "region",
+        "keyboard",
+        "touch",
+        "rtl",
+        "a11y"
+      ]
+    },
+    "List": {
+      "owner": "UIR09",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/navigation-data.test.tsx",
+        "packages/ui/src/components/__tests__/data-navigation.test.tsx"
+      ],
+      "browserScenarios": [
+        "list-navigation-data-certification"
+      ],
+      "requiredAxes": [
+        "navigation-data",
+        "semantic-html",
+        "list",
+        "navigation",
+        "long-content",
+        "localization",
+        "responsive",
+        "rtl",
+        "a11y"
+      ]
+    },
+    "ListItem": {
+      "owner": "UIR09",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/navigation-data.test.tsx",
+        "packages/ui/src/components/__tests__/data-navigation.test.tsx"
+      ],
+      "browserScenarios": [
+        "list-navigation-data-certification"
+      ],
+      "requiredAxes": [
+        "navigation-data",
+        "semantic-html",
+        "list",
+        "navigation",
+        "long-content",
+        "localization",
+        "responsive",
+        "rtl",
+        "a11y"
+      ]
+    },
+    "ListSection": {
+      "owner": "UIR09",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/navigation-data.test.tsx",
+        "packages/ui/src/components/__tests__/data-navigation.test.tsx"
+      ],
+      "browserScenarios": [
+        "list-navigation-data-certification"
+      ],
+      "requiredAxes": [
+        "navigation-data",
+        "semantic-html",
+        "list",
+        "navigation",
+        "long-content",
+        "localization",
+        "responsive",
+        "rtl",
+        "a11y"
+      ]
+    },
+    "ListSeparator": {
+      "owner": "UIR09",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/navigation-data.test.tsx",
+        "packages/ui/src/components/__tests__/data-navigation.test.tsx"
+      ],
+      "browserScenarios": [
+        "list-navigation-data-certification"
+      ],
+      "requiredAxes": [
+        "navigation-data",
+        "semantic-html",
+        "list",
+        "navigation",
+        "long-content",
+        "localization",
+        "responsive",
+        "rtl",
+        "a11y"
+      ]
+    },
+    "AdaptiveNavigation": {
+      "owner": "UIR09",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/navigation-data.test.tsx",
+        "packages/ui/src/components/__tests__/data-navigation.test.tsx"
+      ],
+      "browserScenarios": [
+        "list-navigation-data-certification"
+      ],
+      "requiredAxes": [
+        "navigation-data",
+        "semantic-html",
+        "list",
+        "navigation",
+        "long-content",
+        "localization",
+        "responsive",
+        "rtl",
+        "a11y"
+      ]
+    },
+    "TileGrid": {
+      "owner": "UIR09",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/navigation-data.test.tsx",
+        "packages/ui/src/components/__tests__/data-navigation.test.tsx",
+        "packages/ui/src/components/__tests__/developer-compositions.test.tsx"
+      ],
+      "browserScenarios": [
+        "tile-grid-spatial-navigation-certification"
+      ],
+      "requiredAxes": [
+        "navigation-data",
+        "tile-grid",
+        "geometry",
+        "roving-focus",
+        "reorder",
+        "focus-continuity",
+        "rtl",
+        "keyboard",
+        "touch",
+        "a11y"
+      ]
+    },
+    "Tile": {
+      "owner": "UIR09",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/navigation-data.test.tsx",
+        "packages/ui/src/components/__tests__/data-navigation.test.tsx",
+        "packages/ui/src/components/__tests__/developer-compositions.test.tsx"
+      ],
+      "browserScenarios": [
+        "tile-grid-spatial-navigation-certification"
+      ],
+      "requiredAxes": [
+        "navigation-data",
+        "tile-grid",
+        "geometry",
+        "roving-focus",
+        "reorder",
+        "focus-continuity",
+        "rtl",
+        "keyboard",
+        "touch",
+        "a11y"
+      ]
     }
   }
 }

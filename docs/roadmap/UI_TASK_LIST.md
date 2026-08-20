@@ -235,25 +235,29 @@ Acceptance: FieldGroup/FieldSection own only structural labeling/description sem
 
 ---
 
-## UIR08 — Selection and disclosure controls — TODO
+## UIR08 — Selection and disclosure controls — DONE
 
-- `UI-0801` Rebuild Checkbox/Radio/Switch/Toggle semantics and indeterminate/mixed states where applicable.
-- `UI-0802` Rebuild ToggleGroup/Segmented controlled/uncontrolled and roving behavior.
-- `UI-0803` Rebuild Tabs manual/automatic activation, panel relationships and invalid-selection recovery.
-- `UI-0804` Rebuild Select trigger/listbox/typeahead/form validity/focus restoration from native semantics outward.
-- `UI-0805` Rebuild Disclosure/Accordion state ownership and heading/region semantics.
-- `UI-0806` Certify keyboard, touch, RTL and form/reset behavior before acceptance.
+- `UI-0801` Rebuild Checkbox/Radio/Switch/Toggle semantics and indeterminate/mixed states where applicable. **DONE**
+- `UI-0802` Rebuild ToggleGroup/Segmented controlled/uncontrolled and roving behavior. **DONE**
+- `UI-0803` Rebuild Tabs manual/automatic activation, panel relationships and invalid-selection recovery. **DONE**
+- `UI-0804` Rebuild Select trigger/listbox/typeahead/form validity/focus restoration from native semantics outward. **DONE**
+- `UI-0805` Rebuild Disclosure/Accordion state ownership and heading/region semantics. **DONE**
+- `UI-0806` Certify keyboard, touch, RTL and form/reset behavior before acceptance. **DONE**
+
+Acceptance: Checkbox/Radio preserve native form/reset semantics and explicit mixed/read-only state; Switch and ToggleButton keep immediate/pressed semantics without borrowing ambient realm timers; SegmentedControl/ToggleGroup normalize invalid controlled state with logical roving focus; Tabs/TabPanel own manual/automatic activation and deterministic relationships; Select owns bounded listbox/typeahead/form-validity/focus behavior on shared overlay authority; Disclosure/Accordion own controlled state plus semantic heading/region relationships and keyboard header movement. Twelve exports are reaccepted by dedicated behavior/G6 evidence; Slider remains candidate because numeric range/direct-manipulation certification belongs outside UIR08.
 
 ---
 
-## UIR09 — Navigation and data presentation — TODO
+## UIR09 — Navigation and data presentation — DONE
 
-- `UI-0901` Rebuild List/ListItem/ListSection semantics and trailing-action composition without nested interactivity.
-- `UI-0902` Rebuild navigation items/breadcrumb/pagination or remove concepts that do not justify public ownership.
-- `UI-0903` Rebuild AdaptiveNavigation only after its lower-level navigation contracts are accepted.
-- `UI-0904` Rebuild data/list presentation contracts around semantic HTML and predictable empty/loading/error states.
-- `UI-0905` Rebuild spatial TileGrid navigation from measured geometry with RTL-aware arrows.
-- `UI-0906` Certify long content, localization, reorder and focus continuity.
+- `UI-0901` Rebuild List/ListItem/ListSection semantics and trailing-action composition without nested interactivity. **DONE**
+- `UI-0902` Rebuild navigation items/breadcrumb/pagination or remove concepts that do not justify public ownership. **DONE**
+- `UI-0903` Rebuild AdaptiveNavigation only after its lower-level navigation contracts are accepted. **DONE**
+- `UI-0904` Rebuild data/list presentation contracts around semantic HTML and predictable empty/loading/error states. **DONE**
+- `UI-0905` Rebuild spatial TileGrid navigation from measured geometry with RTL-aware arrows. **DONE**
+- `UI-0906` Certify long content, localization, reorder and focus continuity. **DONE**
+
+Acceptance: List/ListItem/ListSection/ListSeparator use native ul/li/section semantics, explicit caller-owned ready/loading/empty/error replacement content, and sibling trailing actions that cannot nest interactive controls; AdaptiveNavigation preserves native anchors for href destinations and native buttons for action destinations while Breadcrumb/Pagination remain intentionally absent until demanded; TileGrid/Tile use owner-realm measured 2D roving focus with RTL-aware arrows and focus continuity across reorder. Seven exports are reaccepted by dedicated behavior/G6 evidence; ApplicationItem, AppBar and ContentState remain candidates for later composition ownership. Public visual maturity advances to accepted=45/candidate=55; UIR10 Overlays and feedback is next.
 
 ---
 

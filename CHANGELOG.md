@@ -1,3 +1,10 @@
+## UIR08 + UIR09 — selection/disclosure and navigation/data closeout
+
+- Reaccepted the complete UIR08 selection/disclosure family: native Checkbox/Radio form-reset semantics, realm-owned Switch gesture settlement, ToggleButton/ToggleGroup/Segmented normalization, manual/automatic Tabs relationships, Select typeahead/form validity/focus, and semantic Disclosure/Accordion headings/regions.
+- Reaccepted the UIR09 navigation/data family: native ul/li collections with explicit non-ready states, sibling trailing actions, anchor-preserving AdaptiveNavigation, and owner-realm measured TileGrid focus continuity across RTL/reorder.
+- Kept Slider, AppBar, ApplicationItem and ContentState candidate until their owning roadmap batches; Breadcrumb/Pagination remain deliberately absent rather than speculative APIs.
+- Added dedicated G0 contracts, behavior tests, Studio examples and five G6 browser certifications. Expected catalog frontier after full verification: accepted=45, candidate=55, UIR10 NEXT.
+
 - Fixed generated catalog JSON semantic freshness after formatting.
 # Changelog
 - UIR07 TypeScript docs follow-up: native-form action rows now use the accepted `Wrap` primitive instead of passing a nonexistent `wrap` prop to the intentionally non-wrapping `Row` contract; source-wide UIR07 docs are audited against the UIR03 Layout API.

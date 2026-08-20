@@ -1,8 +1,17 @@
 import type { KeyboardEvent, ReactNode } from 'react';
-import { createPortal } from 'react-dom';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { useUiPortalHost, viewportLengthToPortalHost, viewportPointToPortalHost } from '../foundations/portal';
-import { TypeaheadController, type FloatingAnchor, useFloatingPosition, useOverlayLifecycle } from '../interaction';
+import { createPortal } from 'react-dom';
+import {
+  useUiPortalHost,
+  viewportLengthToPortalHost,
+  viewportPointToPortalHost,
+} from '../foundations/portal';
+import {
+  type FloatingAnchor,
+  TypeaheadController,
+  useFloatingPosition,
+  useOverlayLifecycle,
+} from '../interaction';
 import { defineUiIcon, Icon } from '../primitives';
 import { useControllableState } from './controlState';
 import { FieldFrame, type FieldStateProps, useFieldIds } from './Field';
@@ -17,17 +26,29 @@ export type SelectOption = {
 };
 
 export type SelectProps = Omit<FieldStateProps, 'leading' | 'trailing' | 'prefix' | 'suffix'> & {
+  /** Bounded option set rendered through the shared listbox overlay. */
   options: readonly SelectOption[];
+  /** Controlled selected option value. */
   value?: string;
+  /** Initial uncontrolled selected value and native form-reset target. */
   defaultValue?: string;
+  /** Reports committed option changes. */
   onValueChange?: (value: string) => void;
+  /** Controlled popup state. */
   open?: boolean;
+  /** Initial uncontrolled popup state. @default false */
   defaultOpen?: boolean;
+  /** Reports popup state changes. */
   onOpenChange?: (open: boolean) => void;
+  /** Visible text when no option is selected. @default Select an option */
   placeholder?: string;
+  /** Native form field name projected through the validity proxy. */
   name?: string;
+  /** Optional external native form id for the validity proxy. */
   form?: string;
+  /** Structural class hook. */
   className?: string;
+  /** Stable visible trigger/control id. */
   id?: string;
 };
 
@@ -56,15 +77,27 @@ export function Select({
   className = '',
 }: SelectProps) {
   const portalHost = useUiPortalHost();
-  const [currentValue, setCurrentValue] = useControllableState({ value, defaultValue, onValueChange });
-  const [isOpen, setOpen] = useControllableState({ value: open, defaultValue: defaultOpen, onValueChange: onOpenChange });
+  const [currentValue, setCurrentValue] = useControllableState({
+    value,
+    defaultValue,
+    onValueChange,
+  });
+  const [isOpen, setOpen] = useControllableState({
+    value: open,
+    defaultValue: defaultOpen,
+    onValueChange: onOpenChange,
+  });
   const [activeValue, setActiveValue] = useState('');
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
+  const nativeProxyRef = useRef<HTMLSelectElement | null>(null);
   const typeaheadRef = useRef(new TypeaheadController());
   const ids = useFieldIds({ id, description, error });
   const listboxId = `${ids.controlId}-listbox`;
-  const selected = useMemo(() => options.find((option) => option.value === currentValue) ?? null, [currentValue, options]);
+  const selected = useMemo(
+    () => options.find((option) => option.value === currentValue) ?? null,
+    [currentValue, options],
+  );
   const enabled = useMemo(() => options.filter((option) => !option.disabled), [options]);
   const activeOpen = isOpen && portalHost !== null;
   const anchor: FloatingAnchor = { kind: 'element', ref: triggerRef };
@@ -93,9 +126,22 @@ export function Select({
     if (!activeOpen) return;
     const preferred = enabled.some((option) => option.value === currentValue)
       ? currentValue
-      : enabled[0]?.value ?? '';
+      : (enabled[0]?.value ?? '');
     setActiveValue(preferred);
   }, [activeOpen, currentValue, enabled]);
+
+  useEffect(() => {
+    if (value !== undefined) return;
+    const formElement = nativeProxyRef.current?.form;
+    if (!formElement) return;
+    const reset = () => {
+      setCurrentValue(defaultValue);
+      setActiveValue('');
+      setOpen(false);
+    };
+    formElement.addEventListener('reset', reset);
+    return () => formElement.removeEventListener('reset', reset);
+  }, [defaultValue, setCurrentValue, setOpen, value]);
 
   useLayoutEffect(() => {
     const list = listRef.current;
@@ -124,14 +170,19 @@ export function Select({
 
   const moveActive = (delta: number) => {
     if (!enabled.length) return;
-    const index = Math.max(0, enabled.findIndex((option) => option.value === activeValue));
+    const index = Math.max(
+      0,
+      enabled.findIndex((option) => option.value === activeValue),
+    );
     const next = (index + delta + enabled.length) % enabled.length;
     setActiveValue(enabled[next]?.value ?? '');
   };
 
   const applyTypeahead = (event: KeyboardEvent<HTMLButtonElement>, choose: boolean) => {
     if (event.altKey || event.ctrlKey || event.metaKey || !enabled.length) return false;
-    const currentIndex = enabled.findIndex((option) => option.value === (activeValue || currentValue));
+    const currentIndex = enabled.findIndex(
+      (option) => option.value === (activeValue || currentValue),
+    );
     const match = typeaheadRef.current.search({
       key: event.key,
       labels: enabled.map((option) => option.label),
@@ -161,7 +212,9 @@ export function Select({
       event.preventDefault();
       if (!activeOpen) {
         setOpen(true);
-        const preferred = enabled.some((option) => option.value === currentValue) ? currentValue : enabled[0]?.value ?? '';
+        const preferred = enabled.some((option) => option.value === currentValue)
+          ? currentValue
+          : (enabled[0]?.value ?? '');
         setActiveValue(preferred);
       } else {
         moveActive(event.key === 'ArrowDown' ? 1 : -1);
@@ -170,7 +223,9 @@ export function Select({
     }
     if (activeOpen && (event.key === 'Home' || event.key === 'End')) {
       event.preventDefault();
-      setActiveValue(event.key === 'Home' ? enabled[0]?.value ?? '' : enabled.at(-1)?.value ?? '');
+      setActiveValue(
+        event.key === 'Home' ? (enabled[0]?.value ?? '') : (enabled.at(-1)?.value ?? ''),
+      );
       return;
     }
     if (event.key === 'Enter' || event.key === ' ') {
@@ -182,49 +237,54 @@ export function Select({
     if (applyTypeahead(event, !activeOpen)) event.preventDefault();
   };
 
-  const listbox = activeOpen && portalHost ? createPortal(
-    <div
-      ref={listRef}
-      id={listboxId}
-      className="ui-select-listbox"
-      role="listbox"
-      aria-labelledby={ids.labelId}
-      data-placement={position.placement}
-      data-ready={position.ready}
-      data-oxs-overlay-depth={overlay.depth}
-    >
-      {options.map((option) => {
-        const optionId = selectOptionId(ids.controlId, option.value);
-        return (
+  const listbox =
+    activeOpen && portalHost
+      ? createPortal(
           <div
-            key={option.value}
-            id={optionId}
-            role="option"
-            aria-selected={option.value === currentValue}
-            aria-disabled={option.disabled || undefined}
-            data-value={option.value}
-            data-active={option.value === activeValue || undefined}
-            className="ui-select-option"
-            data-oxs-cursor-role={option.disabled ? 'not-allowed' : 'pointer'}
-            onPointerDown={(event) => event.preventDefault()}
-            onPointerMove={() => {
-              if (!option.disabled) setActiveValue(option.value);
-            }}
-            onClick={() => {
-              if (!option.disabled) selectValue(option.value);
-            }}
+            ref={listRef}
+            id={listboxId}
+            className="ui-select-listbox"
+            role="listbox"
+            aria-labelledby={ids.labelId}
+            data-placement={position.placement}
+            data-ready={position.ready}
+            data-oxs-overlay-depth={overlay.depth}
           >
-            <span className="ui-select-option__copy">
-              <span className="ui-select-option__label">{option.label}</span>
-              {option.description ? <span className="ui-select-option__description">{option.description}</span> : null}
-            </span>
-            {option.value === currentValue ? <Icon name="check" size="sm" /> : null}
-          </div>
-        );
-      })}
-    </div>,
-    portalHost,
-  ) : null;
+            {options.map((option) => {
+              const optionId = selectOptionId(ids.controlId, option.value);
+              return (
+                <div
+                  key={option.value}
+                  id={optionId}
+                  role="option"
+                  aria-selected={option.value === currentValue}
+                  aria-disabled={option.disabled || undefined}
+                  data-value={option.value}
+                  data-active={option.value === activeValue || undefined}
+                  className="ui-select-option"
+                  data-oxs-cursor-role={option.disabled ? 'not-allowed' : 'pointer'}
+                  onPointerDown={(event) => event.preventDefault()}
+                  onPointerMove={() => {
+                    if (!option.disabled) setActiveValue(option.value);
+                  }}
+                  onClick={() => {
+                    if (!option.disabled) selectValue(option.value);
+                  }}
+                >
+                  <span className="ui-select-option__copy">
+                    <span className="ui-select-option__label">{option.label}</span>
+                    {option.description ? (
+                      <span className="ui-select-option__description">{option.description}</span>
+                    ) : null}
+                  </span>
+                  {option.value === currentValue ? <Icon name="check" size="sm" /> : null}
+                </div>
+              );
+            })}
+          </div>,
+          portalHost,
+        )
+      : null;
 
   return (
     <>
@@ -255,7 +315,9 @@ export function Select({
           aria-haspopup="listbox"
           aria-expanded={activeOpen}
           aria-controls={activeOpen ? listboxId : undefined}
-          aria-activedescendant={activeOpen && activeValue ? selectOptionId(ids.controlId, activeValue) : undefined}
+          aria-activedescendant={
+            activeOpen && activeValue ? selectOptionId(ids.controlId, activeValue) : undefined
+          }
           aria-readonly={readOnly || undefined}
           aria-required={required || undefined}
           data-placeholder={!selected || undefined}
@@ -271,6 +333,7 @@ export function Select({
       </FieldFrame>
       {name || required ? (
         <select
+          ref={nativeProxyRef}
           className="ui-select-native-proxy"
           name={name}
           form={form}
@@ -280,11 +343,16 @@ export function Select({
           tabIndex={-1}
           aria-hidden="true"
           onChange={() => {}}
-          onInvalid={() => triggerRef.current?.focus({ preventScroll: true })}
+          onInvalid={(event) => {
+            event.preventDefault();
+            triggerRef.current?.focus({ preventScroll: true });
+          }}
         >
           <option value="" />
           {options.map((option) => (
-            <option key={option.value} value={option.value} disabled={option.disabled}>{option.label}</option>
+            <option key={option.value} value={option.value} disabled={option.disabled}>
+              {option.label}
+            </option>
           ))}
         </select>
       ) : null}
@@ -292,7 +360,6 @@ export function Select({
     </>
   );
 }
-
 
 function selectOptionId(controlId: string, value: string) {
   return `${controlId}-option-${safeDomId(value)}`;

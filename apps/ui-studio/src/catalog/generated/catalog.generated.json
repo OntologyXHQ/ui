@@ -7,16 +7,14 @@
     "order": 90,
     "summary": "Single- or multi-expand disclosure collection with controlled/uncontrolled value ownership.",
     "usage": "Use for peer disclosure sections; do not use as application navigation.",
-    "status": "candidate",
-    "accessibility": "Each section uses a React-owned disclosure button/region pair; disabled buttons suppress activation and single-open mode normalizes invalid multi-value input.",
+    "status": "accepted",
+    "accessibility": "Each item uses a semantic heading plus button/region pair; ArrowUp/Down/Home/End move between enabled headers and single/multiple state is normalized.",
     "rtl": "Logical ordering and mirrored disclosure indicators work in either direction.",
     "touch": "Each disclosure button is a full touch target.",
     "responsive": "Sections fill their containing width and copy wraps naturally.",
     "playground": {
       "preferredWidth": "medium",
-      "controls": [
-        "multiple"
-      ],
+      "controls": ["multiple"],
       "fixture": {
         "items": [
           {
@@ -30,9 +28,7 @@
             "content": "Second section content"
           }
         ],
-        "defaultValue": [
-          "first"
-        ]
+        "defaultValue": ["first"]
       }
     },
     "props": [
@@ -40,15 +36,23 @@
         "name": "defaultValue",
         "type": "readonly string[]",
         "optional": true,
-        "description": "",
+        "description": "Initial uncontrolled open item values.",
         "deprecated": false,
         "default": null
+      },
+      {
+        "name": "headingLevel",
+        "type": "2 | 3 | 4 | 5 | 6",
+        "optional": true,
+        "description": "Semantic heading rank wrapping every accordion trigger.",
+        "deprecated": false,
+        "default": "3"
       },
       {
         "name": "items",
         "type": "readonly AccordionItem[]",
         "optional": false,
-        "description": "",
+        "description": "Ordered disclosure items.",
         "deprecated": false,
         "default": null
       },
@@ -56,7 +60,7 @@
         "name": "label",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional accessible name for the accordion collection.",
         "deprecated": false,
         "default": null
       },
@@ -64,7 +68,7 @@
         "name": "multiple",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Allows more than one panel to remain expanded.",
         "deprecated": false,
         "default": "false"
       },
@@ -72,7 +76,7 @@
         "name": "onValueChange",
         "type": "(value: readonly string[]) => void",
         "optional": true,
-        "description": "",
+        "description": "Reports normalized open-value changes.",
         "deprecated": false,
         "default": null
       },
@@ -80,12 +84,18 @@
         "name": "value",
         "type": "readonly string[]",
         "optional": true,
-        "description": "",
+        "description": "Controlled open item values.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "accordion-contract",
+        "title": "Accordion state + keyboard contract",
+        "component": "AccordionContractExample"
+      }
+    ]
   },
   {
     "id": "ActionGroup",
@@ -135,23 +145,16 @@
     "order": 40,
     "summary": "Generic container-driven navigation that can render bar, rail, drawer or adaptive auto layouts.",
     "usage": "Use for application-level destinations; keep OXS launcher/workspace semantics in System UI.",
-    "status": "candidate",
-    "accessibility": "Uses nav landmarks and aria-current for the active destination.",
+    "status": "accepted",
+    "accessibility": "Uses a nav landmark and aria-current; href destinations preserve native anchor semantics while action destinations remain native buttons.",
     "rtl": "Ordering and icon/copy placement inherit logical direction.",
     "touch": "Destination controls use Button interaction ownership.",
     "responsive": "Auto mode changes bar → rail → drawer from container width, not device identity.",
     "playground": {
       "preferredWidth": "wide",
-      "controls": [
-        "mode"
-      ],
+      "controls": ["mode"],
       "options": {
-        "mode": [
-          "auto",
-          "bar",
-          "rail",
-          "drawer"
-        ]
+        "mode": ["auto", "bar", "rail", "drawer"]
       },
       "fixture": {
         "label": "Workspace navigation",
@@ -177,7 +180,7 @@
         "name": "defaultValue",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Initial uncontrolled current destination.",
         "deprecated": false,
         "default": null
       },
@@ -185,7 +188,7 @@
         "name": "items",
         "type": "readonly NavigationItem[]",
         "optional": false,
-        "description": "",
+        "description": "Destination definitions. Link items preserve native anchor navigation.",
         "deprecated": false,
         "default": null
       },
@@ -193,7 +196,7 @@
         "name": "label",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Accessible name for the navigation landmark.",
         "deprecated": false,
         "default": null
       },
@@ -201,15 +204,15 @@
         "name": "mode",
         "type": "'auto' | 'bar' | 'rail' | 'drawer'",
         "optional": true,
-        "description": "",
+        "description": "Explicit presentation mode or container-adaptive auto mode.",
         "deprecated": false,
-        "default": "'auto'"
+        "default": "auto"
       },
       {
         "name": "onValueChange",
         "type": "(value: string) => void",
         "optional": true,
-        "description": "",
+        "description": "Reports current-destination changes before caller routing policy runs.",
         "deprecated": false,
         "default": null
       },
@@ -217,12 +220,18 @@
         "name": "value",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Controlled current destination.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "navigation-contract",
+        "title": "Native link + action destinations",
+        "component": "AdaptiveNavigationContractExample"
+      }
+    ]
   },
   {
     "id": "AlertDialog",
@@ -477,7 +486,7 @@
         "name": "badge",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional bounded badge/metadata.",
         "deprecated": false,
         "default": null
       },
@@ -485,7 +494,7 @@
         "name": "description",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional supporting copy.",
         "deprecated": false,
         "default": null
       },
@@ -493,9 +502,9 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Disables the primary tile action.",
         "deprecated": false,
-        "default": null
+        "default": "false"
       },
       {
         "name": "icon",
@@ -509,7 +518,7 @@
         "name": "leading",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional leading visual/content.",
         "deprecated": false,
         "default": null
       },
@@ -525,7 +534,7 @@
         "name": "onActivate",
         "type": "() => void",
         "optional": true,
-        "description": "",
+        "description": "Turns the tile primary surface into an actionable Button.",
         "deprecated": false,
         "default": null
       },
@@ -533,39 +542,39 @@
         "name": "pending",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Pending action state using the shared Button loading contract.",
         "deprecated": false,
-        "default": null
+        "default": "false"
       },
       {
         "name": "pendingLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible loading name while pending.",
         "deprecated": false,
-        "default": "'Opening application'"
+        "default": "Working"
       },
       {
         "name": "selected",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Visual selected state.",
         "deprecated": false,
-        "default": null
+        "default": "false"
       },
       {
         "name": "selectionSemantics",
         "type": "'visual' | 'current'",
         "optional": true,
-        "description": "",
+        "description": "Whether selection is visual-only or denotes the current item.",
         "deprecated": false,
-        "default": null
+        "default": "visual"
       },
       {
         "name": "tabIndex",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Explicit roving tab index supplied by TileGrid.",
         "deprecated": false,
         "default": null
       },
@@ -573,7 +582,7 @@
         "name": "title",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Visible tile title.",
         "deprecated": false,
         "default": null
       },
@@ -581,7 +590,7 @@
         "name": "trailing",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional trailing control/content rendered outside the primary tile action.",
         "deprecated": false,
         "default": null
       }
@@ -1026,31 +1035,14 @@
     "responsive": "Intrinsic by default or full-inline-size on request; content truncation/wrapping stays inside the caller-owned layout.",
     "playground": {
       "preferredWidth": "medium",
-      "controls": [
-        "variant",
-        "intent",
-        "size",
-        "loading",
-        "fullWidth"
-      ],
+      "controls": ["variant", "intent", "size", "loading", "fullWidth"],
       "fixture": {
         "children": "Continue"
       },
       "options": {
-        "variant": [
-          "quiet",
-          "secondary",
-          "primary"
-        ],
-        "intent": [
-          "neutral",
-          "destructive"
-        ],
-        "size": [
-          "sm",
-          "md",
-          "lg"
-        ]
+        "variant": ["quiet", "secondary", "primary"],
+        "intent": ["neutral", "destructive"],
+        "size": ["sm", "md", "lg"]
       }
     },
     "props": [
@@ -1254,20 +1246,20 @@
     "layer": "components",
     "category": "Selection",
     "order": 20,
-    "summary": "Binary or mixed-state choice with controlled/uncontrolled state and composed label/support copy.",
-    "usage": "Use when multiple independent choices may be selected; use RadioGroup for mutually exclusive choices.",
-    "status": "candidate",
-    "accessibility": "Uses a native checkbox, explicit mixed state, disabled/read-only semantics and label association.",
-    "rtl": "Indicator and copy use logical layout with no physical-side styling.",
-    "touch": "The full label row is the target and inherits coarse-pointer minimum sizing.",
-    "responsive": "Copy wraps naturally while the indicator keeps a stable target and alignment.",
+    "summary": "Native binary or mixed-state choice with controlled/uncontrolled ownership, read-only policy and form reset recovery.",
+    "usage": "Use for independent form-style choices; mixed is a transient presentation owned separately from the persisted checked value.",
+    "status": "accepted",
+    "accessibility": "Native checkbox semantics, explicit mixed state and label/description relationships remain intact.",
+    "rtl": "Indicator and copy use logical layout.",
+    "touch": "The full labelled row preserves the shared coarse-pointer target floor.",
+    "responsive": "Copy wraps without shrinking the indicator.",
     "playground": null,
     "props": [
       {
         "name": "checked",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Controlled checked state.",
         "deprecated": false,
         "default": null
       },
@@ -1275,7 +1267,7 @@
         "name": "defaultChecked",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Initial uncontrolled state and native form-reset target.",
         "deprecated": false,
         "default": "false"
       },
@@ -1283,7 +1275,7 @@
         "name": "description",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional supporting description associated with the control.",
         "deprecated": false,
         "default": null
       },
@@ -1291,7 +1283,7 @@
         "name": "indeterminate",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Exposes the native mixed state without inventing a third persisted value.",
         "deprecated": false,
         "default": "false"
       },
@@ -1299,7 +1291,7 @@
         "name": "label",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Visible control label and accessible name source.",
         "deprecated": false,
         "default": null
       },
@@ -1307,7 +1299,7 @@
         "name": "onCheckedChange",
         "type": "(checked: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "Reports committed checked-state changes.",
         "deprecated": false,
         "default": null
       },
@@ -1315,7 +1307,7 @@
         "name": "readOnly",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Prevents mutation while preserving focus/read semantics.",
         "deprecated": false,
         "default": "false"
       },
@@ -1323,16 +1315,16 @@
         "name": "size",
         "type": "ControlSize",
         "optional": true,
-        "description": "",
+        "description": "Shared control target scale.",
         "deprecated": false,
-        "default": "'md'"
+        "default": "md"
       }
     ],
     "examples": [
       {
-        "id": "selection",
-        "title": "Selection controls",
-        "component": "SelectionControlsExample"
+        "id": "native-contract",
+        "title": "Native selection + form reset",
+        "component": "SelectionNativeContractExample"
       }
     ]
   },
@@ -2008,8 +2000,8 @@
     "order": 90,
     "summary": "React-owned expandable content composition with explicit button/region state authority.",
     "usage": "Use for one independently expandable section; use Accordion for coordinated peer sections.",
-    "status": "candidate",
-    "accessibility": "Uses a native button with aria-expanded/aria-controls and a labelled content region so controlled state never races native details mutation.",
+    "status": "accepted",
+    "accessibility": "Uses a native button inside a semantic heading with aria-expanded/aria-controls and a labelled region; controlled state never races native details mutation.",
     "rtl": "The directional chevron mirrors semantically in RTL and copy uses logical flow.",
     "touch": "The disclosure button keeps a full touch-friendly activation row.",
     "responsive": "Description and content wrap without viewport assumptions.",
@@ -2019,7 +2011,7 @@
         "name": "defaultOpen",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Initial uncontrolled expanded state.",
         "deprecated": false,
         "default": "false"
       },
@@ -2027,7 +2019,7 @@
         "name": "description",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional supporting description associated with the summary control.",
         "deprecated": false,
         "default": null
       },
@@ -2035,15 +2027,23 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Disables expansion while preserving visible content structure.",
         "deprecated": false,
         "default": "false"
+      },
+      {
+        "name": "headingLevel",
+        "type": "2 | 3 | 4 | 5 | 6",
+        "optional": true,
+        "description": "Semantic heading rank wrapping the disclosure trigger.",
+        "deprecated": false,
+        "default": "3"
       },
       {
         "name": "onOpenChange",
         "type": "(open: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "Reports expanded-state changes.",
         "deprecated": false,
         "default": null
       },
@@ -2051,7 +2051,7 @@
         "name": "open",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Controlled expanded state.",
         "deprecated": false,
         "default": null
       },
@@ -2059,12 +2059,18 @@
         "name": "summary",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Visible disclosure summary/action label.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "disclosure-contract",
+        "title": "Disclosure heading + region",
+        "component": "DisclosureContractExample"
+      }
+    ]
   },
   {
     "id": "Divider",
@@ -3066,8 +3072,8 @@
     "order": 50,
     "summary": "Generic semantic list collection with optional separators.",
     "usage": "Own collection structure, not application data fetching or virtualization.",
-    "status": "candidate",
-    "accessibility": "Exposes list/listitem semantics through ListItem children.",
+    "status": "accepted",
+    "accessibility": "Uses native ul/li collection semantics and explicit loading/empty/error replacement-state announcements.",
     "rtl": "Collection flow inherits logical direction.",
     "touch": "Interactive children own their target policy.",
     "responsive": "Fills available inline size without viewport assumptions.",
@@ -3077,7 +3083,7 @@
         "name": "divided",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Draws lightweight separators between direct ListItem children.",
         "deprecated": false,
         "default": "false"
       },
@@ -3085,12 +3091,42 @@
         "name": "label",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible collection name when surrounding context does not already label the list.",
+        "deprecated": false,
+        "default": null
+      },
+      {
+        "name": "state",
+        "type": "ListState",
+        "optional": true,
+        "description": "Predictable collection replacement state.",
+        "deprecated": false,
+        "default": "ready"
+      },
+      {
+        "name": "stateContent",
+        "type": "ReactNode",
+        "optional": true,
+        "description": "Caller-owned visible replacement content for non-ready states.",
+        "deprecated": false,
+        "default": null
+      },
+      {
+        "name": "stateLabel",
+        "type": "string",
+        "optional": true,
+        "description": "Accessible state label used when replacement content is not self-describing.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "collection-contract",
+        "title": "Semantic list collection",
+        "component": "DataListContractExample"
+      }
+    ]
   },
   {
     "id": "ListItem",
@@ -3100,8 +3136,8 @@
     "order": 50,
     "summary": "Generic static or actionable data row with leading, copy, metadata and trailing regions.",
     "usage": "Use for settings, results, choices and data rows; product data ownership stays outside the component.",
-    "status": "candidate",
-    "accessibility": "Static rows preserve list semantics; actionable rows use a native button with optional current-state exposure.",
+    "status": "accepted",
+    "accessibility": "Native li rows preserve list semantics; actionable rows use one sibling primary button so trailing controls can never nest inside it.",
     "rtl": "Leading/trailing and metadata placement follow logical inline order.",
     "touch": "Action rows keep the platform minimum touch target.",
     "responsive": "Copy truncates safely while metadata/trailing regions remain bounded.",
@@ -3111,7 +3147,7 @@
         "name": "actionAriaKeyShortcuts",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional keyboard shortcut metadata for the primary row action.",
         "deprecated": false,
         "default": null
       },
@@ -3119,7 +3155,7 @@
         "name": "actionLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional explicit accessible name for the primary row action.",
         "deprecated": false,
         "default": null
       },
@@ -3127,7 +3163,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Disables the primary row action without disabling independent trailing controls.",
         "deprecated": false,
         "default": "false"
       },
@@ -3135,7 +3171,7 @@
         "name": "leading",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional decorative/semantic leading content.",
         "deprecated": false,
         "default": null
       },
@@ -3143,7 +3179,7 @@
         "name": "metadata",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional bounded metadata rendered separately from the primary action.",
         "deprecated": false,
         "default": null
       },
@@ -3151,7 +3187,7 @@
         "name": "onActivate",
         "type": "() => void",
         "optional": true,
-        "description": "",
+        "description": "Turns the main row surface into a native button action.",
         "deprecated": false,
         "default": null
       },
@@ -3159,7 +3195,7 @@
         "name": "primary",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Primary visible row label.",
         "deprecated": false,
         "default": null
       },
@@ -3167,7 +3203,7 @@
         "name": "secondary",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional supporting copy.",
         "deprecated": false,
         "default": null
       },
@@ -3175,7 +3211,7 @@
         "name": "selected",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Visual selected state.",
         "deprecated": false,
         "default": "false"
       },
@@ -3183,24 +3219,24 @@
         "name": "selectionSemantics",
         "type": "'visual' | 'current'",
         "optional": true,
-        "description": "",
+        "description": "Whether selected state is visual-only or denotes the current item.",
         "deprecated": false,
-        "default": "'visual'"
+        "default": "visual"
       },
       {
         "name": "trailing",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional trailing content rendered as a sibling of the primary action so nested interactivity is impossible.",
         "deprecated": false,
         "default": null
       }
     ],
     "examples": [
       {
-        "id": "overview",
-        "title": "List rows",
-        "component": "DataListExample"
+        "id": "collection-contract",
+        "title": "Semantic list collection",
+        "component": "DataListContractExample"
       }
     ]
   },
@@ -3212,8 +3248,8 @@
     "order": 50,
     "summary": "Labeled collection section with description and trailing utility region.",
     "usage": "Group related list content without embedding product-specific section models.",
-    "status": "candidate",
-    "accessibility": "Section heading is programmatically associated with its content.",
+    "status": "accepted",
+    "accessibility": "Uses a native section plus semantic Heading and description relationships.",
     "rtl": "Header copy and trailing utility use logical order.",
     "touch": "No private interaction ownership.",
     "responsive": "Header regions wrap inside narrow containers.",
@@ -3223,7 +3259,7 @@
         "name": "children",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Collection content, normally one or more List instances.",
         "deprecated": false,
         "default": null
       },
@@ -3231,15 +3267,23 @@
         "name": "description",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Supporting text associated with the section.",
         "deprecated": false,
         "default": null
+      },
+      {
+        "name": "headingLevel",
+        "type": "2 | 3 | 4 | 5 | 6",
+        "optional": true,
+        "description": "Semantic heading rank for the section title.",
+        "deprecated": false,
+        "default": "3"
       },
       {
         "name": "title",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional section heading.",
         "deprecated": false,
         "default": null
       },
@@ -3247,12 +3291,18 @@
         "name": "trailing",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Caller-owned utility content rendered beside the heading.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "collection-contract",
+        "title": "Semantic list collection",
+        "component": "DataListContractExample"
+      }
+    ]
   },
   {
     "id": "ListSeparator",
@@ -3262,8 +3312,8 @@
     "order": 50,
     "summary": "List-aware separator with full or content inset.",
     "usage": "Use inside list collections when visual grouping needs an explicit divider.",
-    "status": "candidate",
-    "accessibility": "Uses the semantic Divider primitive.",
+    "status": "accepted",
+    "accessibility": "Renders a presentation-only list row containing the decorative Divider so listitem counts remain accurate.",
     "rtl": "Content inset is logical, not left/right specific.",
     "touch": "Non-interactive.",
     "responsive": "Tracks collection width.",
@@ -3273,12 +3323,18 @@
         "name": "inset",
         "type": "'none' | 'content'",
         "optional": true,
-        "description": "",
+        "description": "Logical inset policy for the visual divider.",
         "deprecated": false,
-        "default": "'content'"
+        "default": "content"
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "collection-contract",
+        "title": "Semantic list collection",
+        "component": "DataListContractExample"
+      }
+    ]
   },
   {
     "id": "Menu",
@@ -3780,20 +3836,20 @@
     "layer": "components",
     "category": "Selection",
     "order": 20,
-    "summary": "Native radio choice that receives value ownership from RadioGroup.",
-    "usage": "Render only inside RadioGroup and provide a unique string value plus visible label.",
-    "status": "candidate",
-    "accessibility": "Native radio semantics, shared name and group ownership preserve expected keyboard/AT behavior.",
-    "rtl": "Indicator and label order follows logical direction.",
-    "touch": "The full label row activates the radio.",
-    "responsive": "Description copy may wrap without shrinking the indicator target.",
+    "summary": "Native radio choice whose selected value is owned by RadioGroup.",
+    "usage": "Render only inside RadioGroup with a unique value and visible label.",
+    "status": "accepted",
+    "accessibility": "Native radio keyboard, checked and label/description relationships remain browser-owned.",
+    "rtl": "Indicator/copy order is logical.",
+    "touch": "Whole labelled row activates.",
+    "responsive": "Description wraps independently.",
     "playground": null,
     "props": [
       {
         "name": "description",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional supporting description associated with the control.",
         "deprecated": false,
         "default": null
       },
@@ -3801,7 +3857,7 @@
         "name": "label",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Visible control label and accessible name source.",
         "deprecated": false,
         "default": null
       },
@@ -3809,20 +3865,26 @@
         "name": "size",
         "type": "ControlSize",
         "optional": true,
-        "description": "",
+        "description": "Shared control target scale.",
         "deprecated": false,
-        "default": "'md'"
+        "default": "md"
       },
       {
         "name": "value",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Stable native radio value owned by the surrounding RadioGroup.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "native-contract",
+        "title": "Native selection + form reset",
+        "component": "SelectionNativeContractExample"
+      }
+    ]
   },
   {
     "id": "RadioGroup",
@@ -3830,20 +3892,20 @@
     "layer": "components",
     "category": "Selection",
     "order": 20,
-    "summary": "Mutually-exclusive selection owner for native Radio items.",
-    "usage": "Own one related set of Radio values and its accessible group label.",
-    "status": "candidate",
-    "accessibility": "Exposes radiogroup semantics while Radio preserves native radio behavior and keyboard support.",
-    "rtl": "Horizontal and vertical groups follow logical document flow.",
-    "touch": "Every Radio row is a full touch target.",
-    "responsive": "Vertical groups wrap copy naturally; horizontal groups may wrap through surrounding layout composition.",
+    "summary": "Mutually-exclusive native Radio owner with controlled/uncontrolled value and native form-reset recovery.",
+    "usage": "Own one related Radio set and a stable accessible group name; use SegmentedControl for compact mode selection.",
+    "status": "accepted",
+    "accessibility": "Radiogroup semantics wrap native radio controls with shared naming and read-only/disabled policy.",
+    "rtl": "Horizontal and vertical groups preserve logical order.",
+    "touch": "Every child Radio row is the activation target.",
+    "responsive": "Copy reflows naturally.",
     "playground": null,
     "props": [
       {
         "name": "defaultValue",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Initial uncontrolled selected value and form-reset target.",
         "deprecated": false,
         "default": null
       },
@@ -3851,7 +3913,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Disables every child Radio.",
         "deprecated": false,
         "default": "false"
       },
@@ -3859,7 +3921,7 @@
         "name": "label",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Accessible name for the mutually-exclusive group.",
         "deprecated": false,
         "default": null
       },
@@ -3867,7 +3929,7 @@
         "name": "name",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Native radio name shared by child Radio controls.",
         "deprecated": false,
         "default": null
       },
@@ -3875,7 +3937,7 @@
         "name": "onValueChange",
         "type": "(value: string) => void",
         "optional": true,
-        "description": "",
+        "description": "Reports committed selection changes.",
         "deprecated": false,
         "default": null
       },
@@ -3883,15 +3945,15 @@
         "name": "orientation",
         "type": "'horizontal' | 'vertical'",
         "optional": true,
-        "description": "",
+        "description": "Visual/group flow axis.",
         "deprecated": false,
-        "default": "'vertical'"
+        "default": "vertical"
       },
       {
         "name": "readOnly",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Prevents selection changes while preserving group readability.",
         "deprecated": false,
         "default": "false"
       },
@@ -3899,12 +3961,18 @@
         "name": "value",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Controlled selected value.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "native-contract",
+        "title": "Native selection + form reset",
+        "component": "SelectionNativeContractExample"
+      }
+    ]
   },
   {
     "id": "ReplaceTransition",
@@ -4494,12 +4562,7 @@
     "responsive": "Fits narrow toolbars/containers without shrinking trailing actions below their target contract.",
     "playground": {
       "preferredWidth": "medium",
-      "controls": [
-        "value",
-        "disabled",
-        "readOnly",
-        "suggestionsAvailable"
-      ],
+      "controls": ["value", "disabled", "readOnly", "suggestionsAvailable"],
       "fixture": {
         "value": "Launcher",
         "label": "Search applications",
@@ -4731,36 +4794,20 @@
     "layer": "components",
     "category": "Selection",
     "order": 20,
-    "summary": "Compact mutually-exclusive action/selection group with shared roving focus.",
-    "usage": "Use for a small set of peer modes or views; do not use as application navigation.",
-    "status": "candidate",
-    "accessibility": "Radiogroup/radio semantics pair selection with shared keyboard roving focus.",
-    "rtl": "Arrow navigation and item order resolve through logical direction.",
-    "touch": "Every segment keeps the component control target policy.",
-    "responsive": "Can remain intrinsic or fill the available inline size.",
-    "playground": {
-      "preferredWidth": "medium",
-      "fixture": {
-        "label": "View",
-        "options": [
-          {
-            "value": "grid",
-            "label": "Grid"
-          },
-          {
-            "value": "list",
-            "label": "List"
-          }
-        ],
-        "defaultValue": "grid"
-      }
-    },
+    "summary": "Compact single-selection radiogroup with controlled/uncontrolled normalization and logical roving focus.",
+    "usage": "Use for a small peer set of modes/views, not application routing.",
+    "status": "accepted",
+    "accessibility": "Radiogroup/radio semantics keep one selected option and one roving tab stop even after invalid controlled input.",
+    "rtl": "Horizontal roving follows logical direction.",
+    "touch": "Each segment preserves target policy.",
+    "responsive": "Intrinsic or full-width.",
+    "playground": null,
     "props": [
       {
         "name": "defaultValue",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Initial uncontrolled selected value.",
         "deprecated": false,
         "default": null
       },
@@ -4768,7 +4815,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Disables every segment.",
         "deprecated": false,
         "default": "false"
       },
@@ -4776,7 +4823,7 @@
         "name": "fullWidth",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Expands segments evenly across the available inline size.",
         "deprecated": false,
         "default": "false"
       },
@@ -4784,7 +4831,7 @@
         "name": "label",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Accessible name for the single-selection segment group.",
         "deprecated": false,
         "default": null
       },
@@ -4792,7 +4839,7 @@
         "name": "onValueChange",
         "type": "(value: string) => void",
         "optional": true,
-        "description": "",
+        "description": "Reports committed single-selection changes.",
         "deprecated": false,
         "default": null
       },
@@ -4800,7 +4847,7 @@
         "name": "options",
         "type": "readonly ToggleOption[]",
         "optional": false,
-        "description": "",
+        "description": "Ordered peer modes/options.",
         "deprecated": false,
         "default": null
       },
@@ -4808,20 +4855,26 @@
         "name": "size",
         "type": "ControlSize",
         "optional": true,
-        "description": "",
+        "description": "Shared control target scale.",
         "deprecated": false,
-        "default": "'md'"
+        "default": "md"
       },
       {
         "name": "value",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Controlled selected value. Invalid/disabled values recover visually to the first enabled option.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "group-contract",
+        "title": "Segmented + independent toggle groups",
+        "component": "SelectionGroupContractExample"
+      }
+    ]
   },
   {
     "id": "Select",
@@ -4829,20 +4882,16 @@
     "layer": "components",
     "category": "Fields",
     "order": 30,
-    "summary": "Choice field using the shared field frame plus the common floating, overlay and roving-focus services.",
-    "usage": "Use for a bounded option set. Searchable combobox behavior is intentionally not bundled into Select until a capability demand requires it.",
-    "status": "candidate",
-    "accessibility": "Trigger exposes listbox state; options use selected/disabled semantics and keyboard selection.",
-    "rtl": "Floating placement and trigger geometry resolve through the shared direction-aware services.",
-    "touch": "Trigger and options use touch-safe Component sizing without a private pointer engine.",
-    "responsive": "Popup width tracks the trigger minimum while remaining viewport-collision safe.",
+    "summary": "Bounded native-form choice field backed by the shared field frame, overlay authority and Unicode typeahead controller.",
+    "usage": "Use for a finite option set. The trigger retains focus while aria-activedescendant tracks the listbox; searchable combobox behavior stays out of this primitive.",
+    "status": "accepted",
+    "accessibility": "Combobox/listbox relationships, active-descendant, disabled options, required validity and visible-trigger focus restoration are explicit.",
+    "rtl": "Floating placement and trigger/listbox geometry resolve through shared direction-aware services.",
+    "touch": "Trigger and options preserve Component target sizing without private pointer ownership.",
+    "responsive": "Popup width follows the trigger minimum while shared collision handling keeps it inside the viewport.",
     "playground": {
       "preferredWidth": "medium",
-      "controls": [
-        "value",
-        "disabled",
-        "required"
-      ],
+      "controls": ["value", "disabled", "required"],
       "fixture": {
         "label": "Density",
         "value": "comfortable",
@@ -4863,7 +4912,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Structural class hook.",
         "deprecated": false,
         "default": "''"
       },
@@ -4871,7 +4920,7 @@
         "name": "defaultOpen",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Initial uncontrolled popup state.",
         "deprecated": false,
         "default": "false"
       },
@@ -4879,7 +4928,7 @@
         "name": "defaultValue",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Initial uncontrolled selected value and native form-reset target.",
         "deprecated": false,
         "default": "''"
       },
@@ -4919,7 +4968,7 @@
         "name": "form",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional external native form id for the validity proxy.",
         "deprecated": false,
         "default": null
       },
@@ -4935,7 +4984,7 @@
         "name": "id",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Stable visible trigger/control id.",
         "deprecated": false,
         "default": null
       },
@@ -4967,7 +5016,7 @@
         "name": "name",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Native form field name projected through the validity proxy.",
         "deprecated": false,
         "default": null
       },
@@ -4975,7 +5024,7 @@
         "name": "onOpenChange",
         "type": "(open: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "Reports popup state changes.",
         "deprecated": false,
         "default": null
       },
@@ -4983,7 +5032,7 @@
         "name": "onValueChange",
         "type": "(value: string) => void",
         "optional": true,
-        "description": "",
+        "description": "Reports committed option changes.",
         "deprecated": false,
         "default": null
       },
@@ -4991,7 +5040,7 @@
         "name": "open",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Controlled popup state.",
         "deprecated": false,
         "default": null
       },
@@ -5007,7 +5056,7 @@
         "name": "options",
         "type": "readonly SelectOption[]",
         "optional": false,
-        "description": "",
+        "description": "Bounded option set rendered through the shared listbox overlay.",
         "deprecated": false,
         "default": null
       },
@@ -5015,9 +5064,9 @@
         "name": "placeholder",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Visible text when no option is selected.",
         "deprecated": false,
-        "default": "'Select an option'"
+        "default": "Select an option"
       },
       {
         "name": "prefix",
@@ -5071,17 +5120,17 @@
         "name": "value",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Controlled selected option value.",
         "deprecated": false,
         "default": null
       }
     ],
     "examples": [
       {
-        "id": "overview",
-        "title": "Choice field",
-        "description": "A bounded choice field without a second popup implementation.",
-        "component": "SelectExample"
+        "id": "contract",
+        "title": "Typeahead + native form contract",
+        "description": "Required validity, reset, disabled options and trigger-retained listbox interaction share one selection owner.",
+        "component": "SelectContractExample"
       }
     ]
   },
@@ -5346,10 +5395,10 @@
     "summary": "Single numeric value control with shared pan ownership, keyboard steps, logical RTL direction and optional marks.",
     "usage": "Use for bounded numeric adjustment when direct manipulation is more useful than text entry.",
     "status": "candidate",
-    "accessibility": "Exposes slider value/min/max/orientation semantics and full keyboard stepping including Home/End/Page keys.",
-    "rtl": "Horizontal value growth and arrow behavior resolve in logical direction; vertical values grow block-end to block-start.",
-    "touch": "Track and thumb use the shared pan arena with an enlarged interaction target.",
-    "responsive": "Horizontal slider fills its available container; vertical mode owns a stable minimum block size.",
+    "accessibility": "Exposes slider value/min/max/orientation semantics and Home/End/Page keys.",
+    "rtl": "Horizontal arrows/value growth are logical.",
+    "touch": "Uses shared pan arena.",
+    "responsive": "Fills its container.",
     "playground": null,
     "props": [
       {
@@ -5669,22 +5718,10 @@
     "responsive": "Intrinsic; hero keeps the same brand geometry with a stronger display-scale stroke treatment.",
     "playground": {
       "preferredWidth": "wide",
-      "controls": [
-        "size",
-        "renderer",
-        "announce"
-      ],
+      "controls": ["size", "renderer", "announce"],
       "options": {
-        "size": [
-          "sm",
-          "md",
-          "lg",
-          "hero"
-        ],
-        "renderer": [
-          "svg",
-          "canvas"
-        ]
+        "size": ["sm", "md", "lg", "hero"],
+        "renderer": ["svg", "canvas"]
       },
       "fixture": {
         "size": "hero",
@@ -5984,20 +6021,20 @@
     "layer": "components",
     "category": "Selection",
     "order": 20,
-    "summary": "Immediate on/off setting with controlled/uncontrolled state and shared horizontal pan gesture support.",
-    "usage": "Use for settings that take effect immediately; use Checkbox for form-style selection.",
-    "status": "candidate",
-    "accessibility": "Uses role=switch with aria-checked/read-only and native button keyboard activation.",
-    "rtl": "Thumb geometry and drag direction resolve against the active UiRoot direction.",
-    "touch": "Tap and drag share the central gesture arena rather than private pointer ownership.",
-    "responsive": "Label/support copy wraps independently from the fixed-size switch affordance.",
+    "summary": "Immediate on/off setting with controlled/uncontrolled state and realm-owned shared pan gesture support.",
+    "usage": "Use for settings that take effect immediately; use Checkbox for submitted form choices.",
+    "status": "accepted",
+    "accessibility": "Role=switch and aria-checked expose state while the visible label activates the native button.",
+    "rtl": "Drag direction resolves against UiRoot logical direction.",
+    "touch": "Tap and pan share Gesture Arena ownership.",
+    "responsive": "Copy wraps beside fixed affordance.",
     "playground": null,
     "props": [
       {
         "name": "checked",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Controlled on/off state.",
         "deprecated": false,
         "default": null
       },
@@ -6005,7 +6042,7 @@
         "name": "defaultChecked",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Initial uncontrolled on/off state.",
         "deprecated": false,
         "default": "false"
       },
@@ -6013,7 +6050,7 @@
         "name": "description",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional supporting description associated with the control.",
         "deprecated": false,
         "default": null
       },
@@ -6021,7 +6058,7 @@
         "name": "label",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Visible control label and accessible name source.",
         "deprecated": false,
         "default": null
       },
@@ -6029,7 +6066,7 @@
         "name": "onCheckedChange",
         "type": "(checked: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "Reports committed switch-state changes.",
         "deprecated": false,
         "default": null
       },
@@ -6037,7 +6074,7 @@
         "name": "readOnly",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Prevents tap/drag mutation while preserving switch semantics.",
         "deprecated": false,
         "default": "false"
       },
@@ -6045,12 +6082,18 @@
         "name": "size",
         "type": "ControlSize",
         "optional": true,
-        "description": "",
+        "description": "Shared control target scale.",
         "deprecated": false,
-        "default": "'md'"
+        "default": "md"
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "state-contract",
+        "title": "Switch + toggle state",
+        "component": "SelectionStateContractExample"
+      }
+    ]
   },
   {
     "id": "SystemApplicationBrowser",
@@ -7481,8 +7524,8 @@
     "order": 40,
     "summary": "Companion panel for Tabs with explicit selected-value and labelled-by relationships.",
     "usage": "Pair with tabRelationshipIds so the tab and panel IDs stay deterministic without hand-built strings.",
-    "status": "candidate",
-    "accessibility": "Uses tabpanel semantics, aria-labelledby and hidden state while preserving optional mounted content.",
+    "status": "accepted",
+    "accessibility": "Uses tabpanel semantics with deterministic idBase-derived relationships or caller-supplied ids, plus optional mounted hidden content.",
     "rtl": "Content direction inherits from the surrounding UiRoot.",
     "touch": "Non-interactive container; descendants own interaction.",
     "responsive": "Fills available container space without viewport assumptions.",
@@ -7492,7 +7535,15 @@
         "name": "activeValue",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Currently selected tab value.",
+        "deprecated": false,
+        "default": null
+      },
+      {
+        "name": "idBase",
+        "type": "string",
+        "optional": true,
+        "description": "Shared base used to derive this panel id and owning tab id.",
         "deprecated": false,
         "default": null
       },
@@ -7500,15 +7551,15 @@
         "name": "keepMounted",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Keeps inactive panel content mounted while remaining hidden.",
         "deprecated": false,
         "default": "false"
       },
       {
         "name": "labelledBy",
         "type": "string",
-        "optional": false,
-        "description": "",
+        "optional": true,
+        "description": "Id of the owning tab; may be omitted when idBase is supplied.",
         "deprecated": false,
         "default": null
       },
@@ -7516,12 +7567,18 @@
         "name": "value",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Value represented by this panel.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "tabs-contract",
+        "title": "Manual/automatic tabs",
+        "component": "TabsContractExample"
+      }
+    ]
   },
   {
     "id": "Tabs",
@@ -7531,27 +7588,17 @@
     "order": 40,
     "summary": "Roving-focus tab list with controlled/uncontrolled selection and automatic or manual activation.",
     "usage": "Use to switch peer views inside one context; application-wide navigation belongs to AdaptiveNavigation.",
-    "status": "candidate",
-    "accessibility": "Uses tablist/tab semantics with selected state and roving keyboard focus.",
+    "status": "accepted",
+    "accessibility": "Uses tablist/tab semantics with invalid-selection recovery, explicit orientation, selected state and one roving focus target.",
     "rtl": "Horizontal arrow traversal follows logical direction.",
     "touch": "Each tab retains the shared Button target policy.",
     "responsive": "The tab strip can scroll/clip within constrained containers without device detection.",
     "playground": {
       "preferredWidth": "medium",
-      "controls": [
-        "activationMode",
-        "size"
-      ],
+      "controls": ["activationMode", "size"],
       "options": {
-        "activationMode": [
-          "automatic",
-          "manual"
-        ],
-        "size": [
-          "sm",
-          "md",
-          "lg"
-        ]
+        "activationMode": ["automatic", "manual"],
+        "size": ["sm", "md", "lg"]
       },
       "fixture": {
         "label": "Workbench sections",
@@ -7577,15 +7624,23 @@
         "name": "activationMode",
         "type": "'automatic' | 'manual'",
         "optional": true,
-        "description": "",
+        "description": "Automatic selects on focus; manual keeps focus independent until activation.",
         "deprecated": false,
-        "default": "'automatic'"
+        "default": "automatic"
       },
       {
         "name": "defaultValue",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Initial uncontrolled selected value.",
+        "deprecated": false,
+        "default": null
+      },
+      {
+        "name": "idBase",
+        "type": "string",
+        "optional": true,
+        "description": "Stable relationship base used to derive tab/panel ids when item ids are omitted.",
         "deprecated": false,
         "default": null
       },
@@ -7593,7 +7648,7 @@
         "name": "items",
         "type": "readonly TabItem[]",
         "optional": false,
-        "description": "",
+        "description": "Peer tab definitions; disabled items remain visible but leave roving focus.",
         "deprecated": false,
         "default": null
       },
@@ -7601,7 +7656,7 @@
         "name": "label",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Accessible name for the tab list.",
         "deprecated": false,
         "default": null
       },
@@ -7609,32 +7664,40 @@
         "name": "onValueChange",
         "type": "(value: string) => void",
         "optional": true,
-        "description": "",
+        "description": "Reports committed tab selection changes.",
         "deprecated": false,
         "default": null
+      },
+      {
+        "name": "orientation",
+        "type": "'horizontal' | 'vertical'",
+        "optional": true,
+        "description": "Keyboard-roving axis and aria-orientation.",
+        "deprecated": false,
+        "default": "horizontal"
       },
       {
         "name": "size",
         "type": "'sm' | 'md' | 'lg'",
         "optional": true,
-        "description": "",
+        "description": "Shared Button-family control scale.",
         "deprecated": false,
-        "default": "'md'"
+        "default": "md"
       },
       {
         "name": "value",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Controlled selected value. Invalid/disabled values recover visually to the first enabled tab.",
         "deprecated": false,
         "default": null
       }
     ],
     "examples": [
       {
-        "id": "overview",
-        "title": "Tabs + navigation",
-        "component": "NavigationExample"
+        "id": "tabs-contract",
+        "title": "Manual/automatic tabs",
+        "component": "TabsContractExample"
       }
     ]
   },
@@ -8103,18 +8166,18 @@
     "order": 50,
     "summary": "Generic static or actionable tile with copy, leading/trailing content, badge and selected/pending states.",
     "usage": "Use where list rows are too linear and a grid-friendly item is appropriate.",
-    "status": "candidate",
-    "accessibility": "Actionable tiles use shared Button semantics; selection is visual by default or can opt into aria-current without pretending every selected tile is a toggle button.",
+    "status": "accepted",
+    "accessibility": "Actionable tiles use shared Button semantics with trailing controls kept as siblings; selection is visual by default or can explicitly expose aria-current.",
     "rtl": "Leading/trailing and copy order are logical.",
     "touch": "Actionable tiles use shared Button press and minimum-target behavior.",
-    "responsive": "Tile copy wraps/truncates inside responsive TileGrid columns.",
+    "responsive": "Long/localized copy remains bounded inside responsive TileGrid columns.",
     "playground": null,
     "props": [
       {
         "name": "badge",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional bounded badge/metadata.",
         "deprecated": false,
         "default": null
       },
@@ -8122,7 +8185,7 @@
         "name": "description",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional supporting copy.",
         "deprecated": false,
         "default": null
       },
@@ -8130,7 +8193,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Disables the primary tile action.",
         "deprecated": false,
         "default": "false"
       },
@@ -8138,7 +8201,7 @@
         "name": "leading",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional leading visual/content.",
         "deprecated": false,
         "default": null
       },
@@ -8146,7 +8209,7 @@
         "name": "onActivate",
         "type": "() => void",
         "optional": true,
-        "description": "",
+        "description": "Turns the tile primary surface into an actionable Button.",
         "deprecated": false,
         "default": null
       },
@@ -8154,7 +8217,7 @@
         "name": "pending",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Pending action state using the shared Button loading contract.",
         "deprecated": false,
         "default": "false"
       },
@@ -8162,15 +8225,15 @@
         "name": "pendingLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible loading name while pending.",
         "deprecated": false,
-        "default": "'Working'"
+        "default": "Working"
       },
       {
         "name": "selected",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Visual selected state.",
         "deprecated": false,
         "default": "false"
       },
@@ -8178,15 +8241,15 @@
         "name": "selectionSemantics",
         "type": "'visual' | 'current'",
         "optional": true,
-        "description": "",
+        "description": "Whether selection is visual-only or denotes the current item.",
         "deprecated": false,
-        "default": "'visual'"
+        "default": "visual"
       },
       {
         "name": "tabIndex",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Explicit roving tab index supplied by TileGrid.",
         "deprecated": false,
         "default": null
       },
@@ -8194,7 +8257,7 @@
         "name": "title",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Visible tile title.",
         "deprecated": false,
         "default": null
       },
@@ -8202,12 +8265,18 @@
         "name": "trailing",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional trailing control/content rendered outside the primary tile action.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "spatial-grid",
+        "title": "Measured spatial tile navigation",
+        "component": "TileGridContractExample"
+      }
+    ]
   },
   {
     "id": "TileGrid",
@@ -8217,9 +8286,9 @@
     "order": 50,
     "summary": "Responsive collection grid for tiles/application items with named density contracts.",
     "usage": "Use for reusable tile collections; Launcher composition and product filtering remain System UI/application responsibilities.",
-    "status": "candidate",
-    "accessibility": "A labelled group keeps one Tab entry when spatial keyboard navigation is enabled; arrow keys choose the nearest tile in the requested 2D direction while each tile keeps native control semantics.",
-    "rtl": "Grid placement follows logical document direction.",
+    "status": "accepted",
+    "accessibility": "A labelled group keeps one roving Tab entry when spatial navigation is enabled; owner-realm geometry chooses the nearest enabled tile for arrows/Home/End.",
+    "rtl": "Grid placement follows logical direction and horizontal spatial arrows reverse logically.",
     "touch": "Grid sizing keeps interactive tiles large enough for coarse pointers.",
     "responsive": "Columns derive from actual container width through CSS grid rather than device detection.",
     "playground": null,
@@ -8228,15 +8297,15 @@
         "name": "density",
         "type": "'compact' | 'comfortable' | 'roomy'",
         "optional": true,
-        "description": "",
+        "description": "Named density preset for responsive grid tracks.",
         "deprecated": false,
-        "default": "'comfortable'"
+        "default": "comfortable"
       },
       {
         "name": "keyboardNavigation",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Enables measured 2D arrow/Home/End navigation with one roving tab stop.",
         "deprecated": false,
         "default": "false"
       },
@@ -8244,12 +8313,18 @@
         "name": "label",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional accessible group name.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "spatial-grid",
+        "title": "Measured spatial tile navigation",
+        "component": "TileGridContractExample"
+      }
+    ]
   },
   {
     "id": "ToastHost",
@@ -8315,8 +8390,8 @@
     "order": 10,
     "summary": "Button-family toggle action with controlled or uncontrolled pressed state.",
     "usage": "Use for independent on/off actions that should expose aria-pressed rather than choice-field semantics.",
-    "status": "candidate",
-    "accessibility": "Uses native button semantics plus aria-pressed and the same focus/disabled behavior as Button.",
+    "status": "accepted",
+    "accessibility": "Uses native button semantics plus aria-pressed; consumer cancellation is honored before pressed state mutates.",
     "rtl": "Content slots remain logical and state semantics are direction-independent.",
     "touch": "Uses the Button target and shared press-state contract.",
     "responsive": "Shares Button sizing and full-width behavior.",
@@ -8326,7 +8401,7 @@
         "name": "defaultPressed",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Initial uncontrolled pressed state.",
         "deprecated": false,
         "default": "false"
       },
@@ -8398,7 +8473,7 @@
         "name": "onPressedChange",
         "type": "(pressed: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "Reports committed pressed-state changes after consumer cancellation is honored.",
         "deprecated": false,
         "default": null
       },
@@ -8406,7 +8481,7 @@
         "name": "pressed",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Controlled pressed state exposed through aria-pressed.",
         "deprecated": false,
         "default": null
       },
@@ -8443,7 +8518,13 @@
         "default": "quiet"
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "toggle-contract",
+        "title": "Independent pressed action",
+        "component": "ToggleButtonContractExample"
+      }
+    ]
   },
   {
     "id": "ToggleGroup",
@@ -8451,36 +8532,20 @@
     "layer": "components",
     "category": "Selection",
     "order": 20,
-    "summary": "Multi-toggle grouping built from ToggleButton with shared roving focus and immutable value arrays.",
-    "usage": "Use for a small collection of independent toggles that benefit from group labeling and keyboard traversal.",
-    "status": "candidate",
-    "accessibility": "Group labeling plus aria-pressed on each ToggleButton communicates independent toggle state.",
-    "rtl": "Roving focus and content order follow logical direction.",
-    "touch": "Each member uses the Button-family touch target and press ownership.",
-    "responsive": "Wrap or constrain through parent layout; individual members keep minimum target size.",
-    "playground": {
-      "preferredWidth": "medium",
-      "fixture": {
-        "label": "View",
-        "options": [
-          {
-            "value": "grid",
-            "label": "Grid"
-          },
-          {
-            "value": "list",
-            "label": "List"
-          }
-        ],
-        "defaultValue": "grid"
-      }
-    },
+    "summary": "Independent multi-toggle group with immutable normalized values and one logical roving tab stop.",
+    "usage": "Use for a small labelled collection of independent aria-pressed actions.",
+    "status": "accepted",
+    "accessibility": "Group naming plus ToggleButton aria-pressed semantics expose each independent state.",
+    "rtl": "Roving focus follows logical direction.",
+    "touch": "Members inherit Button targets.",
+    "responsive": "Parent layout owns wrapping.",
+    "playground": null,
     "props": [
       {
         "name": "defaultValue",
         "type": "readonly string[]",
         "optional": true,
-        "description": "",
+        "description": "Initial uncontrolled pressed-value set.",
         "deprecated": false,
         "default": null
       },
@@ -8488,7 +8553,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Disables every toggle member.",
         "deprecated": false,
         "default": "false"
       },
@@ -8496,7 +8561,7 @@
         "name": "label",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Accessible name for the independent-toggle cluster.",
         "deprecated": false,
         "default": null
       },
@@ -8504,7 +8569,7 @@
         "name": "onValueChange",
         "type": "(value: readonly string[]) => void",
         "optional": true,
-        "description": "",
+        "description": "Reports immutable normalized pressed-value arrays.",
         "deprecated": false,
         "default": null
       },
@@ -8512,7 +8577,7 @@
         "name": "options",
         "type": "readonly ToggleOption[]",
         "optional": false,
-        "description": "",
+        "description": "Ordered independent toggle options.",
         "deprecated": false,
         "default": null
       },
@@ -8520,20 +8585,26 @@
         "name": "size",
         "type": "ControlSize",
         "optional": true,
-        "description": "",
+        "description": "Shared Button-family control scale.",
         "deprecated": false,
-        "default": "'md'"
+        "default": "md"
       },
       {
         "name": "value",
         "type": "readonly string[]",
         "optional": true,
-        "description": "",
+        "description": "Controlled pressed-value set; unknown/disabled values are ignored visually.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "group-contract",
+        "title": "Segmented + independent toggle groups",
+        "component": "SelectionGroupContractExample"
+      }
+    ]
   },
   {
     "id": "Toolbar",

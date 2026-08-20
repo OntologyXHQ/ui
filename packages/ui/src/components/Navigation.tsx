@@ -1,4 +1,4 @@
-import type { FocusEvent as ReactFocusEvent, HTMLAttributes, ReactNode } from 'react';
+import type { HTMLAttributes, FocusEvent as ReactFocusEvent, ReactNode } from 'react';
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { normalizeSingleSelection, useRovingFocus } from '../interaction';
 import { Heading } from '../primitives';
@@ -23,12 +23,23 @@ export function tabRelationshipIds(baseId: string, value: string) {
 }
 
 export type TabsProps = Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> & {
+  /** Accessible name for the tab list. */
   label: string;
+  /** Peer tab definitions; disabled items remain visible but leave roving focus. */
   items: readonly TabItem[];
+  /** Controlled selected value. Invalid/disabled values recover visually to the first enabled tab. */
   value?: string;
+  /** Initial uncontrolled selected value. */
   defaultValue?: string;
+  /** Reports committed tab selection changes. */
   onValueChange?: (value: string) => void;
+  /** Automatic selects on focus; manual keeps focus independent until activation. @default automatic */
   activationMode?: 'automatic' | 'manual';
+  /** Keyboard-roving axis and aria-orientation. @default horizontal */
+  orientation?: 'horizontal' | 'vertical';
+  /** Stable relationship base used to derive tab/panel ids when item ids are omitted. */
+  idBase?: string;
+  /** Shared Button-family control scale. @default md */
   size?: 'sm' | 'md' | 'lg';
 };
 
@@ -37,15 +48,18 @@ export function Tabs({
   className = '',
   defaultValue,
   items,
+  idBase,
   label,
   onKeyDown,
   onValueChange,
+  orientation = 'horizontal',
   size = 'md',
   value,
   ...props
 }: TabsProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const generatedId = useId().replace(/:/g, '');
+  const relationshipBase = idBase ?? generatedId;
   const firstEnabled = normalizeSingleSelection(items, undefined) ?? '';
   const [current, setCurrent] = useControllableState({
     value,
@@ -60,7 +74,7 @@ export function Tabs({
   const onRovingKeyDown = useRovingFocus({
     containerRef: rootRef,
     itemSelector: '[role="tab"]:not(:disabled)',
-    orientation: 'horizontal',
+    orientation,
   });
 
   useEffect(() => {
@@ -76,6 +90,8 @@ export function Tabs({
       className={`ui-tabs ui-tabs--${size} ${className}`.trim()}
       role="tablist"
       aria-label={label}
+      aria-orientation={orientation}
+      data-orientation={orientation}
       onKeyDown={(event) => {
         onRovingKeyDown(event);
         onKeyDown?.(event);
@@ -83,7 +99,9 @@ export function Tabs({
     >
       {items.map((item) => {
         const selected = item.value === validSelected;
-        const tabId = item.id ?? (item.panelId ? `${generatedId}-tab-${safeDomId(item.value)}` : undefined);
+        const relationship = tabRelationshipIds(relationshipBase, item.value);
+        const tabId = item.id ?? relationship.tabId;
+        const panelId = item.panelId ?? (idBase ? relationship.panelId : undefined);
         return (
           <Button
             key={item.value}
@@ -93,7 +111,7 @@ export function Tabs({
             variant="quiet"
             role="tab"
             aria-selected={selected}
-            aria-controls={item.panelId}
+            aria-controls={panelId}
             tabIndex={item.value === rovingValue ? 0 : -1}
             disabled={item.disabled}
             data-value={item.value}
@@ -120,9 +138,15 @@ export function Tabs({
 }
 
 export type TabPanelProps = HTMLAttributes<HTMLDivElement> & {
+  /** Value represented by this panel. */
   value: string;
+  /** Currently selected tab value. */
   activeValue: string;
-  labelledBy: string;
+  /** Id of the owning tab; may be omitted when idBase is supplied. */
+  labelledBy?: string;
+  /** Shared base used to derive this panel id and owning tab id. */
+  idBase?: string;
+  /** Keeps inactive panel content mounted while remaining hidden. @default false */
   keepMounted?: boolean;
 };
 
@@ -130,17 +154,21 @@ export function TabPanel({
   value,
   activeValue,
   labelledBy,
+  idBase,
   keepMounted = false,
   children,
+  id,
   ...props
 }: TabPanelProps) {
   const active = value === activeValue;
+  const relationship = idBase ? tabRelationshipIds(idBase, value) : null;
   if (!active && !keepMounted) return null;
   return (
     <div
       {...props}
+      id={id ?? relationship?.panelId}
       role="tabpanel"
-      aria-labelledby={labelledBy}
+      aria-labelledby={labelledBy ?? relationship?.tabId}
       hidden={!active}
       tabIndex={active ? 0 : -1}
     >
@@ -150,19 +178,34 @@ export function TabPanel({
 }
 
 export type NavigationItem = {
+  /** Stable destination identity used for selection/current-page state. */
   value: string;
+  /** Visible destination label. */
   label: ReactNode;
+  /** Optional decorative leading icon. */
   icon?: ReactNode;
+  /** Optional bounded metadata/badge. */
   badge?: ReactNode;
+  /** Native link destination; when present the item renders as an anchor. */
+  href?: string;
+  /** Optional activation callback independent from selection ownership. */
+  onActivate?: () => void;
+  /** Removes the destination from activation/tab order while keeping it visible. */
   disabled?: boolean;
 };
 
 export type AdaptiveNavigationProps = Omit<HTMLAttributes<HTMLElement>, 'onChange'> & {
+  /** Accessible name for the navigation landmark. */
   label: string;
+  /** Destination definitions. Link items preserve native anchor navigation. */
   items: readonly NavigationItem[];
+  /** Controlled current destination. */
   value?: string;
+  /** Initial uncontrolled current destination. */
   defaultValue?: string;
+  /** Reports current-destination changes before caller routing policy runs. */
   onValueChange?: (value: string) => void;
+  /** Explicit presentation mode or container-adaptive auto mode. @default auto */
   mode?: 'auto' | 'bar' | 'rail' | 'drawer';
 };
 
@@ -193,7 +236,30 @@ export function AdaptiveNavigation({
       <div className="ui-navigation__items">
         {items.map((item) => {
           const selected = item.value === validSelected;
-          return (
+          return item.href ? (
+            <a
+              key={item.value}
+              className="ui-button ui-button--quiet ui-button--intent-neutral ui-button--md ui-navigation__item"
+              href={item.disabled ? undefined : item.href}
+              aria-current={selected ? 'page' : undefined}
+              aria-disabled={item.disabled || undefined}
+              tabIndex={item.disabled ? -1 : undefined}
+              data-selected={selected || undefined}
+              data-oxs-cursor-role={item.disabled ? 'not-allowed' : 'pointer'}
+              onClick={(event) => {
+                if (item.disabled) {
+                  event.preventDefault();
+                  return;
+                }
+                setCurrent(item.value);
+                item.onActivate?.();
+              }}
+            >
+              {item.icon ? <span className="ui-navigation__icon">{item.icon}</span> : null}
+              <span className="ui-navigation__label">{item.label}</span>
+              {item.badge ? <span className="ui-navigation__badge">{item.badge}</span> : null}
+            </a>
+          ) : (
             <Button
               key={item.value}
               className="ui-navigation__item"
@@ -202,7 +268,9 @@ export function AdaptiveNavigation({
               aria-current={selected ? 'page' : undefined}
               data-selected={selected || undefined}
               onClick={() => {
-                if (!item.disabled) setCurrent(item.value);
+                if (item.disabled) return;
+                setCurrent(item.value);
+                item.onActivate?.();
               }}
             >
               {item.icon ? <span className="ui-navigation__icon">{item.icon}</span> : null}

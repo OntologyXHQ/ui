@@ -4,9 +4,9 @@ import type {
   ForwardedRef,
   HTMLAttributes,
   InputHTMLAttributes,
-  KeyboardEvent as ReactKeyboardEvent,
   PointerEventHandler,
   PropsWithChildren,
+  KeyboardEvent as ReactKeyboardEvent,
   ReactNode,
 } from 'react';
 import {
@@ -29,7 +29,9 @@ import { ToggleButton } from './Button';
 import { useControllableState } from './controlState';
 
 export type SelectionLabelProps = {
+  /** Visible control label and accessible name source. */
   label: ReactNode;
+  /** Optional supporting description associated with the control. */
   description?: ReactNode;
 };
 
@@ -38,11 +40,17 @@ export type CheckboxProps = Omit<
   'checked' | 'defaultChecked' | 'onChange' | 'size' | 'type'
 > &
   SelectionLabelProps & {
+    /** Controlled checked state. */
     checked?: boolean;
+    /** Initial uncontrolled state and native form-reset target. @default false */
     defaultChecked?: boolean;
+    /** Reports committed checked-state changes. */
     onCheckedChange?: (checked: boolean) => void;
+    /** Exposes the native mixed state without inventing a third persisted value. @default false */
     indeterminate?: boolean;
+    /** Prevents mutation while preserving focus/read semantics. @default false */
     readOnly?: boolean;
+    /** Shared control target scale. @default md */
     size?: ControlSize;
   };
 
@@ -64,6 +72,9 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
   forwardedRef,
 ) {
   const localRef = useRef<HTMLInputElement | null>(null);
+  const controlId = `oxs-checkbox-${useId()}`;
+  const labelId = `${controlId}-label`;
+  const descriptionId = `${controlId}-description`;
   const [current, setCurrent] = useControllableState({
     value: checked,
     defaultValue: defaultChecked,
@@ -74,8 +85,20 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
     if (localRef.current) localRef.current.indeterminate = indeterminate;
   }, [indeterminate]);
 
+  useEffect(() => {
+    const form = localRef.current?.form;
+    if (!form || checked !== undefined) return;
+    const reset = () => setCurrent(defaultChecked);
+    form.addEventListener('reset', reset);
+    return () => form.removeEventListener('reset', reset);
+  }, [checked, defaultChecked, setCurrent]);
+
   return (
-    <label className={`ui-choice ui-choice--${size} ${className}`.trim()} data-disabled={disabled || undefined} data-oxs-cursor-role={disabled ? 'not-allowed' : readOnly ? 'default' : 'pointer'}>
+    <label
+      className={`ui-choice ui-choice--${size} ${className}`.trim()}
+      data-disabled={disabled || undefined}
+      data-oxs-cursor-role={disabled ? 'not-allowed' : readOnly ? 'default' : 'pointer'}
+    >
       <input
         {...props}
         ref={(node) => {
@@ -83,9 +106,12 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
           if (node) node.indeterminate = indeterminate;
           assignRef(forwardedRef, node);
         }}
+        id={controlId}
         className="ui-choice__native"
         type="checkbox"
         checked={current}
+        aria-labelledby={labelId}
+        aria-describedby={description ? descriptionId : undefined}
         disabled={disabled}
         aria-checked={indeterminate ? 'mixed' : current}
         aria-readonly={readOnly || undefined}
@@ -99,22 +125,39 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
         }}
       />
       <span className="ui-choice__indicator" aria-hidden>
-        {indeterminate ? <span className="ui-choice__mixed" /> : current ? <Icon name="check" size="sm" /> : null}
+        {indeterminate ? (
+          <span className="ui-choice__mixed" />
+        ) : current ? (
+          <Icon name="check" size="sm" />
+        ) : null}
       </span>
-      <ChoiceCopy label={label} description={description} />
+      <ChoiceCopy
+        label={label}
+        description={description}
+        labelId={labelId}
+        descriptionId={descriptionId}
+      />
     </label>
   );
 });
 
 export type RadioGroupProps = PropsWithChildren<
   Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> & {
+    /** Accessible name for the mutually-exclusive group. */
     label: string;
+    /** Controlled selected value. */
     value?: string;
+    /** Initial uncontrolled selected value and form-reset target. */
     defaultValue?: string;
+    /** Reports committed selection changes. */
     onValueChange?: (value: string) => void;
+    /** Native radio name shared by child Radio controls. */
     name?: string;
+    /** Visual/group flow axis. @default vertical */
     orientation?: 'horizontal' | 'vertical';
+    /** Disables every child Radio. @default false */
     disabled?: boolean;
+    /** Prevents selection changes while preserving group readability. @default false */
     readOnly?: boolean;
   }
 >;
@@ -144,11 +187,23 @@ export function RadioGroup({
   ...props
 }: RadioGroupProps) {
   const generatedName = useId();
+  const groupRef = useRef<HTMLDivElement | null>(null);
   const [current, setCurrent] = useControllableState<string>({
     value,
     defaultValue: defaultValue ?? '',
     onValueChange,
   });
+  useEffect(() => {
+    if (value !== undefined) return;
+    const form =
+      groupRef.current?.querySelector('input[type="radio"]')?.form ??
+      groupRef.current?.closest('form');
+    if (!form) return;
+    const reset = () => setCurrent(defaultValue ?? '');
+    form.addEventListener('reset', reset);
+    return () => form.removeEventListener('reset', reset);
+  }, [defaultValue, setCurrent, value]);
+
   const context = useMemo<RadioContextValue>(
     () => ({
       value: current,
@@ -164,6 +219,7 @@ export function RadioGroup({
     <RadioContext.Provider value={context}>
       <div
         {...props}
+        ref={groupRef}
         className={`ui-radio-group ui-radio-group--${orientation} ${className}`.trim()}
         role="radiogroup"
         aria-label={label}
@@ -182,39 +238,42 @@ export type RadioProps = Omit<
   'checked' | 'defaultChecked' | 'name' | 'onChange' | 'size' | 'type' | 'value'
 > &
   SelectionLabelProps & {
+    /** Stable native radio value owned by the surrounding RadioGroup. */
     value: string;
+    /** Shared control target scale. @default md */
     size?: ControlSize;
   };
 
 export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
-  {
-    className = '',
-    description,
-    disabled = false,
-    label,
-    onClick,
-    size = 'md',
-    value,
-    ...props
-  },
+  { className = '', description, disabled = false, label, onClick, size = 'md', value, ...props },
   ref,
 ) {
   const group = useContext(RadioContext);
   if (!group) throw new Error('Radio must render inside RadioGroup.');
   const unavailable = disabled || group.disabled;
   const checked = group.value === value;
+  const controlId = `oxs-radio-${useId()}`;
+  const labelId = `${controlId}-label`;
+  const descriptionId = `${controlId}-description`;
 
   return (
-    <label className={`ui-choice ui-choice--radio ui-choice--${size} ${className}`.trim()} data-disabled={unavailable || undefined} data-oxs-cursor-role={unavailable ? 'not-allowed' : group.readOnly ? 'default' : 'pointer'}>
+    <label
+      className={`ui-choice ui-choice--radio ui-choice--${size} ${className}`.trim()}
+      data-disabled={unavailable || undefined}
+      data-oxs-cursor-role={unavailable ? 'not-allowed' : group.readOnly ? 'default' : 'pointer'}
+    >
       <input
         {...props}
         ref={ref}
+        id={controlId}
         className="ui-choice__native"
         type="radio"
         name={group.name}
         value={value}
         checked={checked}
         disabled={unavailable}
+        aria-labelledby={labelId}
+        aria-describedby={description ? descriptionId : undefined}
         aria-readonly={group.readOnly || undefined}
         onClick={(event) => {
           if (group.readOnly) event.preventDefault();
@@ -227,7 +286,12 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
       <span className="ui-choice__indicator" aria-hidden>
         <span className="ui-choice__radio-dot" />
       </span>
-      <ChoiceCopy label={label} description={description} />
+      <ChoiceCopy
+        label={label}
+        description={description}
+        labelId={labelId}
+        descriptionId={descriptionId}
+      />
     </label>
   );
 });
@@ -237,10 +301,15 @@ export type SwitchProps = Omit<
   'aria-checked' | 'children' | 'onChange' | 'role' | 'type'
 > &
   SelectionLabelProps & {
+    /** Controlled on/off state. */
     checked?: boolean;
+    /** Initial uncontrolled on/off state. @default false */
     defaultChecked?: boolean;
+    /** Reports committed switch-state changes. */
     onCheckedChange?: (checked: boolean) => void;
+    /** Prevents tap/drag mutation while preserving switch semantics. @default false */
     readOnly?: boolean;
+    /** Shared control target scale. @default md */
     size?: ControlSize;
   };
 
@@ -287,7 +356,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch
       const resolved = resolveUiDirection(direction, localRef.current);
       const logicalTranslation = resolved === 'rtl' ? -sample.translation.x : sample.translation.x;
       setCurrent(logicalTranslation >= 0);
-      window.setTimeout(() => {
+      localRef.current?.ownerDocument.defaultView?.setTimeout(() => {
         draggedRef.current = false;
       }, 0);
     },
@@ -297,7 +366,10 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch
   });
 
   return (
-    <div className={`ui-switch-row ui-switch-row--${size} ${className}`.trim()} data-disabled={disabled || undefined}>
+    <div
+      className={`ui-switch-row ui-switch-row--${size} ${className}`.trim()}
+      data-disabled={disabled || undefined}
+    >
       <button
         {...props}
         ref={(node) => {
@@ -318,7 +390,10 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch
         onPointerDown={composeGesturePointerHandler(onPointerDown, pan.gestureProps.onPointerDown)}
         onPointerMove={composeGesturePointerHandler(onPointerMove, pan.gestureProps.onPointerMove)}
         onPointerUp={composeGesturePointerHandler(onPointerUp, pan.gestureProps.onPointerUp)}
-        onPointerCancel={composeGesturePointerHandler(onPointerCancel, pan.gestureProps.onPointerCancel)}
+        onPointerCancel={composeGesturePointerHandler(
+          onPointerCancel,
+          pan.gestureProps.onPointerCancel,
+        )}
         onLostPointerCapture={composeGesturePointerHandler(
           onLostPointerCapture,
           pan.gestureProps.onLostPointerCapture,
@@ -333,9 +408,19 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch
           <span className="ui-switch__thumb" />
         </span>
       </button>
-      <label htmlFor={controlId} className="ui-choice__copy ui-switch__copy" data-oxs-cursor-role={disabled ? 'not-allowed' : readOnly ? 'default' : 'pointer'}>
-        <span id={labelId} className="ui-choice__label">{label}</span>
-        {description ? <span id={descriptionId} className="ui-choice__description">{description}</span> : null}
+      <label
+        htmlFor={controlId}
+        className="ui-choice__copy ui-switch__copy"
+        data-oxs-cursor-role={disabled ? 'not-allowed' : readOnly ? 'default' : 'pointer'}
+      >
+        <span id={labelId} className="ui-choice__label">
+          {label}
+        </span>
+        {description ? (
+          <span id={descriptionId} className="ui-choice__description">
+            {description}
+          </span>
+        ) : null}
       </label>
     </div>
   );
@@ -411,7 +496,9 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(function Slider(
       ratio = (x - rect.left) / Math.max(1, rect.width);
       if (resolveUiDirection(direction, node) === 'rtl') ratio = 1 - ratio;
     }
-    setCurrent(normalizeSliderValue(lower + clamp01(ratio) * (upper - lower), lower, upper, safeStep));
+    setCurrent(
+      normalizeSliderValue(lower + clamp01(ratio) * (upper - lower), lower, upper, safeStep),
+    );
   };
 
   const pan = usePanGesture({
@@ -434,8 +521,10 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(function Slider(
     else if (event.key === 'PageDown') next = current - pageStep;
     else if (event.key === 'ArrowUp') next = current + safeStep;
     else if (event.key === 'ArrowDown') next = current - safeStep;
-    else if (event.key === 'ArrowRight') next = current + (resolved === 'rtl' ? -safeStep : safeStep);
-    else if (event.key === 'ArrowLeft') next = current + (resolved === 'rtl' ? safeStep : -safeStep);
+    else if (event.key === 'ArrowRight')
+      next = current + (resolved === 'rtl' ? -safeStep : safeStep);
+    else if (event.key === 'ArrowLeft')
+      next = current + (resolved === 'rtl' ? safeStep : -safeStep);
 
     if (next !== null) {
       event.preventDefault();
@@ -481,11 +570,29 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(function Slider(
         aria-readonly={readOnly || undefined}
         data-oxs-cursor-role={disabled ? 'not-allowed' : readOnly ? 'default' : 'pointer'}
         style={{ ...style, '--ui-slider-progress': `${progress}%` } as CSSProperties}
-        onPointerDown={composePointer(onPointerDown, gestureProps.onPointerDown as PointerEventHandler<HTMLElement>)}
-        onPointerMove={composePointer(onPointerMove, gestureProps.onPointerMove as PointerEventHandler<HTMLElement>)}
-        onPointerUp={composePointer(onPointerUp, gestureProps.onPointerUp as PointerEventHandler<HTMLElement>, false)}
-        onPointerCancel={composePointer(onPointerCancel, gestureProps.onPointerCancel as PointerEventHandler<HTMLElement>, false)}
-        onLostPointerCapture={composePointer(onLostPointerCapture, gestureProps.onLostPointerCapture as PointerEventHandler<HTMLElement>, false)}
+        onPointerDown={composePointer(
+          onPointerDown,
+          gestureProps.onPointerDown as PointerEventHandler<HTMLElement>,
+        )}
+        onPointerMove={composePointer(
+          onPointerMove,
+          gestureProps.onPointerMove as PointerEventHandler<HTMLElement>,
+        )}
+        onPointerUp={composePointer(
+          onPointerUp,
+          gestureProps.onPointerUp as PointerEventHandler<HTMLElement>,
+          false,
+        )}
+        onPointerCancel={composePointer(
+          onPointerCancel,
+          gestureProps.onPointerCancel as PointerEventHandler<HTMLElement>,
+          false,
+        )}
+        onLostPointerCapture={composePointer(
+          onLostPointerCapture,
+          gestureProps.onLostPointerCapture as PointerEventHandler<HTMLElement>,
+          false,
+        )}
         onClick={(event) => {
           onClick?.(event);
           if (!event.defaultPrevented) setFromPoint(event.clientX, event.clientY);
@@ -495,7 +602,8 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(function Slider(
         <span className="ui-slider__track" aria-hidden>
           <span className="ui-slider__fill" />
           {marks.map((mark) => {
-            const markProgress = upper === lower ? 0 : clamp01((mark.value - lower) / (upper - lower)) * 100;
+            const markProgress =
+              upper === lower ? 0 : clamp01((mark.value - lower) / (upper - lower)) * 100;
             return (
               <span
                 key={mark.value}
@@ -510,7 +618,14 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(function Slider(
       {marks.some((mark) => mark.label !== undefined) ? (
         <div className="ui-slider__labels" aria-hidden>
           {marks.map((mark) => (
-            <span key={mark.value} style={{ '--ui-slider-mark': `${(upper === lower ? 0 : clamp01((mark.value - lower) / (upper - lower)) * 100)}%` } as CSSProperties}>
+            <span
+              key={mark.value}
+              style={
+                {
+                  '--ui-slider-mark': `${upper === lower ? 0 : clamp01((mark.value - lower) / (upper - lower)) * 100}%`,
+                } as CSSProperties
+              }
+            >
               {mark.label}
             </span>
           ))}
@@ -521,20 +636,35 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(function Slider(
 });
 
 export type ToggleOption = {
+  /** Stable option identity. */
   value: string;
+  /** Visible option label. */
   label: ReactNode;
+  /** Optional decorative icon name. */
   icon?: IconName;
+  /** Keeps the option visible but removes mutation/focus. */
   disabled?: boolean;
 };
 
-export type SegmentedControlProps = Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> & {
+export type SegmentedControlProps = Omit<
+  HTMLAttributes<HTMLDivElement>,
+  'defaultValue' | 'onChange'
+> & {
+  /** Accessible name for the single-selection segment group. */
   label: string;
+  /** Ordered peer modes/options. */
   options: readonly ToggleOption[];
+  /** Controlled selected value. Invalid/disabled values recover visually to the first enabled option. */
   value?: string;
+  /** Initial uncontrolled selected value. */
   defaultValue?: string;
+  /** Reports committed single-selection changes. */
   onValueChange?: (value: string) => void;
+  /** Shared control target scale. @default md */
   size?: ControlSize;
+  /** Disables every segment. @default false */
   disabled?: boolean;
+  /** Expands segments evenly across the available inline size. @default false */
   fullWidth?: boolean;
 };
 
@@ -550,11 +680,20 @@ export function SegmentedControl({
   value,
   ...props
 }: SegmentedControlProps) {
-  const fallback = defaultValue ?? options.find((option) => !option.disabled)?.value ?? '';
-  const [current, setCurrent] = useControllableState({ value, defaultValue: fallback, onValueChange });
-  const rovingValue = options.some((option) => option.value === current && !option.disabled)
+  const firstEnabled = options.find((option) => !option.disabled)?.value ?? '';
+  const fallback = defaultValue ?? firstEnabled;
+  const [current, setCurrent] = useControllableState({
+    value,
+    defaultValue: fallback,
+    onValueChange,
+  });
+  const selectedValue = options.some((option) => option.value === current && !option.disabled)
     ? current
-    : options.find((option) => !option.disabled)?.value ?? '';
+    : firstEnabled;
+  const [focusValue, setFocusValue] = useState(selectedValue);
+  const rovingValue = options.some((option) => option.value === focusValue && !option.disabled)
+    ? focusValue
+    : selectedValue;
   const groupRef = useRef<HTMLDivElement | null>(null);
   const moveFocus = useRovingFocus({
     containerRef: groupRef,
@@ -576,7 +715,7 @@ export function SegmentedControl({
       }}
     >
       {options.map((option) => {
-        const selected = option.value === current;
+        const selected = option.value === selectedValue;
         return (
           <button
             key={option.value}
@@ -589,10 +728,14 @@ export function SegmentedControl({
             className={`ui-segmented__item ui-segmented__item--${size}`}
             data-oxs-cursor-role={disabled || option.disabled ? 'not-allowed' : 'pointer'}
             onFocus={() => {
-              if (!disabled && !option.disabled) setCurrent(option.value);
+              if (disabled || option.disabled) return;
+              setFocusValue(option.value);
+              setCurrent(option.value);
             }}
             onClick={() => {
-              if (!disabled && !option.disabled) setCurrent(option.value);
+              if (disabled || option.disabled) return;
+              setFocusValue(option.value);
+              setCurrent(option.value);
             }}
           >
             {option.icon ? <Icon name={option.icon} size="sm" /> : null}
@@ -605,12 +748,19 @@ export function SegmentedControl({
 }
 
 export type ToggleGroupProps = Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> & {
+  /** Accessible name for the independent-toggle cluster. */
   label: string;
+  /** Ordered independent toggle options. */
   options: readonly ToggleOption[];
+  /** Controlled pressed-value set; unknown/disabled values are ignored visually. */
   value?: readonly string[];
+  /** Initial uncontrolled pressed-value set. */
   defaultValue?: readonly string[];
+  /** Reports immutable normalized pressed-value arrays. */
   onValueChange?: (value: readonly string[]) => void;
+  /** Shared Button-family control scale. @default md */
   size?: ControlSize;
+  /** Disables every toggle member. @default false */
   disabled?: boolean;
 };
 
@@ -630,7 +780,11 @@ export function ToggleGroup({
     defaultValue,
     onValueChange,
   });
-  const firstEnabled = options.find((option) => !option.disabled)?.value ?? '';
+  const enabledValues = options.filter((option) => !option.disabled).map((option) => option.value);
+  const visibleCurrent = [...new Set(current)].filter((candidate) =>
+    enabledValues.includes(candidate),
+  );
+  const firstEnabled = enabledValues[0] ?? '';
   const [focusValue, setFocusValue] = useState(firstEnabled);
   const rovingValue = options.some((option) => option.value === focusValue && !option.disabled)
     ? focusValue
@@ -656,7 +810,7 @@ export function ToggleGroup({
       }}
     >
       {options.map((option) => {
-        const pressed = current.includes(option.value);
+        const pressed = visibleCurrent.includes(option.value);
         return (
           <ToggleButton
             key={option.value}
@@ -670,8 +824,8 @@ export function ToggleGroup({
             onPressedChange={(next) => {
               setCurrent(
                 next
-                  ? [...current, option.value]
-                  : current.filter((candidate) => candidate !== option.value),
+                  ? [...visibleCurrent, option.value]
+                  : visibleCurrent.filter((candidate) => candidate !== option.value),
               );
             }}
           >
@@ -691,8 +845,14 @@ function ChoiceCopy({
 }: SelectionLabelProps & { labelId?: string; descriptionId?: string }) {
   return (
     <span className="ui-choice__copy">
-      <span id={labelId} className="ui-choice__label">{label}</span>
-      {description ? <span id={descriptionId} className="ui-choice__description">{description}</span> : null}
+      <span id={labelId} className="ui-choice__label">
+        {label}
+      </span>
+      {description ? (
+        <span id={descriptionId} className="ui-choice__description">
+          {description}
+        </span>
+      ) : null}
     </span>
   );
 }
