@@ -74,12 +74,24 @@ for (const token of [
   if (!compositions.includes(token))
     issues.push(`TileGrid realm/spatial contract missing ${token}`);
 }
-const selectedTileDescriptionContrastContract = `.ui-tile[data-selected='true'] .ui-tile__description {
-  color: var(--oxs-color-text-secondary);
-}`;
-if (!componentStyles.includes(selectedTileDescriptionContrastContract))
+const selectedTileDescriptionContrastSelector = `.ui-tile[data-selected='true'] .ui-tile__description {`;
+const selectedTileDescriptionContrastStart = componentStyles.indexOf(
+  selectedTileDescriptionContrastSelector,
+);
+const selectedTileDescriptionContrastEnd =
+  selectedTileDescriptionContrastStart < 0
+    ? -1
+    : componentStyles.indexOf('}', selectedTileDescriptionContrastStart);
+const selectedTileDescriptionContrastRule =
+  selectedTileDescriptionContrastStart < 0 || selectedTileDescriptionContrastEnd < 0
+    ? ''
+    : componentStyles.slice(
+        selectedTileDescriptionContrastStart,
+        selectedTileDescriptionContrastEnd + 1,
+      );
+if (!selectedTileDescriptionContrastRule.includes('color: var(--oxs-color-text-primary);'))
   issues.push(
-    'selected Tile descriptions must promote tertiary copy to text-secondary on accent-soft selection surfaces',
+    'selected Tile descriptions must use opaque text-primary on accent-soft selection surfaces so supporting copy keeps a robust AA contrast margin',
   );
 
 for (const id of [

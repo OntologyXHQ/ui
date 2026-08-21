@@ -6,6 +6,7 @@ import { buildCatalog } from '../../packages/ui/scripts/catalog-lib.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const UI = path.join(ROOT, 'packages/ui');
 const overlays = fs.readFileSync(path.join(UI, 'src/components/Overlays.tsx'), 'utf8');
+const overlayDocs = fs.readFileSync(path.join(UI, 'src/components/Overlays.docs.tsx'), 'utf8');
 const transient = fs.readFileSync(path.join(UI, 'src/components/TransientFeedback.tsx'), 'utf8');
 const feedback = fs.readFileSync(path.join(UI, 'src/components/Feedback.tsx'), 'utf8');
 const scrim = fs.readFileSync(path.join(UI, 'src/components/Scrim.tsx'), 'utf8');
@@ -97,6 +98,22 @@ for (const id of [
   'feedback-lifecycle-certification',
 ]) {
   if (!scenarios.includes(`'${id}'`)) issues.push(`missing UIR10 G6 scenario: ${id}`);
+}
+if (!overlayDocs.includes('<MenuItem>Duplicate</MenuItem>')) {
+  issues.push(
+    'Menu preview must retain the Duplicate command used by the shared typeahead certification',
+  );
+}
+for (const token of [
+  "menu.getByRole('menuitem', { name: 'Open', exact: true })",
+  "menu.getByRole('menuitem', { name: 'Duplicate', exact: true })",
+  "menu.getByRole('menuitem', { name: 'Remove', exact: true })",
+]) {
+  if (!scenarios.includes(token))
+    issues.push(`floating Menu certification must use stable command identity: ${token}`);
+}
+if (/floating-menu-tooltip-certification[\s\S]*?items\.nth\(/.test(scenarios)) {
+  issues.push('floating Menu certification must not identify commands by ordinal position');
 }
 
 if (issues.length) {

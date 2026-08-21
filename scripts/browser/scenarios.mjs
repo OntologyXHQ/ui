@@ -5238,13 +5238,22 @@ export const browserScenarios = [
         await menuTrigger.click();
         const menu = page.getByRole('menu', { name: 'Preview menu', exact: true });
         assert.equal(await menu.isVisible(), true, 'Menu did not open through shared Popover.');
-        const items = menu.getByRole('menuitem');
-        assert.equal(await items.count(), 2, 'Menu item/separator structure drifted.');
+        const openItem = menu.getByRole('menuitem', { name: 'Open', exact: true });
+        const duplicateItem = menu.getByRole('menuitem', { name: 'Duplicate', exact: true });
+        const removeItem = menu.getByRole('menuitem', { name: 'Remove', exact: true });
+        assert.equal(await openItem.isVisible(), true, 'Menu lost its Open command.');
+        assert.equal(await duplicateItem.isVisible(), true, 'Menu lost its Duplicate command.');
+        assert.equal(await removeItem.isVisible(), true, 'Menu lost its Remove command.');
+        assert.equal(
+          await menu.getByRole('separator').count(),
+          1,
+          'Menu command grouping lost its separator semantics.',
+        );
         await page.keyboard.type('r');
         assert.equal(
-          await items.nth(1).evaluate((element) => element.ownerDocument.activeElement === element),
+          await removeItem.evaluate((element) => element.ownerDocument.activeElement === element),
           true,
-          'Menu typeahead did not move focus to the matching item.',
+          'Menu typeahead did not move focus to the matching Remove command.',
         );
         await page.keyboard.press('Escape');
 

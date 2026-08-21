@@ -2341,7 +2341,8 @@
 }
 
 .ui-tile[data-selected='true'] .ui-tile__description {
-  color: var(--oxs-color-text-secondary);
+  /* Selected accent-soft surfaces require opaque supporting copy for a robust AA margin. */
+  color: var(--oxs-color-text-primary);
 }
 
 .ui-application-item__icon {
