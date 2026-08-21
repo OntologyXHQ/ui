@@ -123,7 +123,8 @@ function stashSharedBounds(
   timeout = runtime.clock.scheduleTimeout(() => {
     if (runtime.sharedBoundsExpiry.get(transitionId) !== timeout) return;
     runtime.sharedBoundsExpiry.delete(transitionId);
-    if (runtime.sharedBounds.get(transitionId) === bounds) runtime.sharedBounds.delete(transitionId);
+    if (runtime.sharedBounds.get(transitionId) === bounds)
+      runtime.sharedBounds.delete(transitionId);
   }, 5000);
   if (timeout !== null) runtime.sharedBoundsExpiry.set(transitionId, timeout);
 }

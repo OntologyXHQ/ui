@@ -51,9 +51,11 @@ export const uiDocs = defineUiDocsGroup([
     summary: 'Direction-neutral opacity alias over the shared interruptible transition lifecycle.',
     usage: 'Use for low-spatial-emphasis appearance or disappearance.',
     status: 'accepted',
-    accessibility: 'Uses the same logical visibility and immediate reduced-motion settlement as MotionTransition.',
+    accessibility:
+      'Uses the same logical visibility and immediate reduced-motion settlement as MotionTransition.',
     rtl: 'Direction-neutral and unchanged by reading direction.',
-    touch: 'Retargets through the shared spring lifecycle without blocking pointer input while present.',
+    touch:
+      'Retargets through the shared spring lifecycle without blocking pointer input while present.',
     responsive: 'Container-independent and promoted only while motion is actively running.',
     examples: [lifecycleExample],
   },
@@ -65,10 +67,12 @@ export const uiDocs = defineUiDocsGroup([
     summary: 'Bounded scale alias over the shared interruptible transition lifecycle.',
     usage: 'Use for bounded surface appearance/disappearance where scale carries useful emphasis.',
     status: 'accepted',
-    accessibility: 'Reduced motion removes spatial scaling rather than merely shortening its duration.',
+    accessibility:
+      'Reduced motion removes spatial scaling rather than merely shortening its duration.',
     rtl: 'Direction-neutral and unchanged by reading direction.',
     touch: 'In-flight scale can reverse from its current visual value.',
-    responsive: 'Uses the actual element and semantic spring tokens rather than viewport categories.',
+    responsive:
+      'Uses the actual element and semantic spring tokens rather than viewport categories.',
     examples: [lifecycleExample],
   },
   {
@@ -76,11 +80,13 @@ export const uiDocs = defineUiDocsGroup([
     layer: 'components',
     category: 'Interaction',
     order: 80,
-    summary: 'Logical block/inline slide alias with explicit compatibility support for physical directions.',
+    summary:
+      'Logical block/inline slide alias with explicit compatibility support for physical directions.',
     usage:
       'Prefer block-start/block-end/inline-start/inline-end when movement communicates hierarchy or navigation; physical values are compatibility escape hatches.',
     status: 'accepted',
-    accessibility: 'Reduced motion settles directly to the final semantic visibility state with no spatial translation.',
+    accessibility:
+      'Reduced motion settles directly to the final semantic visibility state with no spatial translation.',
     rtl: 'inline-start and inline-end resolve against the owning UiRoot direction, so semantic travel mirrors in RTL.',
     touch: 'Rapid retargeting preserves current spring value and velocity.',
     responsive: 'Distance is a bounded component value and does not branch on device class.',
@@ -91,13 +97,15 @@ export const uiDocs = defineUiDocsGroup([
     layer: 'components',
     category: 'Interaction',
     order: 80,
-    summary: 'Clip-and-translate reveal alias using the shared lifecycle and reduced-motion semantics.',
+    summary:
+      'Clip-and-translate reveal alias using the shared lifecycle and reduced-motion semantics.',
     usage: 'Use when progressive disclosure benefits from a bounded reveal treatment.',
     status: 'accepted',
     accessibility: 'Logical visibility owns accessibility state independently of visual clipping.',
     rtl: 'The current reveal treatment is block-axis and therefore direction-safe.',
     touch: 'Retargeting remains interruptible through the shared spring owner.',
-    responsive: 'Clip geometry follows the rendered element and avoids permanent will-change layers.',
+    responsive:
+      'Clip geometry follows the rendered element and avoids permanent will-change layers.',
     examples: [lifecycleExample],
   },
   {
@@ -108,7 +116,8 @@ export const uiDocs = defineUiDocsGroup([
     summary: 'Block-axis collapse alias using the shared interruptible transition lifecycle.',
     usage: 'Use for compact disclosure where a visual block-axis collapse is appropriate.',
     status: 'accepted',
-    accessibility: 'Final absence is inert/hidden semantically and reduced motion skips scale interpolation.',
+    accessibility:
+      'Final absence is inert/hidden semantically and reduced motion skips scale interpolation.',
     rtl: 'Block-axis collapse does not encode physical left/right behavior.',
     touch: 'Can reverse while active without restarting from an endpoint.',
     responsive: 'Operates on the current element without viewport-size assumptions.',
@@ -119,13 +128,17 @@ export const uiDocs = defineUiDocsGroup([
     layer: 'components',
     category: 'Interaction',
     order: 80,
-    summary: 'Subtle replacement alias for related content states using one shared lifecycle owner.',
-    usage: 'Use for related state replacement when a full spatial navigation transition would overstate the change.',
+    summary:
+      'Subtle replacement alias for related content states using one shared lifecycle owner.',
+    usage:
+      'Use for related state replacement when a full spatial navigation transition would overstate the change.',
     status: 'accepted',
-    accessibility: 'Visibility semantics remain authoritative and reduced motion removes interpolation.',
+    accessibility:
+      'Visibility semantics remain authoritative and reduced motion removes interpolation.',
     rtl: 'Direction-neutral unless the owning composition adds separate navigation semantics.',
     touch: 'Does not require hover and remains interruptible while active.',
-    responsive: 'Container-independent and does not keep a compositor layer promoted after settlement.',
+    responsive:
+      'Container-independent and does not keep a compositor layer promoted after settlement.',
     examples: [lifecycleExample],
   },
 ] as const);

@@ -5204,7 +5204,10 @@ export const browserScenarios = [
           '-1',
           'Scrim entered sequential focus order.',
         );
-        await scrim.click({ position: { x: 4, y: 4 } });
+        // The Studio preview stage intentionally clips the backdrop with a large rounded
+        // corner. Click the scrim's stable interior instead of a clipped corner so this
+        // certification measures caller-owned dismissal rather than preview-stage geometry.
+        await scrim.click();
         assert.equal(
           await scrimExample.locator('.ui-scrim').isDisabled(),
           true,

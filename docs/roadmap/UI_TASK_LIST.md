@@ -276,33 +276,33 @@ Cumulative G6 repair before UIR11 closeout: the native Checkbox/Radio input now 
 
 ---
 
-## UIR11 — Scroll and motion — ACTIVE
+## UIR11 — Scroll and motion — DONE
 
-- `UI-1101` Rebuild ScrollView logical coordinates, ownership, native wheel chaining and scroll restoration.
-- `UI-1102` Rebuild snap semantics for logical start/center/end and variable child geometry.
-- `UI-1103` Rebuild Transition/shared-bounds APIs around stable lifecycle ownership and cleanup.
-- `UI-1104` Prove reduced-motion behavior is semantic, not merely shorter duration.
-- `UI-1105` Establish performance budgets for scroll/motion hot paths with measurable criteria.
-- `UI-1106` Certify nested scroll, RTL, resize and interruption behavior.
+- `UI-1101` Rebuild ScrollView logical coordinates, ownership, native wheel chaining and scroll restoration. **DONE**
+- `UI-1102` Rebuild snap semantics for logical start/center/end and variable child geometry. **DONE**
+- `UI-1103` Rebuild Transition/shared-bounds APIs around stable lifecycle ownership and cleanup. **DONE**
+- `UI-1104` Prove reduced-motion behavior is semantic, not merely shorter duration. **DONE**
+- `UI-1105` Establish performance budgets for scroll/motion hot paths with measurable criteria. **DONE**
+- `UI-1106` Certify nested scroll, RTL, resize and interruption behavior. **DONE**
 
-Closure target: ScrollView stores/restores bounded logical positions in the owning Document realm, chains exhausted wheel input natively, reconciles live resize geometry, and snaps against live child rectangles for logical start/center/end under LTR/RTL; Transition/SharedBounds expose stable owner-scoped lifecycle cleanup, semantic logical slide direction, interruption convergence, and node-local reduced-motion settlement without spatial interpolation or permanent compositor promotion; frame performance exposes measurable budget-miss and long-frame ratios with an explicit assessment contract. Ten exports are promoted in catalog metadata to accepted and bound to dedicated behavior + `scroll-motion-certification` G6 evidence. Canonical `DONE` remains intentionally blocked until the full `pnpm verify` run succeeds on an installed workspace; `pnpm uir11-12:closeout` performs the consolidated final fix-forward closeout without rolling back implementation changes on failure.
-
----
-
-## UIR12 — Gestures, drag/drop, editing and cursor — ACTIVE
-
-- `UI-1201` Rebuild pan/swipe/reveal/edge-pan hooks on the accepted gesture arena.
-- `UI-1202` Rebuild drag/drop source/target lifecycle, preview coordinates and edge auto-scroll.
-- `UI-1203` Rebuild editing/clipboard adapter ownership, session cleanup and race cancellation.
-- `UI-1204` Rebuild cursor roles/themes/scale/hotspot/modality as host-neutral contracts.
-- `UI-1205` Prove gesture competition with native scroll and text selection.
-- `UI-1206` Keep privileged/native cursor application in the host; UI only exposes contracts/visual intent.
-
-Closure target: Pan/swipe/reveal/edge-pan remain one root-scoped Gesture Arena with pre-threshold native scroll/text-selection ownership and owner-Window continuation after claim; drag/drop has stable source/target registration, one authoritative session, owner-realm keyboard/pointer continuation, portal-projected previews and stationary edge auto-scroll; editing sessions end by captured identity and reject stale asynchronous paste after value/selection/session/adapter-generation changes; cursor roles preserve custom host intent while UiRoot owns normalized theme/nominal-size/scale/hotspot/modality state and nested roots reset inherited browser-preview suppression. Privileged/native cursor asset application remains host-owned. `GestureRevealHandle` and `CursorRegion` are the only UIR12 visual promotions, taking the catalog to accepted=77/candidate=23 and binding behavior evidence to `gesture-drag-editing-cursor-certification`. Canonical `DONE` remains blocked until the full `pnpm verify` run succeeds on an installed workspace; `pnpm uir11-12:closeout` regenerates the catalog, runs full verification, preserves implementation on failure and advances UIR13 only after success.
+Closure target: ScrollView stores/restores bounded logical positions in the owning Document realm, chains exhausted wheel input natively, reconciles live resize geometry, and snaps against live child rectangles for logical start/center/end under LTR/RTL; Transition/SharedBounds expose stable owner-scoped lifecycle cleanup, semantic logical slide direction, interruption convergence, and node-local reduced-motion settlement without spatial interpolation or permanent compositor promotion; frame performance exposes measurable budget-miss and long-frame ratios with an explicit assessment contract. Ten exports are promoted in catalog metadata to accepted and bound to dedicated behavior + `scroll-motion-certification` G6 evidence. Canonical `DONE` is backed by the full `pnpm verify` closeout run; `pnpm uir11-12:closeout` performs the consolidated final fix-forward closeout without rolling back implementation changes on failure.
 
 ---
 
-## UIR13 — Developer compositions and adaptive scaffolds — TODO
+## UIR12 — Gestures, drag/drop, editing and cursor — DONE
+
+- `UI-1201` Rebuild pan/swipe/reveal/edge-pan hooks on the accepted gesture arena. **DONE**
+- `UI-1202` Rebuild drag/drop source/target lifecycle, preview coordinates and edge auto-scroll. **DONE**
+- `UI-1203` Rebuild editing/clipboard adapter ownership, session cleanup and race cancellation. **DONE**
+- `UI-1204` Rebuild cursor roles/themes/scale/hotspot/modality as host-neutral contracts. **DONE**
+- `UI-1205` Prove gesture competition with native scroll and text selection. **DONE**
+- `UI-1206` Keep privileged/native cursor application in the host; UI only exposes contracts/visual intent. **DONE**
+
+Closure target: Pan/swipe/reveal/edge-pan remain one root-scoped Gesture Arena with pre-threshold native scroll/text-selection ownership and owner-Window continuation after claim; drag/drop has stable source/target registration, one authoritative session, owner-realm keyboard/pointer continuation, portal-projected previews and stationary edge auto-scroll; editing sessions end by captured identity and reject stale asynchronous paste after value/selection/session/adapter-generation changes; cursor roles preserve custom host intent while UiRoot owns normalized theme/nominal-size/scale/hotspot/modality state and nested roots reset inherited browser-preview suppression. Privileged/native cursor asset application remains host-owned. `GestureRevealHandle` and `CursorRegion` are the only UIR12 visual promotions, taking the catalog to accepted=77/candidate=23 and binding behavior evidence to `gesture-drag-editing-cursor-certification`. Canonical `DONE` is backed by the full `pnpm verify` closeout run; `pnpm uir11-12:closeout` regenerates the catalog, runs full verification, preserves implementation on failure and advances UIR13 only after success.
+
+---
+
+## UIR13 — Developer compositions and adaptive scaffolds — NEXT
 
 - `UI-1301` Audit every current composition; remove wrappers that add no semantic/behavioral value.
 - `UI-1302` Rebuild card/section/empty-state/content-region compositions from accepted components.

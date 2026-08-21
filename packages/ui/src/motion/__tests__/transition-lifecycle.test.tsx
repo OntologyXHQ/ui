@@ -1,17 +1,16 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { UiRoot } from '../../adaptive';
-import {
-  MotionTransition,
-  SlideTransition,
-} from '../Transition';
+import { MotionTransition, SlideTransition } from '../Transition';
 import {
   assessFramePerformance,
   DEFAULT_FRAME_PERFORMANCE_BUDGET,
   type FramePerformanceSnapshot,
 } from '../performance';
 
-function performanceSnapshot(overrides: Partial<FramePerformanceSnapshot> = {}): FramePerformanceSnapshot {
+function performanceSnapshot(
+  overrides: Partial<FramePerformanceSnapshot> = {},
+): FramePerformanceSnapshot {
   return {
     targetFrameRate: 60,
     frameBudgetMs: 1000 / 60,
@@ -64,12 +63,13 @@ describe('UIR11 transition lifecycle', () => {
   it('turns frame telemetry into explicit measurable hot-path budgets', () => {
     expect(assessFramePerformance(performanceSnapshot()).passed).toBe(true);
     expect(
-      assessFramePerformance(
-        performanceSnapshot({ budgetMisses: 12, budgetMissRatio: 0.2 }),
-      ).passed,
+      assessFramePerformance(performanceSnapshot({ budgetMisses: 12, budgetMissRatio: 0.2 }))
+        .passed,
     ).toBe(false);
     const pending = assessFramePerformance(
-      performanceSnapshot({ sampledFrames: DEFAULT_FRAME_PERFORMANCE_BUDGET.minimumSampledFrames - 1 }),
+      performanceSnapshot({
+        sampledFrames: DEFAULT_FRAME_PERFORMANCE_BUDGET.minimumSampledFrames - 1,
+      }),
     );
     expect(pending.measurable).toBe(false);
     expect(pending.passed).toBe(false);

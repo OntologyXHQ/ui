@@ -31,7 +31,9 @@ function setRoadmapState(state) {
         'active roadmap marker',
       );
     }
-    if (roadmap.includes('- `UIR12+` — Gestures/drag/drop/editing → System UI reacceptance: **TODO**')) {
+    if (
+      roadmap.includes('- `UIR12+` — Gestures/drag/drop/editing → System UI reacceptance: **TODO**')
+    ) {
       roadmap = replaceRequired(
         roadmap,
         '- `UIR12+` — Gestures/drag/drop/editing → System UI reacceptance: **TODO**',
@@ -58,12 +60,18 @@ function setRoadmapState(state) {
     );
   } else {
     roadmap = roadmap
-      .replace('- `UIR11` — Scroll and motion: **DONE**', '- `UIR11` — Scroll and motion: **ACTIVE**')
+      .replace(
+        '- `UIR11` — Scroll and motion: **DONE**',
+        '- `UIR11` — Scroll and motion: **ACTIVE**',
+      )
       .replace(
         '- `UIR12+` — Gestures/drag/drop/editing → System UI reacceptance: **NEXT**',
         '- `UIR12+` — Gestures/drag/drop/editing → System UI reacceptance: **TODO**',
       );
-    tasks = tasks.replace('## UIR11 — Scroll and motion — DONE', '## UIR11 — Scroll and motion — ACTIVE');
+    tasks = tasks.replace(
+      '## UIR11 — Scroll and motion — DONE',
+      '## UIR11 — Scroll and motion — ACTIVE',
+    );
     for (const id of TASK_IDS) {
       const pattern = new RegExp('(^- `UI-' + id + '`[^\\n]*?) \\*\\*DONE\\*\\*$', 'm');
       tasks = tasks.replace(pattern, '$1');
@@ -85,7 +93,9 @@ try {
   process.exit(2);
 }
 
-console.log('UIR10 + UIR11 closeout: marked the candidate source state DONE and running full pnpm verify.');
+console.log(
+  'UIR10 + UIR11 closeout: marked the candidate source state DONE and running full pnpm verify.',
+);
 const result = spawnSync('pnpm', ['verify'], {
   cwd: repoRoot,
   env: process.env,
@@ -105,5 +115,7 @@ try {
   process.exit(result.status ?? 1);
 }
 
-console.error('UIR10 + UIR11 closeout validation failed. Implementation state is preserved; only roadmap acceptance claims were returned to ACTIVE. NO SOURCE ROLLBACK.');
+console.error(
+  'UIR10 + UIR11 closeout validation failed. Implementation state is preserved; only roadmap acceptance claims were returned to ACTIVE. NO SOURCE ROLLBACK.',
+);
 process.exit(result.status ?? 1);

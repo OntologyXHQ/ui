@@ -6,10 +6,16 @@ const ROOT = path.resolve(new URL('../..', import.meta.url).pathname);
 const SCENARIOS = path.join(ROOT, 'scripts/browser/scenarios.mjs');
 const source = fs.readFileSync(SCENARIOS, 'utf8');
 const catalog = JSON.parse(
-  fs.readFileSync(path.join(ROOT, 'apps/ui-studio/src/catalog/generated/catalog.generated.json'), 'utf8'),
+  fs.readFileSync(
+    path.join(ROOT, 'apps/ui-studio/src/catalog/generated/catalog.generated.json'),
+    'utf8',
+  ),
 );
 const examplesByExport = new Map(
-  catalog.map((entry) => [entry.exportName, new Set((entry.examples ?? []).map((example) => example.id))]),
+  catalog.map((entry) => [
+    entry.exportName,
+    new Set((entry.examples ?? []).map((example) => example.id)),
+  ]),
 );
 
 function scanCallEnd(start) {

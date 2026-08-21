@@ -124,7 +124,6 @@ export function MotionTransition({
   );
 }
 
-
 export function FadeTransition(props: TransitionAliasProps) {
   return <MotionTransition {...props} kind="fade" />;
 }

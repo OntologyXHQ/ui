@@ -36,7 +36,6 @@ for (const [name, exampleId] of requiredExamples) {
     issues.push(`${name}: missing Studio example ${exampleId}`);
 }
 
-
 const nativeChoiceBlock = componentStyles.match(/\.ui-choice__native\s*\{([\s\S]*?)\}/)?.[1] ?? '';
 if (!/\binset\s*:\s*0\b/.test(nativeChoiceBlock))
   issues.push('Checkbox/Radio native input must cover the full shared choice hit target');
