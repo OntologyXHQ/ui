@@ -82,6 +82,67 @@ describe('UI Kit drag/drop runtime', () => {
     );
   });
 
+  it('continues pointer drag on the owner Window when Pointer Capture is unavailable', () => {
+    const onDrop = vi.fn();
+
+    function Fixture() {
+      const sourceProps = useDragSource({
+        id: 'continuation-source',
+        item: { id: 'continuation-item', type: 'document', label: 'Continuation item' },
+        threshold: 2,
+      });
+      const targetProps = useDropTarget({ id: 'continuation-target', operation: 'move', onDrop });
+      return (
+        <>
+          <button {...sourceProps}>Continuation source</button>
+          <button {...targetProps}>Continuation target</button>
+        </>
+      );
+    }
+
+    render(
+      <UiRoot>
+        <Fixture />
+      </UiRoot>,
+    );
+    const source = screen.getByRole('button', { name: 'Continuation source' });
+    const target = screen.getByRole('button', { name: 'Continuation target' });
+    Object.defineProperties(source, {
+      setPointerCapture: { configurable: true, value: undefined },
+      hasPointerCapture: { configurable: true, value: undefined },
+      releasePointerCapture: { configurable: true, value: undefined },
+    });
+    vi.spyOn(target, 'getBoundingClientRect').mockReturnValue({
+      x: 80,
+      y: 80,
+      left: 80,
+      top: 80,
+      right: 180,
+      bottom: 180,
+      width: 100,
+      height: 100,
+      toJSON: () => ({}),
+    });
+
+    fireEvent(source, pointerEvent('pointerdown', { pointerId: 71, clientX: 10, clientY: 10 }));
+    act(() => {
+      window.dispatchEvent(
+        pointerEvent('pointermove', { pointerId: 71, clientX: 110, clientY: 110 }),
+      );
+    });
+    expect(screen.getByText('Continuation item')).toHaveClass('ui-drag-preview');
+    act(() => {
+      window.dispatchEvent(
+        pointerEvent('pointerup', { pointerId: 71, clientX: 110, clientY: 110 }),
+      );
+    });
+    expect(onDrop).toHaveBeenCalledTimes(1);
+    expect(onDrop).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'continuation-item' }),
+      'move',
+    );
+  });
+
   it('keeps pointer drag previews inside the owning UiRoot portal scope', () => {
     function Fixture() {
       const sourceProps = useDragSource({

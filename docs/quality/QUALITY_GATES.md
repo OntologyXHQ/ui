@@ -63,7 +63,7 @@ Runs host-safety plus unit/interaction/runtime tests. Tests must assert observab
 The Studio is a real consumer, not a second component library:
 
 - every TS/TSX module must be reachable from `main.tsx` unless it is an ambient declaration;
-- reusable controls must come from `@ontologyx/ui`;
+- reusable controls must come from `@ontologyx/ui`; colocated certification docs may use the published `@ontologyx/ui/advanced` diagnostics subpath, but Studio/Product/System implementation may not use it as a visual shortcut;
 - because package JS is stylesheet-neutral, the Studio browser host must import `@ontologyx/ui/styles.css` exactly once before Studio-local CSS;
 - raw `<button>`, `<input>`, `<select>`, and `<textarea>` are forbidden in Studio source;
 - product/host internals and source deep-imports are forbidden;
@@ -97,6 +97,8 @@ The current harness proves the evidence system itself across real browser journe
 - runtime-kernel certification additionally proves cross-UiRoot portal ownership and top-most Escape ordering, plus nested MotionRuntime frame-rate ownership, interruption convergence and semantic reduced-motion settlement;
 - field/text-input certification proves controlled/uncontrolled native form behavior, native replacement/autocomplete-compatible input, validation/reset/FormData semantics, composition-safe SearchField actions, secure export/preedit redaction, host metadata-only text sessions, selection/multiline hints and logical keyboard-occlusion response;
 - UIR10 overlay/feedback certification proves shared Dialog/Sheet/Scrim ownership, owner-realm floating collision/Menu/Tooltip/ContextMenu behavior, stable-id ToastHost timing/live-region policy, and semantic progress/loading/empty feedback under reduced motion;
+- UIR11 scroll/motion certification proves owner-Document logical restoration, native exhausted-wheel chaining, live variable-geometry logical snap under RTL/LTR, resize reconciliation, interruption convergence, SharedBounds cleanup ownership, node-local semantic reduced-motion settlement across nested roots, transient compositor promotion only while active, and explicit frame-budget assessment (`>=30` sampled frames, budget-miss ratio `<=0.10`, long-frame ratio `<=0.02` by default);
+- UIR12 gesture/drag/editing/cursor certification proves pre-threshold native scroll/text-selection ownership before Gesture Arena claim, owner-Window continuation without Pointer Capture, one authoritative drag/drop session with stable target lifecycle, portal-local preview coordinates, stationary edge auto-scroll, keyboard parity, clipboard adapter/session generation race cancellation, and nested UiRoot cursor modality/theme/scale/hotspot intent while privileged/native cursor application remains host-owned;
 - browser console/page errors are blocking in product journeys; focused content inside `aria-hidden`/`inert` ancestry is checked as a direct DOM-semantic invariant rather than relying on browser warning transport.
 
 G6 writes machine-readable diagnostic evidence to `artifacts/browser-acceptance/latest.json` plus a timestamped sibling. Evidence contains the source fingerprint, Git HEAD when available, browser/version, axes, scenario results and axe summaries. Screenshots are not acceptance evidence and pixel snapshots are not used.
@@ -146,4 +148,4 @@ G0 Visual rejects an accepted multi-state Icon implementation that lacks both ow
 
 The same G0 gate also rejects root-coupled directional mirroring and icon-pack boundary drift: `@ontologyx/ui/icons` must remain a dedicated built subpath, the canonical package entry must not re-export the large vocabulary, declared static/animated counts must match source breadth, and pack sources may depend only on the canonical Icon definition contract.
 
-- `check-browser-fixture-scope.mjs` — requires canonical Studio example scoping for G6 journeys.
+- `check-browser-fixture-scope.mjs` — requires every literal G6 Studio deep-link to resolve to a canonical generated-catalog example and keeps example scoping deterministic.

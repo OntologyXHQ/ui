@@ -270,11 +270,13 @@ Acceptance: List/ListItem/ListSection/ListSeparator use native ul/li/section sem
 - `UI-1005` Rebuild progress/loading/skeleton/feedback semantics with reduced-motion behavior. **DONE**
 - `UI-1006` Certify nested overlays, scroll lock, escape arbitration, outside interaction and RTL geometry. **DONE**
 
-Acceptance: Dialog/AlertDialog/Sheet/BottomSheet share one root/document overlay lifecycle for focus entry/restoration, modal isolation, scroll lock and top-most Escape/outside arbitration; Popover/Menu/ContextMenu/Tooltip share owner-realm floating geometry, collision observation and command/typeahead semantics; Scrim remains presentation-only and never creates a private portal; ToastHost owns controlled stable-id/upsert timing with owner-Window timers, pause semantics and one labelled polite live region; Badge/StatusIndicator/Progress/Spinner/Skeleton/EmptyState/Snackbar/Banner preserve semantic native/loading/feedback behavior with reduced-motion-safe presentation. Twenty exports are reaccepted by dedicated behavior/G6 evidence. Public visual maturity advances to accepted=65/candidate=35; UIR11 Scroll and motion is next.
+Acceptance: Dialog/AlertDialog/Sheet/BottomSheet share one root/document overlay lifecycle for focus entry/restoration, modal isolation, scroll lock and top-most Escape/outside arbitration; Popover/Menu/ContextMenu/Tooltip share owner-realm floating geometry, collision observation and command/typeahead semantics; Scrim remains presentation-only and never creates a private portal; ToastHost owns controlled stable-id/upsert timing with owner-Window timers, pause semantics and one labelled polite live region; Badge/StatusIndicator/Progress/Spinner/Skeleton/EmptyState/Snackbar/Banner preserve semantic native/loading/feedback behavior with reduced-motion-safe presentation. Twenty exports are reaccepted by dedicated behavior/G6 evidence. Public visual maturity advances to accepted=65/candidate=35; UIR11 Scroll and motion is active.
+
+Cumulative G6 repair before UIR11 closeout: the native Checkbox/Radio input now owns the full row hit target instead of a 1px non-interactive proxy, the stale Tabs/Select example deep links were corrected to canonical generated-catalog ids, and the browser fixture-scope gate now rejects future literal deep links to missing examples. These are fix-forward repairs to the accepted controls/certification substrate, not new public APIs.
 
 ---
 
-## UIR11 — Scroll and motion — TODO
+## UIR11 — Scroll and motion — ACTIVE
 
 - `UI-1101` Rebuild ScrollView logical coordinates, ownership, native wheel chaining and scroll restoration.
 - `UI-1102` Rebuild snap semantics for logical start/center/end and variable child geometry.
@@ -283,9 +285,11 @@ Acceptance: Dialog/AlertDialog/Sheet/BottomSheet share one root/document overlay
 - `UI-1105` Establish performance budgets for scroll/motion hot paths with measurable criteria.
 - `UI-1106` Certify nested scroll, RTL, resize and interruption behavior.
 
+Closure target: ScrollView stores/restores bounded logical positions in the owning Document realm, chains exhausted wheel input natively, reconciles live resize geometry, and snaps against live child rectangles for logical start/center/end under LTR/RTL; Transition/SharedBounds expose stable owner-scoped lifecycle cleanup, semantic logical slide direction, interruption convergence, and node-local reduced-motion settlement without spatial interpolation or permanent compositor promotion; frame performance exposes measurable budget-miss and long-frame ratios with an explicit assessment contract. Ten exports are promoted in catalog metadata to accepted and bound to dedicated behavior + `scroll-motion-certification` G6 evidence. Canonical `DONE` remains intentionally blocked until the full `pnpm verify` run succeeds on an installed workspace; `pnpm uir11-12:closeout` performs the consolidated final fix-forward closeout without rolling back implementation changes on failure.
+
 ---
 
-## UIR12 — Gestures, drag/drop, editing and cursor — TODO
+## UIR12 — Gestures, drag/drop, editing and cursor — ACTIVE
 
 - `UI-1201` Rebuild pan/swipe/reveal/edge-pan hooks on the accepted gesture arena.
 - `UI-1202` Rebuild drag/drop source/target lifecycle, preview coordinates and edge auto-scroll.
@@ -293,6 +297,8 @@ Acceptance: Dialog/AlertDialog/Sheet/BottomSheet share one root/document overlay
 - `UI-1204` Rebuild cursor roles/themes/scale/hotspot/modality as host-neutral contracts.
 - `UI-1205` Prove gesture competition with native scroll and text selection.
 - `UI-1206` Keep privileged/native cursor application in the host; UI only exposes contracts/visual intent.
+
+Closure target: Pan/swipe/reveal/edge-pan remain one root-scoped Gesture Arena with pre-threshold native scroll/text-selection ownership and owner-Window continuation after claim; drag/drop has stable source/target registration, one authoritative session, owner-realm keyboard/pointer continuation, portal-projected previews and stationary edge auto-scroll; editing sessions end by captured identity and reject stale asynchronous paste after value/selection/session/adapter-generation changes; cursor roles preserve custom host intent while UiRoot owns normalized theme/nominal-size/scale/hotspot/modality state and nested roots reset inherited browser-preview suppression. Privileged/native cursor asset application remains host-owned. `GestureRevealHandle` and `CursorRegion` are the only UIR12 visual promotions, taking the catalog to accepted=77/candidate=23 and binding behavior evidence to `gesture-drag-editing-cursor-certification`. Canonical `DONE` remains blocked until the full `pnpm verify` run succeeds on an installed workspace; `pnpm uir11-12:closeout` regenerates the catalog, runs full verification, preserves implementation on failure and advances UIR13 only after success.
 
 ---
 

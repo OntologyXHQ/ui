@@ -686,11 +686,13 @@
 
 .ui-choice__native {
   position: absolute;
-  inline-size: 1px;
-  block-size: 1px;
-  overflow: hidden;
+  inset: 0;
+  z-index: 1;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
   opacity: 0;
-  pointer-events: none;
+  cursor: inherit;
 }
 
 .ui-choice__indicator {

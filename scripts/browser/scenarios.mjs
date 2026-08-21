@@ -205,14 +205,18 @@ export const browserScenarios = [
         const workbench = await gotoCatalog(page, baseUrl, {
           entry: 'Tabs',
           tab: 'examples',
-          example: 'overview',
+          example: 'tabs-contract',
         });
-        const overview = workbench.getByRole('tab', { name: 'Overview', exact: true });
+        const automaticTabs = workbench.getByRole('tablist', {
+          name: 'Automatic sections',
+          exact: true,
+        });
+        const overview = automaticTabs.getByRole('tab', { name: 'Overview', exact: true });
         await focusByTab(page, overview);
         await assertVisibleFocus(overview, 'Tabs component Overview control');
 
         await page.keyboard.press('ArrowRight');
-        const activity = workbench.getByRole('tab', { name: 'Activity', exact: true });
+        const activity = automaticTabs.getByRole('tab', { name: 'Activity', exact: true });
         await activity.waitFor({ state: 'visible' });
         assert.equal(
           await activity.getAttribute('aria-selected'),
@@ -2393,6 +2397,516 @@ export const browserScenarios = [
   ),
 
   scenario(
+    'scroll-motion-certification',
+    [
+      'scroll',
+      'logical-coordinates',
+      'rtl',
+      'nested-scroll',
+      'native-chaining',
+      'restoration',
+      'snap',
+      'variable-geometry',
+      'resize',
+      'motion',
+      'interruption',
+      'shared-bounds',
+      'reduced-motion',
+      'performance-budget',
+      'a11y',
+    ],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 1180, height: 900 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        let example = await gotoCatalog(page, baseUrl, {
+          entry: 'ScrollView',
+          tab: 'examples',
+          example: 'scroll-contract',
+          dir: 'rtl',
+          motion: 'full',
+        });
+        let restorable = example.getByLabel('Restorable scroll', { exact: true });
+        await restorable.waitFor({ state: 'visible' });
+        const savedOffset = await restorable.evaluate((element) => {
+          element.scrollTop = 112;
+          element.dispatchEvent(new Event('scroll'));
+          return element.scrollTop;
+        });
+        assert.ok(
+          savedOffset > 40,
+          'Restoration fixture did not establish a non-zero scroll offset.',
+        );
+        await example
+          .getByRole('button', { name: 'Unmount restorable scroll', exact: true })
+          .click();
+        await example.getByRole('button', { name: 'Mount restorable scroll', exact: true }).click();
+        restorable = example.getByLabel('Restorable scroll', { exact: true });
+        await restorable.waitFor({ state: 'visible' });
+        assert.ok(
+          Math.abs((await restorable.evaluate((element) => element.scrollTop)) - savedOffset) <= 2,
+          'ScrollView did not restore the caller-keyed logical offset after remount.',
+        );
+
+        const nativeAncestor = example.locator('[data-native-scroll]');
+        const nativeChild = example.getByLabel('Native-chain inner scroll', { exact: true });
+        await nativeChild.evaluate((element) => {
+          element.scrollTop = element.scrollHeight;
+        });
+        await nativeAncestor.evaluate((element) => {
+          element.scrollTop = 0;
+        });
+        await nativeChild.hover();
+        await page.mouse.wheel(0, 180);
+        await page.waitForTimeout(120);
+        assert.ok(
+          (await nativeAncestor.evaluate((element) => element.scrollTop)) > 0,
+          'Exhausted ScrollView did not release wheel input to its native scrollable ancestor.',
+        );
+
+        const outer = example.getByLabel('Outer nested scroll', { exact: true });
+        const inner = example.getByLabel('Inner nested scroll', { exact: true });
+        await inner.evaluate((element) => {
+          element.scrollTop = element.scrollHeight;
+        });
+        await outer.evaluate((element) => {
+          element.scrollTop = 0;
+        });
+        await inner.hover();
+        await page.mouse.wheel(0, 180);
+        await page.waitForTimeout(80);
+        assert.ok(
+          (await outer.evaluate((element) => element.scrollTop)) > 0,
+          'Nested ScrollView did not consume overflow before native ancestor chaining.',
+        );
+
+        const snap = example.getByLabel('Logical snap strip', { exact: true });
+        const snapDirection = await snap.evaluate(
+          (element) => element.ownerDocument.defaultView?.getComputedStyle(element).direction,
+        );
+        assert.equal(snapDirection, 'rtl', 'Horizontal ScrollView did not inherit resolved RTL.');
+        await snap.hover();
+        await page.mouse.wheel(-220, 0);
+        await page.waitForTimeout(700);
+        const snapState = await snap.evaluate((element) => {
+          const viewport = element.getBoundingClientRect();
+          const rtl =
+            element.ownerDocument.defaultView?.getComputedStyle(element).direction === 'rtl';
+          const alignmentErrors = [...element.querySelectorAll('[data-snap-card]')].map((item) => {
+            const rect = item.getBoundingClientRect();
+            const align = item.getAttribute('data-snap-align') ?? 'start';
+            if (align === 'center') {
+              return Math.abs((rect.left + rect.right) / 2 - (viewport.left + viewport.right) / 2);
+            }
+            if (align === 'end')
+              return rtl
+                ? Math.abs(rect.left - viewport.left)
+                : Math.abs(rect.right - viewport.right);
+            return rtl
+              ? Math.abs(rect.right - viewport.right)
+              : Math.abs(rect.left - viewport.left);
+          });
+          return {
+            physical: element.scrollLeft,
+            max: Math.max(0, element.scrollWidth - element.clientWidth),
+            nearestAlignmentError: Math.min(...alignmentErrors),
+          };
+        });
+        assert.ok(
+          Math.abs(snapState.physical) <= snapState.max + 1,
+          'RTL scroll settlement escaped the native physical scroll range.',
+        );
+        assert.ok(
+          snapState.nearestAlignmentError <= 6,
+          `Variable-geometry RTL snap did not settle to start/center/end alignment (${snapState.nearestAlignmentError}px).`,
+        );
+        const resizeFrame = example.locator('.ui-doc-scroll-resize-frame');
+        await resizeFrame.evaluate((element) => {
+          element.style.inlineSize = '14rem';
+        });
+        await page.waitForTimeout(180);
+        const resizedState = await snap.evaluate((element) => ({
+          physical: element.scrollLeft,
+          max: Math.max(0, element.scrollWidth - element.clientWidth),
+        }));
+        assert.ok(
+          Math.abs(resizedState.physical) <= resizedState.max + 1,
+          'Resize reconciliation left ScrollView outside its current bounds.',
+        );
+
+        example = await gotoCatalog(page, baseUrl, {
+          entry: 'MotionTransition',
+          tab: 'examples',
+          example: 'lifecycle',
+          dir: 'rtl',
+          motion: 'full',
+        });
+        let aliases = example.locator('[data-motion-alias]');
+        await aliases.first().waitFor({ state: 'visible' });
+        assert.equal(await aliases.count(), 6, 'Motion alias lifecycle fixture is incomplete.');
+        const slide = example.locator('[data-motion-alias="slide"]');
+        assert.equal(
+          await slide.getAttribute('data-motion-kind'),
+          'slide-right',
+          'Logical inline-start slide did not mirror in RTL.',
+        );
+        const toggle = example.getByRole('button', { name: 'Toggle transitions', exact: true });
+        await toggle.click();
+        await page.waitForTimeout(30);
+        await toggle.click();
+        await page.waitForTimeout(30);
+        await toggle.click();
+        await page.waitForTimeout(30);
+        await toggle.click();
+        await page.waitForFunction(
+          () =>
+            [...document.querySelectorAll('#example-lifecycle [data-motion-alias]')].every(
+              (element) =>
+                element.getAttribute('data-present') === 'true' &&
+                element.getAttribute('data-hidden') === 'false' &&
+                !element.hasAttribute('data-motion-active'),
+            ),
+          null,
+          { timeout: 2200 },
+        );
+        const idlePromotion = await aliases.evaluateAll((elements) =>
+          elements.map(
+            (element) =>
+              element.ownerDocument.defaultView?.getComputedStyle(element).willChange ?? '',
+          ),
+        );
+        assert.ok(
+          idlePromotion.every((value) => value === 'auto'),
+          `Settled transitions retained compositor promotion: ${idlePromotion.join(', ')}`,
+        );
+
+        example = await gotoCatalog(page, baseUrl, {
+          entry: 'MotionTransition',
+          tab: 'examples',
+          example: 'lifecycle',
+          dir: 'rtl',
+          motion: 'reduced',
+        });
+        aliases = example.locator('[data-motion-alias]');
+        await example.getByRole('button', { name: 'Toggle transitions', exact: true }).click();
+        await page.waitForTimeout(40);
+        const reducedState = await aliases.evaluateAll((elements) =>
+          elements.map((element) => ({
+            hidden: element.getAttribute('data-hidden'),
+            active: element.hasAttribute('data-motion-active'),
+            transform: element.ownerDocument.defaultView?.getComputedStyle(element).transform,
+          })),
+        );
+        assert.ok(
+          reducedState.every(
+            (state) => state.hidden === 'true' && !state.active && state.transform === 'none',
+          ),
+          'Reduced motion did not semantically settle aliases without spatial interpolation.',
+        );
+
+        example = await gotoCatalog(page, baseUrl, {
+          entry: 'SharedBounds',
+          tab: 'examples',
+          example: 'bounds-lifecycle',
+          motion: 'full',
+        });
+        const shared = example.locator('[data-shared-bounds-target]');
+        const before = await shared.boundingBox();
+        await example.getByRole('button', { name: 'Move shared surface', exact: true }).click();
+        await page.waitForFunction(
+          () => {
+            const element = document.querySelector(
+              '#example-bounds-lifecycle [data-shared-bounds-target]',
+            );
+            return element && !element.hasAttribute('data-motion-active');
+          },
+          null,
+          { timeout: 2200 },
+        );
+        const after = await shared.boundingBox();
+        assert.ok(
+          before && after && Math.abs(before.x - after.x) > 8,
+          'SharedBounds lifecycle fixture did not produce a measurable destination change.',
+        );
+        assert.equal(
+          await shared.evaluate((element) => element.style.transform),
+          '',
+          'SharedBounds left an inline transform after settlement.',
+        );
+
+        const axe = await runAxe(page, 'UIR11 scroll and motion contracts');
+        diagnostics.assertClean('UIR11 scroll and motion contracts');
+        return {
+          restoredOffset: savedOffset,
+          nestedChained: true,
+          rtlSnapBounded: true,
+          resizeReconciled: true,
+          interruptionConverged: true,
+          reducedSettled: true,
+          sharedBoundsSettled: true,
+          idlePromotion,
+          axe,
+        };
+      } finally {
+        await context.close();
+      }
+    },
+    {
+      accepts: [
+        'ScrollView',
+        'ScrollSnapItem',
+        'MotionTransition',
+        'FadeTransition',
+        'ScaleTransition',
+        'SlideTransition',
+        'RevealTransition',
+        'CollapseTransition',
+        'ReplaceTransition',
+        'SharedBounds',
+      ],
+    },
+  ),
+
+  scenario(
+    'gesture-drag-editing-cursor-certification',
+    [
+      'gestures',
+      'arena',
+      'native-scroll',
+      'text-selection',
+      'drag-drop',
+      'pointer-continuation',
+      'preview',
+      'edge-autoscroll',
+      'keyboard',
+      'editing',
+      'clipboard-race',
+      'cursor',
+      'hotspot',
+      'modality',
+      'nested-root',
+      'realm',
+      'a11y',
+    ],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 1120, height: 860 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        let example = await gotoCatalog(page, baseUrl, {
+          entry: 'GestureRevealHandle',
+          tab: 'examples',
+          example: 'interaction-runtime',
+          motion: 'full',
+        });
+        const reveal = example.getByRole('button', { name: 'Runtime reveal handle', exact: true });
+        await reveal.click();
+        assert.equal(
+          await example.locator('[data-reveal-state]').textContent(),
+          'open',
+          'GestureRevealHandle activation did not converge with the arena-owned reveal state.',
+        );
+
+        const pan = example.locator('[data-pan-competition]');
+        const panBox = await pan.boundingBox();
+        assert.ok(panBox, 'Pan competition fixture has no measurable geometry.');
+        const panX = panBox.x + Math.min(42, panBox.width / 3);
+        const panY = panBox.y + panBox.height / 2;
+        await page.mouse.move(panX, panY);
+        await page.mouse.down();
+        await page.mouse.move(panX + 4, panY);
+        assert.equal(
+          await example.locator('[data-pan-state]').textContent(),
+          'native',
+          'Pan cancelled native text/scroll ownership before crossing its arena threshold.',
+        );
+        await page.mouse.move(panX + 28, panY);
+        await page.waitForFunction(
+          () =>
+            document.querySelector('#example-interaction-runtime [data-pan-state]')?.textContent ===
+            'claimed',
+        );
+        await page.mouse.up();
+
+        const scroll = example.locator('[data-dnd-scroll]');
+        const source = example.getByRole('button', { name: 'Drag Studio card', exact: true });
+        const target = example.getByRole('button', { name: 'Studio drop target', exact: true });
+        let sourceBox = await source.boundingBox();
+        let targetBox = await target.boundingBox();
+        assert.ok(
+          sourceBox && targetBox,
+          'Drag/drop fixture controls have no measurable geometry.',
+        );
+        await page.mouse.move(
+          sourceBox.x + sourceBox.width / 2,
+          sourceBox.y + sourceBox.height / 2,
+        );
+        await page.mouse.down();
+        await page.mouse.move(
+          targetBox.x + targetBox.width / 2,
+          targetBox.y + targetBox.height / 2,
+          {
+            steps: 4,
+          },
+        );
+        const preview = page.locator('[data-dnd-preview-content]');
+        await preview.waitFor({ state: 'visible' });
+        assert.ok(
+          await preview.evaluate((element) => Boolean(element.closest('[data-oxs-portal-root]'))),
+          'Pointer drag preview escaped the owning UiRoot portal coordinate space.',
+        );
+        await page.mouse.up();
+        await page.waitForFunction(
+          () =>
+            document.querySelector('#example-interaction-runtime [data-drop-result]')
+              ?.textContent === 'studio-card:move',
+        );
+
+        await scroll.evaluate((element) => {
+          element.scrollTop = 0;
+        });
+        sourceBox = await source.boundingBox();
+        const scrollBox = await scroll.boundingBox();
+        assert.ok(sourceBox && scrollBox, 'Edge auto-scroll fixture lost measurable geometry.');
+        await page.mouse.move(
+          sourceBox.x + sourceBox.width / 2,
+          sourceBox.y + sourceBox.height / 2,
+        );
+        await page.mouse.down();
+        await page.mouse.move(
+          scrollBox.x + scrollBox.width / 2,
+          scrollBox.y + scrollBox.height - 5,
+          {
+            steps: 5,
+          },
+        );
+        await page.waitForFunction(
+          () =>
+            (document.querySelector('#example-interaction-runtime [data-dnd-scroll]')?.scrollTop ??
+              0) > 0,
+          null,
+          { timeout: 1800 },
+        );
+        const edgeScrolled = await scroll.evaluate((element) => element.scrollTop);
+        assert.ok(
+          edgeScrolled > 0,
+          'Stationary drag did not trigger owner-realm edge auto-scroll.',
+        );
+        await page.keyboard.press('Escape');
+        await page.mouse.up();
+
+        await scroll.evaluate((element) => {
+          element.scrollTop = 0;
+        });
+        await source.scrollIntoViewIfNeeded();
+        await source.focus();
+        await page.keyboard.press('Space');
+        await page.waitForFunction(
+          () =>
+            document.activeElement?.getAttribute('data-oxs-drop-target') === 'studio-drop-target',
+        );
+        await page.keyboard.press('Enter');
+        assert.equal(
+          await example.locator('[data-drop-result]').textContent(),
+          'studio-card:move',
+          'Keyboard drag did not use the same authoritative target/drop lifecycle.',
+        );
+        const gestureAxe = await runAxe(page, 'UIR12 gesture and drag/drop runtime');
+
+        example = await gotoCatalog(page, baseUrl, {
+          entry: 'TextField',
+          tab: 'examples',
+          example: 'clipboard-race',
+        });
+        const clipboardTarget = example.getByLabel('Clipboard race target', { exact: true });
+        await clipboardTarget.focus();
+        await clipboardTarget.evaluate((element) => {
+          element.setSelectionRange(element.value.length, element.value.length);
+        });
+        await page.keyboard.press('Control+V');
+        await example
+          .locator('[data-rotate-clipboard-adapter]')
+          .evaluate((element) => element.click());
+        await page.waitForFunction(
+          () =>
+            document.querySelector('#example-clipboard-race [data-clipboard-adapter-version]')
+              ?.textContent === '2',
+        );
+        await example
+          .locator('[data-resolve-pending-paste]')
+          .evaluate((element) => element.click());
+        await page.waitForTimeout(40);
+        assert.equal(
+          await clipboardTarget.inputValue(),
+          'seed',
+          'A paste response from a replaced clipboard adapter mutated the active editable session.',
+        );
+        const editingAxe = await runAxe(page, 'UIR12 editing clipboard race');
+
+        example = await gotoCatalog(page, baseUrl, {
+          entry: 'CursorRegion',
+          tab: 'examples',
+          example: 'cursor-contract',
+          pointer: 'fine',
+        });
+        const outerCursorRoot = example.locator('.ui-doc-cursor-root--outer');
+        const innerCursorRoot = example.locator('.ui-doc-cursor-root--inner');
+        const customIntent = example.locator(
+          '[data-oxs-cursor-intent="custom:precision-crosshair"]',
+        );
+        await Promise.all([
+          outerCursorRoot.waitFor({ state: 'visible' }),
+          innerCursorRoot.waitFor({ state: 'visible' }),
+          customIntent.waitFor({ state: 'visible' }),
+        ]);
+        assert.equal(await outerCursorRoot.getAttribute('data-oxs-pointer-visible'), 'false');
+        assert.equal(await innerCursorRoot.getAttribute('data-oxs-pointer-visible'), 'true');
+        assert.equal(await customIntent.getAttribute('data-oxs-cursor-role'), 'default');
+        assert.equal(
+          await customIntent.getAttribute('data-oxs-cursor-intent'),
+          'custom:precision-crosshair',
+          'Custom cursor host intent was lost while deriving the browser fallback role.',
+        );
+        const cursorProjection = await outerCursorRoot.evaluate((element) => ({
+          theme: element.getAttribute('data-oxs-cursor-theme'),
+          hotspot: element.getAttribute('data-oxs-cursor-hotspot'),
+          scale: element.style.getPropertyValue('--oxs-cursor-scale'),
+        }));
+        assert.deepEqual(cursorProjection, {
+          theme: 'studio-host-theme',
+          hotspot: '6,8',
+          scale: '1.5',
+        });
+        assert.notEqual(
+          await innerCursorRoot.evaluate(
+            (element) => element.ownerDocument.defaultView?.getComputedStyle(element).cursor,
+          ),
+          'none',
+          'Outer touch cursor suppression leaked through the nested UiRoot authority boundary.',
+        );
+        const cursorAxe = await runAxe(page, 'UIR12 cursor host intent');
+
+        diagnostics.assertClean('UIR12 gesture/drag/editing/cursor contracts');
+        return {
+          panThresholdOwnership: true,
+          pointerPreviewScoped: true,
+          edgeScrolled,
+          keyboardDrop: true,
+          stalePasteRejected: true,
+          nestedCursorAuthority: true,
+          gestureAxe,
+          editingAxe,
+          cursorAxe,
+        };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['GestureRevealHandle', 'CursorRegion'] },
+  ),
+
+  scenario(
     'motion-authority-realm-interruption-certification',
     [
       'motion-kernel',
@@ -2546,7 +3060,7 @@ export const browserScenarios = [
         const selectWorkbench = await gotoCatalog(page, baseUrl, {
           entry: 'Select',
           tab: 'examples',
-          example: 'overview',
+          example: 'contract',
         });
         const select = selectWorkbench.getByRole('combobox', { name: 'Density', exact: true });
         await select.waitFor({ state: 'visible' });

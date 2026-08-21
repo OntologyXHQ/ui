@@ -5,6 +5,12 @@ import process from 'node:process';
 const ROOT = path.resolve(new URL('../..', import.meta.url).pathname);
 const SCENARIOS = path.join(ROOT, 'scripts/browser/scenarios.mjs');
 const source = fs.readFileSync(SCENARIOS, 'utf8');
+const catalog = JSON.parse(
+  fs.readFileSync(path.join(ROOT, 'apps/ui-studio/src/catalog/generated/catalog.generated.json'), 'utf8'),
+);
+const examplesByExport = new Map(
+  catalog.map((entry) => [entry.exportName, new Set((entry.examples ?? []).map((example) => example.id))]),
+);
 
 function scanCallEnd(start) {
   let depth = 0;
@@ -78,9 +84,19 @@ while ((cursor = source.indexOf(needle, cursor)) !== -1) {
   const consumesResult =
     /(?:^|\b)(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=\s*await\s*$/.test(prefix) ||
     /^[A-Za-z_$][\w$]*\s*=\s*await\s*$/.test(prefix);
+  const line = source.slice(0, cursor).split('\n').length;
   if (/\bexample\s*:/.test(call) && !consumesResult) {
-    const line = source.slice(0, cursor).split('\n').length;
     failures.push(`line ${line}: example deep link ignores gotoCatalog's canonical fixture scope`);
+  }
+  const entryMatch = call.match(/\bentry\s*:\s*['"]([^'"]+)['"]/);
+  const exampleMatch = call.match(/\bexample\s*:\s*['"]([^'"]+)['"]/);
+  if (entryMatch && exampleMatch) {
+    const known = examplesByExport.get(entryMatch[1]);
+    if (!known?.has(exampleMatch[1])) {
+      failures.push(
+        `line ${line}: ${entryMatch[1]} deep link references unknown canonical example ${exampleMatch[1]}`,
+      );
+    }
   }
   cursor = end + 1;
 }
@@ -135,5 +151,5 @@ if (failures.length) {
 }
 
 console.log(
-  'G0 browser fixture-scope gate passed: every example journey consumes canonical #example-<id> scope, fixture DOM polling is explicitly scoped, and modal-isolation evidence uses stable DOM identities after accessibility removal.',
+  'G0 browser fixture-scope gate passed: every example journey consumes an existing canonical #example-<id> scope, fixture DOM polling is explicitly scoped, and modal-isolation evidence uses stable DOM identities after accessibility removal.',
 );

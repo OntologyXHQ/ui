@@ -1435,36 +1435,28 @@
     "layer": "components",
     "category": "Interaction",
     "order": 80,
-    "summary": "Collapse/expand transition alias.",
-    "usage": "Use for layout disclosure with measured bounds.",
-    "status": "candidate",
-    "accessibility": "Respects reduced motion and final visibility semantics.",
-    "rtl": "Block/inline collapse semantics must remain direction-safe.",
-    "touch": "Direct interaction must be cancellable.",
-    "responsive": "Measurement follows content/container size.",
+    "summary": "Block-axis collapse alias using the shared interruptible transition lifecycle.",
+    "usage": "Use for compact disclosure where a visual block-axis collapse is appropriate.",
+    "status": "accepted",
+    "accessibility": "Final absence is inert/hidden semantically and reduced motion skips scale interpolation.",
+    "rtl": "Block-axis collapse does not encode physical left/right behavior.",
+    "touch": "Can reverse while active without restarting from an endpoint.",
+    "responsive": "Operates on the current element without viewport-size assumptions.",
     "playground": null,
     "props": [
       {
         "name": "distance",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Maximum spatial travel in CSS pixels for slide/reveal treatments.",
         "deprecated": false,
-        "default": null
-      },
-      {
-        "name": "kind",
-        "type": "TransitionKind",
-        "optional": true,
-        "description": "",
-        "deprecated": false,
-        "default": null
+        "default": "24"
       },
       {
         "name": "onRest",
         "type": "(present: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "Called after the requested present/absent state has settled, including immediate reduced-motion settlement.",
         "deprecated": false,
         "default": null
       },
@@ -1472,7 +1464,7 @@
         "name": "present",
         "type": "boolean",
         "optional": false,
-        "description": "",
+        "description": "Logical visibility state that owns accessibility and interaction semantics.",
         "deprecated": false,
         "default": null
       },
@@ -1480,12 +1472,18 @@
         "name": "spring",
         "type": "SpringPreset",
         "optional": true,
-        "description": "",
+        "description": "Semantic spring preset read from the owning element realm.",
         "deprecated": false,
-        "default": null
+        "default": "standard"
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "lifecycle",
+        "title": "Interruptible semantic transitions",
+        "component": "MotionLifecycleExample"
+      }
+    ]
   },
   {
     "id": "Container",
@@ -1750,30 +1748,32 @@
     "layer": "components",
     "category": "Interaction",
     "order": 80,
-    "summary": "Declares a semantic cursor role for a bounded interaction region.",
-    "usage": "Use semantic cursor roles instead of feature-owned CSS cursor values.",
-    "status": "candidate",
-    "accessibility": "Cursor decoration does not replace accessible interaction semantics.",
-    "rtl": "Start/end resize semantics are normalized by the cursor service.",
-    "touch": "Touch does not depend on cursor visibility; pointer modality remains optional.",
-    "responsive": "Region behavior follows its container rather than screen-size assumptions.",
-    "playground": {
-      "preferredWidth": "medium",
-      "fixture": {
-        "role": "pointer"
-      }
-    },
+    "summary": "Declares host-neutral cursor intent for a bounded interaction region while UiRoot owns theme, size, scale, hotspot and modality state.",
+    "usage": "Use semantic roles or a custom:<id> intent instead of feature-owned cursor CSS. The browser preview receives only a safe system-role fallback; native asset/theme installation remains host-owned.",
+    "status": "accepted",
+    "accessibility": "Cursor intent is supplementary feedback only and never replaces role, name, focus, keyboard operation or other accessible interaction semantics.",
+    "rtl": "Cursor roles are physical when the platform role itself is physical; compositions choose logical start/end intent before mapping to a concrete resize role.",
+    "touch": "UiRoot can suppress pointer presentation after touch/pen and nested roots retain independent cursor authority; touch interaction never depends on cursor visibility.",
+    "responsive": "Theme/nominal size/scale/hotspot are root-scoped host intent and remain independent from viewport-size adaptation.",
+    "playground": null,
     "props": [
       {
         "name": "role",
         "type": "CursorRole",
         "optional": false,
-        "description": "",
+        "description": "Semantic cursor intent. Custom roles are preserved for the native host and use a safe browser fallback.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "cursor-contract",
+        "title": "Host-neutral cursor intent and nested modality",
+        "description": "Shows preserved custom host intent, browser fallback and a mouse-owned nested UiRoot escaping an outer touch-suppressed pointer preview.",
+        "component": "CursorContractExample"
+      }
+    ]
   },
   {
     "id": "DesktopShellLayout",
@@ -2235,36 +2235,28 @@
     "layer": "components",
     "category": "Interaction",
     "order": 80,
-    "summary": "Fade transition alias.",
-    "usage": "Use for low-spatial emphasis changes.",
-    "status": "candidate",
-    "accessibility": "Respects reduced motion.",
-    "rtl": "Direction-neutral.",
-    "touch": "Does not block touch interaction.",
-    "responsive": "Container-independent.",
+    "summary": "Direction-neutral opacity alias over the shared interruptible transition lifecycle.",
+    "usage": "Use for low-spatial-emphasis appearance or disappearance.",
+    "status": "accepted",
+    "accessibility": "Uses the same logical visibility and immediate reduced-motion settlement as MotionTransition.",
+    "rtl": "Direction-neutral and unchanged by reading direction.",
+    "touch": "Retargets through the shared spring lifecycle without blocking pointer input while present.",
+    "responsive": "Container-independent and promoted only while motion is actively running.",
     "playground": null,
     "props": [
       {
         "name": "distance",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Maximum spatial travel in CSS pixels for slide/reveal treatments.",
         "deprecated": false,
-        "default": null
-      },
-      {
-        "name": "kind",
-        "type": "TransitionKind",
-        "optional": true,
-        "description": "",
-        "deprecated": false,
-        "default": null
+        "default": "24"
       },
       {
         "name": "onRest",
         "type": "(present: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "Called after the requested present/absent state has settled, including immediate reduced-motion settlement.",
         "deprecated": false,
         "default": null
       },
@@ -2272,7 +2264,7 @@
         "name": "present",
         "type": "boolean",
         "optional": false,
-        "description": "",
+        "description": "Logical visibility state that owns accessibility and interaction semantics.",
         "deprecated": false,
         "default": null
       },
@@ -2280,12 +2272,18 @@
         "name": "spring",
         "type": "SpringPreset",
         "optional": true,
-        "description": "",
+        "description": "Semantic spring preset read from the owning element realm.",
         "deprecated": false,
-        "default": null
+        "default": "standard"
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "lifecycle",
+        "title": "Interruptible semantic transitions",
+        "component": "MotionLifecycleExample"
+      }
+    ]
   },
   {
     "id": "FieldGroup",
@@ -2399,25 +2397,20 @@
     "layer": "components",
     "category": "Interaction",
     "order": 80,
-    "summary": "Visual handle for edge/reveal interactions.",
-    "usage": "Use as the reusable visual handle for a shared reveal/edge gesture owner; product/System placement and open-state policy stay outside the Component.",
-    "status": "candidate",
-    "accessibility": "Handle is supplementary and should not be the only accessible way to reveal content.",
-    "rtl": "Edge meaning must distinguish semantic start/end from physical system edges.",
-    "touch": "Intended for direct manipulation with coarse pointers.",
-    "responsive": "Handle placement follows the owning adaptive surface.",
-    "playground": {
-      "preferredWidth": "narrow",
-      "fixture": {
-        "gestureProps": {}
-      }
-    },
+    "summary": "Accessible reveal handle backed by the shared gesture arena, with pointer cancellation and keyboard activation kept on one control.",
+    "usage": "Bind gestureProps and activate from useDragReveal; keep product/System placement and open-state policy outside the Component.",
+    "status": "accepted",
+    "accessibility": "The handle is one real button with visible focus, aria-expanded state and keyboard activation; direct manipulation supplements rather than replaces activation.",
+    "rtl": "Reveal displacement is supplied by the owning composition; semantic start/end and physical system-edge gestures remain distinct contracts.",
+    "touch": "Pan/reveal arbitration uses the shared Gesture Arena. Unclaimed pointer streams remain available to native scrolling/text selection and touch drag yields to native movement before long-press ownership.",
+    "responsive": "Gesture and drag coordinates stay in the owning Window realm; pointer previews are projected into the owning portal host and edge auto-scroll follows live container geometry.",
+    "playground": null,
     "props": [
       {
         "name": "ariaLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional accessible name when it must differ from the visible action label.",
         "deprecated": false,
         "default": null
       },
@@ -2425,7 +2418,7 @@
         "name": "expanded",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Current expanded state reflected through `aria-expanded`.",
         "deprecated": false,
         "default": "false"
       },
@@ -2433,7 +2426,7 @@
         "name": "gestureProps",
         "type": "ButtonHTMLAttributes<HTMLButtonElement>",
         "optional": false,
-        "description": "",
+        "description": "Arena-owned pointer/gesture handlers supplied by the shared reveal runtime.",
         "deprecated": false,
         "default": null
       },
@@ -2441,7 +2434,7 @@
         "name": "label",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional visible action label; otherwise a state-aware default is shown.",
         "deprecated": false,
         "default": null
       },
@@ -2449,12 +2442,19 @@
         "name": "onActivate",
         "type": "() => void",
         "optional": false,
-        "description": "",
+        "description": "Accessible activation path equivalent to committing the reveal gesture.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "interaction-runtime",
+        "title": "Gesture and drag/drop ownership",
+        "description": "Exercises reveal arbitration, threshold ownership, keyboard/pointer drag, portal preview and stationary edge auto-scroll without moving native host authority into the Component.",
+        "component": "GestureRuntimeContractExample"
+      }
+    ]
   },
   {
     "id": "Grid",
@@ -3541,20 +3541,20 @@
     "layer": "components",
     "category": "Interaction",
     "order": 80,
-    "summary": "General enter/exit transition wrapper.",
-    "usage": "Use the smallest semantic transition that communicates state change; reduced-motion behavior is built into the motion runtime.",
-    "status": "candidate",
-    "accessibility": "Content remains in the accessibility tree according to its owning visibility state.",
-    "rtl": "Directional slide behavior must use semantic direction where relevant.",
-    "touch": "Transitions remain interruptible during direct interaction.",
-    "responsive": "Animation derives from content state, not fixed viewport assumptions.",
+    "summary": "Interruptible enter/exit transition whose logical presence, accessibility state and reduced-motion settlement remain authoritative.",
+    "usage": "Use the smallest semantic transition that communicates state change; reversal inherits the current spring value instead of restarting from an endpoint.",
+    "status": "accepted",
+    "accessibility": "Logical absence immediately owns aria-hidden/inert semantics; reduced motion settles without spatial interpolation while preserving the same final state.",
+    "rtl": "Physical transition kinds remain explicit; the SlideTransition alias adds logical inline/block direction for direction-sensitive movement.",
+    "touch": "An in-flight target can reverse without a visual jump, so direct interaction can interrupt and retarget motion safely.",
+    "responsive": "Motion reads semantic spring tokens from the animated element realm and avoids permanent compositor promotion when idle.",
     "playground": null,
     "props": [
       {
         "name": "distance",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Maximum spatial travel in CSS pixels for slide/reveal treatments.",
         "deprecated": false,
         "default": "24"
       },
@@ -3562,15 +3562,15 @@
         "name": "kind",
         "type": "TransitionKind",
         "optional": true,
-        "description": "",
+        "description": "Visual transition treatment.",
         "deprecated": false,
-        "default": "'fade'"
+        "default": "fade"
       },
       {
         "name": "onRest",
         "type": "(present: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "Called after the requested present/absent state has settled, including immediate reduced-motion settlement.",
         "deprecated": false,
         "default": null
       },
@@ -3578,7 +3578,7 @@
         "name": "present",
         "type": "boolean",
         "optional": false,
-        "description": "",
+        "description": "Logical visibility state that owns accessibility and interaction semantics.",
         "deprecated": false,
         "default": null
       },
@@ -3586,12 +3586,17 @@
         "name": "spring",
         "type": "SpringPreset",
         "optional": true,
-        "description": "",
+        "description": "Semantic spring preset read from the owning element realm.",
         "deprecated": false,
-        "default": "'standard'"
+        "default": "standard"
       }
     ],
     "examples": [
+      {
+        "id": "lifecycle",
+        "title": "Interruptible semantic transitions",
+        "component": "MotionLifecycleExample"
+      },
       {
         "id": "authority",
         "title": "Motion runtime authority",
@@ -4032,36 +4037,28 @@
     "layer": "components",
     "category": "Interaction",
     "order": 80,
-    "summary": "Content replacement transition alias.",
-    "usage": "Use for related state replacement without layering independent screens.",
-    "status": "candidate",
-    "accessibility": "Respects reduced motion.",
-    "rtl": "Direction-neutral unless the owning navigation adds semantics.",
-    "touch": "Does not require hover.",
-    "responsive": "Container-independent.",
+    "summary": "Subtle replacement alias for related content states using one shared lifecycle owner.",
+    "usage": "Use for related state replacement when a full spatial navigation transition would overstate the change.",
+    "status": "accepted",
+    "accessibility": "Visibility semantics remain authoritative and reduced motion removes interpolation.",
+    "rtl": "Direction-neutral unless the owning composition adds separate navigation semantics.",
+    "touch": "Does not require hover and remains interruptible while active.",
+    "responsive": "Container-independent and does not keep a compositor layer promoted after settlement.",
     "playground": null,
     "props": [
       {
         "name": "distance",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Maximum spatial travel in CSS pixels for slide/reveal treatments.",
         "deprecated": false,
-        "default": null
-      },
-      {
-        "name": "kind",
-        "type": "TransitionKind",
-        "optional": true,
-        "description": "",
-        "deprecated": false,
-        "default": null
+        "default": "24"
       },
       {
         "name": "onRest",
         "type": "(present: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "Called after the requested present/absent state has settled, including immediate reduced-motion settlement.",
         "deprecated": false,
         "default": null
       },
@@ -4069,7 +4066,7 @@
         "name": "present",
         "type": "boolean",
         "optional": false,
-        "description": "",
+        "description": "Logical visibility state that owns accessibility and interaction semantics.",
         "deprecated": false,
         "default": null
       },
@@ -4077,12 +4074,18 @@
         "name": "spring",
         "type": "SpringPreset",
         "optional": true,
-        "description": "",
+        "description": "Semantic spring preset read from the owning element realm.",
         "deprecated": false,
-        "default": null
+        "default": "standard"
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "lifecycle",
+        "title": "Interruptible semantic transitions",
+        "component": "MotionLifecycleExample"
+      }
+    ]
   },
   {
     "id": "RevealTransition",
@@ -4090,36 +4093,28 @@
     "layer": "components",
     "category": "Interaction",
     "order": 80,
-    "summary": "Reveal transition alias.",
-    "usage": "Use for progressive disclosure where clipping communicates hierarchy.",
-    "status": "candidate",
-    "accessibility": "Respects reduced motion.",
-    "rtl": "Reveal edge must remain logical when semantic.",
-    "touch": "Direct manipulation may take over the transition.",
-    "responsive": "Bounds follow the containing element.",
+    "summary": "Clip-and-translate reveal alias using the shared lifecycle and reduced-motion semantics.",
+    "usage": "Use when progressive disclosure benefits from a bounded reveal treatment.",
+    "status": "accepted",
+    "accessibility": "Logical visibility owns accessibility state independently of visual clipping.",
+    "rtl": "The current reveal treatment is block-axis and therefore direction-safe.",
+    "touch": "Retargeting remains interruptible through the shared spring owner.",
+    "responsive": "Clip geometry follows the rendered element and avoids permanent will-change layers.",
     "playground": null,
     "props": [
       {
         "name": "distance",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Maximum spatial travel in CSS pixels for slide/reveal treatments.",
         "deprecated": false,
-        "default": null
-      },
-      {
-        "name": "kind",
-        "type": "TransitionKind",
-        "optional": true,
-        "description": "",
-        "deprecated": false,
-        "default": null
+        "default": "24"
       },
       {
         "name": "onRest",
         "type": "(present: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "Called after the requested present/absent state has settled, including immediate reduced-motion settlement.",
         "deprecated": false,
         "default": null
       },
@@ -4127,7 +4122,7 @@
         "name": "present",
         "type": "boolean",
         "optional": false,
-        "description": "",
+        "description": "Logical visibility state that owns accessibility and interaction semantics.",
         "deprecated": false,
         "default": null
       },
@@ -4135,12 +4130,18 @@
         "name": "spring",
         "type": "SpringPreset",
         "optional": true,
-        "description": "",
+        "description": "Semantic spring preset read from the owning element realm.",
         "deprecated": false,
-        "default": null
+        "default": "standard"
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "lifecycle",
+        "title": "Interruptible semantic transitions",
+        "component": "MotionLifecycleExample"
+      }
+    ]
   },
   {
     "id": "Row",
@@ -4390,36 +4391,28 @@
     "layer": "components",
     "category": "Interaction",
     "order": 80,
-    "summary": "Scale transition alias.",
-    "usage": "Use for bounded surface appearance/disappearance.",
-    "status": "candidate",
-    "accessibility": "Respects reduced motion.",
-    "rtl": "Direction-neutral.",
-    "touch": "Must remain interruptible.",
-    "responsive": "Origin and bounds follow the actual element.",
+    "summary": "Bounded scale alias over the shared interruptible transition lifecycle.",
+    "usage": "Use for bounded surface appearance/disappearance where scale carries useful emphasis.",
+    "status": "accepted",
+    "accessibility": "Reduced motion removes spatial scaling rather than merely shortening its duration.",
+    "rtl": "Direction-neutral and unchanged by reading direction.",
+    "touch": "In-flight scale can reverse from its current visual value.",
+    "responsive": "Uses the actual element and semantic spring tokens rather than viewport categories.",
     "playground": null,
     "props": [
       {
         "name": "distance",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Maximum spatial travel in CSS pixels for slide/reveal treatments.",
         "deprecated": false,
-        "default": null
-      },
-      {
-        "name": "kind",
-        "type": "TransitionKind",
-        "optional": true,
-        "description": "",
-        "deprecated": false,
-        "default": null
+        "default": "24"
       },
       {
         "name": "onRest",
         "type": "(present: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "Called after the requested present/absent state has settled, including immediate reduced-motion settlement.",
         "deprecated": false,
         "default": null
       },
@@ -4427,7 +4420,7 @@
         "name": "present",
         "type": "boolean",
         "optional": false,
-        "description": "",
+        "description": "Logical visibility state that owns accessibility and interaction semantics.",
         "deprecated": false,
         "default": null
       },
@@ -4435,12 +4428,18 @@
         "name": "spring",
         "type": "SpringPreset",
         "optional": true,
-        "description": "",
+        "description": "Semantic spring preset read from the owning element realm.",
         "deprecated": false,
-        "default": null
+        "default": "standard"
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "lifecycle",
+        "title": "Interruptible semantic transitions",
+        "component": "MotionLifecycleExample"
+      }
+    ]
   },
   {
     "id": "Scrim",
@@ -4512,25 +4511,31 @@
     "layer": "components",
     "category": "Interaction",
     "order": 80,
-    "summary": "Child marker that contributes real start/center/end snap alignment to ScrollView.",
-    "usage": "Use only as a direct/owned ScrollView child when snap behavior is needed.",
-    "status": "candidate",
-    "accessibility": "Does not alter child accessibility semantics.",
-    "rtl": "Start/end snap alignment is interpreted logically by the scroll service.",
-    "touch": "Does not own touch input independently of ScrollView.",
-    "responsive": "Start/center/end offsets derive from real item and viewport geometry, then clamp through the shared scroll service.",
+    "summary": "Semantic child marker that contributes live start/center/end geometry to an owning ScrollView snap calculation.",
+    "usage": "Wrap snap destinations inside ScrollView; alignment is measured from live viewport-relative bounds so nested wrappers and variable item sizes remain valid.",
+    "status": "accepted",
+    "accessibility": "Adds no role, focus stop or accessibility state; the wrapped content keeps its original semantics.",
+    "rtl": "Start/end are logical alignments and horizontal item starts are derived from live RTL viewport geometry.",
+    "touch": "Owns no gesture; ScrollView remains the sole direct-manipulation owner.",
+    "responsive": "Alignment uses current item and viewport bounds, so resizing and variable child geometry are remeasured before settlement.",
     "playground": null,
     "props": [
       {
         "name": "align",
         "type": "'start' | 'center' | 'end'",
         "optional": true,
-        "description": "",
+        "description": "Logical alignment target inside the owning ScrollView viewport.",
         "deprecated": false,
-        "default": null
+        "default": "start"
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "scroll-contract",
+        "title": "Logical nested scroll, restoration and snap",
+        "component": "ScrollViewContractExample"
+      }
+    ]
   },
   {
     "id": "ScrollView",
@@ -4538,20 +4543,20 @@
     "layer": "components",
     "category": "Interaction",
     "order": 80,
-    "summary": "Reusable scroll owner with inertia, overscroll, snapping, indicators and keyboard support.",
-    "usage": "Use where OXS scroll behavior is required instead of feature-owned overflow/gesture engines.",
-    "status": "candidate",
-    "accessibility": "Focusable keyboard scrolling can be enabled and labelled.",
-    "rtl": "Horizontal motion is normalized to a logical inline position before drag, keyboard, momentum, indicator and snap calculations, insulating callers from browser RTL scrollLeft models.",
-    "touch": "Direct pointer/touch scrolling is first-class and competes through shared gesture ownership.",
-    "responsive": "Scroll viewport observes its actual container.",
+    "summary": "Logical scroll owner with native wheel chaining, direct manipulation, restoration, snapping, indicators and keyboard support.",
+    "usage": "Use where a reusable scroll owner is needed; give remounting views a stable restorationKey instead of storing browser-specific scrollLeft values.",
+    "status": "accepted",
+    "accessibility": "The native viewport remains focusable when keyboard control is enabled, accepts an explicit accessible label and preserves descendant semantics.",
+    "rtl": "Horizontal offset, keyboard movement, snapping and restoration use one logical inline coordinate independent of the browser RTL scrollLeft model and Document realm.",
+    "touch": "Touch and pen direct manipulation arbitrate through the shared gesture arena while wheel overflow can chain to nested OXS or native scroll owners.",
+    "responsive": "Viewport/content ResizeObserver reconciliation clamps stale offsets and recomputes variable-geometry snap targets without viewport or device branches.",
     "playground": null,
     "props": [
       {
         "name": "ariaLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible label applied to the focusable native scroll viewport.",
         "deprecated": false,
         "default": null
       },
@@ -4559,31 +4564,39 @@
         "name": "axis",
         "type": "ScrollAxis",
         "optional": true,
-        "description": "",
+        "description": "Logical scroll axis.",
         "deprecated": false,
-        "default": null
+        "default": "vertical"
       },
       {
         "name": "indicator",
         "type": "ScrollIndicatorMode",
         "optional": true,
-        "description": "",
+        "description": "Overlay indicator visibility policy.",
         "deprecated": false,
-        "default": null
+        "default": "auto"
       },
       {
         "name": "keyboard",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Enables focus and keyboard scrolling on the viewport.",
         "deprecated": false,
-        "default": null
+        "default": "true"
       },
       {
         "name": "overscroll",
         "type": "'elastic' | 'clamp'",
         "optional": true,
-        "description": "",
+        "description": "Edge response after local and nested owners are exhausted.",
+        "deprecated": false,
+        "default": "elastic"
+      },
+      {
+        "name": "restorationKey",
+        "type": "string",
+        "optional": true,
+        "description": "Caller-owned key used to restore the logical offset when this ScrollView remounts in the same Document realm.",
         "deprecated": false,
         "default": null
       },
@@ -4591,17 +4604,17 @@
         "name": "snap",
         "type": "ScrollSnapMode",
         "optional": true,
-        "description": "",
+        "description": "Nearest-child snap policy.",
         "deprecated": false,
-        "default": null
+        "default": "none"
       }
     ],
     "examples": [
       {
-        "id": "overview",
-        "title": "Overview",
-        "description": "Representative current states rendered from the colocated docs module.",
-        "component": "ScrollViewExample"
+        "id": "scroll-contract",
+        "title": "Logical nested scroll, restoration and snap",
+        "description": "Exercises nested wheel ownership, remount restoration and variable-width start/center/end snap geometry.",
+        "component": "ScrollViewContractExample"
       }
     ]
   },
@@ -5207,13 +5220,13 @@
     "layer": "components",
     "category": "Interaction",
     "order": 80,
-    "summary": "Shared-bounds transition helper for related visual elements.",
-    "usage": "Use for continuity between related source and destination surfaces, not as generic layout.",
-    "status": "candidate",
-    "accessibility": "Motion is supplementary and respects reduced-motion policy.",
-    "rtl": "Geometry is physical, while content direction remains logical.",
-    "touch": "Transitions must remain interruptible under direct touch interaction.",
-    "responsive": "Measurements follow actual element bounds rather than device breakpoints.",
+    "summary": "Root-owned shared-bounds continuity helper with interruption-safe measurement, expiry and cleanup lifecycle.",
+    "usage": "Give related source/destination surfaces one stable transitionId; use layoutKey only when a mounted destination changes geometry without changing identity.",
+    "status": "accepted",
+    "accessibility": "Shared-bounds motion is supplementary; reduced motion keeps the destination semantic state and skips geometry interpolation.",
+    "rtl": "Physical DOMRect interpolation is isolated to visual geometry while child content continues to inherit logical direction.",
+    "touch": "A new layout target cancels the prior animation/expiry owner before starting the next transition, so direct interaction can interrupt safely.",
+    "responsive": "Each lifecycle reads current DOMRect bounds and temporary will-change promotion is removed after settlement.",
     "playground": null,
     "props": [
       {
@@ -5228,20 +5241,26 @@
         "name": "spring",
         "type": "SpringPreset",
         "optional": true,
-        "description": "",
+        "description": "Semantic spring preset for bounds interpolation.",
         "deprecated": false,
-        "default": "'standard'"
+        "default": "standard"
       },
       {
         "name": "transitionId",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Stable identity shared by source and destination surfaces.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "bounds-lifecycle",
+        "title": "Shared bounds interruption and cleanup",
+        "component": "SharedBoundsLifecycleExample"
+      }
+    ]
   },
   {
     "id": "Sheet",
@@ -5579,44 +5598,36 @@
     "layer": "components",
     "category": "Interaction",
     "order": 80,
-    "summary": "Sliding transition alias.",
-    "usage": "Use when spatial direction communicates navigation or reveal.",
-    "status": "candidate",
-    "accessibility": "Respects reduced motion.",
-    "rtl": "Semantic directions must mirror under RTL where applicable.",
-    "touch": "Must remain interruptible.",
-    "responsive": "Distance follows token/config rather than device category.",
+    "summary": "Logical block/inline slide alias with explicit compatibility support for physical directions.",
+    "usage": "Prefer block-start/block-end/inline-start/inline-end when movement communicates hierarchy or navigation; physical values are compatibility escape hatches.",
+    "status": "accepted",
+    "accessibility": "Reduced motion settles directly to the final semantic visibility state with no spatial translation.",
+    "rtl": "inline-start and inline-end resolve against the owning UiRoot direction, so semantic travel mirrors in RTL.",
+    "touch": "Rapid retargeting preserves current spring value and velocity.",
+    "responsive": "Distance is a bounded component value and does not branch on device class.",
     "playground": null,
     "props": [
       {
         "name": "direction",
-        "type": "'up' | 'down' | 'left' | 'right'",
+        "type": "SlideDirection",
         "optional": true,
-        "description": "",
+        "description": "Logical slide direction. Physical up/down/left/right remain as compatibility values.",
         "deprecated": false,
-        "default": "'up'"
+        "default": "block-start"
       },
       {
         "name": "distance",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Maximum spatial travel in CSS pixels for slide/reveal treatments.",
         "deprecated": false,
-        "default": null
-      },
-      {
-        "name": "kind",
-        "type": "TransitionKind",
-        "optional": true,
-        "description": "",
-        "deprecated": false,
-        "default": null
+        "default": "24"
       },
       {
         "name": "onRest",
         "type": "(present: boolean) => void",
         "optional": true,
-        "description": "",
+        "description": "Called after the requested present/absent state has settled, including immediate reduced-motion settlement.",
         "deprecated": false,
         "default": null
       },
@@ -5624,7 +5635,7 @@
         "name": "present",
         "type": "boolean",
         "optional": false,
-        "description": "",
+        "description": "Logical visibility state that owns accessibility and interaction semantics.",
         "deprecated": false,
         "default": null
       },
@@ -5632,12 +5643,18 @@
         "name": "spring",
         "type": "SpringPreset",
         "optional": true,
-        "description": "",
+        "description": "Semantic spring preset read from the owning element realm.",
         "deprecated": false,
-        "default": null
+        "default": "standard"
       }
     ],
-    "examples": []
+    "examples": [
+      {
+        "id": "lifecycle",
+        "title": "Interruptible semantic transitions",
+        "component": "MotionLifecycleExample"
+      }
+    ]
   },
   {
     "id": "Snackbar",
@@ -8256,6 +8273,12 @@
         "title": "Host text session + occlusion",
         "description": "UiRoot exposes a metadata-only editing bridge while transient keyboard occlusion stays a separate logical host input.",
         "component": "EditableHostSessionExample"
+      },
+      {
+        "id": "clipboard-race",
+        "title": "Clipboard adapter race cancellation",
+        "description": "A delayed paste is invalidated when its root swaps clipboard transport; stale text never enters the active field.",
+        "component": "ClipboardRaceExample"
       }
     ]
   },

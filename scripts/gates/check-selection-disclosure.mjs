@@ -11,6 +11,7 @@ const navigation = fs.readFileSync(path.join(UI, 'src/components/Navigation.tsx'
 const select = fs.readFileSync(path.join(UI, 'src/components/Select.tsx'), 'utf8');
 const compositions = fs.readFileSync(path.join(UI, 'src/components/Compositions.tsx'), 'utf8');
 const scenarios = fs.readFileSync(path.join(ROOT, 'scripts/browser/scenarios.mjs'), 'utf8');
+const componentStyles = fs.readFileSync(path.join(UI, 'src/styles/components.css'), 'utf8');
 const catalog = buildCatalog({ uiRoot: UI });
 const issues = [];
 
@@ -34,6 +35,15 @@ for (const [name, exampleId] of requiredExamples) {
   if (!entry?.examples?.some((example) => example.id === exampleId))
     issues.push(`${name}: missing Studio example ${exampleId}`);
 }
+
+
+const nativeChoiceBlock = componentStyles.match(/\.ui-choice__native\s*\{([\s\S]*?)\}/)?.[1] ?? '';
+if (!/\binset\s*:\s*0\b/.test(nativeChoiceBlock))
+  issues.push('Checkbox/Radio native input must cover the full shared choice hit target');
+if (/pointer-events\s*:\s*none/.test(nativeChoiceBlock))
+  issues.push('Checkbox/Radio native input must remain the pointer hit-test owner');
+if (/inline-size\s*:\s*1px|block-size\s*:\s*1px/.test(nativeChoiceBlock))
+  issues.push('Checkbox/Radio native input may not collapse to a 1px proxy');
 
 for (const token of [
   "form.addEventListener('reset', reset)",

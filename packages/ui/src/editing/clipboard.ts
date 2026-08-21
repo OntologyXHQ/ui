@@ -5,13 +5,19 @@ export type UiClipboardAdapter = {
 };
 
 let configuredClipboardAdapter: UiClipboardAdapter | undefined;
+let configuredClipboardGeneration = 0;
 
 /**
  * Configures the process default adapter used by subsequently rendered UiRoot scopes.
  * Prefer the UiRoot `clipboardAdapter` prop when multiple roots need different transports.
  */
 export function configureUiClipboardAdapter(adapter: UiClipboardAdapter | undefined): void {
+  if (configuredClipboardAdapter !== adapter) configuredClipboardGeneration += 1;
   configuredClipboardAdapter = adapter;
+}
+
+export function getConfiguredUiClipboardGeneration(): number {
+  return configuredClipboardGeneration;
 }
 
 export function getConfiguredUiClipboardAdapter(): UiClipboardAdapter | undefined {

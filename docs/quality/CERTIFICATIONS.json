@@ -1305,6 +1305,223 @@
         "responsive",
         "a11y"
       ]
+    },
+    "ScrollView": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "packages/ui/src/scroll/__tests__/scroll-view.test.tsx",
+        "packages/ui/src/scroll/__tests__/physics.test.ts"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "scroll",
+        "logical-coordinates",
+        "rtl",
+        "nested-scroll",
+        "native-chaining",
+        "restoration",
+        "snap",
+        "resize",
+        "a11y"
+      ]
+    },
+    "ScrollSnapItem": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "packages/ui/src/scroll/__tests__/scroll-view.test.tsx",
+        "packages/ui/src/scroll/__tests__/physics.test.ts"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "scroll",
+        "snap",
+        "variable-geometry",
+        "rtl",
+        "resize",
+        "a11y"
+      ]
+    },
+    "MotionTransition": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "packages/ui/src/motion/__tests__/motion.test.ts",
+        "packages/ui/src/motion/__tests__/transition-lifecycle.test.tsx"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "motion",
+        "interruption",
+        "reduced-motion",
+        "performance-budget",
+        "a11y"
+      ]
+    },
+    "FadeTransition": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "packages/ui/src/motion/__tests__/motion.test.ts",
+        "packages/ui/src/motion/__tests__/transition-lifecycle.test.tsx"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "motion",
+        "interruption",
+        "reduced-motion",
+        "performance-budget",
+        "a11y"
+      ]
+    },
+    "ScaleTransition": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "packages/ui/src/motion/__tests__/motion.test.ts",
+        "packages/ui/src/motion/__tests__/transition-lifecycle.test.tsx"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "motion",
+        "interruption",
+        "reduced-motion",
+        "performance-budget",
+        "a11y"
+      ]
+    },
+    "RevealTransition": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "packages/ui/src/motion/__tests__/motion.test.ts",
+        "packages/ui/src/motion/__tests__/transition-lifecycle.test.tsx"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "motion",
+        "interruption",
+        "reduced-motion",
+        "performance-budget",
+        "a11y"
+      ]
+    },
+    "CollapseTransition": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "packages/ui/src/motion/__tests__/motion.test.ts",
+        "packages/ui/src/motion/__tests__/transition-lifecycle.test.tsx"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "motion",
+        "interruption",
+        "reduced-motion",
+        "performance-budget",
+        "a11y"
+      ]
+    },
+    "ReplaceTransition": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "packages/ui/src/motion/__tests__/motion.test.ts",
+        "packages/ui/src/motion/__tests__/transition-lifecycle.test.tsx"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "motion",
+        "interruption",
+        "reduced-motion",
+        "performance-budget",
+        "a11y"
+      ]
+    },
+    "SlideTransition": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "packages/ui/src/motion/__tests__/motion.test.ts",
+        "packages/ui/src/motion/__tests__/transition-lifecycle.test.tsx"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "motion",
+        "interruption",
+        "reduced-motion",
+        "performance-budget",
+        "rtl",
+        "a11y"
+      ]
+    },
+    "SharedBounds": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "packages/ui/src/motion/__tests__/transition-lifecycle.test.tsx"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "motion",
+        "shared-bounds",
+        "interruption",
+        "reduced-motion",
+        "performance-budget",
+        "resize",
+        "a11y"
+      ]
+    },
+    "GestureRevealHandle": {
+      "owner": "UIR12",
+      "behaviorTests": [
+        "packages/ui/src/gestures/__tests__/gesture-contract.test.tsx",
+        "packages/ui/src/drag-drop/__tests__/dragDrop.test.tsx"
+      ],
+      "browserScenarios": [
+        "gesture-drag-editing-cursor-certification"
+      ],
+      "requiredAxes": [
+        "gestures",
+        "arena",
+        "native-scroll",
+        "text-selection",
+        "drag-drop",
+        "pointer-continuation",
+        "preview",
+        "edge-autoscroll",
+        "keyboard",
+        "realm",
+        "a11y"
+      ]
+    },
+    "CursorRegion": {
+      "owner": "UIR12",
+      "behaviorTests": [
+        "packages/ui/src/cursor/__tests__/cursor.test.tsx"
+      ],
+      "browserScenarios": [
+        "gesture-drag-editing-cursor-certification"
+      ],
+      "requiredAxes": [
+        "cursor",
+        "hotspot",
+        "modality",
+        "nested-root",
+        "realm",
+        "a11y"
+      ]
     }
   }
 }

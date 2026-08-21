@@ -103,7 +103,7 @@ export function UiRoot({
       realmWindow={realm.window}
       realmDocument={realm.document}
     >
-      <CursorRuntimeProvider config={cursor}>
+      <CursorRuntimeProvider config={cursor} realmWindow={realm.window}>
         <MotionRuntimeProvider
           preference={motion}
           targetFrameRate={targetFrameRate}
@@ -195,11 +195,15 @@ function UiRootFrame({
         data-oxs-cursor-animation={cursor.config.animation}
         data-oxs-pointer-modality={cursor.modality}
         data-oxs-pointer-visible={cursor.pointerVisible}
+        data-oxs-pointer-suppressed={cursor.pointerSuppressed ? 'true' : 'false'}
+        data-oxs-cursor-hotspot={`${cursor.config.hotspot.x},${cursor.config.hotspot.y}`}
         style={
           {
             ...environmentStyle,
             '--oxs-cursor-scale': cursor.config.scale,
             '--oxs-cursor-nominal-size': `${cursor.config.nominalSize}px`,
+            '--oxs-cursor-hotspot-x': `${cursor.config.hotspot.x}px`,
+            '--oxs-cursor-hotspot-y': `${cursor.config.hotspot.y}px`,
             ...style,
           } as CSSProperties
         }

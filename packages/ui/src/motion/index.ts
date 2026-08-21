@@ -1,10 +1,16 @@
 export type { FrameRateTarget, MotionFrame, MotionFrameHost, MotionFrameListener } from './clock';
 export { motionFrameHost, MotionClock } from './clock';
 export type {
+  FramePerformanceAssessment,
+  FramePerformanceBudget,
   FramePerformanceListener,
   FramePerformanceSnapshot,
 } from './performance';
-export { FramePerformanceMonitor } from './performance';
+export {
+  assessFramePerformance,
+  DEFAULT_FRAME_PERFORMANCE_BUDGET,
+  FramePerformanceMonitor,
+} from './performance';
 export type {
   MotionPreference,
   MotionRuntime,
@@ -31,6 +37,7 @@ export {
 } from './spring';
 export type {
   MotionTransitionProps,
+  SlideDirection,
   TransitionAliasProps,
   TransitionKind,
 } from './Transition';

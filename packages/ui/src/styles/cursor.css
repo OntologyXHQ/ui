@@ -1,10 +1,10 @@
-/* Cursor presentation is centralized here for browser/Servo preview.
- * The native compositor maps the same semantic roles to client/system cursor state later.
+/* Browser/Servo preview only. Privileged/native cursor theme, asset, scale and hotspot application
+ * remains host-owned; UI emits semantic role/config intent through data attributes and UiRoot state.
+ * Cursor is inherited, so each nested UiRoot explicitly resets the inherited preview before applying
+ * its own modality policy. This keeps root-local touch suppression and drag feedback from leaking.
  */
-.ui-root[data-oxs-pointer-visible='false'],
-.ui-root[data-oxs-pointer-visible='false'] * {
-  cursor: none !important;
-}
+.ui-root[data-oxs-pointer-visible='false'] { cursor: none !important; }
+.ui-root[data-oxs-pointer-visible='true'] { cursor: auto; }
 
 [data-oxs-cursor-role='default'] { cursor: default; }
 [data-oxs-cursor-role='pointer'] { cursor: pointer; }
@@ -34,11 +34,8 @@
 
 .ui-cursor-region { display: contents; }
 
-/* Active drag operation owns cursor feedback across the whole gesture, including
- * pointer movement outside the source element. */
-.ui-drag-drop-runtime[data-oxs-drag-cursor-role='drag-copy'],
-.ui-drag-drop-runtime[data-oxs-drag-cursor-role='drag-copy'] * { cursor: copy !important; }
-.ui-drag-drop-runtime[data-oxs-drag-cursor-role='drag-move'],
-.ui-drag-drop-runtime[data-oxs-drag-cursor-role='drag-move'] * { cursor: move !important; }
-.ui-drag-drop-runtime[data-oxs-drag-cursor-role='no-drop'],
-.ui-drag-drop-runtime[data-oxs-drag-cursor-role='no-drop'] * { cursor: no-drop !important; }
+/* Active drag feedback is inherited within one DragDropProvider. A nested UiRoot resets cursor at
+ * its own `.ui-root[data-oxs-pointer-visible]` boundary and therefore keeps independent authority. */
+.ui-drag-drop-runtime[data-oxs-drag-cursor-role='drag-copy'] { cursor: copy !important; }
+.ui-drag-drop-runtime[data-oxs-drag-cursor-role='drag-move'] { cursor: move !important; }
+.ui-drag-drop-runtime[data-oxs-drag-cursor-role='no-drop'] { cursor: no-drop !important; }

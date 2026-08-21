@@ -139,14 +139,15 @@ for path in sorted(module_files):
 
 # Colocated docs modules are executable Studio code whenever they own examples.
 # They may use the local metadata helper, but every runtime UI symbol must flow
-# through the same public package entry that consumers use. Relative visual
-# imports would instantiate a second source graph and can split UiRoot/portal
-# contexts from the package instance exercised by Studio.
+# through public package entries. Normal visual/runtime composition uses `@ontologyx/ui`;
+# docs that explicitly certify infrastructure may use the published `@ontologyx/ui/advanced`
+# diagnostics subpath. Relative visual imports would instantiate a second source graph and can
+# split UiRoot/portal contexts from the package instance exercised by Studio.
 for path in sorted(DOCS_ROOT.rglob('*.docs.tsx')):
     text = path.read_text(encoding='utf-8')
     for match in import_re.finditer(text):
         specifier = match.group(1)
-        if specifier in {'react', '@ontologyx/ui', '@ontologyx/ui/icons', DOCS_HELPER}:
+        if specifier in {'react', '@ontologyx/ui', '@ontologyx/ui/advanced', '@ontologyx/ui/icons', DOCS_HELPER}:
             continue
         if specifier.startswith('react/'):
             continue
@@ -160,4 +161,4 @@ if issues:
         print(f' - {issue}')
     raise SystemExit(1)
 
-print(f'G4 Studio integrity gate passed: {len(reachable)} reachable TS/TSX modules · no dead Studio modules · Studio/docs runtime uses public @ontologyx/ui package entries only · no host/source deep imports.')
+print(f'G4 Studio integrity gate passed: {len(reachable)} reachable TS/TSX modules · no dead Studio modules · Studio/docs runtime uses reviewed public @ontologyx/ui package entries only · no host/source deep imports.')

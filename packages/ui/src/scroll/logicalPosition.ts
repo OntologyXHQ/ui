@@ -1,13 +1,15 @@
 export type RtlScrollType = 'negative' | 'positive-descending' | 'positive-ascending';
 
-let cachedRtlScrollType: RtlScrollType | null = null;
+const rtlScrollTypes = new WeakMap<Document, RtlScrollType>();
 
-export function rtlScrollType(): RtlScrollType {
-  if (cachedRtlScrollType) return cachedRtlScrollType;
-  if (typeof document === 'undefined' || !document.body) return 'negative';
+/** Resolve the host browser's RTL scrollLeft model inside the element's own Document realm. */
+export function rtlScrollType(ownerDocument: Document | null | undefined): RtlScrollType {
+  if (!ownerDocument?.body) return 'negative';
+  const cached = rtlScrollTypes.get(ownerDocument);
+  if (cached) return cached;
 
-  const outer = document.createElement('div');
-  const inner = document.createElement('div');
+  const outer = ownerDocument.createElement('div');
+  const inner = ownerDocument.createElement('div');
   outer.dir = 'rtl';
   Object.assign(outer.style, {
     width: '4px',
@@ -19,16 +21,18 @@ export function rtlScrollType(): RtlScrollType {
   });
   Object.assign(inner.style, { width: '8px', height: '1px' });
   outer.append(inner);
-  document.body.append(outer);
+  ownerDocument.body.append(outer);
 
+  let type: RtlScrollType;
   if (outer.scrollLeft > 0) {
-    cachedRtlScrollType = 'positive-descending';
+    type = 'positive-descending';
   } else {
     outer.scrollLeft = 1;
-    cachedRtlScrollType = outer.scrollLeft === 0 ? 'negative' : 'positive-ascending';
+    type = outer.scrollLeft === 0 ? 'negative' : 'positive-ascending';
   }
   outer.remove();
-  return cachedRtlScrollType;
+  rtlScrollTypes.set(ownerDocument, type);
+  return type;
 }
 
 export function logicalHorizontalFromPhysical(type: RtlScrollType, max: number, physical: number) {
@@ -53,7 +57,11 @@ export function physicalHorizontalFromLogical(type: RtlScrollType, max: number, 
 export function readLogicalHorizontalScroll(element: HTMLElement, direction: 'ltr' | 'rtl') {
   if (direction === 'ltr') return element.scrollLeft;
   const max = Math.max(0, element.scrollWidth - element.clientWidth);
-  return logicalHorizontalFromPhysical(rtlScrollType(), max, element.scrollLeft);
+  return logicalHorizontalFromPhysical(
+    rtlScrollType(element.ownerDocument),
+    max,
+    element.scrollLeft,
+  );
 }
 
 export function writeLogicalHorizontalScroll(
@@ -64,16 +72,22 @@ export function writeLogicalHorizontalScroll(
   const max = Math.max(0, element.scrollWidth - element.clientWidth);
   const value = Math.min(max, Math.max(0, logicalPosition));
   element.scrollLeft =
-    direction === 'ltr' ? value : physicalHorizontalFromLogical(rtlScrollType(), max, value);
+    direction === 'ltr'
+      ? value
+      : physicalHorizontalFromLogical(rtlScrollType(element.ownerDocument), max, value);
 }
 
-export function logicalInlineStart(
-  item: HTMLElement,
-  content: HTMLElement,
+/** Resolve a snap child's logical start from live viewport-relative geometry. */
+export function logicalSnapItemStart(
+  itemRect: Pick<DOMRect, 'top' | 'left' | 'right'>,
+  viewportRect: Pick<DOMRect, 'top' | 'left' | 'right'>,
+  currentPosition: number,
+  axis: 'vertical' | 'horizontal',
   direction: 'ltr' | 'rtl',
 ) {
-  if (direction === 'ltr') return item.offsetLeft;
-  return Math.max(0, content.scrollWidth - (item.offsetLeft + item.offsetWidth));
+  if (axis === 'vertical') return currentPosition + itemRect.top - viewportRect.top;
+  if (direction === 'rtl') return currentPosition + viewportRect.right - itemRect.right;
+  return currentPosition + itemRect.left - viewportRect.left;
 }
 
 export function alignedSnapOffset(

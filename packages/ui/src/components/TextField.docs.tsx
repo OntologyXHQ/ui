@@ -1,4 +1,4 @@
-import type { EditableTextSessionSnapshot } from '@ontologyx/ui';
+import type { EditableTextSessionSnapshot, UiClipboardAdapter } from '@ontologyx/ui';
 import {
   Button,
   Code,
@@ -10,7 +10,7 @@ import {
   UiRoot,
   Wrap,
 } from '@ontologyx/ui';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { defineUiDocsGroup } from '../docs/defineUiDocs';
 
 export const uiDocs = defineUiDocsGroup([
@@ -45,6 +45,13 @@ export const uiDocs = defineUiDocsGroup([
         description:
           'UiRoot exposes a metadata-only editing bridge while transient keyboard occlusion stays a separate logical host input.',
         component: 'EditableHostSessionExample',
+      },
+      {
+        id: 'clipboard-race',
+        title: 'Clipboard adapter race cancellation',
+        description:
+          'A delayed paste is invalidated when its root swaps clipboard transport; stale text never enters the active field.',
+        component: 'ClipboardRaceExample',
       },
     ],
   },
@@ -282,6 +289,55 @@ export function EditableHostSessionExample() {
           {session ? `${session.state.selection.start}:${session.state.selection.end}` : 'none'}
         </Code>
         <Code data-editable-session-enterkey>{session?.descriptor.enterKeyHint ?? 'none'}</Code>
+      </Stack>
+    </UiRoot>
+  );
+}
+
+export function ClipboardRaceExample() {
+  const [adapterVersion, setAdapterVersion] = useState(1);
+  const [value, setValue] = useState('seed');
+  const pendingPasteRef = useRef<((text: string) => void) | null>(null);
+  const adapter = useMemo<UiClipboardAdapter>(
+    () => ({
+      isAvailable: () => true,
+      writeText: () => true,
+      readText: () =>
+        new Promise<string>((resolve) => {
+          pendingPasteRef.current = resolve;
+        }),
+    }),
+    [adapterVersion],
+  );
+
+  return (
+    <UiRoot clipboardAdapter={adapter}>
+      <Stack gap="sm" data-clipboard-race-example>
+        <TextField
+          label="Clipboard race target"
+          value={value}
+          onChange={(event) => setValue(event.currentTarget.value)}
+        />
+        <Wrap gap="sm">
+          <Button
+            data-rotate-clipboard-adapter
+            onClick={() => setAdapterVersion((version) => version + 1)}
+          >
+            Rotate clipboard adapter
+          </Button>
+          <Button
+            data-resolve-pending-paste
+            variant="secondary"
+            onClick={() => {
+              pendingPasteRef.current?.('stale-paste');
+              pendingPasteRef.current = null;
+            }}
+          >
+            Resolve pending paste
+          </Button>
+        </Wrap>
+        <Code data-clipboard-adapter-version>{String(adapterVersion)}</Code>
+        <Code data-clipboard-race-value>{value}</Code>
       </Stack>
     </UiRoot>
   );

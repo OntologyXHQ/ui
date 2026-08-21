@@ -1,12 +1,14 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { UiRoot } from '../../adaptive';
 import { ScrollSnapItem, ScrollView } from '../../components/ScrollView';
 import {
   alignedSnapOffset,
   logicalHorizontalFromPhysical,
+  logicalSnapItemStart,
   physicalHorizontalFromLogical,
 } from '../logicalPosition';
+import { consumeNativeScrollChain, findNativeScrollableAncestor } from '../nativeChain';
 
 function setMetric(
   element: HTMLElement,
@@ -33,6 +35,14 @@ describe('ScrollView runtime contracts', () => {
     expect(alignedSnapOffset(100, 20, 60, 'end')).toBe(60);
   });
 
+  it('derives nested variable-size snap starts from viewport-relative logical geometry', () => {
+    const item = { top: 140, left: 230, right: 350 } as DOMRect;
+    const viewport = { top: 100, left: 200, right: 500 } as DOMRect;
+    expect(logicalSnapItemStart(item, viewport, 60, 'vertical', 'ltr')).toBe(100);
+    expect(logicalSnapItemStart(item, viewport, 60, 'horizontal', 'ltr')).toBe(90);
+    expect(logicalSnapItemStart(item, viewport, 60, 'horizontal', 'rtl')).toBe(210);
+  });
+
   it('direct-manipulates safely when the host has no Pointer Capture implementation', () => {
     render(
       <UiRoot>
@@ -50,7 +60,7 @@ describe('ScrollView runtime contracts', () => {
     }).not.toThrow();
   });
 
-  it('lets wheel input chain to a native scrollable ancestor when already at its own edge', () => {
+  it('deterministically chains exhausted wheel input to a native scrollable ancestor', () => {
     render(
       <UiRoot>
         <div data-testid="native-scroll" style={{ overflowY: 'auto' }}>
@@ -64,9 +74,19 @@ describe('ScrollView runtime contracts', () => {
     setMetric(ancestor, 'scrollHeight', 300);
     setMetric(viewport, 'clientHeight', 100);
     setMetric(viewport, 'scrollHeight', 300);
-    viewport.scrollTop = 0;
+    viewport.scrollTop = 200;
+    ancestor.scrollTop = 0;
 
-    expect(fireEvent.wheel(viewport, { deltaY: -40, deltaMode: 0 })).toBe(true);
+    expect(findNativeScrollableAncestor(viewport, 'vertical', 40)).toBe(ancestor);
+    expect(fireEvent.wheel(viewport, { deltaY: 40, deltaMode: 0 })).toBe(false);
+    expect(ancestor.scrollTop).toBe(40);
+    ancestor.scrollTop = 0;
+    expect(consumeNativeScrollChain(viewport, 'vertical', 40)).toEqual({
+      position: 40,
+      consumed: 40,
+      overflow: 0,
+    });
+    expect(ancestor.scrollTop).toBe(40);
   });
 
   it('preserves consumer pointer callbacks while direct manipulation owns the gesture', () => {

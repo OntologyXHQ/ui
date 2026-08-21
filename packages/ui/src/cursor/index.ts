@@ -4,6 +4,7 @@ export type { CursorRuntimeSnapshot } from './runtime';
 export { CursorRuntimeProvider, useCursorRuntime } from './runtime';
 export type {
   CursorAnimationPreference,
+  CursorHotspot,
   CursorRole,
   CursorRuntimeConfig,
   PointerModality,
@@ -11,6 +12,7 @@ export type {
 } from './types';
 export {
   DEFAULT_CURSOR_RUNTIME_CONFIG,
+  normalizeCursorRuntimeConfig,
   normalizeCursorRole,
   SYSTEM_CURSOR_ROLES,
 } from './types';

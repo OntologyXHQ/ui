@@ -3,6 +3,7 @@
   min-width: 0;
   min-height: 0;
   overflow: hidden;
+  overflow: clip;
   isolation: isolate;
 }
 
@@ -12,7 +13,7 @@
   min-width: 0;
   min-height: 0;
   overflow: auto;
-  overscroll-behavior: contain;
+  overscroll-behavior: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
   touch-action: none;
@@ -43,6 +44,9 @@
 .ui-scroll-view__content {
   min-width: 100%;
   min-height: 100%;
+}
+
+.ui-scroll-view[data-overscrolling='true'] > .ui-scroll-view__viewport > .ui-scroll-view__content {
   transform: translate3d(
     var(--oxs-scroll-overscroll-x, 0px),
     var(--oxs-scroll-overscroll-y, 0px),
@@ -55,9 +59,6 @@
   width: max-content;
   min-width: 100%;
   min-height: 100%;
-}
-
-.ui-scroll-view[data-dragging='true'] {
 }
 
 .ui-scroll-indicator {
@@ -126,22 +127,15 @@
   scroll-snap-type: x mandatory;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ui-scroll-view__content {
-    transform: none;
-  }
-
-  .ui-scroll-indicator {
-    transition-duration: var(--oxs-motion-reduced);
-  }
-}
-
-.ui-root[data-oxs-motion='reduced'] .ui-scroll-view__content {
+.ui-scroll-view[data-motion-preference='reduced'][data-overscrolling='true']
+  > .ui-scroll-view__viewport
+  > .ui-scroll-view__content {
   transform: none;
+  will-change: auto;
 }
 
-.ui-root[data-oxs-motion='reduced'] .ui-scroll-indicator {
-  transition-duration: var(--oxs-motion-reduced);
+.ui-scroll-view[data-motion-preference='reduced'] > .ui-scroll-indicator {
+  transition: none;
 }
 
 @media (forced-colors: active) {

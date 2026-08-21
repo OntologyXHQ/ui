@@ -36,24 +36,33 @@ const DragDropContext = createContext<DragDropRuntime | null>(null);
 
 export function DragDropProvider({ children }: PropsWithChildren) {
   const portalHost = useUiPortalHost();
+  const [rootElement, setRootElement] = useState<HTMLDivElement | null>(null);
   const targetsRef = useRef(new Map<string, RegisteredTarget>());
   const sessionRef = useRef<DragSession | null>(null);
   const [session, setSession] = useState<DragSession | null>(null);
   const [announcement, setAnnouncement] = useState('');
+  const ownerDocument = rootElement?.ownerDocument ?? portalHost?.ownerDocument ?? null;
+  const ownerWindow = ownerDocument?.defaultView ?? null;
 
   const commitSession = useCallback((next: DragSession | null) => {
     sessionRef.current = next;
     setSession(next);
   }, []);
 
-  const registerTarget = useCallback((target: RegisteredTarget) => {
-    targetsRef.current.set(target.id, target);
-    return () => {
-      if (targetsRef.current.get(target.id)?.element === target.element) {
+  const registerTarget = useCallback(
+    (target: RegisteredTarget) => {
+      targetsRef.current.set(target.id, target);
+      return () => {
+        if (targetsRef.current.get(target.id)?.element !== target.element) return;
         targetsRef.current.delete(target.id);
-      }
-    };
-  }, []);
+        const current = sessionRef.current;
+        if (current?.targetId === target.id) {
+          commitSession({ ...current, targetId: undefined, operation: 'none' });
+        }
+      };
+    },
+    [commitSession],
+  );
 
   const begin = useCallback(
     (input: Omit<DragSession, 'active' | 'targetId' | 'operation'>) => {
@@ -93,6 +102,7 @@ export function DragDropProvider({ children }: PropsWithChildren) {
             : targets.length - 1
           : (currentIndex + delta + targets.length) % targets.length;
       const target = targets[nextIndex];
+      if (!target?.element.isConnected) return;
       const rect = target.element.getBoundingClientRect();
       const point = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
       const operation = operationForTarget(target, current.item);
@@ -115,7 +125,11 @@ export function DragDropProvider({ children }: PropsWithChildren) {
     const current = sessionRef.current;
     if (!current) return;
     const target = current.targetId ? targetsRef.current.get(current.targetId) : undefined;
-    if (target && current.operation !== 'none' && target.accepts?.(current.item) !== false) {
+    if (
+      target?.element.isConnected &&
+      current.operation !== 'none' &&
+      target.accepts?.(current.item) !== false
+    ) {
       target.onDrop(current.item, current.operation);
       setAnnouncement(
         `Dropped ${current.item.label ?? current.item.id} on ${target.label ?? target.id}.`,
@@ -127,6 +141,7 @@ export function DragDropProvider({ children }: PropsWithChildren) {
   }, [commitSession]);
 
   useEffect(() => {
+    if (!ownerWindow || !ownerDocument) return;
     const onKeyDown = (event: KeyboardEvent) => {
       const current = sessionRef.current;
       if (!current) return;
@@ -141,10 +156,12 @@ export function DragDropProvider({ children }: PropsWithChildren) {
         finish();
         return;
       }
-      const active = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      const activeElement = ownerDocument.activeElement;
+      const active =
+        activeElement instanceof ownerWindow.HTMLElement ? (activeElement as HTMLElement) : null;
       const direction = active
-        ? window.getComputedStyle(active).direction
-        : document.documentElement.dir;
+        ? ownerWindow.getComputedStyle(active).direction
+        : ownerWindow.getComputedStyle(ownerDocument.documentElement).direction;
       let step: 'next' | 'previous' | null = null;
       if (event.key === 'ArrowDown') step = 'next';
       if (event.key === 'ArrowUp') step = 'previous';
@@ -155,22 +172,32 @@ export function DragDropProvider({ children }: PropsWithChildren) {
         stepTarget(step);
       }
     };
-    window.addEventListener('keydown', onKeyDown, true);
-    return () => window.removeEventListener('keydown', onKeyDown, true);
-  }, [cancel, finish, stepTarget]);
+    ownerWindow.addEventListener('keydown', onKeyDown, true);
+    return () => ownerWindow.removeEventListener('keydown', onKeyDown, true);
+  }, [cancel, finish, ownerDocument, ownerWindow, stepTarget]);
 
   useEffect(() => {
-    if (!session || session.modality === 'keyboard') return;
-    let frame = 0;
+    if (!session || session.modality === 'keyboard' || !ownerWindow || !ownerDocument) return;
+    let frame: number | null = null;
     const tick = () => {
       const current = sessionRef.current;
       if (!current || current.modality === 'keyboard') return;
-      autoScrollAt(current.point);
-      frame = requestAnimationFrame(tick);
+      autoScrollAt(ownerDocument, current.point);
+      frame = ownerWindow.requestAnimationFrame(tick);
     };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [session?.sourceId, session?.modality]);
+    frame = ownerWindow.requestAnimationFrame(tick);
+    return () => {
+      if (frame !== null) ownerWindow.cancelAnimationFrame(frame);
+    };
+  }, [ownerDocument, ownerWindow, session?.modality, session?.sourceId]);
+
+  useEffect(
+    () => () => {
+      sessionRef.current = null;
+      targetsRef.current.clear();
+    },
+    [],
+  );
 
   const runtime = useMemo(
     () => ({ session, begin, update, stepTarget, finish, cancel, registerTarget }),
@@ -181,6 +208,7 @@ export function DragDropProvider({ children }: PropsWithChildren) {
   return (
     <DragDropContext.Provider value={runtime}>
       <div
+        ref={setRootElement}
         className="ui-drag-drop-runtime"
         data-oxs-drag-active={session ? 'true' : 'false'}
         data-oxs-drag-cursor-role={cursorRole}
@@ -232,11 +260,13 @@ function renderPreview(preview: DragPreview | undefined, item: DragItem): ReactN
 
 function orderedTargets(targets: IterableIterator<RegisteredTarget>, item: DragItem) {
   return [...targets]
-    .filter((target) => target.accepts?.(item) !== false)
+    .filter((target) => target.element.isConnected && target.accepts?.(item) !== false)
     .sort((left, right) => {
       const relation = left.element.compareDocumentPosition(right.element);
-      if (relation & Node.DOCUMENT_POSITION_FOLLOWING) return -1;
-      if (relation & Node.DOCUMENT_POSITION_PRECEDING) return 1;
+      const NodeConstructor = left.element.ownerDocument.defaultView?.Node;
+      if (!NodeConstructor) return 0;
+      if (relation & NodeConstructor.DOCUMENT_POSITION_FOLLOWING) return -1;
+      if (relation & NodeConstructor.DOCUMENT_POSITION_PRECEDING) return 1;
       return 0;
     });
 }
@@ -249,7 +279,7 @@ function findDropTarget(
   let selected: RegisteredTarget | undefined;
   let selectedArea = Number.POSITIVE_INFINITY;
   for (const target of targets) {
-    if (target.accepts?.(item) === false) continue;
+    if (!target.element.isConnected || target.accepts?.(item) === false) continue;
     const rect = target.element.getBoundingClientRect();
     if (point.x < rect.left || point.x > rect.right || point.y < rect.top || point.y > rect.bottom)
       continue;
@@ -282,21 +312,27 @@ export function autoScrollDelta(
   return 0;
 }
 
-function autoScrollAt(point: DragPoint) {
-  if (typeof document.elementFromPoint !== 'function') return;
-  let element = document.elementFromPoint(point.x, point.y) as HTMLElement | null;
+function autoScrollAt(ownerDocument: Document, point: DragPoint) {
+  if (typeof ownerDocument.elementFromPoint !== 'function') return;
+  const ownerWindow = ownerDocument.defaultView;
+  if (!ownerWindow) return;
+  let element = ownerDocument.elementFromPoint(point.x, point.y) as HTMLElement | null;
   while (element) {
-    const style = window.getComputedStyle(element);
+    const style = ownerWindow.getComputedStyle(element);
     const scrollableY =
-      /(auto|scroll)/.test(style.overflowY) && element.scrollHeight > element.clientHeight;
+      /(auto|scroll|overlay)/.test(style.overflowY) && element.scrollHeight > element.clientHeight;
     const scrollableX =
-      /(auto|scroll)/.test(style.overflowX) && element.scrollWidth > element.clientWidth;
+      /(auto|scroll|overlay)/.test(style.overflowX) && element.scrollWidth > element.clientWidth;
     if (scrollableY || scrollableX) {
       const rect = element.getBoundingClientRect();
       const dx = scrollableX ? autoScrollDelta(point.x, rect.left, rect.right) : 0;
       const dy = scrollableY ? autoScrollDelta(point.y, rect.top, rect.bottom) : 0;
-      if (dx !== 0 || dy !== 0) element.scrollBy({ left: dx, top: dy, behavior: 'auto' });
-      return;
+      if (dx !== 0 || dy !== 0) {
+        const beforeX = element.scrollLeft;
+        const beforeY = element.scrollTop;
+        element.scrollBy({ left: dx, top: dy, behavior: 'auto' });
+        if (element.scrollLeft !== beforeX || element.scrollTop !== beforeY) return;
+      }
     }
     element = element.parentElement;
   }

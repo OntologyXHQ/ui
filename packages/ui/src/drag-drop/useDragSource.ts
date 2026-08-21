@@ -31,11 +31,26 @@ type PendingPointer = {
   pointerId: number;
   pointerType: string;
   target: HTMLElement;
+  ownerWindow: Window | null;
   origin: DragPoint;
   latest: DragPoint;
   active: boolean;
   timer: number | null;
   unregister: () => void;
+  removeWindowContinuation: () => void;
+};
+
+type DragPointerEvent = {
+  pointerId: number;
+  clientX: number;
+  clientY: number;
+  target: EventTarget | null;
+  preventDefault: () => void;
+};
+
+type ClickSuppressionTimer = {
+  ownerWindow: Window;
+  id: number;
 };
 
 export function useDragSource({
@@ -49,16 +64,43 @@ export function useDragSource({
   const { begin, update, stepTarget, finish, cancel, session } = useDragDropRuntime();
   const pendingRef = useRef<PendingPointer | null>(null);
   const suppressNextClickRef = useRef(false);
-  const suppressClickTimerRef = useRef<number | null>(null);
+  const suppressClickTimerRef = useRef<ClickSuppressionTimer | null>(null);
   const gestureOwner = useId();
   const gestureArena = useGestureArena();
   const keyboardActive = session?.sourceId === id && session.modality === 'keyboard';
+
+  const clearClickSuppressionTimer = useCallback(() => {
+    const timer = suppressClickTimerRef.current;
+    if (!timer) return;
+    timer.ownerWindow.clearTimeout(timer.id);
+    suppressClickTimerRef.current = null;
+  }, []);
+
+  const armClickSuppression = useCallback(
+    (ownerWindow: Window | null) => {
+      suppressNextClickRef.current = true;
+      clearClickSuppressionTimer();
+      if (!ownerWindow) return;
+      const timer: ClickSuppressionTimer = {
+        ownerWindow,
+        id: ownerWindow.setTimeout(() => {
+          suppressNextClickRef.current = false;
+          if (suppressClickTimerRef.current === timer) suppressClickTimerRef.current = null;
+        }, 0),
+      };
+      suppressClickTimerRef.current = timer;
+    },
+    [clearClickSuppressionTimer],
+  );
 
   const clearPending = useCallback(
     (releaseArena = true) => {
       const pending = pendingRef.current;
       if (!pending) return;
-      if (pending.timer !== null) window.clearTimeout(pending.timer);
+      if (pending.timer !== null && pending.ownerWindow)
+        pending.ownerWindow.clearTimeout(pending.timer);
+      pending.timer = null;
+      pending.removeWindowContinuation();
       if (releaseArena) gestureArena.release(pending.pointerId, gestureOwner);
       pending.unregister();
       releasePointerCaptureIfSupported(pending.target, pending.pointerId);
@@ -96,42 +138,8 @@ export function useDragSource({
     [begin, gestureArena, gestureOwner, id, item, preview, update],
   );
 
-  const onPointerDown = useCallback(
-    (event: ReactPointerEvent<HTMLElement>) => {
-      if (disabled || event.isPrimary === false || event.button > 0 || pendingRef.current) return;
-      const pending: PendingPointer = {
-        pointerId: event.pointerId,
-        pointerType: event.pointerType,
-        target: event.currentTarget,
-        origin: { x: event.clientX, y: event.clientY },
-        latest: { x: event.clientX, y: event.clientY },
-        active: false,
-        timer: null,
-        unregister: () => {},
-      };
-      pending.unregister = gestureArena.register(event.pointerId, {
-        owner: gestureOwner,
-        priority: 'content',
-        onCancel: () => {
-          if (pendingRef.current !== pending) return;
-          if (pending.active) cancel();
-          clearPending(false);
-        },
-      });
-      pendingRef.current = pending;
-
-      if (event.pointerType === 'touch') {
-        pending.timer = window.setTimeout(() => {
-          pending.timer = null;
-          if (pendingRef.current === pending) start(pending);
-        }, touchLongPressMs);
-      }
-    },
-    [cancel, clearPending, disabled, gestureArena, gestureOwner, start, touchLongPressMs],
-  );
-
-  const onPointerMove = useCallback(
-    (event: ReactPointerEvent<HTMLElement>) => {
+  const updatePointer = useCallback(
+    (event: DragPointerEvent) => {
       const pending = pendingRef.current;
       if (!pending || event.pointerId !== pending.pointerId) return;
       pending.latest = { x: event.clientX, y: event.clientY };
@@ -141,6 +149,7 @@ export function useDragSource({
       );
       if (!pending.active) {
         if (pending.pointerType === 'touch') {
+          // Direct-manipulation movement before the long-press threshold belongs to native scroll.
           if (distance >= threshold) clearPending();
           return;
         }
@@ -153,28 +162,22 @@ export function useDragSource({
     [clearPending, gestureArena, gestureOwner, start, threshold, update],
   );
 
-  const onPointerUp = useCallback(
-    (event: ReactPointerEvent<HTMLElement>) => {
+  const finishPointer = useCallback(
+    (event: Pick<DragPointerEvent, 'pointerId'>) => {
       const pending = pendingRef.current;
       if (!pending || event.pointerId !== pending.pointerId) return;
       const owned = pending.active && gestureArena.owns(event.pointerId, gestureOwner);
       if (owned) {
-        suppressNextClickRef.current = true;
-        if (suppressClickTimerRef.current !== null)
-          window.clearTimeout(suppressClickTimerRef.current);
-        suppressClickTimerRef.current = window.setTimeout(() => {
-          suppressNextClickRef.current = false;
-          suppressClickTimerRef.current = null;
-        }, 0);
+        armClickSuppression(pending.ownerWindow);
         finish();
       }
       clearPending();
     },
-    [clearPending, finish, gestureArena, gestureOwner],
+    [armClickSuppression, clearPending, finish, gestureArena, gestureOwner],
   );
 
-  const onPointerCancel = useCallback(
-    (event: ReactPointerEvent<HTMLElement>) => {
+  const cancelPointer = useCallback(
+    (event: Pick<DragPointerEvent, 'pointerId'>) => {
       const pending = pendingRef.current;
       if (!pending || event.pointerId !== pending.pointerId) return;
       if (pending.active) cancel();
@@ -183,16 +186,116 @@ export function useDragSource({
     [cancel, clearPending],
   );
 
-  const onClickCapture = useCallback((event: ReactMouseEvent<HTMLElement>) => {
-    if (!suppressNextClickRef.current) return;
-    suppressNextClickRef.current = false;
-    if (suppressClickTimerRef.current !== null) {
-      window.clearTimeout(suppressClickTimerRef.current);
-      suppressClickTimerRef.current = null;
-    }
-    event.preventDefault();
-    event.stopPropagation();
-  }, []);
+  const installWindowContinuation = useCallback(
+    (pending: PendingPointer) => {
+      const ownerWindow = pending.ownerWindow;
+      if (!ownerWindow) return () => {};
+
+      const onWindowPointerMove = (event: PointerEvent) => {
+        if (
+          event.pointerId !== pending.pointerId ||
+          eventTargetsSessionElement(event.target, pending.target)
+        )
+          return;
+        updatePointer(event);
+      };
+      const onWindowPointerUp = (event: PointerEvent) => {
+        if (
+          event.pointerId !== pending.pointerId ||
+          eventTargetsSessionElement(event.target, pending.target)
+        )
+          return;
+        finishPointer(event);
+      };
+      const onWindowPointerCancel = (event: PointerEvent) => {
+        if (event.pointerId !== pending.pointerId) return;
+        cancelPointer(event);
+      };
+
+      ownerWindow.addEventListener('pointermove', onWindowPointerMove);
+      ownerWindow.addEventListener('pointerup', onWindowPointerUp);
+      ownerWindow.addEventListener('pointercancel', onWindowPointerCancel);
+      return () => {
+        ownerWindow.removeEventListener('pointermove', onWindowPointerMove);
+        ownerWindow.removeEventListener('pointerup', onWindowPointerUp);
+        ownerWindow.removeEventListener('pointercancel', onWindowPointerCancel);
+      };
+    },
+    [cancelPointer, finishPointer, updatePointer],
+  );
+
+  const onPointerDown = useCallback(
+    (event: ReactPointerEvent<HTMLElement>) => {
+      if (disabled || event.isPrimary === false || event.button > 0 || pendingRef.current) return;
+      const ownerWindow = event.currentTarget.ownerDocument.defaultView;
+      const pending: PendingPointer = {
+        pointerId: event.pointerId,
+        pointerType: event.pointerType,
+        target: event.currentTarget,
+        ownerWindow,
+        origin: { x: event.clientX, y: event.clientY },
+        latest: { x: event.clientX, y: event.clientY },
+        active: false,
+        timer: null,
+        unregister: () => {},
+        removeWindowContinuation: () => {},
+      };
+      pending.unregister = gestureArena.register(event.pointerId, {
+        owner: gestureOwner,
+        priority: 'content',
+        onCancel: () => {
+          if (pendingRef.current !== pending) return;
+          if (pending.active) cancel();
+          clearPending(false);
+        },
+      });
+      pending.removeWindowContinuation = installWindowContinuation(pending);
+      pendingRef.current = pending;
+
+      if (event.pointerType === 'touch' && ownerWindow) {
+        pending.timer = ownerWindow.setTimeout(() => {
+          pending.timer = null;
+          if (pendingRef.current === pending) start(pending);
+        }, touchLongPressMs);
+      }
+    },
+    [
+      cancel,
+      clearPending,
+      disabled,
+      gestureArena,
+      gestureOwner,
+      installWindowContinuation,
+      start,
+      touchLongPressMs,
+    ],
+  );
+
+  const onPointerMove = useCallback(
+    (event: ReactPointerEvent<HTMLElement>) => updatePointer(event),
+    [updatePointer],
+  );
+
+  const onPointerUp = useCallback(
+    (event: ReactPointerEvent<HTMLElement>) => finishPointer(event),
+    [finishPointer],
+  );
+
+  const onPointerCancel = useCallback(
+    (event: ReactPointerEvent<HTMLElement>) => cancelPointer(event),
+    [cancelPointer],
+  );
+
+  const onClickCapture = useCallback(
+    (event: ReactMouseEvent<HTMLElement>) => {
+      if (!suppressNextClickRef.current) return;
+      suppressNextClickRef.current = false;
+      clearClickSuppressionTimer();
+      event.preventDefault();
+      event.stopPropagation();
+    },
+    [clearClickSuppressionTimer],
+  );
 
   const onKeyDown = useCallback(
     (event: ReactKeyboardEvent<HTMLElement>) => {
@@ -217,10 +320,9 @@ export function useDragSource({
     () => () => {
       if (pendingRef.current?.active) cancel();
       clearPending();
-      if (suppressClickTimerRef.current !== null)
-        window.clearTimeout(suppressClickTimerRef.current);
+      clearClickSuppressionTimer();
     },
-    [cancel, clearPending],
+    [cancel, clearClickSuppressionTimer, clearPending],
   );
 
   return {
@@ -238,4 +340,9 @@ export function useDragSource({
     'data-oxs-drag-source': id,
     'data-oxs-drag-active': keyboardActive ? 'true' : 'false',
   };
+}
+
+function eventTargetsSessionElement(target: EventTarget | null, sessionTarget: HTMLElement) {
+  const NodeCtor = sessionTarget.ownerDocument.defaultView?.Node;
+  return Boolean(NodeCtor && target instanceof NodeCtor && sessionTarget.contains(target));
 }

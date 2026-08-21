@@ -7,7 +7,15 @@ import type {
   PointerEvent as ReactPointerEvent,
   Ref,
 } from 'react';
-import { forwardRef, useCallback, useEffect, useId, useImperativeHandle, useRef } from 'react';
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 import { observeElementSize, resolveUiDirection, useUiEnvironment } from '../foundations';
 import { useGestureArena } from '../gestures/runtime';
 import {
@@ -31,26 +39,39 @@ import {
 } from './physics';
 import {
   alignedSnapOffset,
-  logicalInlineStart,
+  logicalSnapItemStart,
   readLogicalHorizontalScroll,
   writeLogicalHorizontalScroll,
 } from './logicalPosition';
+import { consumeNativeScrollChain, findNativeScrollableAncestor } from './nativeChain';
 
 export type ScrollViewHandle = {
+  /** Current native viewport element, or null before mount. */
   element: HTMLElement | null;
+  /** Scroll to the logical start edge. */
   scrollToStart: (animated?: boolean) => void;
+  /** Scroll to the logical end edge. */
   scrollToEnd: (animated?: boolean) => void;
+  /** Scroll to a bounded logical offset independent of the browser RTL scrollLeft model. */
   scrollToOffset: (offset: number, animated?: boolean) => void;
 };
 
 export type ScrollViewProps = PropsWithChildren<
   Omit<HTMLAttributes<HTMLElement>, 'onScroll'> & {
+    /** Logical scroll axis. @default vertical */
     axis?: ScrollAxis;
+    /** Overlay indicator visibility policy. @default auto */
     indicator?: ScrollIndicatorMode;
+    /** Enables focus and keyboard scrolling on the viewport. @default true */
     keyboard?: boolean;
+    /** Edge response after local and nested owners are exhausted. @default elastic */
     overscroll?: 'elastic' | 'clamp';
+    /** Nearest-child snap policy. @default none */
     snap?: ScrollSnapMode;
+    /** Accessible label applied to the focusable native scroll viewport. */
     ariaLabel?: string;
+    /** Caller-owned key used to restore the logical offset when this ScrollView remounts in the same Document realm. */
+    restorationKey?: string;
   }
 >;
 
@@ -82,6 +103,7 @@ const ScrollViewImpl = forwardRef(function ScrollView(
     overscroll = 'elastic',
     snap = 'none',
     ariaLabel,
+    restorationKey,
     children,
     className,
     style,
@@ -120,10 +142,10 @@ const ScrollViewImpl = forwardRef(function ScrollView(
 
   const clearSnapTimer = useCallback(() => {
     if (snapTimerRef.current !== null) {
-      window.clearTimeout(snapTimerRef.current);
+      clock.cancelTimeout(snapTimerRef.current);
       snapTimerRef.current = null;
     }
-  }, []);
+  }, [clock]);
 
   const coordinateForPointer = useCallback(
     (event: ReactPointerEvent<HTMLElement>) =>
@@ -180,6 +202,11 @@ const ScrollViewImpl = forwardRef(function ScrollView(
         '--oxs-scroll-overscroll-y',
         axis === 'vertical' ? `${value}px` : '0px',
       );
+      const root = rootRef.current;
+      if (root) {
+        if (Math.abs(value) > 0.01) root.dataset.overscrolling = 'true';
+        else delete root.dataset.overscrolling;
+      }
     },
     [axis],
   );
@@ -194,18 +221,18 @@ const ScrollViewImpl = forwardRef(function ScrollView(
     root.dataset.indicatorActive = 'true';
 
     if (hideIndicatorTimerRef.current !== null) {
-      window.clearTimeout(hideIndicatorTimerRef.current);
+      clock.cancelTimeout(hideIndicatorTimerRef.current);
     }
 
     if (indicator === 'auto') {
-      hideIndicatorTimerRef.current = window.setTimeout(() => {
+      hideIndicatorTimerRef.current = clock.scheduleTimeout(() => {
         if (rootRef.current) {
           rootRef.current.dataset.indicatorActive = 'false';
         }
         hideIndicatorTimerRef.current = null;
       }, 620);
     }
-  }, [indicator]);
+  }, [clock, indicator]);
 
   const updateIndicator = useCallback(() => {
     const viewport = viewportRef.current;
@@ -366,18 +393,25 @@ const ScrollViewImpl = forwardRef(function ScrollView(
 
     const resolvedDirection = resolveUiDirection(direction, viewport);
     const viewportExtent = readViewportExtent(viewport);
+    const current = readPosition(viewport);
+    const viewportRect = viewport.getBoundingClientRect();
     const snapItems = [
       ...content.querySelectorAll<HTMLElement>('[data-oxs-scroll-snap-item="true"]'),
     ];
     const offsets = snapItems.map((item) => {
-      const itemStart =
-        axis === 'vertical' ? item.offsetTop : logicalInlineStart(item, content, resolvedDirection);
-      const itemExtent = axis === 'vertical' ? item.offsetHeight : item.offsetWidth;
+      const itemRect = item.getBoundingClientRect();
+      const itemStart = logicalSnapItemStart(
+        itemRect,
+        viewportRect,
+        current,
+        axis,
+        resolvedDirection,
+      );
+      const itemExtent = axis === 'vertical' ? itemRect.height : itemRect.width;
       const rawAlign = item.dataset.snapAlign;
       const align = rawAlign === 'center' || rawAlign === 'end' ? rawAlign : 'start';
       return alignedSnapOffset(itemStart, itemExtent, viewportExtent, align);
     });
-    const current = readPosition(viewport);
     const target = nearestSnapOffset(offsets, current, readMax(viewport));
 
     if (target === null) {
@@ -432,7 +466,7 @@ const ScrollViewImpl = forwardRef(function ScrollView(
     clearSnapTimer();
 
     if (snap !== 'none') {
-      snapTimerRef.current = window.setTimeout(() => {
+      snapTimerRef.current = clock.scheduleTimeout(() => {
         snapTimerRef.current = null;
         snapToNearest();
       }, 90);
@@ -538,6 +572,19 @@ const ScrollViewImpl = forwardRef(function ScrollView(
     [readMax, scrollToOffset],
   );
 
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport || !restorationKey) return;
+
+    const restored = readRestoredOffset(viewport, axis, restorationKey);
+    if (restored !== null) writePosition(viewport, Math.min(readMax(viewport), restored));
+    updateIndicator();
+
+    return () => {
+      saveRestoredOffset(viewport, axis, restorationKey, readPosition(viewport));
+    };
+  }, [axis, readMax, readPosition, restorationKey, updateIndicator, writePosition]);
+
   useEffect(() => {
     const viewport = viewportRef.current;
 
@@ -581,12 +628,18 @@ const ScrollViewImpl = forwardRef(function ScrollView(
       const position = readPosition(viewport);
       const max = readMax(viewport);
       const atBoundary = (delta < 0 && position <= 0) || (delta > 0 && position >= max);
-      if (
-        atBoundary &&
-        !canConsumeChainedDelta(delta) &&
-        hasNativeScrollableAncestor(viewport, axis)
-      ) {
-        return;
+      if (atBoundary && !canConsumeChainedDelta(delta)) {
+        const nativeAncestor = findNativeScrollableAncestor(viewport, axis, delta);
+        if (nativeAncestor) {
+          const nativeResult = consumeNativeScrollChain(viewport, axis, delta);
+          if (nativeResult.consumed !== 0) {
+            event.preventDefault();
+            event.stopPropagation();
+            clearSnapTimer();
+            stopMomentum();
+            return;
+          }
+        }
       }
 
       event.preventDefault();
@@ -604,6 +657,7 @@ const ScrollViewImpl = forwardRef(function ScrollView(
     axis,
     canConsumeChainedDelta,
     clearSnapTimer,
+    clock,
     direction,
     readMax,
     readPosition,
@@ -620,13 +674,15 @@ const ScrollViewImpl = forwardRef(function ScrollView(
     }
 
     const onNativeScroll = () => {
+      if (restorationKey)
+        saveRestoredOffset(viewport, axis, restorationKey, readPosition(viewport));
       updateIndicator();
       showIndicator();
     };
 
     viewport.addEventListener('scroll', onNativeScroll, { passive: true });
     return () => viewport.removeEventListener('scroll', onNativeScroll);
-  }, [showIndicator, updateIndicator]);
+  }, [axis, readPosition, restorationKey, showIndicator, updateIndicator]);
 
   useEffect(() => {
     const viewport = viewportRef.current;
@@ -637,13 +693,20 @@ const ScrollViewImpl = forwardRef(function ScrollView(
       return;
     }
 
-    const stopViewport = observeElementSize(viewport, updateIndicator);
-    const stopContent = observeElementSize(content, updateIndicator);
+    const reconcileGeometry = () => {
+      const current = readPosition(viewport);
+      const bounded = Math.min(readMax(viewport), Math.max(0, current));
+      if (bounded !== current) writePosition(viewport, bounded);
+      updateIndicator();
+      scheduleSnap();
+    };
+    const stopViewport = observeElementSize(viewport, reconcileGeometry);
+    const stopContent = observeElementSize(content, reconcileGeometry);
     return () => {
       stopViewport();
       stopContent();
     };
-  }, [updateIndicator]);
+  }, [readMax, readPosition, scheduleSnap, updateIndicator, writePosition]);
 
   useEffect(
     () => () => {
@@ -651,13 +714,15 @@ const ScrollViewImpl = forwardRef(function ScrollView(
       stopMomentum();
 
       if (hideIndicatorTimerRef.current !== null) {
-        window.clearTimeout(hideIndicatorTimerRef.current);
+        clock.cancelTimeout(hideIndicatorTimerRef.current);
+        hideIndicatorTimerRef.current = null;
       }
       if (suppressClickTimerRef.current !== null) {
-        window.clearTimeout(suppressClickTimerRef.current);
+        clock.cancelTimeout(suppressClickTimerRef.current);
+        suppressClickTimerRef.current = null;
       }
     },
-    [clearSnapTimer, stopMomentum],
+    [clearSnapTimer, clock, stopMomentum],
   );
 
   const cancelPointerSession = useCallback(() => {
@@ -792,8 +857,8 @@ const ScrollViewImpl = forwardRef(function ScrollView(
     if (session.moved) {
       suppressNextClickRef.current = true;
       if (suppressClickTimerRef.current !== null)
-        window.clearTimeout(suppressClickTimerRef.current);
-      suppressClickTimerRef.current = window.setTimeout(() => {
+        clock.cancelTimeout(suppressClickTimerRef.current);
+      suppressClickTimerRef.current = clock.scheduleTimeout(() => {
         suppressNextClickRef.current = false;
         suppressClickTimerRef.current = null;
       }, 0);
@@ -813,7 +878,7 @@ const ScrollViewImpl = forwardRef(function ScrollView(
     if (suppressNextClickRef.current) {
       suppressNextClickRef.current = false;
       if (suppressClickTimerRef.current !== null) {
-        window.clearTimeout(suppressClickTimerRef.current);
+        clock.cancelTimeout(suppressClickTimerRef.current);
         suppressClickTimerRef.current = null;
       }
       event.preventDefault();
@@ -879,6 +944,7 @@ const ScrollViewImpl = forwardRef(function ScrollView(
       data-indicator-active={indicator === 'always' ? 'true' : 'false'}
       data-overscroll={overscroll}
       data-snap={snap}
+      data-motion-preference={reducedMotion ? 'reduced' : 'full'}
     >
       <section
         {...props}
@@ -914,6 +980,7 @@ export const ScrollView = ScrollViewImpl;
 
 export type ScrollSnapItemProps = PropsWithChildren<
   HTMLAttributes<HTMLDivElement> & {
+    /** Logical alignment target inside the owning ScrollView viewport. @default start */
     align?: 'start' | 'center' | 'end';
   }
 >;
@@ -936,28 +1003,40 @@ export function ScrollSnapItem({
   );
 }
 
+const MAX_RESTORED_SCROLL_OFFSETS = 128;
+const restoredOffsets = new WeakMap<Document, Map<string, number>>();
+
+function restorationStore(viewport: HTMLElement) {
+  let store = restoredOffsets.get(viewport.ownerDocument);
+  if (!store) {
+    store = new Map<string, number>();
+    restoredOffsets.set(viewport.ownerDocument, store);
+  }
+  return store;
+}
+
+function restorationIdentity(axis: ScrollAxis, key: string) {
+  return `${axis}:${key}`;
+}
+
+function readRestoredOffset(viewport: HTMLElement, axis: ScrollAxis, key: string) {
+  return restorationStore(viewport).get(restorationIdentity(axis, key)) ?? null;
+}
+
+function saveRestoredOffset(viewport: HTMLElement, axis: ScrollAxis, key: string, offset: number) {
+  const store = restorationStore(viewport);
+  const identity = restorationIdentity(axis, key);
+  store.delete(identity);
+  store.set(identity, Math.max(0, offset));
+  while (store.size > MAX_RESTORED_SCROLL_OFFSETS) {
+    const oldest = store.keys().next().value;
+    if (oldest === undefined) break;
+    store.delete(oldest);
+  }
+}
+
 function findParentScrollViewport(viewport: HTMLElement) {
   const parentRoot = viewport.parentElement?.parentElement?.closest<HTMLElement>('.ui-scroll-view');
 
   return parentRoot?.querySelector<HTMLElement>(':scope > .ui-scroll-view__viewport') ?? null;
-}
-
-function hasNativeScrollableAncestor(viewport: HTMLElement, axis: ScrollAxis) {
-  let element = viewport.parentElement;
-  while (element) {
-    if (element.matches('[data-oxs-scroll-viewport="true"]')) {
-      element = element.parentElement;
-      continue;
-    }
-    const style = window.getComputedStyle(element);
-    const overflow = axis === 'vertical' ? style.overflowY : style.overflowX;
-    const scrollable =
-      /(auto|scroll|overlay)/.test(overflow) &&
-      (axis === 'vertical'
-        ? element.scrollHeight > element.clientHeight
-        : element.scrollWidth > element.clientWidth);
-    if (scrollable) return true;
-    element = element.parentElement;
-  }
-  return false;
 }

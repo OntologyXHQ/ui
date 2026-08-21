@@ -1,5 +1,6 @@
+import { Button, ScrollSnapItem, ScrollView, Stack, Surface, Text } from '@ontologyx/ui';
+import { useState } from 'react';
 import { defineUiDocsGroup } from '../docs/defineUiDocs';
-import { ScrollView, Stack, Surface, Text } from '@ontologyx/ui';
 
 export const uiDocs = defineUiDocsGroup([
   {
@@ -8,21 +9,24 @@ export const uiDocs = defineUiDocsGroup([
     category: 'Interaction',
     order: 80,
     summary:
-      'Reusable scroll owner with inertia, overscroll, snapping, indicators and keyboard support.',
+      'Logical scroll owner with native wheel chaining, direct manipulation, restoration, snapping, indicators and keyboard support.',
     usage:
-      'Use where OXS scroll behavior is required instead of feature-owned overflow/gesture engines.',
-    status: 'candidate',
-    accessibility: 'Focusable keyboard scrolling can be enabled and labelled.',
-    rtl: 'Horizontal motion is normalized to a logical inline position before drag, keyboard, momentum, indicator and snap calculations, insulating callers from browser RTL scrollLeft models.',
+      'Use where a reusable scroll owner is needed; give remounting views a stable restorationKey instead of storing browser-specific scrollLeft values.',
+    status: 'accepted',
+    accessibility:
+      'The native viewport remains focusable when keyboard control is enabled, accepts an explicit accessible label and preserves descendant semantics.',
+    rtl: 'Horizontal offset, keyboard movement, snapping and restoration use one logical inline coordinate independent of the browser RTL scrollLeft model and Document realm.',
     touch:
-      'Direct pointer/touch scrolling is first-class and competes through shared gesture ownership.',
-    responsive: 'Scroll viewport observes its actual container.',
+      'Touch and pen direct manipulation arbitrate through the shared gesture arena while wheel overflow can chain to nested OXS or native scroll owners.',
+    responsive:
+      'Viewport/content ResizeObserver reconciliation clamps stale offsets and recomputes variable-geometry snap targets without viewport or device branches.',
     examples: [
       {
-        id: 'overview',
-        title: 'Overview',
-        description: 'Representative current states rendered from the colocated docs module.',
-        component: 'ScrollViewExample',
+        id: 'scroll-contract',
+        title: 'Logical nested scroll, restoration and snap',
+        description:
+          'Exercises nested wheel ownership, remount restoration and variable-width start/center/end snap geometry.',
+        component: 'ScrollViewContractExample',
       },
     ],
   },
@@ -31,38 +35,116 @@ export const uiDocs = defineUiDocsGroup([
     layer: 'components',
     category: 'Interaction',
     order: 80,
-    summary: 'Child marker that contributes real start/center/end snap alignment to ScrollView.',
-    usage: 'Use only as a direct/owned ScrollView child when snap behavior is needed.',
-    status: 'candidate',
-    accessibility: 'Does not alter child accessibility semantics.',
-    rtl: 'Start/end snap alignment is interpreted logically by the scroll service.',
-    touch: 'Does not own touch input independently of ScrollView.',
+    summary:
+      'Semantic child marker that contributes live start/center/end geometry to an owning ScrollView snap calculation.',
+    usage:
+      'Wrap snap destinations inside ScrollView; alignment is measured from live viewport-relative bounds so nested wrappers and variable item sizes remain valid.',
+    status: 'accepted',
+    accessibility:
+      'Adds no role, focus stop or accessibility state; the wrapped content keeps its original semantics.',
+    rtl: 'Start/end are logical alignments and horizontal item starts are derived from live RTL viewport geometry.',
+    touch: 'Owns no gesture; ScrollView remains the sole direct-manipulation owner.',
     responsive:
-      'Start/center/end offsets derive from real item and viewport geometry, then clamp through the shared scroll service.',
+      'Alignment uses current item and viewport bounds, so resizing and variable child geometry are remeasured before settlement.',
+    examples: [
+      {
+        id: 'scroll-contract',
+        title: 'Logical nested scroll, restoration and snap',
+        component: 'ScrollViewContractExample',
+      },
+    ],
   },
 ] as const);
 
-const scrollViewExampleItems = [
-  'Scrollable item 1',
-  'Scrollable item 2',
-  'Scrollable item 3',
-  'Scrollable item 4',
-  'Scrollable item 5',
-  'Scrollable item 6',
-  'Scrollable item 7',
-  'Scrollable item 8',
-] as const;
+const restorationItems = Array.from({ length: 14 }, (_, index) => `Restoration row ${index + 1}`);
+const nestedItems = Array.from({ length: 10 }, (_, index) => `Nested row ${index + 1}`);
 
-export function ScrollViewExample() {
+export function ScrollViewContractExample() {
+  const [mounted, setMounted] = useState(true);
   return (
-    <ScrollView className="ui-doc-example-scroll" ariaLabel="Catalog scroll example">
-      <Stack gap="sm">
-        {scrollViewExampleItems.map((item) => (
-          <Surface key={item} className="ui-doc-example-scroll-item" radius="md">
-            <Text>{item}</Text>
-          </Surface>
-        ))}
-      </Stack>
-    </ScrollView>
+    <Stack gap="lg" data-scroll-contract-example>
+      <Button size="sm" onClick={() => setMounted((value) => !value)}>
+        {mounted ? 'Unmount restorable scroll' : 'Mount restorable scroll'}
+      </Button>
+      {mounted ? (
+        <ScrollView
+          className="ui-doc-scroll-restorable"
+          ariaLabel="Restorable scroll"
+          restorationKey="docs-scroll-restoration"
+        >
+          <Stack gap="xs">
+            {restorationItems.map((item) => (
+              <Surface key={item} className="ui-doc-scroll-row" radius="sm">
+                <Text>{item}</Text>
+              </Surface>
+            ))}
+          </Stack>
+        </ScrollView>
+      ) : (
+        <Text tone="tertiary">Restorable viewport is unmounted.</Text>
+      )}
+
+      <div className="ui-doc-native-scroll" data-native-scroll>
+        <Text>Native ancestor start</Text>
+        <ScrollView className="ui-doc-scroll-native-child" ariaLabel="Native-chain inner scroll">
+          <Stack gap="xs">
+            {nestedItems.map((item) => (
+              <Surface key={`native-${item}`} className="ui-doc-scroll-row" radius="sm">
+                <Text>{`Native ${item}`}</Text>
+              </Surface>
+            ))}
+          </Stack>
+        </ScrollView>
+        <div className="ui-doc-native-scroll-tail">
+          <Text>Native ancestor continuation</Text>
+        </div>
+      </div>
+
+      <ScrollView className="ui-doc-scroll-outer" ariaLabel="Outer nested scroll">
+        <Stack gap="sm">
+          <Text>Outer start</Text>
+          <ScrollView className="ui-doc-scroll-inner" ariaLabel="Inner nested scroll">
+            <Stack gap="xs">
+              {nestedItems.map((item) => (
+                <Surface key={item} className="ui-doc-scroll-row" radius="sm">
+                  <Text>{item}</Text>
+                </Surface>
+              ))}
+            </Stack>
+          </ScrollView>
+          {nestedItems.slice(0, 5).map((item) => (
+            <Surface key={`outer-${item}`} className="ui-doc-scroll-row" radius="sm">
+              <Text>{`Outer ${item}`}</Text>
+            </Surface>
+          ))}
+        </Stack>
+      </ScrollView>
+
+      <div className="ui-doc-scroll-resize-frame">
+        <ScrollView
+          axis="horizontal"
+          snap="mandatory"
+          overscroll="clamp"
+          className="ui-doc-scroll-horizontal"
+          ariaLabel="Logical snap strip"
+        >
+          <div className="ui-doc-scroll-snap-track">
+            {(['start', 'center', 'end'] as const).map((align, index) => (
+              <ScrollSnapItem
+                key={align}
+                align={align}
+                className="ui-doc-scroll-snap-card"
+                data-snap-card={align}
+                data-size={index === 1 ? 'wide' : 'regular'}
+              >
+                <Surface radius="md">
+                  <Text>{`${align} snap`}</Text>
+                </Surface>
+              </ScrollSnapItem>
+            ))}
+          </div>
+        </ScrollView>
+      </div>
+    </Stack>
   );
 }

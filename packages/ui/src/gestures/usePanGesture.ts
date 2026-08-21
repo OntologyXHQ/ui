@@ -1,5 +1,6 @@
 import type { HTMLAttributes, PointerEvent as ReactPointerEvent } from 'react';
 import { useCallback, useEffect, useId, useRef } from 'react';
+import { releasePointerCaptureIfSupported, setPointerCaptureIfSupported } from './pointerCapture';
 import { useGestureArena } from './runtime';
 import type {
   GestureAxis,
@@ -65,7 +66,7 @@ export function usePanGesture({
       session.removeWindowContinuation();
       session.unregister();
       gestureArena.release(session.pointerId, owner);
-      releasePointerCapture(session.target, session.pointerId);
+      releasePointerCaptureIfSupported(session.target, session.pointerId);
     },
     [gestureArena, owner],
   );
@@ -117,7 +118,7 @@ export function usePanGesture({
         }
 
         session.claimed = true;
-        trySetPointerCapture(session.target, event.pointerId);
+        setPointerCaptureIfSupported(session.target, event.pointerId);
         callbacksRef.current.onBegin?.(sampleFromSession(session, 'began', delta));
       }
 
@@ -290,25 +291,6 @@ export function usePanGesture({
     cancel: cancelSession,
     isActive: () => sessionRef.current?.claimed ?? false,
   };
-}
-
-function trySetPointerCapture(target: HTMLElement, pointerId: number) {
-  try {
-    target.setPointerCapture?.(pointerId);
-  } catch {
-    // Browser engines may expose Pointer Events before pointer capture is fully implemented.
-    // Window-level continuation keeps an OXS gesture alive in that compatibility case.
-  }
-}
-
-function releasePointerCapture(target: HTMLElement, pointerId: number) {
-  try {
-    if (target.hasPointerCapture?.(pointerId)) {
-      target.releasePointerCapture?.(pointerId);
-    }
-  } catch {
-    // Treat pointer capture as an optional optimization; gesture ownership is held by the arena.
-  }
 }
 
 function eventTargetsSessionElement(target: EventTarget | null, sessionTarget: HTMLElement) {

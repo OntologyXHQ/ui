@@ -1,5 +1,6 @@
 import type { HTMLAttributes, PropsWithChildren } from 'react';
 import { useLayoutEffect, useRef, useState } from 'react';
+import { useUiEnvironment } from '../foundations';
 import { useMotionRuntime } from './runtime';
 import type { SpringPreset } from './spring';
 import { readSpringSpec, SpringValue } from './spring';
@@ -15,15 +16,23 @@ export type TransitionKind =
   | 'collapse'
   | 'replace';
 
-export type MotionTransitionProps = PropsWithChildren<
+export type TransitionAliasProps = PropsWithChildren<
   Omit<HTMLAttributes<HTMLDivElement>, 'onTransitionEnd' | 'style'> & {
+    /** Logical visibility state that owns accessibility and interaction semantics. */
     present: boolean;
-    kind?: TransitionKind;
+    /** Semantic spring preset read from the owning element realm. @default standard */
     spring?: SpringPreset;
+    /** Maximum spatial travel in CSS pixels for slide/reveal treatments. @default 24 */
     distance?: number;
+    /** Called after the requested present/absent state has settled, including immediate reduced-motion settlement. */
     onRest?: (present: boolean) => void;
   }
 >;
+
+export type MotionTransitionProps = TransitionAliasProps & {
+  /** Visual transition treatment. @default fade */
+  kind?: TransitionKind;
+};
 
 export function MotionTransition({
   present,
@@ -45,69 +54,56 @@ export function MotionTransition({
 
   useLayoutEffect(() => {
     const node = nodeRef.current;
-
-    if (!node) {
-      return;
-    }
+    if (!node) return;
 
     unsubscribeRef.current?.();
     unsubscribeRef.current = null;
+    delete node.dataset.motionActive;
 
-    if (present) {
-      setHidden(false);
-    }
+    if (present) setHidden(false);
 
     const target = present ? 1 : 0;
     const spec = readSpringSpec(node, spring);
     const springValue = springValueRef.current ?? new SpringValue(present ? 0 : 1, spec);
-
     springValueRef.current = springValue;
     springValue.setSpec(spec);
 
     if (runtime.preference === 'reduced') {
       springValue.jump(target);
-      applyTransitionFrame(node, kind, target, distance);
-
-      if (!present) {
-        setHidden(true);
-      }
-
+      applyReducedTransitionFrame(node, target);
+      if (!present) setHidden(true);
       onRestRef.current?.(present);
       return;
     }
 
-    springValue.setTarget(target);
+    springValue.setTarget(target, springValue.velocity);
 
     const settle = () => {
       unsubscribeRef.current?.();
       unsubscribeRef.current = null;
-
-      if (!present) {
-        setHidden(true);
-      }
-
+      delete node.dataset.motionActive;
+      applySettledTransitionFrame(node, target);
+      if (!present) setHidden(true);
       onRestRef.current?.(present);
     };
 
     applyTransitionFrame(node, kind, springValue.value, distance);
-
     if (springValue.isSettled()) {
       settle();
       return;
     }
 
+    node.dataset.motionActive = 'true';
     unsubscribeRef.current = runtime.clock.subscribe((frame) => {
       const state = springValue.step(frame.deltaMs);
       applyTransitionFrame(node, kind, state.value, distance);
-
-      if (springValue.isSettled()) {
-        settle();
-      }
+      if (springValue.isSettled()) settle();
     });
 
     return () => {
       unsubscribeRef.current?.();
       unsubscribeRef.current = null;
+      delete node.dataset.motionActive;
     };
   }, [distance, kind, present, runtime, spring]);
 
@@ -119,6 +115,7 @@ export function MotionTransition({
       data-motion-kind={kind}
       data-present={present}
       data-hidden={hidden}
+      data-motion-preference={runtime.preference}
       aria-hidden={!present || undefined}
       inert={!present || undefined}
     >
@@ -127,7 +124,6 @@ export function MotionTransition({
   );
 }
 
-export type TransitionAliasProps = Omit<MotionTransitionProps, 'kind'>;
 
 export function FadeTransition(props: TransitionAliasProps) {
   return <MotionTransition {...props} kind="fade" />;
@@ -137,13 +133,26 @@ export function ScaleTransition(props: TransitionAliasProps) {
   return <MotionTransition {...props} kind="scale" />;
 }
 
+export type SlideDirection =
+  | 'block-start'
+  | 'block-end'
+  | 'inline-start'
+  | 'inline-end'
+  | 'up'
+  | 'down'
+  | 'left'
+  | 'right';
+
 export function SlideTransition({
-  direction = 'up',
+  direction = 'block-start',
   ...props
 }: TransitionAliasProps & {
-  direction?: 'up' | 'down' | 'left' | 'right';
+  /** Logical slide direction. Physical up/down/left/right remain as compatibility values. @default block-start */
+  direction?: SlideDirection;
 }) {
-  return <MotionTransition {...props} kind={`slide-${direction}`} />;
+  const environment = useUiEnvironment();
+  const resolved = resolveSlideKind(direction, environment.direction);
+  return <MotionTransition {...props} kind={resolved} />;
 }
 
 export function RevealTransition(props: TransitionAliasProps) {
@@ -156,6 +165,28 @@ export function CollapseTransition(props: TransitionAliasProps) {
 
 export function ReplaceTransition(props: TransitionAliasProps) {
   return <MotionTransition {...props} kind="replace" />;
+}
+
+function resolveSlideKind(direction: SlideDirection, uiDirection: 'ltr' | 'rtl'): TransitionKind {
+  if (direction === 'block-start') return 'slide-up';
+  if (direction === 'block-end') return 'slide-down';
+  if (direction === 'inline-start') return uiDirection === 'rtl' ? 'slide-right' : 'slide-left';
+  if (direction === 'inline-end') return uiDirection === 'rtl' ? 'slide-left' : 'slide-right';
+  return `slide-${direction}` as TransitionKind;
+}
+
+function applySettledTransitionFrame(node: HTMLDivElement, progress: number) {
+  node.style.opacity = String(clamp(progress, 0, 1));
+  node.style.transform = '';
+  node.style.transformOrigin = '';
+  node.style.clipPath = '';
+}
+
+function applyReducedTransitionFrame(node: HTMLDivElement, progress: number) {
+  node.style.opacity = String(clamp(progress, 0, 1));
+  node.style.transform = '';
+  node.style.transformOrigin = '';
+  node.style.clipPath = '';
 }
 
 function applyTransitionFrame(
@@ -205,10 +236,7 @@ function applyTransitionFrame(
 }
 
 function resolveOpacity(kind: TransitionKind, progress: number) {
-  if (kind === 'collapse') {
-    return 0.4 + 0.6 * progress;
-  }
-
+  if (kind === 'collapse') return 0.4 + 0.6 * progress;
   return progress;
 }
 

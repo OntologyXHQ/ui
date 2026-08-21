@@ -1,7 +1,6 @@
-.ui-motion-transition {
-  will-change: transform, opacity, clip-path;
+.ui-motion-transition[data-motion-active='true'] {
   backface-visibility: hidden;
-  transform: translateZ(0);
+  will-change: transform, opacity, clip-path;
 }
 
 .ui-motion-transition[data-present='false'] {
@@ -12,12 +11,15 @@
   visibility: hidden;
 }
 
-.ui-shared-bounds {
-  will-change: transform;
+.ui-shared-bounds[data-motion-active='true'] {
   backface-visibility: hidden;
+  will-change: transform;
 }
 
-.ui-root[data-oxs-motion='reduced'] .ui-motion-transition,
-.ui-root[data-oxs-motion='reduced'] .ui-shared-bounds {
+.ui-motion-transition[data-motion-preference='reduced'],
+.ui-shared-bounds[data-motion-preference='reduced'] {
+  backface-visibility: visible;
   will-change: auto;
+  transform: none !important;
+  clip-path: none !important;
 }

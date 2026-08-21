@@ -114,18 +114,45 @@ describe('UI editable text contract', () => {
 
   it('ends the active editing session when a focused field unmounts', () => {
     const end = vi.fn();
+    const bridge = { end };
     const { rerender } = render(
-      <UiRoot editingBridge={{ end }}>
+      <UiRoot editingBridge={bridge}>
         <TextField label="Transient field" defaultValue="abc" />
       </UiRoot>,
     );
     fireEvent.focus(screen.getByLabelText('Transient field'));
     rerender(
-      <UiRoot editingBridge={{ end }}>
+      <UiRoot editingBridge={bridge}>
         <div>Gone</div>
       </UiRoot>,
     );
     expect(end).toHaveBeenCalledTimes(1);
+  });
+
+  it('transfers one active session cleanly when the owning root replaces its host bridge', () => {
+    const firstBegin = vi.fn();
+    const firstEnd = vi.fn();
+    const secondBegin = vi.fn();
+    const secondEnd = vi.fn();
+    const { rerender } = render(
+      <UiRoot editingBridge={{ begin: firstBegin, end: firstEnd }}>
+        <TextField label="Bridge transfer" defaultValue="abc" />
+      </UiRoot>,
+    );
+    const input = screen.getByLabelText('Bridge transfer');
+    fireEvent.focus(input);
+    expect(firstBegin).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <UiRoot editingBridge={{ begin: secondBegin, end: secondEnd }}>
+        <TextField label="Bridge transfer" defaultValue="abc" />
+      </UiRoot>,
+    );
+    expect(firstEnd).toHaveBeenCalledTimes(1);
+    expect(secondBegin).toHaveBeenCalledTimes(1);
+
+    fireEvent.blur(screen.getByLabelText('Bridge transfer'));
+    expect(secondEnd).toHaveBeenCalledTimes(1);
   });
 
   it('drops a delayed paste response after the field value or selection changes', async () => {
@@ -152,6 +179,71 @@ describe('UI editable text contract', () => {
     await waitFor(() => expect(readText).toHaveBeenCalledTimes(1));
     await Promise.resolve();
     expect(input.value).toBe('hello!');
+  });
+
+  it('drops a delayed paste when the owning UiRoot replaces its clipboard adapter', async () => {
+    let resolvePaste!: (value: string) => void;
+    const firstAdapter = {
+      isAvailable: () => true,
+      readText: () =>
+        new Promise<string>((resolve) => {
+          resolvePaste = resolve;
+        }),
+      writeText: () => true,
+    };
+    const secondAdapter = {
+      isAvailable: () => true,
+      readText: async () => 'fresh',
+      writeText: () => true,
+    };
+    const { rerender } = render(
+      <UiRoot clipboardAdapter={firstAdapter}>
+        <TextField label="Adapter race" defaultValue="seed" />
+      </UiRoot>,
+    );
+    const input = screen.getByLabelText('Adapter race') as HTMLInputElement;
+    fireEvent.focus(input);
+    input.setSelectionRange(4, 4);
+    fireEvent.keyDown(input, { key: 'v', ctrlKey: true });
+
+    rerender(
+      <UiRoot clipboardAdapter={secondAdapter}>
+        <TextField label="Adapter race" defaultValue="seed" />
+      </UiRoot>,
+    );
+    resolvePaste('-stale');
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(input.value).toBe('seed');
+  });
+
+  it('drops a delayed paste after another field replaces the active root editing session', async () => {
+    let resolvePaste!: (value: string) => void;
+    render(
+      <UiRoot
+        clipboardAdapter={{
+          isAvailable: () => true,
+          readText: () =>
+            new Promise<string>((resolve) => {
+              resolvePaste = resolve;
+            }),
+          writeText: () => true,
+        }}
+      >
+        <TextField label="First session" defaultValue="first" />
+        <TextField label="Second session" defaultValue="second" />
+      </UiRoot>,
+    );
+    const first = screen.getByLabelText('First session') as HTMLInputElement;
+    const second = screen.getByLabelText('Second session') as HTMLInputElement;
+    fireEvent.focus(first);
+    first.setSelectionRange(5, 5);
+    fireEvent.keyDown(first, { key: 'v', ctrlKey: true });
+    fireEvent.focus(second);
+    resolvePaste('-stale');
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(first.value).toBe('first');
   });
 
   it('keeps clipboard transport scoped to the owning UiRoot', () => {

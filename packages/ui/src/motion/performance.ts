@@ -8,12 +8,65 @@ export type FramePerformanceSnapshot = {
   maximumFrameIntervalMs: number;
   observedRefreshRateHz: number;
   budgetMisses: number;
+  budgetMissRatio: number;
   longFrames: number;
+  longFrameRatio: number;
   reactCommits: number;
   longTasks: number;
   layoutShifts: number;
   paintEntries: number;
 };
+
+export type FramePerformanceBudget = {
+  /** Minimum frame sample count before a pass/fail assessment is meaningful. */
+  minimumSampledFrames: number;
+  /** Maximum allowed share of frames exceeding 125% of the target frame budget. */
+  maximumBudgetMissRatio: number;
+  /** Maximum allowed share of frames exceeding max(2x budget, 50ms). */
+  maximumLongFrameRatio: number;
+};
+
+export type FramePerformanceAssessment = {
+  measurable: boolean;
+  passed: boolean;
+  reasons: string[];
+};
+
+/** Stable UIR11 hot-path budget; callers may use stricter product-specific thresholds. */
+export const DEFAULT_FRAME_PERFORMANCE_BUDGET: Readonly<FramePerformanceBudget> = Object.freeze({
+  minimumSampledFrames: 30,
+  maximumBudgetMissRatio: 0.1,
+  maximumLongFrameRatio: 0.02,
+});
+
+export function assessFramePerformance(
+  snapshot: FramePerformanceSnapshot,
+  budget: Readonly<FramePerformanceBudget> = DEFAULT_FRAME_PERFORMANCE_BUDGET,
+): FramePerformanceAssessment {
+  if (snapshot.sampledFrames < budget.minimumSampledFrames) {
+    return {
+      measurable: false,
+      passed: false,
+      reasons: [
+        `needs ${budget.minimumSampledFrames} sampled frames; observed ${snapshot.sampledFrames}`,
+      ],
+    };
+  }
+
+  const reasons: string[] = [];
+  if (snapshot.budgetMissRatio > budget.maximumBudgetMissRatio) {
+    reasons.push(
+      `budget miss ratio ${snapshot.budgetMissRatio.toFixed(3)} exceeds ${budget.maximumBudgetMissRatio.toFixed(3)}`,
+    );
+  }
+  if (snapshot.longFrameRatio > budget.maximumLongFrameRatio) {
+    reasons.push(
+      `long frame ratio ${snapshot.longFrameRatio.toFixed(3)} exceeds ${budget.maximumLongFrameRatio.toFixed(3)}`,
+    );
+  }
+
+  return { measurable: true, passed: reasons.length === 0, reasons };
+}
 
 export type FramePerformanceListener = (snapshot: FramePerformanceSnapshot) => void;
 
@@ -22,8 +75,6 @@ export class FramePerformanceMonitor {
   private readonly frameIntervals: number[] = [];
   private unsubscribeClock: (() => void) | null = null;
   private observers: PerformanceObserver[] = [];
-  private budgetMisses = 0;
-  private longFrames = 0;
   private reactCommits = 0;
   private longTasks = 0;
   private layoutShifts = 0;
@@ -65,16 +116,24 @@ export class FramePerformanceMonitor {
     const total = this.frameIntervals.reduce((sum, value) => sum + value, 0);
     const average = this.frameIntervals.length > 0 ? total / this.frameIntervals.length : 0;
     const maximum = this.frameIntervals.length > 0 ? Math.max(...this.frameIntervals) : 0;
+    const sampledFrames = this.frameIntervals.length;
+    const frameBudgetMs = 1000 / this.targetFrameRate;
+    const budgetMisses = this.frameIntervals.filter((value) => value > frameBudgetMs * 1.25).length;
+    const longFrames = this.frameIntervals.filter(
+      (value) => value > Math.max(frameBudgetMs * 2, 50),
+    ).length;
 
     return {
       targetFrameRate: this.targetFrameRate,
-      frameBudgetMs: 1000 / this.targetFrameRate,
-      sampledFrames: this.frameIntervals.length,
+      frameBudgetMs,
+      sampledFrames,
       averageFrameIntervalMs: average,
       maximumFrameIntervalMs: maximum,
       observedRefreshRateHz: average > 0 ? 1000 / average : 0,
-      budgetMisses: this.budgetMisses,
-      longFrames: this.longFrames,
+      budgetMisses,
+      budgetMissRatio: sampledFrames > 0 ? budgetMisses / sampledFrames : 0,
+      longFrames,
+      longFrameRatio: sampledFrames > 0 ? longFrames / sampledFrames : 0,
       reactCommits: this.reactCommits,
       longTasks: this.longTasks,
       layoutShifts: this.layoutShifts,
@@ -86,10 +145,6 @@ export class FramePerformanceMonitor {
     if (frame.deltaMs <= 0) return;
     this.frameIntervals.push(frame.deltaMs);
     if (this.frameIntervals.length > 240) this.frameIntervals.shift();
-
-    const frameBudget = 1000 / this.targetFrameRate;
-    if (frame.deltaMs > frameBudget * 1.25) this.budgetMisses += 1;
-    if (frame.deltaMs > Math.max(frameBudget * 2, 50)) this.longFrames += 1;
 
     if (frame.nowMs - this.lastReportMs >= 500) {
       this.lastReportMs = frame.nowMs;

@@ -7,6 +7,7 @@ export type { CursorRegionProps, CursorRoleAttributes } from './cursor/CursorReg
 export { CursorRegion, cursorRoleAttributes, useCursorRole } from './cursor/CursorRegion';
 export type {
   CursorAnimationPreference,
+  CursorHotspot,
   CursorRole,
   CursorRuntimeConfig,
   PointerModality,
@@ -54,6 +55,7 @@ export type { SharedBoundsProps } from './motion/SharedBounds';
 export { SharedBounds } from './motion/SharedBounds';
 export type {
   MotionTransitionProps,
+  SlideDirection,
   TransitionAliasProps,
   TransitionKind,
 } from './motion/Transition';

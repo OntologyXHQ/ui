@@ -48,73 +48,83 @@ export function useEditableTextContract<T extends EditableTextElement>({
 }: EditableTextContractOptions<T>) {
   const runtime = useEditableTextRuntime();
   const activeRef = useRef(false);
+  const activeSessionIdRef = useRef<string | null>(null);
   const composingRef = useRef(false);
   const preeditRef = useRef('');
   const asyncRequestRef = useRef(0);
   const callbackRef = useRef(onEditingStateChange);
   const runtimeRef = useRef(runtime);
-  const sessionIdRef = useRef(sessionId);
   callbackRef.current = onEditingStateChange;
   runtimeRef.current = runtime;
-  sessionIdRef.current = sessionId;
 
   const invalidateAsyncRequests = useCallback(() => {
     asyncRequestRef.current += 1;
   }, []);
 
-  const readSnapshot = useCallback((): EditableTextSessionSnapshot | null => {
-    const input = inputRef.current;
-    if (!input) return null;
-    return {
-      id: sessionId,
-      descriptor: {
-        multiline,
-        inputMode,
-        enterKeyHint,
-        readOnly,
-      },
-      state: {
-        valueLength: input.value.length,
-        selection: {
-          start: input.selectionStart ?? 0,
-          end: input.selectionEnd ?? input.selectionStart ?? 0,
-          direction: input.selectionDirection ?? 'none',
+  const readSnapshot = useCallback(
+    (id = sessionId): EditableTextSessionSnapshot | null => {
+      const input = inputRef.current;
+      if (!input) return null;
+      return {
+        id,
+        descriptor: {
+          multiline,
+          inputMode,
+          enterKeyHint,
+          readOnly,
         },
-        composing: composingRef.current,
-        preedit: secure ? '' : preeditRef.current,
-        contentPurpose,
-        secure,
-      },
-    };
-  }, [contentPurpose, enterKeyHint, inputMode, inputRef, multiline, readOnly, secure, sessionId]);
+        state: {
+          valueLength: input.value.length,
+          selection: {
+            start: input.selectionStart ?? 0,
+            end: input.selectionEnd ?? input.selectionStart ?? 0,
+            direction: input.selectionDirection ?? 'none',
+          },
+          composing: composingRef.current,
+          preedit: secure ? '' : preeditRef.current,
+          contentPurpose,
+          secure,
+        },
+      };
+    },
+    [contentPurpose, enterKeyHint, inputMode, inputRef, multiline, readOnly, secure, sessionId],
+  );
 
   const publishState = useCallback(() => {
-    const snapshot = readSnapshot();
+    const activeSessionId = activeSessionIdRef.current ?? sessionId;
+    const snapshot = readSnapshot(activeSessionId);
     if (!snapshot) return;
     callbackRef.current?.(snapshot.state);
-    if (activeRef.current) runtime.update(snapshot);
-  }, [readSnapshot, runtime]);
+    if (activeRef.current && runtime.ownsSession(activeSessionId)) runtime.update(snapshot);
+  }, [readSnapshot, runtime, sessionId]);
 
   const onFocus = useCallback(
     (_event: FocusEvent<T>) => {
       invalidateAsyncRequests();
-      const snapshot = readSnapshot();
+      const snapshot = readSnapshot(sessionId);
       if (!snapshot) return;
+      const previousSessionId = activeSessionIdRef.current;
+      if (activeRef.current && previousSessionId && previousSessionId !== sessionId) {
+        runtime.end(previousSessionId);
+      }
       activeRef.current = true;
+      activeSessionIdRef.current = sessionId;
       runtime.begin(snapshot);
       callbackRef.current?.(snapshot.state);
     },
-    [invalidateAsyncRequests, readSnapshot, runtime],
+    [invalidateAsyncRequests, readSnapshot, runtime, sessionId],
   );
 
   const endSession = useCallback(() => {
     invalidateAsyncRequests();
     if (!activeRef.current) return;
+    const activeSessionId = activeSessionIdRef.current;
     activeRef.current = false;
+    activeSessionIdRef.current = null;
     composingRef.current = false;
     preeditRef.current = '';
-    runtime.end(sessionId);
-  }, [invalidateAsyncRequests, runtime, sessionId]);
+    if (activeSessionId) runtime.end(activeSessionId);
+  }, [invalidateAsyncRequests, runtime]);
 
   const onBlur = useCallback((_event: FocusEvent<T>) => endSession(), [endSession]);
 
@@ -202,15 +212,20 @@ export function useEditableTextContract<T extends EditableTextElement>({
 
       event.preventDefault();
       const requestId = ++asyncRequestRef.current;
+      const activeSessionId = activeSessionIdRef.current;
+      if (!activeSessionId || !runtime.ownsSession(activeSessionId)) return;
+      const clipboardRequest = runtime.readClipboardText();
       const pasteStart = input.selectionStart ?? 0;
       const pasteEnd = input.selectionEnd ?? pasteStart;
       const valueBefore = input.value;
-      void runtime
-        .readClipboardText()
+      void clipboardRequest.promise
         .then((text) => {
           if (
             requestId !== asyncRequestRef.current ||
             !activeRef.current ||
+            activeSessionIdRef.current !== activeSessionId ||
+            !runtime.ownsSession(activeSessionId) ||
+            runtime.clipboardGeneration() !== clipboardRequest.generation ||
             inputRef.current !== input ||
             !input.isConnected ||
             input.value !== valueBefore ||
@@ -223,21 +238,45 @@ export function useEditableTextContract<T extends EditableTextElement>({
           publishState();
         })
         .catch((error: unknown) => {
-          if (requestId !== asyncRequestRef.current) return;
+          if (
+            requestId !== asyncRequestRef.current ||
+            activeSessionIdRef.current !== activeSessionId ||
+            runtime.clipboardGeneration() !== clipboardRequest.generation
+          )
+            return;
           console.error('OntologyX UI clipboard paste failed.', error);
         });
     },
     [inputRef, invalidateAsyncRequests, publishState, runtime, secure],
   );
 
+  useEffect(() => {
+    if (!activeRef.current) return;
+    const previousSessionId = activeSessionIdRef.current;
+    if (!previousSessionId || previousSessionId === sessionId) return;
+    invalidateAsyncRequests();
+    runtime.end(previousSessionId);
+    const snapshot = readSnapshot(sessionId);
+    if (!snapshot) {
+      activeRef.current = false;
+      activeSessionIdRef.current = null;
+      return;
+    }
+    activeSessionIdRef.current = sessionId;
+    runtime.begin(snapshot);
+    callbackRef.current?.(snapshot.state);
+  }, [invalidateAsyncRequests, readSnapshot, runtime, sessionId]);
+
   useEffect(
     () => () => {
       asyncRequestRef.current += 1;
       if (!activeRef.current) return;
+      const activeSessionId = activeSessionIdRef.current;
       activeRef.current = false;
+      activeSessionIdRef.current = null;
       composingRef.current = false;
       preeditRef.current = '';
-      runtimeRef.current.end(sessionIdRef.current);
+      if (activeSessionId) runtimeRef.current.end(activeSessionId);
     },
     [],
   );

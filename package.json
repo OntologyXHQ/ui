@@ -16,7 +16,7 @@
     "quality": "pnpm gate:architecture && pnpm gate:catalog && pnpm gate:types && pnpm gate:behavior",
     "verify": "pnpm quality && pnpm gate:studio && pnpm gate:browser",
     "release:check": "pnpm verify && node scripts/check-studio-production.mjs && pnpm package:smoke",
-    "gate:architecture": "python3 scripts/gates/check-architecture.py && node scripts/gates/check-foundations.mjs && node scripts/gates/check-environment.mjs && node scripts/gates/check-layout.mjs && node scripts/gates/check-visual.mjs && node scripts/gates/check-runtime-kernel.mjs && node scripts/gates/check-actions.mjs && node scripts/gates/check-fields.mjs && node scripts/gates/check-browser-fixture-scope.mjs && node scripts/gates/check-selection-disclosure.mjs && node scripts/gates/check-navigation-data.mjs && node scripts/gates/check-overlays-feedback.mjs",
+    "gate:architecture": "python3 scripts/gates/check-architecture.py && node scripts/gates/check-foundations.mjs && node scripts/gates/check-environment.mjs && node scripts/gates/check-layout.mjs && node scripts/gates/check-visual.mjs && node scripts/gates/check-runtime-kernel.mjs && node scripts/gates/check-actions.mjs && node scripts/gates/check-fields.mjs && node scripts/gates/check-browser-fixture-scope.mjs && node scripts/gates/check-selection-disclosure.mjs && node scripts/gates/check-navigation-data.mjs && node scripts/gates/check-overlays-feedback.mjs && node scripts/gates/check-scroll-motion.mjs && node scripts/gates/check-gestures-drag-editing-cursor.mjs",
     "gate:catalog": "pnpm catalog:check && node scripts/gates/check-catalog-acceptance.mjs",
     "gate:types": "pnpm --filter @ontologyx/ui check && pnpm --filter @ontologyx/ui-studio check",
     "gate:behavior": "pnpm --filter @ontologyx/ui test && pnpm --filter @ontologyx/ui docs:test",
@@ -31,7 +31,8 @@
     "studio:build": "pnpm catalog:generate && pnpm --filter @ontologyx/ui-studio build && node scripts/check-studio-production.mjs",
     "studio:preview": "pnpm --filter @ontologyx/ui-studio preview",
     "snapshot": "node scripts/create-snapshot.mjs",
-    "gate:browser": "pnpm gate:build && node scripts/browser/run-browser-acceptance.mjs"
+    "gate:browser": "pnpm gate:build && node scripts/browser/run-browser-acceptance.mjs",
+    "uir11-12:closeout": "node scripts/closeout-uir11-uir12.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.7",

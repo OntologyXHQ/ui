@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
-import { useInteractiveTransition } from '../motion';
+import { useInteractiveTransition, useMotionRuntime } from '../motion';
 import { usePanGesture } from './usePanGesture';
 
 export type DragRevealOptions = {
@@ -11,6 +11,7 @@ export type DragRevealOptions = {
 };
 
 export function useDragReveal({ open, onOpen, onClose, distance = 240 }: DragRevealOptions) {
+  const { clock } = useMotionRuntime();
   const openRef = useRef(open);
   const callbacksRef = useRef({ onOpen, onClose });
   const startProgressRef = useRef(open ? 1 : 0);
@@ -47,10 +48,10 @@ export function useDragReveal({ open, onOpen, onClose, distance = 240 }: DragRev
   useEffect(
     () => () => {
       if (suppressActivateTimerRef.current !== null) {
-        window.clearTimeout(suppressActivateTimerRef.current);
+        clock.cancelTimeout(suppressActivateTimerRef.current);
       }
     },
-    [],
+    [clock],
   );
 
   useEffect(() => {
@@ -78,9 +79,9 @@ export function useDragReveal({ open, onOpen, onClose, distance = 240 }: DragRev
     onEnd: () => {
       suppressActivateRef.current = true;
       if (suppressActivateTimerRef.current !== null) {
-        window.clearTimeout(suppressActivateTimerRef.current);
+        clock.cancelTimeout(suppressActivateTimerRef.current);
       }
-      suppressActivateTimerRef.current = window.setTimeout(() => {
+      suppressActivateTimerRef.current = clock.scheduleTimeout(() => {
         suppressActivateRef.current = false;
         suppressActivateTimerRef.current = null;
       }, 0);
