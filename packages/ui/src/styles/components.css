@@ -374,7 +374,7 @@
 
 .ui-select-option {
   width: 100%;
-  min-height: var(--oxs-touch-target-min);
+  min-height: max(var(--oxs-control-height-sm), var(--oxs-touch-target-min));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1775,8 +1775,10 @@
   min-width: 12rem;
   max-width: min(24rem, calc(100cqi - 1.25rem));
   max-height: min(32rem, calc(100vh - 1.25rem));
-  transform: translate3d(var(--oxs-popover-x, 0), var(--oxs-popover-y, 0), 0)
-    scale(0.985);
+  /* Floating coordinates are geometry, not motion. Keep them out of transform transitions so a
+     freshly mounted popover never animates from the portal origin (0, 0) to its anchor. */
+  translate: var(--oxs-popover-x, 0) var(--oxs-popover-y, 0);
+  transform: scale(0.985);
   transform-origin: top left;
   opacity: 0;
   pointer-events: none;
@@ -1787,10 +1789,17 @@
 
 .ui-popover[data-ready='true'] {
   opacity: 1;
-  transform: translate3d(var(--oxs-popover-x, 0), var(--oxs-popover-y, 0), 0)
-    scale(1);
+  transform: scale(1);
   pointer-events: auto;
 }
+
+.ui-popover[data-placement='bottom-end'] { transform-origin: top right; }
+.ui-popover[data-placement='top-start'] { transform-origin: bottom left; }
+.ui-popover[data-placement='top-end'] { transform-origin: bottom right; }
+.ui-popover:dir(rtl)[data-placement='bottom-start'] { transform-origin: top right; }
+.ui-popover:dir(rtl)[data-placement='bottom-end'] { transform-origin: top left; }
+.ui-popover:dir(rtl)[data-placement='top-start'] { transform-origin: bottom right; }
+.ui-popover:dir(rtl)[data-placement='top-end'] { transform-origin: bottom left; }
 
 .ui-menu {
   min-width: 13rem;
@@ -2329,6 +2338,10 @@
 .ui-tile[data-selected='true'] .ui-tile__content {
   border-color: var(--oxs-color-accent);
   background: var(--oxs-color-accent-soft);
+}
+
+.ui-tile[data-selected='true'] .ui-tile__description {
+  color: var(--oxs-color-text-secondary);
 }
 
 .ui-application-item__icon {

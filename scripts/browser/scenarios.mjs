@@ -64,6 +64,89 @@ export const browserScenarios = [
           containerWidth: '88rem',
         });
         await assertPublicUiStylesLoaded(page);
+
+        const environmentToolbar = page.getByRole('toolbar', {
+          name: 'Global UI environment',
+          exact: true,
+        });
+        const controlRoot = page.locator('.ui-studio-environment-control-root');
+        const directionTrigger = environmentToolbar.getByRole('combobox', {
+          name: 'Direction',
+          exact: true,
+        });
+        const densityTrigger = environmentToolbar.getByRole('combobox', {
+          name: 'Density',
+          exact: true,
+        });
+        await assertWithinViewport(
+          directionTrigger,
+          'Studio direction control before environment change',
+        );
+
+        await directionTrigger.click();
+        await page.getByRole('option', { name: 'Direction: RTL', exact: true }).click();
+        await page.waitForFunction(
+          () =>
+            document.querySelector('.ui-studio-root')?.getAttribute('data-oxs-direction') === 'rtl',
+        );
+        assert.deepEqual(
+          await controlRoot.evaluate((element) => ({
+            direction: element.getAttribute('data-oxs-direction'),
+            density: element.getAttribute('data-oxs-density'),
+          })),
+          { direction: 'ltr', density: 'comfortable' },
+          'Studio environment controls must stay on a stable LTR/comfortable control plane.',
+        );
+        await assertWithinViewport(
+          directionTrigger,
+          'Studio direction control after RTL preview change',
+        );
+
+        await directionTrigger.click();
+        await page.getByRole('option', { name: 'Direction: LTR', exact: true }).click();
+        await page.waitForFunction(
+          () =>
+            document.querySelector('.ui-studio-root')?.getAttribute('data-oxs-direction') === 'ltr',
+        );
+        await assertWithinViewport(
+          directionTrigger,
+          'Studio direction control after LTR preview change',
+        );
+
+        const densityProbe = workbench
+          .locator('#example-contract')
+          .getByRole('button', { name: 'Secondary', exact: true });
+        await densityProbe.waitFor({ state: 'visible' });
+        const comfortableHeight = await densityProbe.evaluate(
+          (element) => element.getBoundingClientRect().height,
+        );
+        await densityTrigger.click();
+        await page.getByRole('option', { name: 'Density: compact', exact: true }).click();
+        await page.waitForFunction(
+          () =>
+            document.querySelector('.ui-studio-root')?.getAttribute('data-oxs-density') ===
+            'compact',
+        );
+        const compactHeight = await densityProbe.evaluate(
+          (element) => element.getBoundingClientRect().height,
+        );
+        assert.ok(
+          comfortableHeight - compactHeight >= 6,
+          `Studio density control did not produce a visible Component density delta (${comfortableHeight}px comfortable vs ${compactHeight}px compact).`,
+        );
+        assert.equal(
+          await controlRoot.getAttribute('data-oxs-density'),
+          'comfortable',
+          'Preview density leaked back into the Studio control plane.',
+        );
+        await densityTrigger.click();
+        await page.getByRole('option', { name: 'Density: comfortable', exact: true }).click();
+        await page.waitForFunction(
+          () =>
+            document.querySelector('.ui-studio-root')?.getAttribute('data-oxs-density') ===
+            'comfortable',
+        );
+
         await assertWithinViewport(workbench, 'Button Studio workbench');
         const stacked = await workbench.evaluate((element) => {
           const sections = [...element.querySelectorAll('[data-studio-section]')];
@@ -2732,40 +2815,217 @@ export const browserScenarios = [
         const scroll = example.locator('[data-dnd-scroll]');
         const source = example.getByRole('button', { name: 'Drag Studio card', exact: true });
         const target = example.getByRole('button', { name: 'Studio drop target', exact: true });
+        await source.scrollIntoViewIfNeeded();
+        await target.scrollIntoViewIfNeeded();
         let sourceBox = await source.boundingBox();
         let targetBox = await target.boundingBox();
         assert.ok(
           sourceBox && targetBox,
           'Drag/drop fixture controls have no measurable geometry.',
         );
-        await page.mouse.move(
-          sourceBox.x + sourceBox.width / 2,
-          sourceBox.y + sourceBox.height / 2,
-        );
-        await page.mouse.down();
-        await page.mouse.move(
-          targetBox.x + targetBox.width / 2,
-          targetBox.y + targetBox.height / 2,
+        const sourceHit = await page.evaluate(
+          ({ x, y }) => {
+            const hit = document.elementFromPoint(x, y);
+            return (
+              hit?.closest('[data-oxs-drag-source]')?.getAttribute('data-oxs-drag-source') ?? null
+            );
+          },
           {
-            steps: 4,
+            x: sourceBox.x + sourceBox.width / 2,
+            y: sourceBox.y + sourceBox.height / 2,
           },
         );
+        assert.equal(
+          sourceHit,
+          'studio-drag-source',
+          'DnD source center was not hit-testable after Studio scrolling.',
+        );
+        await page.evaluate(() => {
+          const trace = [];
+          const record = (event) => {
+            const target = event.target instanceof Element ? event.target : null;
+            trace.push({
+              type: event.type,
+              pointerId: event.pointerId,
+              pointerType: event.pointerType,
+              buttons: event.buttons,
+              defaultPrevented: event.defaultPrevented,
+              target:
+                target?.getAttribute('data-oxs-drag-source') ??
+                target?.getAttribute('data-oxs-drop-target') ??
+                target?.tagName ??
+                null,
+            });
+          };
+          for (const type of [
+            'pointerdown',
+            'gotpointercapture',
+            'pointermove',
+            'lostpointercapture',
+            'pointercancel',
+            'pointerup',
+          ]) {
+            window.addEventListener(type, record, true);
+          }
+          window.__oxsUir12DndTrace = trace;
+        });
+        const sourceCenter = {
+          x: sourceBox.x + sourceBox.width / 2,
+          y: sourceBox.y + sourceBox.height / 2,
+        };
+        await page.mouse.move(sourceCenter.x, sourceCenter.y);
+        await page.mouse.down();
+        // Cross the drag threshold locally first. Once the session is active, Studio/drag
+        // auto-scroll may move scroll ancestors, so any target geometry captured before drag
+        // ownership is stale by definition.
+        await page.mouse.move(sourceCenter.x + 12, sourceCenter.y);
         const preview = page.locator('[data-dnd-preview-content]');
-        await preview.waitFor({ state: 'visible' });
+        try {
+          await preview.waitFor({ state: 'visible', timeout: 1200 });
+        } catch (_error) {
+          const state = await page.evaluate(() => {
+            const runtime = document
+              .querySelector('#example-interaction-runtime [data-uir12-interaction-runtime]')
+              ?.closest('.ui-root')
+              ?.querySelector('.ui-drag-drop-runtime');
+            const portal = document
+              .querySelector('#example-interaction-runtime [data-uir12-interaction-runtime]')
+              ?.closest('.ui-root')
+              ?.querySelector('[data-oxs-portal-root]');
+            const previewContent = document.querySelector('[data-dnd-preview-content]');
+            const previewLayer = previewContent?.closest('.ui-drag-preview');
+            const rect = previewLayer?.getBoundingClientRect();
+            const style = previewLayer ? getComputedStyle(previewLayer) : null;
+            const live = runtime?.parentElement?.querySelector('[aria-live="polite"]');
+            return {
+              runtimeActive: runtime?.getAttribute('data-oxs-drag-active') ?? null,
+              runtimeCursorRole: runtime?.getAttribute('data-oxs-drag-cursor-role') ?? null,
+              announcement: live?.textContent ?? null,
+              portalPresent: Boolean(portal),
+              portalChildren: portal?.children.length ?? null,
+              previewPresent: Boolean(previewContent),
+              previewRect: rect
+                ? { x: rect.x, y: rect.y, width: rect.width, height: rect.height }
+                : null,
+              previewStyle: style
+                ? { display: style.display, visibility: style.visibility, opacity: style.opacity }
+                : null,
+              trace: window.__oxsUir12DndTrace ?? [],
+            };
+          });
+          assert.fail(
+            `DnD preview did not become visible. Runtime trace: ${JSON.stringify(state)}`,
+          );
+        }
         assert.ok(
           await preview.evaluate((element) => Boolean(element.closest('[data-oxs-portal-root]'))),
           'Pointer drag preview escaped the owning UiRoot portal coordinate space.',
         );
-        await page.mouse.up();
-        await page.waitForFunction(
-          () =>
-            document.querySelector('#example-interaction-runtime [data-drop-result]')
-              ?.textContent === 'studio-card:move',
+
+        // Re-resolve the drop target after drag ownership begins. The DragDrop runtime is
+        // allowed to auto-scroll the nearest eligible ancestor while the pointer is stationary,
+        // so pre-drag bounding boxes cannot be used as a durable drop coordinate.
+        await target.scrollIntoViewIfNeeded();
+        targetBox = await target.boundingBox();
+        assert.ok(targetBox, 'Drop target lost measurable geometry after drag activation.');
+        const targetCenter = {
+          x: targetBox.x + targetBox.width / 2,
+          y: targetBox.y + targetBox.height / 2,
+        };
+        const targetHit = await page.evaluate(({ x, y }) => {
+          const hit = document.elementFromPoint(x, y);
+          return (
+            hit?.closest('[data-oxs-drop-target]')?.getAttribute('data-oxs-drop-target') ?? null
+          );
+        }, targetCenter);
+        assert.equal(
+          targetHit,
+          'studio-drop-target',
+          'DnD target center was not hit-testable after drag activation.',
         );
+        await page.evaluate((point) => {
+          window.__oxsUir12LastDropPoint = point;
+        }, targetCenter);
+        await page.mouse.move(targetCenter.x, targetCenter.y);
+        try {
+          await page.waitForFunction(
+            () =>
+              document
+                .querySelector(
+                  '#example-interaction-runtime [data-oxs-drop-target="studio-drop-target"]',
+                )
+                ?.getAttribute('data-oxs-drop-active') === 'true',
+            null,
+            { timeout: 1200 },
+          );
+        } catch (_error) {
+          const state = await page.evaluate(() => {
+            const runtime = document
+              .querySelector('#example-interaction-runtime [data-uir12-interaction-runtime]')
+              ?.closest('.ui-root')
+              ?.querySelector('.ui-drag-drop-runtime');
+            const target = document.querySelector(
+              '#example-interaction-runtime [data-oxs-drop-target="studio-drop-target"]',
+            );
+            const rect = target?.getBoundingClientRect();
+            return {
+              runtimeActive: runtime?.getAttribute('data-oxs-drag-active') ?? null,
+              runtimeCursorRole: runtime?.getAttribute('data-oxs-drag-cursor-role') ?? null,
+              targetActive: target?.getAttribute('data-oxs-drop-active') ?? null,
+              targetRect: rect
+                ? { x: rect.x, y: rect.y, width: rect.width, height: rect.height }
+                : null,
+              hitAtPointer:
+                document
+                  .elementFromPoint(
+                    window.__oxsUir12LastDropPoint?.x ?? -1,
+                    window.__oxsUir12LastDropPoint?.y ?? -1,
+                  )
+                  ?.closest('[data-oxs-drop-target]')
+                  ?.getAttribute('data-oxs-drop-target') ?? null,
+              trace: window.__oxsUir12DndTrace ?? [],
+            };
+          });
+          assert.fail(`DnD target did not become active. Runtime trace: ${JSON.stringify(state)}`);
+        }
+        await page.mouse.up();
+        try {
+          await page.waitForFunction(
+            () =>
+              document.querySelector('#example-interaction-runtime [data-drop-result]')
+                ?.textContent === 'studio-card:move',
+            null,
+            { timeout: 1200 },
+          );
+        } catch (_error) {
+          const state = await page.evaluate(() => ({
+            dropResult:
+              document.querySelector('#example-interaction-runtime [data-drop-result]')
+                ?.textContent ?? null,
+            runtimeActive:
+              document
+                .querySelector('#example-interaction-runtime .ui-drag-drop-runtime')
+                ?.getAttribute('data-oxs-drag-active') ?? null,
+            targetActive:
+              document
+                .querySelector(
+                  '#example-interaction-runtime [data-oxs-drop-target="studio-drop-target"]',
+                )
+                ?.getAttribute('data-oxs-drop-active') ?? null,
+            announcement:
+              document
+                .querySelector('#example-interaction-runtime [data-uir12-interaction-runtime]')
+                ?.closest('.ui-root')
+                ?.querySelector('[aria-live="polite"]')?.textContent ?? null,
+            trace: window.__oxsUir12DndTrace ?? [],
+          }));
+          assert.fail(`DnD drop did not commit. Runtime trace: ${JSON.stringify(state)}`);
+        }
 
         await scroll.evaluate((element) => {
           element.scrollTop = 0;
         });
+        await source.scrollIntoViewIfNeeded();
         sourceBox = await source.boundingBox();
         const scrollBox = await scroll.boundingBox();
         assert.ok(sourceBox && scrollBox, 'Edge auto-scroll fixture lost measurable geometry.');
@@ -5002,6 +5262,26 @@ export const browserScenarios = [
           'Popover floating geometry did not settle.',
         );
         await assertWithinViewport(popover, 'UIR10 collision-aware Popover');
+        const popoverMotion = await popover.evaluate((element) => {
+          const style = getComputedStyle(element);
+          return {
+            translate: style.translate,
+            transitionProperty: style.transitionProperty,
+          };
+        });
+        assert.notEqual(
+          popoverMotion.translate,
+          'none',
+          'Popover did not publish settled floating coordinates through CSS translate.',
+        );
+        assert.equal(
+          popoverMotion.transitionProperty
+            .split(',')
+            .map((property) => property.trim())
+            .includes('translate'),
+          false,
+          'Popover floating coordinates must not animate from the portal origin to the anchor.',
+        );
 
         const tooltipExample = await gotoCatalog(page, baseUrl, {
           entry: 'Tooltip',

@@ -305,10 +305,12 @@
 }
 
 [data-oxs-density='comfortable'] {
-  --oxs-density-scale: 1.08;
-  --oxs-control-height-sm: 2.125rem;
-  --oxs-control-height-md: 2.875rem;
-  --oxs-control-height-lg: 3.375rem;
+  --oxs-density-scale: 1.12;
+  /* The touch-target floor remains independent; comfortable adds visible breathing room above it. */
+  --oxs-control-height-sm: 2.875rem;
+  --oxs-control-height-md: 3.25rem;
+  --oxs-control-height-lg: 3.75rem;
+  --oxs-layout-gap: clamp(0.75rem, 1.6vw, 1.25rem);
 }
 
 [data-oxs-pointer-precision='coarse'] {

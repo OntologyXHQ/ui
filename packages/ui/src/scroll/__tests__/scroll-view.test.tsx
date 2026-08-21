@@ -89,6 +89,35 @@ describe('ScrollView runtime contracts', () => {
     expect(ancestor.scrollTop).toBe(40);
   });
 
+  it('does not jump across a nearer native scroll owner to a farther OXS ScrollView', () => {
+    render(
+      <UiRoot>
+        <ScrollView ariaLabel="Far outer OXS">
+          <div data-testid="near-native" style={{ overflowY: 'auto' }}>
+            <ScrollView ariaLabel="Boundary inner OXS">Inner content</ScrollView>
+            <div style={{ height: 300 }}>Native continuation</div>
+          </div>
+          <div style={{ height: 300 }}>Outer continuation</div>
+        </ScrollView>
+      </UiRoot>,
+    );
+
+    const outer = screen.getByLabelText('Far outer OXS');
+    const native = screen.getByTestId('near-native');
+    const inner = screen.getByLabelText('Boundary inner OXS');
+    for (const element of [outer, native, inner]) {
+      setMetric(element, 'clientHeight', 100);
+      setMetric(element, 'scrollHeight', 300);
+    }
+    inner.scrollTop = 200;
+    native.scrollTop = 0;
+    outer.scrollTop = 0;
+
+    expect(fireEvent.wheel(inner, { deltaY: 40, deltaMode: 0 })).toBe(false);
+    expect(native.scrollTop).toBe(40);
+    expect(outer.scrollTop).toBe(0);
+  });
+
   it('preserves consumer pointer callbacks while direct manipulation owns the gesture', () => {
     const down = vi.fn();
     const move = vi.fn();

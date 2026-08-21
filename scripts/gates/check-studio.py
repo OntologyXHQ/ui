@@ -40,6 +40,28 @@ else:
         )
 
 
+ENVIRONMENT_TOOLBAR = STUDIO / 'studio' / 'StudioEnvironmentToolbar.tsx'
+environment_toolbar_text = ENVIRONMENT_TOOLBAR.read_text(encoding='utf-8')
+for token, message in (
+    ('<UiRoot', 'Studio environment controls must own a nested stable UiRoot control plane'),
+    ('direction="ltr"', 'Studio environment control plane must stay LTR while preview direction changes'),
+    ('density="comfortable"', 'Studio environment control plane must keep a stable comfortable control density'),
+    ('className="ui-studio-environment-control-root"', 'Studio environment control plane marker is missing'),
+    ('Direction: LTR', 'Studio direction selector must expose self-describing values'),
+    ('Density: comfortable', 'Studio density selector must expose self-describing values'),
+):
+    if token not in environment_toolbar_text:
+        issues.append(message)
+if '.ui-studio-environment-control-root' not in studio_css:
+    issues.append('Studio stylesheet must size the stable environment control-plane UiRoot')
+control_root_rule = re.search(
+    r'\.ui-studio-environment-control-root\s*\{(?P<body>[^}]*)\}',
+    studio_css,
+    re.DOTALL,
+)
+if control_root_rule is None or 'z-index: var(--oxs-z-popover)' not in control_root_rule.group('body'):
+    issues.append('Studio environment control-plane UiRoot must elevate its isolated portal above workspace content')
+
 CATALOG_PAGE = STUDIO / 'catalog' / 'CatalogPage.tsx'
 catalog_page_text = CATALOG_PAGE.read_text(encoding='utf-8')
 if re.search(r'\b(TabPanel|Tabs)\b', catalog_page_text):

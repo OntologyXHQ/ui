@@ -10,6 +10,7 @@ const transient = fs.readFileSync(path.join(UI, 'src/components/TransientFeedbac
 const feedback = fs.readFileSync(path.join(UI, 'src/components/Feedback.tsx'), 'utf8');
 const scrim = fs.readFileSync(path.join(UI, 'src/components/Scrim.tsx'), 'utf8');
 const floating = fs.readFileSync(path.join(UI, 'src/interaction/floating.ts'), 'utf8');
+const componentStyles = fs.readFileSync(path.join(UI, 'src/styles/components.css'), 'utf8');
 const scenarios = fs.readFileSync(path.join(ROOT, 'scripts/browser/scenarios.mjs'), 'utf8');
 const catalog = buildCatalog({ uiRoot: UI });
 const issues = [];
@@ -68,6 +69,12 @@ for (const token of [
   'observeElementGeometry([surface, anchorElement], update)',
 ]) {
   if (!floating.includes(token)) issues.push(`shared floating realm contract missing ${token}`);
+}
+if (!componentStyles.includes('translate: var(--oxs-popover-x, 0) var(--oxs-popover-y, 0);')) {
+  issues.push('Popover geometry must use non-animated CSS translate coordinates');
+}
+if (componentStyles.includes('transform: translate3d(var(--oxs-popover-x')) {
+  issues.push('Popover anchor coordinates must not share the animated transform channel');
 }
 if (scrim.includes('createPortal'))
   issues.push('Scrim must remain presentation-only and never own a portal');

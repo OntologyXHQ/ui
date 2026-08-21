@@ -1,7 +1,8 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
+import { StrictMode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { UiRoot } from '../../adaptive';
-import { ScrollView } from '../../components';
+import { Button, ScrollView } from '../../components';
 import { autoScrollDelta, DragDropProvider } from '../runtime';
 import { cursorRoleForDragOperation } from '../types';
 import { useDragSource } from '../useDragSource';
@@ -80,6 +81,347 @@ describe('UI Kit drag/drop runtime', () => {
       expect.objectContaining({ id: 'document-1', type: 'document' }),
       'copy',
     );
+  });
+
+  it('resolves the actual hit-tested public Button target during owner-Window continuation', () => {
+    const onDrop = vi.fn();
+    const originalElementFromPoint = Object.getOwnPropertyDescriptor(document, 'elementFromPoint');
+
+    function Fixture() {
+      const sourceProps = useDragSource({
+        id: 'public-button-source',
+        item: { id: 'public-button-item', type: 'document', label: 'Public Button item' },
+        threshold: 2,
+      });
+      const targetProps = useDropTarget({
+        id: 'public-button-target',
+        operation: 'move',
+        onDrop,
+      });
+      return (
+        <>
+          <Button {...sourceProps}>Public Button source</Button>
+          <Button {...targetProps}>Public Button target</Button>
+        </>
+      );
+    }
+
+    render(
+      <UiRoot>
+        <Fixture />
+      </UiRoot>,
+    );
+
+    const source = screen.getByRole('button', { name: 'Public Button source' });
+    const target = screen.getByRole('button', { name: 'Public Button target' });
+    const targetLabel = target.querySelector('.ui-button__label');
+    expect(targetLabel).not.toBeNull();
+    vi.spyOn(target, 'getBoundingClientRect').mockReturnValue({
+      x: 80,
+      y: 80,
+      left: 80,
+      top: 80,
+      right: 180,
+      bottom: 180,
+      width: 100,
+      height: 100,
+      toJSON: () => ({}),
+    });
+    Object.defineProperty(document, 'elementFromPoint', {
+      configurable: true,
+      value: vi.fn(() => targetLabel),
+    });
+
+    try {
+      fireEvent(source, pointerEvent('pointerdown', { pointerId: 62, clientX: 10, clientY: 10 }));
+      act(() => {
+        window.dispatchEvent(
+          pointerEvent('pointermove', { pointerId: 62, clientX: 110, clientY: 110 }),
+        );
+      });
+
+      expect(target).toHaveAttribute('data-oxs-drop-active', 'true');
+      expect(target.closest('.ui-drag-drop-runtime')).toHaveAttribute(
+        'data-oxs-drag-cursor-role',
+        'drag-move',
+      );
+
+      act(() => {
+        window.dispatchEvent(
+          pointerEvent('pointerup', { pointerId: 62, clientX: 110, clientY: 110 }),
+        );
+      });
+      expect(onDrop).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'public-button-item' }),
+        'move',
+      );
+    } finally {
+      if (originalElementFromPoint) {
+        Object.defineProperty(document, 'elementFromPoint', originalElementFromPoint);
+      } else {
+        Reflect.deleteProperty(document, 'elementFromPoint');
+      }
+    }
+  });
+
+  it('keeps callback-ref drop registration alive through React StrictMode replay', () => {
+    const onDrop = vi.fn();
+    const originalElementFromPoint = Object.getOwnPropertyDescriptor(document, 'elementFromPoint');
+
+    function Fixture() {
+      const sourceProps = useDragSource({
+        id: 'strict-source',
+        item: { id: 'strict-item', type: 'document', label: 'Strict item' },
+        threshold: 2,
+      });
+      const targetProps = useDropTarget({
+        id: 'strict-target',
+        operation: 'move',
+        onDrop,
+      });
+      return (
+        <>
+          <Button {...sourceProps}>Strict source</Button>
+          <Button {...targetProps}>Strict target</Button>
+        </>
+      );
+    }
+
+    render(
+      <StrictMode>
+        <UiRoot>
+          <Fixture />
+        </UiRoot>
+      </StrictMode>,
+    );
+
+    const source = screen.getByRole('button', { name: 'Strict source' });
+    const target = screen.getByRole('button', { name: 'Strict target' });
+    const targetLabel = target.querySelector('.ui-button__label');
+    expect(targetLabel).not.toBeNull();
+    Object.defineProperty(document, 'elementFromPoint', {
+      configurable: true,
+      value: vi.fn(() => targetLabel),
+    });
+
+    try {
+      fireEvent(source, pointerEvent('pointerdown', { pointerId: 63, clientX: 10, clientY: 10 }));
+      act(() => {
+        window.dispatchEvent(
+          pointerEvent('pointermove', { pointerId: 63, clientX: 110, clientY: 110 }),
+        );
+      });
+
+      expect(target).toHaveAttribute('data-oxs-drop-active', 'true');
+      expect(target.closest('.ui-drag-drop-runtime')).toHaveAttribute(
+        'data-oxs-drag-cursor-role',
+        'drag-move',
+      );
+
+      act(() => {
+        window.dispatchEvent(
+          pointerEvent('pointerup', { pointerId: 63, clientX: 110, clientY: 110 }),
+        );
+      });
+      expect(onDrop).toHaveBeenCalledWith(expect.objectContaining({ id: 'strict-item' }), 'move');
+    } finally {
+      if (originalElementFromPoint) {
+        Object.defineProperty(document, 'elementFromPoint', originalElementFromPoint);
+      } else {
+        Reflect.deleteProperty(document, 'elementFromPoint');
+      }
+    }
+  });
+
+  it('keeps duplicate semantic target ids instance-safe inside one UiRoot', () => {
+    const firstDrop = vi.fn();
+    const secondDrop = vi.fn();
+    const originalElementFromPoint = Object.getOwnPropertyDescriptor(document, 'elementFromPoint');
+
+    function Fixture() {
+      const sourceProps = useDragSource({
+        id: 'duplicate-source',
+        item: { id: 'duplicate-item', type: 'document', label: 'Duplicate item' },
+        threshold: 2,
+      });
+      const firstTarget = useDropTarget({
+        id: 'shared-target',
+        label: 'First shared target',
+        operation: 'move',
+        onDrop: firstDrop,
+      });
+      const secondTarget = useDropTarget({
+        id: 'shared-target',
+        label: 'Second shared target',
+        operation: 'copy',
+        onDrop: secondDrop,
+      });
+      return (
+        <>
+          <Button {...sourceProps}>Duplicate source</Button>
+          <Button {...firstTarget}>First shared target</Button>
+          <Button {...secondTarget}>Second shared target</Button>
+        </>
+      );
+    }
+
+    render(
+      <UiRoot>
+        <Fixture />
+      </UiRoot>,
+    );
+
+    const source = screen.getByRole('button', { name: 'Duplicate source' });
+    const firstTarget = screen.getByRole('button', { name: 'First shared target' });
+    const secondTarget = screen.getByRole('button', { name: 'Second shared target' });
+    const firstLabel = firstTarget.querySelector('.ui-button__label');
+    expect(firstLabel).not.toBeNull();
+    expect(firstTarget).toHaveAttribute('data-oxs-drop-target', 'shared-target');
+    expect(secondTarget).toHaveAttribute('data-oxs-drop-target', 'shared-target');
+    expect(firstTarget.getAttribute('data-oxs-drop-target-instance')).not.toBe(
+      secondTarget.getAttribute('data-oxs-drop-target-instance'),
+    );
+
+    Object.defineProperty(document, 'elementFromPoint', {
+      configurable: true,
+      value: vi.fn(() => firstLabel),
+    });
+
+    try {
+      fireEvent(source, pointerEvent('pointerdown', { pointerId: 64, clientX: 10, clientY: 10 }));
+      act(() => {
+        window.dispatchEvent(
+          pointerEvent('pointermove', { pointerId: 64, clientX: 110, clientY: 110 }),
+        );
+      });
+
+      expect(firstTarget).toHaveAttribute('data-oxs-drop-active', 'true');
+      expect(secondTarget).toHaveAttribute('data-oxs-drop-active', 'false');
+      expect(firstTarget.closest('.ui-drag-drop-runtime')).toHaveAttribute(
+        'data-oxs-drag-cursor-role',
+        'drag-move',
+      );
+
+      act(() => {
+        window.dispatchEvent(
+          pointerEvent('pointerup', { pointerId: 64, clientX: 110, clientY: 110 }),
+        );
+      });
+      expect(firstDrop).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'duplicate-item' }),
+        'move',
+      );
+      expect(secondDrop).not.toHaveBeenCalled();
+    } finally {
+      if (originalElementFromPoint) {
+        Object.defineProperty(document, 'elementFromPoint', originalElementFromPoint);
+      } else {
+        Reflect.deleteProperty(document, 'elementFromPoint');
+      }
+    }
+  });
+
+  it('keeps active drag continuation above descendants that stop pointer bubbling', () => {
+    const onDrop = vi.fn();
+    const originalElementFromPoint = Object.getOwnPropertyDescriptor(document, 'elementFromPoint');
+
+    function Fixture() {
+      const sourceProps = useDragSource({
+        id: 'capture-source',
+        item: { id: 'capture-item', type: 'document', label: 'Capture item' },
+        threshold: 2,
+      });
+      const targetProps = useDropTarget({ id: 'capture-target', operation: 'move', onDrop });
+      return (
+        <div onPointerMove={(event) => event.stopPropagation()}>
+          <Button {...sourceProps}>Capture source</Button>
+          <Button {...targetProps}>Capture target</Button>
+        </div>
+      );
+    }
+
+    render(
+      <UiRoot>
+        <Fixture />
+      </UiRoot>,
+    );
+
+    const source = screen.getByRole('button', { name: 'Capture source' });
+    const target = screen.getByRole('button', { name: 'Capture target' });
+    const targetLabel = target.querySelector('.ui-button__label');
+    expect(targetLabel).not.toBeNull();
+    Object.defineProperty(document, 'elementFromPoint', {
+      configurable: true,
+      value: vi.fn(() => targetLabel),
+    });
+
+    try {
+      fireEvent(source, pointerEvent('pointerdown', { pointerId: 65, clientX: 10, clientY: 10 }));
+      act(() => {
+        window.dispatchEvent(
+          pointerEvent('pointermove', { pointerId: 65, clientX: 24, clientY: 24 }),
+        );
+      });
+      expect(source.closest('.ui-drag-drop-runtime')).toHaveAttribute(
+        'data-oxs-drag-active',
+        'true',
+      );
+
+      fireEvent(
+        targetLabel as Element,
+        pointerEvent('pointermove', { pointerId: 65, clientX: 110, clientY: 110 }),
+      );
+      expect(target).toHaveAttribute('data-oxs-drop-active', 'true');
+      expect(target.closest('.ui-drag-drop-runtime')).toHaveAttribute(
+        'data-oxs-drag-cursor-role',
+        'drag-move',
+      );
+
+      fireEvent(
+        targetLabel as Element,
+        pointerEvent('pointerup', { pointerId: 65, clientX: 110, clientY: 110 }),
+      );
+      expect(onDrop).toHaveBeenCalledWith(expect.objectContaining({ id: 'capture-item' }), 'move');
+    } finally {
+      if (originalElementFromPoint) {
+        Object.defineProperty(document, 'elementFromPoint', originalElementFromPoint);
+      } else {
+        Reflect.deleteProperty(document, 'elementFromPoint');
+      }
+    }
+  });
+
+  it('keeps owner-Window continuation authoritative through Button press pointer-capture handoff', () => {
+    function Fixture() {
+      const sourceProps = useDragSource({
+        id: 'button-handoff-source',
+        item: { id: 'button-handoff-item', type: 'document', label: 'Button handoff item' },
+        preview: 'Button handoff preview',
+        threshold: 2,
+      });
+      return <Button {...sourceProps}>Button drag source</Button>;
+    }
+
+    render(
+      <UiRoot>
+        <Fixture />
+      </UiRoot>,
+    );
+
+    const source = screen.getByRole('button', { name: 'Button drag source' });
+    fireEvent(source, pointerEvent('pointerdown', { pointerId: 61, clientX: 10, clientY: 10 }));
+    fireEvent(source, pointerEvent('pointermove', { pointerId: 61, clientX: 24, clientY: 24 }));
+    expect(screen.getByText('Button handoff preview')).toHaveClass('ui-drag-preview');
+
+    // Press losing capture is a normal ownership handoff, not cancellation of the active drag.
+    fireEvent(
+      source,
+      pointerEvent('lostpointercapture', { pointerId: 61, clientX: 24, clientY: 24 }),
+    );
+    expect(screen.getByText('Button handoff preview')).toHaveClass('ui-drag-preview');
+
+    fireEvent(source, pointerEvent('pointercancel', { pointerId: 61, clientX: 24, clientY: 24 }));
+    expect(screen.queryByText('Button handoff preview')).not.toBeInTheDocument();
   });
 
   it('continues pointer drag on the owner Window when Pointer Capture is unavailable', () => {

@@ -8,6 +8,7 @@ const UI = path.join(ROOT, 'packages/ui');
 const list = fs.readFileSync(path.join(UI, 'src/components/DataList.tsx'), 'utf8');
 const navigation = fs.readFileSync(path.join(UI, 'src/components/Navigation.tsx'), 'utf8');
 const compositions = fs.readFileSync(path.join(UI, 'src/components/Compositions.tsx'), 'utf8');
+const componentStyles = fs.readFileSync(path.join(UI, 'src/styles/components.css'), 'utf8');
 const publicComponents = fs.readFileSync(path.join(UI, 'src/components/index.ts'), 'utf8');
 const scenarios = fs.readFileSync(path.join(ROOT, 'scripts/browser/scenarios.mjs'), 'utf8');
 const catalog = buildCatalog({ uiRoot: UI });
@@ -73,6 +74,14 @@ for (const token of [
   if (!compositions.includes(token))
     issues.push(`TileGrid realm/spatial contract missing ${token}`);
 }
+const selectedTileDescriptionContrastContract = `.ui-tile[data-selected='true'] .ui-tile__description {
+  color: var(--oxs-color-text-secondary);
+}`;
+if (!componentStyles.includes(selectedTileDescriptionContrastContract))
+  issues.push(
+    'selected Tile descriptions must promote tertiary copy to text-secondary on accent-soft selection surfaces',
+  );
+
 for (const id of [
   'list-navigation-data-certification',
   'tile-grid-spatial-navigation-certification',
@@ -86,5 +95,5 @@ if (issues.length) {
   process.exit(1);
 }
 console.log(
-  'G0 navigation/data contract passed: native ul/li collections · explicit ready/loading/empty/error states · sibling trailing actions · native link destinations · no speculative breadcrumb/pagination API · owner-realm spatial TileGrid focus continuity.',
+  'G0 navigation/data contract passed: native ul/li collections · explicit ready/loading/empty/error states · sibling trailing actions · native link destinations · no speculative breadcrumb/pagination API · owner-realm spatial TileGrid focus continuity · contrast-safe selected Tile supporting copy.',
 );

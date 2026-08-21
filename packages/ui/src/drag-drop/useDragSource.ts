@@ -6,10 +6,6 @@ import type {
 } from 'react';
 import { useCallback, useEffect, useId, useRef } from 'react';
 import { useGestureArena } from '../gestures/runtime';
-import {
-  releasePointerCaptureIfSupported,
-  setPointerCaptureIfSupported,
-} from '../gestures/pointerCapture';
 import { useDragDropRuntime } from './runtime';
 import type { DragItem, DragPoint, DragPreview } from './types';
 
@@ -103,7 +99,6 @@ export function useDragSource({
       pending.removeWindowContinuation();
       if (releaseArena) gestureArena.release(pending.pointerId, gestureOwner);
       pending.unregister();
-      releasePointerCaptureIfSupported(pending.target, pending.pointerId);
       pendingRef.current = null;
     },
     [gestureArena, gestureOwner],
@@ -131,7 +126,6 @@ export function useDragSource({
         return false;
       }
       pending.active = true;
-      setPointerCaptureIfSupported(pending.target, pending.pointerId);
       update(pending.latest);
       return true;
     },
@@ -192,19 +186,11 @@ export function useDragSource({
       if (!ownerWindow) return () => {};
 
       const onWindowPointerMove = (event: PointerEvent) => {
-        if (
-          event.pointerId !== pending.pointerId ||
-          eventTargetsSessionElement(event.target, pending.target)
-        )
-          return;
+        if (event.pointerId !== pending.pointerId || pending.active) return;
         updatePointer(event);
       };
       const onWindowPointerUp = (event: PointerEvent) => {
-        if (
-          event.pointerId !== pending.pointerId ||
-          eventTargetsSessionElement(event.target, pending.target)
-        )
-          return;
+        if (event.pointerId !== pending.pointerId) return;
         finishPointer(event);
       };
       const onWindowPointerCancel = (event: PointerEvent) => {
@@ -272,17 +258,29 @@ export function useDragSource({
   );
 
   const onPointerMove = useCallback(
-    (event: ReactPointerEvent<HTMLElement>) => updatePointer(event),
+    (event: ReactPointerEvent<HTMLElement>) => {
+      const pending = pendingRef.current;
+      if (!pending || pending.pointerId !== event.pointerId || pending.ownerWindow) return;
+      updatePointer(event);
+    },
     [updatePointer],
   );
 
   const onPointerUp = useCallback(
-    (event: ReactPointerEvent<HTMLElement>) => finishPointer(event),
+    (event: ReactPointerEvent<HTMLElement>) => {
+      const pending = pendingRef.current;
+      if (!pending || pending.pointerId !== event.pointerId || pending.ownerWindow) return;
+      finishPointer(event);
+    },
     [finishPointer],
   );
 
   const onPointerCancel = useCallback(
-    (event: ReactPointerEvent<HTMLElement>) => cancelPointer(event),
+    (event: ReactPointerEvent<HTMLElement>) => {
+      const pending = pendingRef.current;
+      if (!pending || pending.pointerId !== event.pointerId || pending.ownerWindow) return;
+      cancelPointer(event);
+    },
     [cancelPointer],
   );
 
@@ -330,7 +328,9 @@ export function useDragSource({
     onPointerMove,
     onPointerUp,
     onPointerCancel,
-    onLostPointerCapture: onPointerCancel,
+    // Losing pointer capture is an expected handoff when another candidate on the same control
+    // (for example Button/usePress) yields Gesture Arena ownership to drag. Window continuation
+    // was installed on pointer-down, so only a real pointercancel should terminate the drag.
     onClickCapture,
     onKeyDown,
     tabIndex: disabled ? undefined : 0,
@@ -340,9 +340,4 @@ export function useDragSource({
     'data-oxs-drag-source': id,
     'data-oxs-drag-active': keyboardActive ? 'true' : 'false',
   };
-}
-
-function eventTargetsSessionElement(target: EventTarget | null, sessionTarget: HTMLElement) {
-  const NodeCtor = sessionTarget.ownerDocument.defaultView?.Node;
-  return Boolean(NodeCtor && target instanceof NodeCtor && sessionTarget.contains(target));
 }

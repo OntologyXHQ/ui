@@ -20,6 +20,22 @@ export function findNativeScrollableAncestor(
   return findNativeScrollTarget(viewport, axis, delta)?.element ?? null;
 }
 
+/**
+ * Returns whether one concrete non-OXS element is a native scroll owner for this delta.
+ * This is used while resolving mixed OXS/native ancestor chains so a farther OXS ScrollView
+ * can never jump across a nearer native scroll container that can consume the same input.
+ */
+export function canNativeScrollElementConsume(
+  element: HTMLElement,
+  axis: ScrollAxis,
+  delta: number,
+): boolean {
+  if (delta === 0 || element.matches('[data-oxs-scroll-viewport="true"]')) return false;
+  const target = nativeScrollTarget(element, axis);
+  if (!target) return false;
+  return delta < 0 ? target.position > 0 : target.position < target.max;
+}
+
 /** Read a native ancestor through the same logical inline coordinate used by ScrollView. */
 export function readNativeScrollPosition(element: HTMLElement, axis: ScrollAxis): number {
   if (axis === 'vertical') return element.scrollTop;

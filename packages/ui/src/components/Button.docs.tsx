@@ -54,6 +54,11 @@ export const uiDocs = defineUiDocsGroup([
     rtl: 'Content slots remain logical and state semantics are direction-independent.',
     touch: 'Uses the Button target and shared press-state contract.',
     responsive: 'Shares Button sizing and full-width behavior.',
+    playground: {
+      preferredWidth: 'medium',
+      controls: ['pressed', 'size'],
+      fixture: { children: 'Pin panel' },
+    },
     examples: [
       {
         id: 'toggle-contract',

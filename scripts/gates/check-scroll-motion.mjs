@@ -50,6 +50,9 @@ for (const token of [
   'observeElementSize(viewport, reconcileGeometry)',
   'findNativeScrollableAncestor(viewport, axis, delta)',
   'consumeNativeScrollChain(viewport, axis, delta)',
+  'findParentScrollViewport(viewport, axis, localResult.overflow)',
+  'findParentScrollViewport(viewport, axis, delta)',
+  'canNativeScrollElementConsume(ancestor, axis, delta)',
 ]) {
   if (!scrollView.includes(token)) issues.push(`ScrollView contract missing ${token}`);
 }
@@ -70,6 +73,7 @@ for (const token of [
   'element.ownerDocument.defaultView',
   'readLogicalHorizontalScroll(element, elementDirection(element))',
   'consumeNativeScrollChain(',
+  'canNativeScrollElementConsume(',
 ]) {
   if (!nativeChain.includes(token)) issues.push(`native wheel-chain bridge missing ${token}`);
 }

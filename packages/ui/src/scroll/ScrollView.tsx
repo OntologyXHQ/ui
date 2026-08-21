@@ -43,7 +43,11 @@ import {
   readLogicalHorizontalScroll,
   writeLogicalHorizontalScroll,
 } from './logicalPosition';
-import { consumeNativeScrollChain, findNativeScrollableAncestor } from './nativeChain';
+import {
+  canNativeScrollElementConsume,
+  consumeNativeScrollChain,
+  findNativeScrollableAncestor,
+} from './nativeChain';
 
 export type ScrollViewHandle = {
   /** Current native viewport element, or null before mount. */
@@ -305,7 +309,9 @@ const ScrollViewImpl = forwardRef(function ScrollView(
       }
 
       const viewport = viewportRef.current;
-      const parentViewport = viewport ? findParentScrollViewport(viewport) : null;
+      const parentViewport = viewport
+        ? findParentScrollViewport(viewport, axis, localResult.overflow)
+        : null;
       const parentController = parentViewport ? scrollControllers.get(parentViewport) : null;
 
       if (parentController && parentController.axis === axis) {
@@ -324,7 +330,7 @@ const ScrollViewImpl = forwardRef(function ScrollView(
       const position = readPosition(viewport);
       const max = readMax(viewport);
       if ((delta < 0 && position > 0) || (delta > 0 && position < max)) return true;
-      const parentViewport = findParentScrollViewport(viewport);
+      const parentViewport = findParentScrollViewport(viewport, axis, delta);
       const parentController = parentViewport ? scrollControllers.get(parentViewport) : null;
       return parentController && parentController.axis === axis
         ? parentController.canConsumeChainedDelta(delta)
@@ -1035,8 +1041,16 @@ function saveRestoredOffset(viewport: HTMLElement, axis: ScrollAxis, key: string
   }
 }
 
-function findParentScrollViewport(viewport: HTMLElement) {
-  const parentRoot = viewport.parentElement?.parentElement?.closest<HTMLElement>('.ui-scroll-view');
+function findParentScrollViewport(viewport: HTMLElement, axis: ScrollAxis, delta: number) {
+  let ancestor = viewport.parentElement;
 
-  return parentRoot?.querySelector<HTMLElement>(':scope > .ui-scroll-view__viewport') ?? null;
+  while (ancestor) {
+    if (ancestor.matches('[data-oxs-scroll-viewport="true"]')) return ancestor;
+
+    if (canNativeScrollElementConsume(ancestor, axis, delta)) return null;
+
+    ancestor = ancestor.parentElement;
+  }
+
+  return null;
 }

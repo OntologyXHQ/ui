@@ -20,7 +20,7 @@ Every public catalog entry gets one generated reading flow: Overview, API, Examp
 
 ### Environment
 
-The toolbar changes the outer `UiRoot`: theme/custom tokens, LTR/RTL, density, motion, input modality, pointer precision, viewport preset, content-container preset and safe-area/occlusion preset. Examples require no environment-specific code.
+The toolbar changes the outer preview `UiRoot`: theme/custom tokens, LTR/RTL, density, motion, input modality, pointer precision, viewport preset, content-container preset and safe-area/occlusion preset. The toolbar itself is a nested stable LTR/comfortable control plane so changing preview direction or density can never move the control needed to reverse that change. Examples require no environment-specific code.
 
 ### Stable links and search
 

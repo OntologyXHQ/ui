@@ -992,6 +992,16 @@ body { overflow: hidden; background: #091019; color-scheme: dark light; }
   flex-wrap: wrap;
 }
 
+.ui-studio-environment-control-root {
+  width: 100%;
+  min-width: 0;
+  /* Nested UiRoot isolates its portal stacking context. Elevate the control-plane root itself
+     so Select/Popover portals remain above the following workspace ScrollView. */
+  z-index: var(--oxs-z-popover);
+  background: transparent;
+  color: inherit;
+}
+
 .ui-studio-environment {
   min-width: 0;
   padding: var(--oxs-space-sm);

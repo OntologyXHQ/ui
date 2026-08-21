@@ -13,6 +13,7 @@ const edgePan = read('packages/ui/src/gestures/useEdgePanGesture.ts');
 const dragSource = read('packages/ui/src/drag-drop/useDragSource.ts');
 const dropTarget = read('packages/ui/src/drag-drop/useDropTarget.ts');
 const dragRuntime = read('packages/ui/src/drag-drop/runtime.tsx');
+const dragTests = read('packages/ui/src/drag-drop/__tests__/dragDrop.test.tsx');
 const editingRuntime = read('packages/ui/src/editing/runtime.tsx');
 const editable = read('packages/ui/src/editing/useEditableText.ts');
 const cursorTypes = read('packages/ui/src/cursor/types.ts');
@@ -73,7 +74,7 @@ for (const token of [
   "ownerWindow.addEventListener('pointermove'",
   "ownerWindow.addEventListener('pointerup'",
   'ownerWindow.setTimeout',
-  'eventTargetsSessionElement',
+  'if (event.pointerId !== pending.pointerId) return;',
   "priority: 'content'",
 ]) {
   if (!dragSource.includes(token)) issues.push(`drag source lifecycle missing ${token}`);
@@ -81,16 +82,63 @@ for (const token of [
 if (/\bwindow\.(?:setTimeout|clearTimeout|addEventListener|removeEventListener)/.test(dragSource)) {
   issues.push('drag source must not borrow continuation/timers from the ambient Window');
 }
+if (dragSource.includes('onLostPointerCapture: onPointerCancel')) {
+  issues.push(
+    'drag source must not treat pointer-capture ownership handoff as pointer cancellation',
+  );
+}
+if (dragSource.includes('eventTargetsSessionElement')) {
+  issues.push(
+    'drag source must not split continuation ownership by event target once an owner Window exists',
+  );
+}
+if (/setPointerCaptureIfSupported|releasePointerCaptureIfSupported/.test(dragSource)) {
+  issues.push(
+    'drag source must not steal/release pointer capture; owner-Window continuation owns drag transport',
+  );
+}
+for (const token of [
+  'pending.ownerWindow) return;',
+  "ownerWindow.addEventListener('pointercancel'",
+]) {
+  if (!dragSource.includes(token))
+    issues.push(`drag source owner-Window authority missing ${token}`);
+}
+for (const token of [
+  'keeps owner-Window continuation authoritative through Button press pointer-capture handoff',
+  '<Button {...sourceProps}>Button drag source</Button>',
+  "pointerEvent('lostpointercapture'",
+]) {
+  if (!dragTests.includes(token))
+    issues.push(`drag source Button handoff regression missing ${token}`);
+}
+for (const token of [
+  'resolves the actual hit-tested public Button target during owner-Window continuation',
+  '<Button {...targetProps}>Public Button target</Button>',
+  "Object.defineProperty(document, 'elementFromPoint'",
+  "'data-oxs-drop-active', 'true'",
+  "'data-oxs-drag-cursor-role'",
+  "'drag-move'",
+]) {
+  if (!dragTests.includes(token)) issues.push(`drag target hit-test regression missing ${token}`);
+}
 for (const token of [
   'const targetRef = useRef(target)',
   'targetRef.current = target',
-  'target.id',
-  'element',
+  'const bindTarget = useCallback(',
+  'unregisterRef.current?.()',
+  'unregisterRef.current = registerTarget({',
+  'elementRef.current === element',
 ]) {
   if (!dropTarget.includes(token)) issues.push(`drop target stable registration missing ${token}`);
 }
 if (dropTarget.includes('registerTarget({ ...target, element })')) {
   issues.push('drop target registration must not churn with inline contract object identity');
+}
+if (/useState<HTMLElement\s*\|\s*null>/.test(dropTarget)) {
+  issues.push(
+    'drop target registration must bind synchronously to the attached DOM ref rather than wait for state/effect registration',
+  );
 }
 
 for (const token of [
@@ -100,9 +148,14 @@ for (const token of [
   'ownerWindow.requestAnimationFrame',
   'ownerWindow.cancelAnimationFrame',
   'ownerDocument.elementFromPoint',
+  "hit?.closest?.('[data-oxs-drop-target]')",
+  'target.element === marker',
+  'target.instanceId',
+  'targetInstanceId: target?.instanceId',
+  'targetsRef.current.set(target.instanceId, target)',
+  'targetsRef.current.delete(target.instanceId)',
   'viewportPointToPortalHost',
   'target.element.isConnected',
-  'targetsRef.current.delete(target.id)',
 ]) {
   if (!dragRuntime.includes(token)) issues.push(`drag/drop runtime missing ${token}`);
 }
@@ -222,6 +275,66 @@ for (const axis of [
 ]) {
   if (!certificationScenario.includes(`'${axis}'`))
     issues.push(`UIR12 G6 scenario missing axis ${axis}`);
+}
+
+if (/\buseEffect\s*\(/.test(dropTarget)) {
+  issues.push(
+    'drop target callback-ref registration must be the only lifecycle owner; StrictMode effect replay must not unregister a live target',
+  );
+}
+for (const token of [
+  'keeps callback-ref drop registration alive through React StrictMode replay',
+  '<StrictMode>',
+  '<Button {...targetProps}>Strict target</Button>',
+  "'data-oxs-drop-active', 'true'",
+  "'data-oxs-drag-cursor-role'",
+  "'drag-move'",
+]) {
+  if (!dragTests.includes(token)) issues.push(`drop target StrictMode regression missing ${token}`);
+}
+
+for (const token of [
+  'const instanceId = useId()',
+  'instanceId,',
+  "'data-oxs-drop-target-instance': instanceId",
+  'session?.targetInstanceId === instanceId',
+]) {
+  if (!dropTarget.includes(token)) issues.push(`drop target instance identity missing ${token}`);
+}
+for (const token of [
+  'keeps duplicate semantic target ids instance-safe inside one UiRoot',
+  "id: 'shared-target'",
+  "'data-oxs-drop-target-instance'",
+  "'data-oxs-drop-active', 'true'",
+  "'data-oxs-drop-active', 'false'",
+  'expect(secondDrop).not.toHaveBeenCalled()',
+]) {
+  if (!dragTests.includes(token)) issues.push(`duplicate drop-target regression missing ${token}`);
+}
+
+// UIR12 provider-authority continuation contract (v2)
+for (const token of ['event.pointerId !== pending.pointerId || pending.active']) {
+  if (!dragSource.includes(token)) issues.push(`drag source provider handoff missing ${token}`);
+}
+for (const token of [
+  "marker.getAttribute('data-oxs-drop-target-instance')",
+  'targets.get(instanceId)',
+  "ownerWindow.addEventListener('pointermove', onPointerMove, true)",
+  "ownerWindow.addEventListener('pointerup', onPointerUp, true)",
+  "ownerWindow.addEventListener('pointercancel', onPointerCancel, true)",
+  "ownerWindow.removeEventListener('pointermove', onPointerMove, true)",
+]) {
+  if (!dragRuntime.includes(token)) issues.push(`drag runtime provider authority missing ${token}`);
+}
+for (const token of [
+  'keeps active drag continuation above descendants that stop pointer bubbling',
+  'event.stopPropagation()',
+  "'data-oxs-drop-active', 'true'",
+  "'data-oxs-drag-cursor-role'",
+  "'drag-move'",
+]) {
+  if (!dragTests.includes(token))
+    issues.push(`drag provider-authority regression missing ${token}`);
 }
 
 if (issues.length) {

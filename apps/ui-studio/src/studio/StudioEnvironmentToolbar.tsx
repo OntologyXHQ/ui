@@ -1,4 +1,4 @@
-import { Label, Row, Select, Surface, Toolbar } from '@ontologyx/ui';
+import { Label, Row, Select, Surface, Toolbar, UiRoot } from '@ontologyx/ui';
 import { useStudioEnvironment } from './StudioEnvironment';
 
 const themeOptions = [
@@ -8,14 +8,14 @@ const themeOptions = [
   { value: 'custom', label: 'Custom' },
 ] as const;
 const directionOptions = [
-  { value: 'ltr', label: 'LTR' },
-  { value: 'rtl', label: 'RTL' },
-  { value: 'auto', label: 'Auto' },
+  { value: 'ltr', label: 'Direction: LTR' },
+  { value: 'rtl', label: 'Direction: RTL' },
+  { value: 'auto', label: 'Direction: auto' },
 ] as const;
 const densityOptions = [
-  { value: 'comfortable', label: 'Comfortable' },
-  { value: 'compact', label: 'Compact' },
-  { value: 'auto', label: 'Auto' },
+  { value: 'comfortable', label: 'Density: comfortable' },
+  { value: 'compact', label: 'Density: compact' },
+  { value: 'auto', label: 'Density: auto' },
 ] as const;
 const motionOptions = [
   { value: 'system', label: 'Motion: system' },
@@ -57,90 +57,97 @@ const safeAreaOptions = [
 export function StudioEnvironmentToolbar() {
   const { environment, update } = useStudioEnvironment();
   return (
-    <Surface className="ui-studio-environment" material="subtle" radius="md">
-      <Row gap="sm" align="center" className="ui-studio-environment__row">
-        <Label tone="tertiary" emphasis="strong" className="ui-studio-environment__label">
-          Environment
-        </Label>
-        <Toolbar label="Global UI environment" className="ui-studio-environment__toolbar">
-          <Select
-            label="Theme"
-            hideLabel
-            fieldSize="sm"
-            options={themeOptions}
-            value={environment.theme}
-            onValueChange={(value) => update('theme', value as typeof environment.theme)}
-          />
-          <Select
-            label="Direction"
-            hideLabel
-            fieldSize="sm"
-            options={directionOptions}
-            value={environment.direction}
-            onValueChange={(value) => update('direction', value as typeof environment.direction)}
-          />
-          <Select
-            label="Density"
-            hideLabel
-            fieldSize="sm"
-            options={densityOptions}
-            value={environment.density}
-            onValueChange={(value) => update('density', value as typeof environment.density)}
-          />
-          <Select
-            label="Motion"
-            hideLabel
-            fieldSize="sm"
-            options={motionOptions}
-            value={environment.motion}
-            onValueChange={(value) => update('motion', value as typeof environment.motion)}
-          />
-          <Select
-            label="Input modality"
-            hideLabel
-            fieldSize="sm"
-            options={modalityOptions}
-            value={environment.modality}
-            onValueChange={(value) => update('modality', value as typeof environment.modality)}
-          />
-          <Select
-            label="Pointer precision"
-            hideLabel
-            fieldSize="sm"
-            options={pointerOptions}
-            value={environment.pointerPrecision}
-            onValueChange={(value) =>
-              update('pointerPrecision', value as typeof environment.pointerPrecision)
-            }
-          />
-          <Select
-            label="Viewport preset"
-            hideLabel
-            fieldSize="sm"
-            options={viewportOptions}
-            value={environment.viewport}
-            onValueChange={(value) => update('viewport', value as typeof environment.viewport)}
-          />
-          <Select
-            label="Content container preset"
-            hideLabel
-            fieldSize="sm"
-            options={containerOptions}
-            value={environment.container}
-            onValueChange={(value) => update('container', value as typeof environment.container)}
-          />
-          <Select
-            label="Safe area and occlusion"
-            hideLabel
-            fieldSize="sm"
-            options={safeAreaOptions}
-            value={environment.insetPreset}
-            onValueChange={(value) =>
-              update('insetPreset', value as typeof environment.insetPreset)
-            }
-          />
-        </Toolbar>
-      </Row>
-    </Surface>
+    <UiRoot
+      direction="ltr"
+      density="comfortable"
+      motion={environment.motion}
+      className="ui-studio-environment-control-root"
+    >
+      <Surface className="ui-studio-environment" material="subtle" radius="md">
+        <Row gap="sm" align="center" className="ui-studio-environment__row">
+          <Label tone="tertiary" emphasis="strong" className="ui-studio-environment__label">
+            Environment
+          </Label>
+          <Toolbar label="Global UI environment" className="ui-studio-environment__toolbar">
+            <Select
+              label="Theme"
+              hideLabel
+              fieldSize="sm"
+              options={themeOptions}
+              value={environment.theme}
+              onValueChange={(value) => update('theme', value as typeof environment.theme)}
+            />
+            <Select
+              label="Direction"
+              hideLabel
+              fieldSize="sm"
+              options={directionOptions}
+              value={environment.direction}
+              onValueChange={(value) => update('direction', value as typeof environment.direction)}
+            />
+            <Select
+              label="Density"
+              hideLabel
+              fieldSize="sm"
+              options={densityOptions}
+              value={environment.density}
+              onValueChange={(value) => update('density', value as typeof environment.density)}
+            />
+            <Select
+              label="Motion"
+              hideLabel
+              fieldSize="sm"
+              options={motionOptions}
+              value={environment.motion}
+              onValueChange={(value) => update('motion', value as typeof environment.motion)}
+            />
+            <Select
+              label="Input modality"
+              hideLabel
+              fieldSize="sm"
+              options={modalityOptions}
+              value={environment.modality}
+              onValueChange={(value) => update('modality', value as typeof environment.modality)}
+            />
+            <Select
+              label="Pointer precision"
+              hideLabel
+              fieldSize="sm"
+              options={pointerOptions}
+              value={environment.pointerPrecision}
+              onValueChange={(value) =>
+                update('pointerPrecision', value as typeof environment.pointerPrecision)
+              }
+            />
+            <Select
+              label="Viewport preset"
+              hideLabel
+              fieldSize="sm"
+              options={viewportOptions}
+              value={environment.viewport}
+              onValueChange={(value) => update('viewport', value as typeof environment.viewport)}
+            />
+            <Select
+              label="Content container preset"
+              hideLabel
+              fieldSize="sm"
+              options={containerOptions}
+              value={environment.container}
+              onValueChange={(value) => update('container', value as typeof environment.container)}
+            />
+            <Select
+              label="Safe area and occlusion"
+              hideLabel
+              fieldSize="sm"
+              options={safeAreaOptions}
+              value={environment.insetPreset}
+              onValueChange={(value) =>
+                update('insetPreset', value as typeof environment.insetPreset)
+              }
+            />
+          </Toolbar>
+        </Row>
+      </Surface>
+    </UiRoot>
   );
 }

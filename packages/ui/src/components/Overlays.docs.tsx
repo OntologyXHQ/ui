@@ -375,6 +375,7 @@ export function MenuPreviewExample() {
       </Button>
       <Menu open={open} onOpenChange={setOpen} anchorRef={anchorRef} ariaLabel="Preview menu">
         <MenuItem>Open</MenuItem>
+        <MenuItem>Duplicate</MenuItem>
         <MenuSeparator />
         <MenuItem destructive>Remove</MenuItem>
       </Menu>

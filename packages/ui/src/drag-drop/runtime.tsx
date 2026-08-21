@@ -20,11 +20,14 @@ import type {
 } from './types';
 import { cursorRoleForDragOperation } from './types';
 
-type RegisteredTarget = DropTargetContract & { element: HTMLElement };
+type RegisteredTarget = DropTargetContract & { element: HTMLElement; instanceId: string };
+type RuntimeSession = DragSession & { targetInstanceId?: string };
 
 type DragDropRuntime = {
-  session: DragSession | null;
-  begin: (input: Omit<DragSession, 'active' | 'targetId' | 'operation'>) => boolean;
+  session: RuntimeSession | null;
+  begin: (
+    input: Omit<RuntimeSession, 'active' | 'targetId' | 'targetInstanceId' | 'operation'>,
+  ) => boolean;
   update: (point: DragPoint) => void;
   stepTarget: (direction: 'next' | 'previous') => void;
   finish: () => void;
@@ -38,26 +41,31 @@ export function DragDropProvider({ children }: PropsWithChildren) {
   const portalHost = useUiPortalHost();
   const [rootElement, setRootElement] = useState<HTMLDivElement | null>(null);
   const targetsRef = useRef(new Map<string, RegisteredTarget>());
-  const sessionRef = useRef<DragSession | null>(null);
-  const [session, setSession] = useState<DragSession | null>(null);
+  const sessionRef = useRef<RuntimeSession | null>(null);
+  const [session, setSession] = useState<RuntimeSession | null>(null);
   const [announcement, setAnnouncement] = useState('');
   const ownerDocument = rootElement?.ownerDocument ?? portalHost?.ownerDocument ?? null;
   const ownerWindow = ownerDocument?.defaultView ?? null;
 
-  const commitSession = useCallback((next: DragSession | null) => {
+  const commitSession = useCallback((next: RuntimeSession | null) => {
     sessionRef.current = next;
     setSession(next);
   }, []);
 
   const registerTarget = useCallback(
     (target: RegisteredTarget) => {
-      targetsRef.current.set(target.id, target);
+      targetsRef.current.set(target.instanceId, target);
       return () => {
-        if (targetsRef.current.get(target.id)?.element !== target.element) return;
-        targetsRef.current.delete(target.id);
+        if (targetsRef.current.get(target.instanceId)?.element !== target.element) return;
+        targetsRef.current.delete(target.instanceId);
         const current = sessionRef.current;
-        if (current?.targetId === target.id) {
-          commitSession({ ...current, targetId: undefined, operation: 'none' });
+        if (current?.targetInstanceId === target.instanceId) {
+          commitSession({
+            ...current,
+            targetId: undefined,
+            targetInstanceId: undefined,
+            operation: 'none',
+          });
         }
       };
     },
@@ -65,7 +73,7 @@ export function DragDropProvider({ children }: PropsWithChildren) {
   );
 
   const begin = useCallback(
-    (input: Omit<DragSession, 'active' | 'targetId' | 'operation'>) => {
+    (input: Omit<RuntimeSession, 'active' | 'targetId' | 'targetInstanceId' | 'operation'>) => {
       if (sessionRef.current) return false;
       commitSession({ ...input, active: true, operation: 'none' });
       setAnnouncement(`Picked up ${input.item.label ?? input.item.id}.`);
@@ -78,11 +86,17 @@ export function DragDropProvider({ children }: PropsWithChildren) {
     (point: DragPoint) => {
       const current = sessionRef.current;
       if (!current) return;
-      const target = findDropTarget(targetsRef.current.values(), current.item, point);
+      const target = findDropTarget(targetsRef.current, current.item, point, ownerDocument);
       const operation = target ? operationForTarget(target, current.item) : 'none';
-      commitSession({ ...current, point, targetId: target?.id, operation });
+      commitSession({
+        ...current,
+        point,
+        targetId: target?.id,
+        targetInstanceId: target?.instanceId,
+        operation,
+      });
     },
-    [commitSession],
+    [commitSession, ownerDocument],
   );
 
   const stepTarget = useCallback(
@@ -91,8 +105,8 @@ export function DragDropProvider({ children }: PropsWithChildren) {
       if (!current) return;
       const targets = orderedTargets(targetsRef.current.values(), current.item);
       if (!targets.length) return;
-      const currentIndex = current.targetId
-        ? targets.findIndex((target) => target.id === current.targetId)
+      const currentIndex = current.targetInstanceId
+        ? targets.findIndex((target) => target.instanceId === current.targetInstanceId)
         : -1;
       const delta = direction === 'next' ? 1 : -1;
       const nextIndex =
@@ -106,7 +120,13 @@ export function DragDropProvider({ children }: PropsWithChildren) {
       const rect = target.element.getBoundingClientRect();
       const point = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
       const operation = operationForTarget(target, current.item);
-      commitSession({ ...current, point, targetId: target.id, operation });
+      commitSession({
+        ...current,
+        point,
+        targetId: target.id,
+        targetInstanceId: target.instanceId,
+        operation,
+      });
       setAnnouncement(
         `${current.item.label ?? current.item.id} over ${target.label ?? target.id}. ${operation} operation.`,
       );
@@ -124,7 +144,9 @@ export function DragDropProvider({ children }: PropsWithChildren) {
   const finish = useCallback(() => {
     const current = sessionRef.current;
     if (!current) return;
-    const target = current.targetId ? targetsRef.current.get(current.targetId) : undefined;
+    const target = current.targetInstanceId
+      ? targetsRef.current.get(current.targetInstanceId)
+      : undefined;
     if (
       target?.element.isConnected &&
       current.operation !== 'none' &&
@@ -176,8 +198,44 @@ export function DragDropProvider({ children }: PropsWithChildren) {
     return () => ownerWindow.removeEventListener('keydown', onKeyDown, true);
   }, [cancel, finish, ownerDocument, ownerWindow, stepTarget]);
 
+  const pointerSessionActive = session !== null && session.modality !== 'keyboard';
+
   useEffect(() => {
-    if (!session || session.modality === 'keyboard' || !ownerWindow || !ownerDocument) return;
+    if (!ownerWindow) return;
+
+    const onPointerMove = (event: PointerEvent) => {
+      const current = sessionRef.current;
+      if (!current || current.modality === 'keyboard' || event.pointerId !== current.pointerId)
+        return;
+      if (event.cancelable) event.preventDefault();
+      update({ x: event.clientX, y: event.clientY });
+    };
+    const onPointerUp = (event: PointerEvent) => {
+      const current = sessionRef.current;
+      if (!current || current.modality === 'keyboard' || event.pointerId !== current.pointerId)
+        return;
+      update({ x: event.clientX, y: event.clientY });
+      finish();
+    };
+    const onPointerCancel = (event: PointerEvent) => {
+      const current = sessionRef.current;
+      if (!current || current.modality === 'keyboard' || event.pointerId !== current.pointerId)
+        return;
+      cancel();
+    };
+
+    ownerWindow.addEventListener('pointermove', onPointerMove, true);
+    ownerWindow.addEventListener('pointerup', onPointerUp, true);
+    ownerWindow.addEventListener('pointercancel', onPointerCancel, true);
+    return () => {
+      ownerWindow.removeEventListener('pointermove', onPointerMove, true);
+      ownerWindow.removeEventListener('pointerup', onPointerUp, true);
+      ownerWindow.removeEventListener('pointercancel', onPointerCancel, true);
+    };
+  }, [cancel, finish, ownerWindow, update]);
+
+  useEffect(() => {
+    if (!pointerSessionActive || !ownerWindow || !ownerDocument) return;
     let frame: number | null = null;
     const tick = () => {
       const current = sessionRef.current;
@@ -189,7 +247,7 @@ export function DragDropProvider({ children }: PropsWithChildren) {
     return () => {
       if (frame !== null) ownerWindow.cancelAnimationFrame(frame);
     };
-  }, [ownerDocument, ownerWindow, session?.modality, session?.sourceId]);
+  }, [ownerDocument, ownerWindow, pointerSessionActive]);
 
   useEffect(
     () => () => {
@@ -272,13 +330,31 @@ function orderedTargets(targets: IterableIterator<RegisteredTarget>, item: DragI
 }
 
 function findDropTarget(
-  targets: IterableIterator<RegisteredTarget>,
+  targets: ReadonlyMap<string, RegisteredTarget>,
   item: DragItem,
   point: DragPoint,
+  ownerDocument: Document | null,
 ): RegisteredTarget | undefined {
+  if (ownerDocument && typeof ownerDocument.elementFromPoint === 'function') {
+    const hit = ownerDocument.elementFromPoint(point.x, point.y);
+    const marker = hit?.closest?.('[data-oxs-drop-target]') ?? null;
+    if (!marker) return undefined;
+    const instanceId = marker.getAttribute('data-oxs-drop-target-instance');
+    const target = instanceId ? targets.get(instanceId) : undefined;
+    if (
+      target &&
+      target.element === marker &&
+      target.element.isConnected &&
+      target.accepts?.(item) !== false
+    ) {
+      return target;
+    }
+    return undefined;
+  }
+
   let selected: RegisteredTarget | undefined;
   let selectedArea = Number.POSITIVE_INFINITY;
-  for (const target of targets) {
+  for (const target of targets.values()) {
     if (!target.element.isConnected || target.accepts?.(item) === false) continue;
     const rect = target.element.getBoundingClientRect();
     if (point.x < rect.left || point.x > rect.right || point.y < rect.top || point.y > rect.bottom)
