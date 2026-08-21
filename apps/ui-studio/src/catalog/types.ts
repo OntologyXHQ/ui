@@ -19,6 +19,13 @@ export type UiCatalogExample = {
   load: () => Promise<{ default: ComponentType }>;
 };
 
+export type UiCatalogCertification = {
+  owner: string;
+  behaviorTests: readonly string[];
+  browserScenarios: readonly string[];
+  requiredAxes: readonly string[];
+};
+
 export type UiCatalogEntry = {
   id: string;
   exportName: string;
@@ -32,6 +39,7 @@ export type UiCatalogEntry = {
   rtl: string;
   touch: string;
   responsive: string;
+  certification: UiCatalogCertification | null;
   playground: {
     preferredWidth?: 'narrow' | 'medium' | 'wide';
     controls?: readonly string[];

@@ -15,12 +15,19 @@ import {
 import { SystemSurface } from './SystemScaffold';
 
 export type SystemOsdProps = {
+  /** Accessible status label for the OSD and its determinate value when present. */
   label: string;
+  /** Controlled value; caller remains authoritative when supplied. */
   value?: number;
+  /** Upper value bound used for semantic progress presentation. */
   max?: number;
+  /** Optional decorative/status icon rendered beside the OSD content. */
   icon?: ReactNode;
+  /** Semantic status tone applied through accepted Component color roles. */
   tone?: BadgeTone;
+  /** Optional caller-owned status presentation. */
   status?: ReactNode;
+  /** Optional consumer class name appended without changing component ownership. */
   className?: string;
 };
 
@@ -68,17 +75,29 @@ export type SystemCommandItem = {
 };
 
 export type SystemCommandSurfaceProps = {
+  /** Caller-owned controlled visibility state for this System surface. */
   open: boolean;
+  /** Caller-owned search/filter query. */
   query: string;
+  /** Caller-owned filtered command view models; execution policy remains external. */
   commands: readonly SystemCommandItem[];
+  /** Reports query changes without taking ownership of filtering policy. */
   onQueryChange: (query: string) => void;
+  /** Reports activation by stable identity; execution authority remains external. */
   onActivate: (id: string) => void;
+  /** Reports requested visibility changes without taking ownership of command-surface state. */
   onOpenChange: (open: boolean) => void;
+  /** Caller-owned visible title; reusable UI never supplies product meaning. */
   title?: ReactNode;
+  /** Accessible name for the search field. */
   searchLabel?: string;
+  /** Optional search-field placeholder; never used as the accessible name. */
   searchPlaceholder?: string;
+  /** Accessible name for the rendered collection. */
   collectionLabel?: string;
+  /** Caller-owned empty-state title. */
   emptyTitle?: ReactNode;
+  /** Caller-owned empty-state supporting description. */
   emptyDescription?: ReactNode;
 };
 
@@ -203,14 +222,23 @@ function filterSystemCommands(commands: readonly SystemCommandItem[], query: str
 }
 
 export type SystemLockLayoutProps = {
+  /** Required primary lock-screen content; authentication semantics remain caller-owned. */
   primary: ReactNode;
+  /** Optional secondary lock-screen content. */
   secondary?: ReactNode;
+  /** Optional caller-owned identity presentation. */
   identity?: ReactNode;
+  /** Caller-owned authentication controls; credential validation is never performed here. */
   authentication?: ReactNode;
+  /** Optional caller-owned status presentation. */
   status?: ReactNode;
+  /** Optional caller-owned action region composed from public Components. */
   actions?: ReactNode;
+  /** Accessible landmark label for the lock/authentication surface. */
   label?: string;
+  /** Optional consumer class name appended without changing component ownership. */
   className?: string;
+  /** Semantic landmark role for the primary reusable content region. */
   contentRole?: 'main' | 'region';
 };
 

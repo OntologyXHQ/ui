@@ -22,7 +22,20 @@ function scenario(id, axes, run, { accepts = [] } = {}) {
 export const browserScenarios = [
   scenario(
     'studio-route-environment-a11y',
-    ['route', 'a11y', 'theme', 'ltr', 'desktop'],
+    [
+      'route',
+      'a11y',
+      'theme',
+      'ltr',
+      'desktop',
+      'studio',
+      'catalog',
+      'search',
+      'deep-link',
+      'api-docs',
+      'evidence',
+      'real-preview',
+    ],
     async ({ browser, baseUrl }) => {
       const context = await browser.newContext({
         viewport: { width: 1280, height: 900 },
@@ -200,9 +213,72 @@ export const browserScenarios = [
           { role: 'region', label: 'Button API reference', tabIndex: 0 },
           'Studio API overflow wrapper must remain a named keyboard-focusable scroll region.',
         );
-        const axe = await runAxe(page, 'Button Studio route');
-        diagnostics.assertClean('Button Studio route');
-        return { axe, stacked };
+
+        const livePreview = workbench.locator('.ui-studio-component-preview');
+        await livePreview.getByRole('button', { name: 'Continue', exact: true }).waitFor({
+          state: 'visible',
+        });
+        assert.equal(
+          await workbench
+            .locator('[data-studio-acceptance-evidence]')
+            .getAttribute('data-studio-acceptance-evidence'),
+          'bound',
+          'Studio inferred documentation completeness instead of binding real certification evidence.',
+        );
+        assert.ok(
+          (await workbench.locator('[data-studio-certification-owner]').textContent())?.trim(),
+          'Studio acceptance evidence did not expose its certification owner.',
+        );
+        assert.ok(
+          (await workbench.locator('[data-studio-browser-scenario]').textContent())?.includes(
+            'button-action-contract-certification',
+          ),
+          'Studio acceptance evidence did not expose the real Button G6 scenario.',
+        );
+        assert.equal(
+          await workbench.getByText('No JSDoc yet.', { exact: true }).count(),
+          0,
+          'Accepted Studio API reference still contains inferred/missing prop documentation.',
+        );
+
+        const catalogSearch = page.getByRole('searchbox', {
+          name: 'Search UI catalog',
+          exact: true,
+        });
+        await catalogSearch.fill('SystemKeyboardHost');
+        const keyboardLink = page.getByRole('button', {
+          name: 'Open SystemKeyboardHost',
+          exact: true,
+        });
+        await keyboardLink.waitFor({ state: 'visible' });
+        await keyboardLink.click();
+        const keyboardWorkbench = page.locator('[data-studio-entry="SystemKeyboardHost"]');
+        await keyboardWorkbench.waitFor({ state: 'visible' });
+        const keyboardPreview = keyboardWorkbench.locator('.ui-studio-component-preview');
+        await keyboardPreview
+          .getByRole('group', { name: 'System touch keyboard', exact: true })
+          .waitFor({ state: 'visible' });
+        assert.equal(
+          await keyboardPreview.locator('[data-oxs-system-keyboard-purpose="text"]').count(),
+          1,
+          'Studio live preview retained stale props across Button -> SystemKeyboardHost navigation.',
+        );
+        assert.equal(
+          new URL(page.url()).searchParams.get('entry'),
+          'SystemKeyboardHost',
+          'Studio catalog search navigation did not produce a durable deep link.',
+        );
+        assert.equal(
+          await keyboardWorkbench
+            .locator('[data-studio-acceptance-evidence]')
+            .getAttribute('data-studio-acceptance-evidence'),
+          'bound',
+          'System Studio entry lost its real certification evidence binding.',
+        );
+
+        const axe = await runAxe(page, 'Studio V1 workbench route');
+        diagnostics.assertClean('Studio V1 workbench route');
+        return { axe, stacked, deepLinkEntry: 'SystemKeyboardHost' };
       } finally {
         await context.close();
       }
@@ -4615,6 +4691,8 @@ export const browserScenarios = [
     'selection-controls-certification',
     [
       'selection',
+      'slider',
+      'range',
       'native-form',
       'native-semantics',
       'uncontrolled',
@@ -4726,6 +4804,25 @@ export const browserScenarios = [
           'ToggleGroup did not expose pressed state.',
         );
 
+        const sliderWorkbench = await gotoCatalog(page, baseUrl, {
+          entry: 'Slider',
+          tab: 'playground',
+          dir: 'rtl',
+          pointer: 'coarse',
+        });
+        const slider = sliderWorkbench.getByRole('slider', { name: 'Volume', exact: true }).first();
+        await slider.focus();
+        const sliderBefore = Number(await slider.getAttribute('aria-valuenow'));
+        await page.keyboard.press('ArrowLeft');
+        const sliderAfter = Number(await slider.getAttribute('aria-valuenow'));
+        assert.ok(
+          sliderAfter > sliderBefore,
+          'RTL Slider ArrowLeft did not increase the logical value.',
+        );
+        assert.equal(await slider.getAttribute('aria-valuemin'), '0');
+        assert.equal(await slider.getAttribute('aria-valuemax'), '100');
+        await assertMinimumBlockSize(slider, 44, 'coarse-pointer Slider');
+
         const buttonExample = await gotoCatalog(page, baseUrl, {
           entry: 'ToggleButton',
           tab: 'examples',
@@ -4754,6 +4851,7 @@ export const browserScenarios = [
         'ToggleButton',
         'SegmentedControl',
         'ToggleGroup',
+        'Slider',
       ],
     },
   ),
@@ -5442,6 +5540,410 @@ export const browserScenarios = [
         'Snackbar',
         'ToastHost',
         'Banner',
+      ],
+    },
+  ),
+
+  scenario(
+    'developer-compositions-adaptive-certification',
+    [
+      'compositions',
+      'adaptive',
+      'container',
+      'min-size',
+      'nested-scroll',
+      'rtl',
+      'touch',
+      'keyboard',
+      'a11y',
+    ],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 980, height: 760 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const cards = await gotoCatalog(page, baseUrl, {
+          entry: 'Card',
+          tab: 'examples',
+          example: 'overview',
+          dir: 'rtl',
+          pointer: 'coarse',
+        });
+        const project = cards.getByRole('group', { name: 'Project summary', exact: true });
+        assert.equal(await project.isVisible(), true, 'Card lost its labelled group contract.');
+        assert.equal(
+          (await project.getAttribute('aria-describedby')) !== null,
+          true,
+          'Card lost its description relationship.',
+        );
+
+        const scaffold = await gotoCatalog(page, baseUrl, {
+          entry: 'PageScaffold',
+          tab: 'examples',
+          example: 'overview',
+          dir: 'rtl',
+        });
+        const main = scaffold.getByRole('main', { name: 'Scaffold example content', exact: true });
+        assert.equal(await main.isVisible(), true, 'PageScaffold lost its primary landmark.');
+        const geometry = await scaffold.locator('.ui-page-scaffold').evaluate((element) => {
+          const content = element.querySelector('.ui-page-scaffold__content');
+          const sidebar = element.querySelector('.ui-page-scaffold__sidebar');
+          return {
+            rootWidth: element.getBoundingClientRect().width,
+            rootScrollWidth: element.scrollWidth,
+            contentMinInline: content ? getComputedStyle(content).minInlineSize : null,
+            sidebarMinInline: sidebar ? getComputedStyle(sidebar).minInlineSize : null,
+          };
+        });
+        assert.ok(
+          geometry.rootScrollWidth <= Math.ceil(geometry.rootWidth) + 1,
+          'PageScaffold leaked horizontal overflow from nested content.',
+        );
+        assert.equal(
+          geometry.contentMinInline,
+          '0px',
+          'PageScaffold content lost min-inline-size:0.',
+        );
+        assert.equal(
+          geometry.sidebarMinInline,
+          '0px',
+          'PageScaffold sidebar lost min-inline-size:0.',
+        );
+        assert.equal(
+          await scaffold.locator('.ui-scroll-view__viewport').count(),
+          1,
+          'PageScaffold realistic example lost nested ScrollView ownership.',
+        );
+
+        const apps = await gotoCatalog(page, baseUrl, {
+          entry: 'ApplicationItem',
+          tab: 'examples',
+          example: 'overview',
+          dir: 'rtl',
+          pointer: 'coarse',
+        });
+        const browserItem = apps.getByRole('button', { name: 'Browser', exact: true });
+        await assertMinimumBlockSize(browserItem, 44, 'ApplicationItem coarse-pointer action');
+        await apps.getByRole('button', { name: 'Files', exact: true }).click();
+        assert.equal(
+          await apps
+            .getByRole('button', { name: 'Files', exact: true })
+            .locator('..')
+            .locator('..')
+            .getAttribute('data-selected'),
+          'true',
+          'ApplicationItem did not preserve caller-owned selection after activation.',
+        );
+
+        const states = await gotoCatalog(page, baseUrl, {
+          entry: 'ContentState',
+          tab: 'examples',
+          example: 'overview',
+          motion: 'reduced',
+        });
+        assert.equal(
+          await states.getByRole('alert').isVisible(),
+          true,
+          'ContentState error lost alert semantics.',
+        );
+        assert.equal(
+          await states.getByRole('status').isVisible(),
+          true,
+          'ContentState loading lost status semantics.',
+        );
+
+        const appBar = await gotoCatalog(page, baseUrl, {
+          entry: 'AppBar',
+          tab: 'playground',
+          dir: 'rtl',
+        });
+        assert.equal(
+          await appBar
+            .getByRole('heading', { name: 'Application header', exact: true })
+            .first()
+            .isVisible(),
+          true,
+          'AppBar live preview did not render the real public export.',
+        );
+        const direction = await appBar
+          .locator('.ui-app-bar')
+          .first()
+          .evaluate((element) => getComputedStyle(element).direction);
+        assert.equal(direction, 'rtl', 'AppBar did not inherit logical RTL direction.');
+
+        const axe = await runAxe(page, 'UIR13 developer compositions');
+        diagnostics.assertClean('UIR13 developer compositions');
+        return { geometry, axe };
+      } finally {
+        await context.close();
+      }
+    },
+    { accepts: ['Card', 'PageScaffold', 'ApplicationItem', 'ContentState', 'AppBar'] },
+  ),
+  scenario(
+    'system-ui-core-certification',
+    [
+      'system-ui',
+      'components-only',
+      'workspace',
+      'chrome',
+      'launcher',
+      'settings',
+      'adaptive',
+      'rtl',
+      'touch',
+      'keyboard',
+      'a11y',
+    ],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 1100, height: 820 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const boundary = await gotoCatalog(page, baseUrl, {
+          entry: 'SystemScaffold',
+          tab: 'examples',
+          example: 'boundary',
+          dir: 'rtl',
+        });
+        const scaffold = boundary.locator('[data-oxs-system-scaffold]');
+        assert.equal(await scaffold.count(), 1, 'SystemScaffold boundary example lost its root.');
+        assert.equal(
+          await boundary.locator('[data-oxs-system-surface="chrome"]').count(),
+          1,
+          'SystemSurface chrome classification is missing.',
+        );
+        assert.equal(
+          await boundary.locator('[data-oxs-privileged-surface-host]').count(),
+          1,
+          'SystemScaffold lost the privileged host boundary.',
+        );
+
+        const layout = await gotoCatalog(page, baseUrl, {
+          entry: 'DesktopShellLayout',
+          tab: 'examples',
+          example: 'layout-library',
+          dir: 'rtl',
+          pointer: 'coarse',
+        });
+        assert.equal(
+          await layout.getByRole('region', { name: 'Desktop workspace', exact: true }).isVisible(),
+          true,
+        );
+        assert.equal(
+          await layout.getByRole('toolbar', { name: 'Top system bar', exact: true }).isVisible(),
+          true,
+        );
+        assert.equal(
+          await layout.getByRole('toolbar', { name: 'System dock', exact: true }).isVisible(),
+          true,
+        );
+        assert.equal(
+          await layout.getByText('All services ready', { exact: true }).isVisible(),
+          true,
+        );
+
+        const launcher = await gotoCatalog(page, baseUrl, {
+          entry: 'SystemLauncher',
+          tab: 'examples',
+          example: 'launcher',
+          pointer: 'coarse',
+        });
+        await launcher.getByRole('button', { name: 'Open System Launcher', exact: true }).click();
+        const launcherDialog = page.getByRole('dialog', {
+          name: 'Application launcher',
+          exact: true,
+        });
+        assert.equal(
+          await launcherDialog.isVisible(),
+          true,
+          'SystemLauncher did not open through Component overlay authority.',
+        );
+        const search = launcherDialog.getByRole('searchbox', {
+          name: 'Search applications',
+          exact: true,
+        });
+        await search.fill('Files');
+        assert.equal(
+          await launcherDialog.getByRole('button', { name: 'Files', exact: true }).isVisible(),
+          true,
+        );
+        assert.equal(
+          await launcherDialog.getByRole('button', { name: 'Browser', exact: true }).count(),
+          0,
+        );
+        await page.keyboard.press('Escape');
+
+        const settings = await gotoCatalog(page, baseUrl, {
+          entry: 'SystemSettingsLayout',
+          tab: 'examples',
+          example: 'settings',
+          dir: 'rtl',
+        });
+        await settings.getByRole('button', { name: 'Input', exact: true }).click();
+        assert.equal(
+          await settings.getByText('Current section: input', { exact: false }).isVisible(),
+          true,
+          'SystemSettingsLayout did not keep section state caller-owned.',
+        );
+        assert.equal(
+          await settings
+            .getByRole('main', { name: 'System settings content', exact: true })
+            .isVisible(),
+          true,
+        );
+
+        const axe = await runAxe(page, 'UIR14 System UI core');
+        diagnostics.assertClean('UIR14 System UI core');
+        return { axe };
+      } finally {
+        await context.close();
+      }
+    },
+    {
+      accepts: [
+        'SystemScaffold',
+        'SystemSurface',
+        'SystemLauncher',
+        'SystemWorkspace',
+        'DesktopShellLayout',
+        'SystemApplicationBrowser',
+        'SystemBar',
+        'SystemDock',
+        'SystemPanel',
+        'SystemChromeGroup',
+        'SystemSettingsLayout',
+      ],
+    },
+  ),
+  scenario(
+    'privileged-system-surfaces-certification',
+    [
+      'system-ui',
+      'privileged',
+      'host-boundary',
+      'occlusion',
+      'transient',
+      'keyboard',
+      'touch',
+      'rtl',
+      'reduced-motion',
+      'a11y',
+    ],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 980, height: 800 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const transient = await gotoCatalog(page, baseUrl, {
+          entry: 'SystemOsd',
+          tab: 'examples',
+          example: 'transient',
+          dir: 'rtl',
+          pointer: 'coarse',
+          motion: 'reduced',
+        });
+        const volume = transient.getByRole('progressbar', { name: 'Volume', exact: true }).first();
+        assert.equal(
+          await volume.getAttribute('value'),
+          '64',
+          'SystemOsd lost semantic progress value.',
+        );
+        assert.equal(
+          await transient.getByRole('switch', { name: 'Wi-Fi', exact: true }).isVisible(),
+          true,
+          'SystemQuickSettings lost Component controls.',
+        );
+        assert.equal(
+          await transient.getByRole('region', { name: 'Lock screen', exact: true }).isVisible(),
+          true,
+          'SystemLockLayout lost its landmark.',
+        );
+        await transient.getByRole('button', { name: 'Open commands', exact: true }).click();
+        const commands = page.getByRole('dialog', { name: 'Commands', exact: true });
+        assert.equal(
+          await commands.isVisible(),
+          true,
+          'SystemCommandSurface did not open through shared Dialog authority.',
+        );
+        const commandSearch = commands.getByRole('searchbox', {
+          name: 'Search commands',
+          exact: true,
+        });
+        await commandSearch.fill('lock');
+        assert.equal(
+          await commands.getByRole('button', { name: /Lock session/ }).isVisible(),
+          true,
+        );
+        await page.keyboard.press('Escape');
+
+        const notifications = await gotoCatalog(page, baseUrl, {
+          entry: 'SystemNotificationCenter',
+          tab: 'playground',
+          dir: 'rtl',
+          pointer: 'coarse',
+        });
+        assert.equal(
+          await notifications.getByText('Sync complete', { exact: true }).first().isVisible(),
+          true,
+          'SystemNotificationCenter did not render its caller-owned notification fixture.',
+        );
+
+        const keyboard = await gotoCatalog(page, baseUrl, {
+          entry: 'SystemKeyboardHost',
+          tab: 'examples',
+          example: 'keyboard',
+          dir: 'rtl',
+          pointer: 'coarse',
+          motion: 'reduced',
+        });
+        const host = keyboard.getByRole('group', { name: 'System touch keyboard', exact: true });
+        assert.equal(
+          await host.locator('xpath=ancestor::*[@data-oxs-system-surface="privileged"][1]').count(),
+          1,
+          'SystemKeyboardHost escaped the privileged SystemSurface boundary.',
+        );
+        const key = host.getByRole('button').first();
+        await assertMinimumBlockSize(key, 44, 'SystemKeyboardHost coarse-pointer key');
+        await key.click();
+        assert.equal(
+          await keyboard.getByText(/Last command:/).isVisible(),
+          true,
+          'SystemKeyboardHost did not emit a typed host command.',
+        );
+        const hostContract = await host.evaluate((element) => {
+          const surface = element.closest('[data-oxs-system-surface="privileged"]');
+          return {
+            edge: surface?.getAttribute('data-oxs-system-edge'),
+            occludes: surface?.getAttribute('data-oxs-occludes-content'),
+          };
+        });
+        assert.equal(
+          hostContract.edge,
+          'block-end',
+          'SystemKeyboardHost lost logical block-end placement.',
+        );
+        assert.equal(
+          hostContract.occludes,
+          'true',
+          'SystemKeyboardHost lost explicit occlusion metadata.',
+        );
+
+        const axe = await runAxe(page, 'UIR15 privileged System surfaces');
+        diagnostics.assertClean('UIR15 privileged System surfaces');
+        return { hostContract, axe };
+      } finally {
+        await context.close();
+      }
+    },
+    {
+      accepts: [
+        'SystemNotificationCenter',
+        'SystemQuickSettings',
+        'SystemOsd',
+        'SystemCommandSurface',
+        'SystemLockLayout',
+        'SystemKeyboardHost',
       ],
     },
   ),

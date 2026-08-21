@@ -44,6 +44,7 @@ export const uiDocs = defineUiDocsGroup([
       'Never becomes a pointer/touch target by itself; Button/IconButton and other Components own hit targets.',
     responsive:
       'Finite sizes preserve the shared viewBox/currentColor contract; state transitions do not change layout geometry.',
+    playground: { preferredWidth: 'narrow', fixture: { name: 'settings', label: 'Settings icon' } },
     examples: [
       {
         id: 'state-transition',

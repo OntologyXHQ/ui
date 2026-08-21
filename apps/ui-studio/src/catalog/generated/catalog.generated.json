@@ -99,7 +99,27 @@
         "title": "Accordion state + keyboard contract",
         "component": "AccordionContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
+        "@ontologyx/ui/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "disclosure-accordion-certification"
+      ],
+      "requiredAxes": [
+        "disclosure",
+        "controlled",
+        "heading",
+        "region",
+        "keyboard",
+        "touch",
+        "rtl",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "ActionGroup",
@@ -139,7 +159,25 @@
         "title": "Named action group",
         "component": "ActionGroupContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR06",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/actions.test.tsx"
+      ],
+      "browserScenarios": [
+        "action-group-toolbar-certification"
+      ],
+      "requiredAxes": [
+        "actions",
+        "group",
+        "semantics",
+        "no-hidden-actions",
+        "responsive",
+        "rtl",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "AdaptiveNavigation",
@@ -242,7 +280,26 @@
         "title": "Native link + action destinations",
         "component": "AdaptiveNavigationContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR09",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/navigation-data.test.tsx",
+        "@ontologyx/ui/components/__tests__/data-navigation.test.tsx"
+      ],
+      "browserScenarios": [
+        "list-navigation-data-certification"
+      ],
+      "requiredAxes": [
+        "navigation-data",
+        "semantic-html",
+        "list",
+        "navigation",
+        "localization",
+        "rtl",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "AlertDialog",
@@ -418,7 +475,27 @@
         "title": "Confirmation",
         "component": "AlertDialogExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "overlay-components-nested-dismissal-certification"
+      ],
+      "requiredAxes": [
+        "overlay-components",
+        "dialog",
+        "sheet",
+        "modal-isolation",
+        "focus",
+        "scroll-lock",
+        "escape",
+        "touch",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "AppBar",
@@ -428,18 +505,23 @@
     "order": 40,
     "summary": "Generic title/subtitle/leading/actions header composition.",
     "usage": "Use in developer application layouts; OXS system bars are composed later in System UI.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Associates the header with its title and preserves child control semantics.",
     "rtl": "Leading/title/actions use logical regions.",
     "touch": "Interactive children preserve shared target policy.",
     "responsive": "Actions remain bounded while copy can truncate/wrap.",
-    "playground": null,
+    "playground": {
+      "preferredWidth": "wide",
+      "fixture": {
+        "title": "Application header"
+      }
+    },
     "props": [
       {
         "name": "actions",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned action region composed from public Components.",
         "deprecated": false,
         "default": null
       },
@@ -447,7 +529,7 @@
         "name": "leading",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional logical-start content; direction follows the owning UI environment.",
         "deprecated": false,
         "default": null
       },
@@ -455,7 +537,7 @@
         "name": "subtitle",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned supporting title text.",
         "deprecated": false,
         "default": null
       },
@@ -463,7 +545,7 @@
         "name": "title",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned visible title; reusable UI never supplies product meaning.",
         "deprecated": false,
         "default": null
       },
@@ -471,12 +553,33 @@
         "name": "titleLevel",
         "type": "1 | 2 | 3 | 4 | 5 | 6",
         "optional": true,
-        "description": "",
+        "description": "Semantic heading rank for the visible caller-owned title.",
         "deprecated": false,
         "default": "2"
       }
     ],
-    "examples": []
+    "examples": [],
+    "certification": {
+      "owner": "UIR13",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/data-navigation.test.tsx",
+        "@ontologyx/ui/components/__tests__/developer-compositions.test.tsx"
+      ],
+      "browserScenarios": [
+        "developer-compositions-adaptive-certification"
+      ],
+      "requiredAxes": [
+        "compositions",
+        "adaptive",
+        "container",
+        "min-size",
+        "nested-scroll",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "ApplicationItem",
@@ -486,18 +589,24 @@
     "order": 50,
     "summary": "Reusable application identity tile separated from Launcher-specific state and layout.",
     "usage": "Use with TileGrid for application collections; Launcher search, open/close state and launch policy stay outside this Component.",
-    "status": "candidate",
-    "accessibility": "The visible application name is the action name; image icons remain decorative unless the caller provides separate meaning.",
+    "status": "accepted",
+    "accessibility": "The visible application name is the action name; image icons and visual badge metadata are excluded from that name unless the caller exposes separate meaning.",
     "rtl": "Name/metadata placement follows logical tile flow.",
     "touch": "Uses the shared Tile/Button interaction contract.",
     "responsive": "Application identity remains bounded across compact and roomy tile grids.",
-    "playground": null,
+    "playground": {
+      "preferredWidth": "medium",
+      "fixture": {
+        "name": "Browser",
+        "icon": "browser"
+      }
+    },
     "props": [
       {
         "name": "badge",
         "type": "ReactNode",
         "optional": true,
-        "description": "Optional bounded badge/metadata.",
+        "description": "Optional visual badge/metadata excluded from the primary action accessible name.",
         "deprecated": false,
         "default": null
       },
@@ -521,7 +630,7 @@
         "name": "icon",
         "type": "ApplicationItemIcon",
         "optional": false,
-        "description": "",
+        "description": "Application icon identity; built-in names or caller image sources remain presentation-only.",
         "deprecated": false,
         "default": null
       },
@@ -537,7 +646,7 @@
         "name": "name",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Stable visible application name used as the primary action label.",
         "deprecated": false,
         "default": null
       },
@@ -612,7 +721,27 @@
         "title": "Tiles + application items",
         "component": "TileExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR13",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/developer-compositions.test.tsx"
+      ],
+      "browserScenarios": [
+        "developer-compositions-adaptive-certification"
+      ],
+      "requiredAxes": [
+        "compositions",
+        "adaptive",
+        "container",
+        "min-size",
+        "nested-scroll",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Badge",
@@ -652,7 +781,27 @@
         "title": "Feedback states",
         "component": "FeedbackExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "feedback-lifecycle-certification"
+      ],
+      "requiredAxes": [
+        "feedback",
+        "live-region",
+        "timing",
+        "upsert",
+        "progress",
+        "loading",
+        "reduced-motion",
+        "responsive",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Banner",
@@ -732,7 +881,27 @@
         "title": "Banner",
         "component": "BannerExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "feedback-lifecycle-certification"
+      ],
+      "requiredAxes": [
+        "feedback",
+        "live-region",
+        "timing",
+        "upsert",
+        "progress",
+        "loading",
+        "reduced-motion",
+        "responsive",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "BottomSheet",
@@ -924,7 +1093,27 @@
         "title": "Bottom sheet interaction",
         "component": "BottomSheetPreviewExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "overlay-components-nested-dismissal-certification"
+      ],
+      "requiredAxes": [
+        "overlay-components",
+        "dialog",
+        "sheet",
+        "modal-isolation",
+        "focus",
+        "scroll-lock",
+        "escape",
+        "touch",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Box",
@@ -1029,7 +1218,26 @@
         "description": "Semantic element selection, nested overflow safety and explicit child-layout participation without inline style serialization.",
         "component": "BoxBoundaryExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR03-A",
+      "behaviorTests": [
+        "@ontologyx/ui/primitives/__tests__/layout-core.test.tsx"
+      ],
+      "browserScenarios": [
+        "box-layout-boundary-certification"
+      ],
+      "requiredAxes": [
+        "layout",
+        "polymorphism",
+        "overflow",
+        "min-size",
+        "flex-child",
+        "grid-span",
+        "rtl",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Button",
@@ -1178,7 +1386,30 @@
         "description": "Emphasis, destructive intent, loading cancellation, logical slots and explicit submit behavior.",
         "component": "ButtonContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR06",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/actions.test.tsx",
+        "@ontologyx/ui/interaction/__tests__/press.test.tsx"
+      ],
+      "browserScenarios": [
+        "button-action-contract-certification"
+      ],
+      "requiredAxes": [
+        "actions",
+        "button",
+        "native-form",
+        "loading",
+        "disabled",
+        "pointer",
+        "touch",
+        "keyboard",
+        "cancellation",
+        "rtl",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Card",
@@ -1188,7 +1419,7 @@
     "order": 90,
     "summary": "Product-neutral content container with optional leading, title, description, actions and footer regions.",
     "usage": "Use when repeated Surface + heading/action assembly would otherwise leak into application code; keep product state outside the card.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Associates title and description with the grouped card when supplied and preserves child semantics.",
     "rtl": "Leading/actions/footer regions use logical layout and inherit bidi direction.",
     "touch": "Interactive children retain their own touch targets; Card itself does not invent pointer behavior.",
@@ -1199,7 +1430,7 @@
         "name": "actions",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned action region composed from public Components.",
         "deprecated": false,
         "default": null
       },
@@ -1207,7 +1438,7 @@
         "name": "description",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned supporting description.",
         "deprecated": false,
         "default": null
       },
@@ -1215,7 +1446,7 @@
         "name": "emphasis",
         "type": "'subtle' | 'default' | 'strong'",
         "optional": true,
-        "description": "",
+        "description": "Named surface emphasis using semantic UI tokens.",
         "deprecated": false,
         "default": "'default'"
       },
@@ -1223,7 +1454,7 @@
         "name": "footer",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned footer region.",
         "deprecated": false,
         "default": null
       },
@@ -1231,7 +1462,7 @@
         "name": "leading",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional logical-start content; direction follows the owning UI environment.",
         "deprecated": false,
         "default": null
       },
@@ -1239,7 +1470,7 @@
         "name": "padding",
         "type": "'sm' | 'md' | 'lg'",
         "optional": true,
-        "description": "",
+        "description": "Named internal spacing token; no product-specific measurements are accepted.",
         "deprecated": false,
         "default": "'md'"
       },
@@ -1247,7 +1478,7 @@
         "name": "title",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Caller-owned visible title; reusable UI never supplies product meaning.",
         "deprecated": false,
         "default": null
       },
@@ -1255,7 +1486,7 @@
         "name": "titleLevel",
         "type": "2 | 3 | 4 | 5 | 6",
         "optional": true,
-        "description": "",
+        "description": "Semantic heading rank for the visible caller-owned title.",
         "deprecated": false,
         "default": "3"
       }
@@ -1266,7 +1497,27 @@
         "title": "Content containers",
         "component": "ContainersExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR13",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/developer-compositions.test.tsx"
+      ],
+      "browserScenarios": [
+        "developer-compositions-adaptive-certification"
+      ],
+      "requiredAxes": [
+        "compositions",
+        "adaptive",
+        "container",
+        "min-size",
+        "nested-scroll",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Checkbox",
@@ -1354,7 +1605,27 @@
         "title": "Native selection + form reset",
         "component": "SelectionNativeContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
+        "@ontologyx/ui/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "selection-controls-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "native-semantics",
+        "uncontrolled",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reset",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Code",
@@ -1427,7 +1698,27 @@
         "description": "Keyboard-input semantics, monospace fallback and long-token reflow stay explicit.",
         "component": "CodeSemanticExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR04",
+      "behaviorTests": [
+        "@ontologyx/ui/primitives/__tests__/visual-primitives.test.tsx"
+      ],
+      "browserScenarios": [
+        "typography-semantic-bidi-reflow-certification"
+      ],
+      "requiredAxes": [
+        "visual",
+        "typography",
+        "semantics",
+        "bidi",
+        "rtl",
+        "font-fallback",
+        "long-string",
+        "reflow",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "CollapseTransition",
@@ -1483,7 +1774,24 @@
         "title": "Interruptible semantic transitions",
         "component": "MotionLifecycleExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "@ontologyx/ui/motion/__tests__/motion.test.ts",
+        "@ontologyx/ui/motion/__tests__/transition-lifecycle.test.tsx"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "motion",
+        "interruption",
+        "reduced-motion",
+        "performance-budget",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Container",
@@ -1596,7 +1904,25 @@
         "description": "Readable and full-width regions remain centered and bounded by their containing block.",
         "component": "ContainerWidthsExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR03-B",
+      "behaviorTests": [
+        "@ontologyx/ui/primitives/__tests__/layout-boundaries.test.tsx"
+      ],
+      "browserScenarios": [
+        "container-semantic-width-certification"
+      ],
+      "requiredAxes": [
+        "layout",
+        "container",
+        "semantic-width",
+        "readable",
+        "responsive",
+        "polymorphism",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "ContentState",
@@ -1606,18 +1932,24 @@
     "order": 60,
     "summary": "Shared empty, error and loading composition with icon/status/actions slots and no product copy ownership.",
     "usage": "Use for collection/page state replacement; supply application-specific title, description and actions.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Error state uses alert semantics, loading uses status semantics, and empty state stays neutral unless caller overrides role.",
     "rtl": "Centered or logical copy remains bidi-safe.",
     "touch": "Actions preserve their own shared touch contracts.",
     "responsive": "State copy and actions wrap within the containing region.",
-    "playground": null,
+    "playground": {
+      "preferredWidth": "medium",
+      "fixture": {
+        "kind": "empty",
+        "title": "No items"
+      }
+    },
     "props": [
       {
         "name": "actions",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned action region composed from public Components.",
         "deprecated": false,
         "default": null
       },
@@ -1625,7 +1957,7 @@
         "name": "description",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned supporting description.",
         "deprecated": false,
         "default": null
       },
@@ -1633,7 +1965,7 @@
         "name": "icon",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional decorative or status icon supplied by the caller.",
         "deprecated": false,
         "default": null
       },
@@ -1641,7 +1973,7 @@
         "name": "kind",
         "type": "ContentStateKind",
         "optional": false,
-        "description": "",
+        "description": "Semantic content state controlling empty/error/loading status behavior.",
         "deprecated": false,
         "default": null
       },
@@ -1649,7 +1981,7 @@
         "name": "status",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned status presentation.",
         "deprecated": false,
         "default": null
       },
@@ -1657,7 +1989,7 @@
         "name": "title",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned visible title; reusable UI never supplies product meaning.",
         "deprecated": false,
         "default": null
       },
@@ -1665,7 +1997,7 @@
         "name": "titleLevel",
         "type": "2 | 3 | 4 | 5 | 6",
         "optional": true,
-        "description": "",
+        "description": "Semantic heading rank for the visible caller-owned title.",
         "deprecated": false,
         "default": "3"
       }
@@ -1676,7 +2008,27 @@
         "title": "Content states",
         "component": "StateExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR13",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/developer-compositions.test.tsx"
+      ],
+      "browserScenarios": [
+        "developer-compositions-adaptive-certification"
+      ],
+      "requiredAxes": [
+        "compositions",
+        "adaptive",
+        "container",
+        "min-size",
+        "nested-scroll",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "ContextMenu",
@@ -1740,7 +2092,27 @@
         "title": "Context actions",
         "component": "ContextMenuPreviewExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "floating-menu-tooltip-certification"
+      ],
+      "requiredAxes": [
+        "floating",
+        "collision",
+        "menu",
+        "typeahead",
+        "tooltip",
+        "keyboard",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "CursorRegion",
@@ -1755,7 +2127,13 @@
     "rtl": "Cursor roles are physical when the platform role itself is physical; compositions choose logical start/end intent before mapping to a concrete resize role.",
     "touch": "UiRoot can suppress pointer presentation after touch/pen and nested roots retain independent cursor authority; touch interaction never depends on cursor visibility.",
     "responsive": "Theme/nominal size/scale/hotspot are root-scoped host intent and remain independent from viewport-size adaptation.",
-    "playground": null,
+    "playground": {
+      "preferredWidth": "medium",
+      "fixture": {
+        "role": "pointer",
+        "children": "Pointer cursor region"
+      }
+    },
     "props": [
       {
         "name": "role",
@@ -1773,7 +2151,24 @@
         "description": "Shows preserved custom host intent, browser fallback and a mouse-owned nested UiRoot escaping an outer touch-suppressed pointer preview.",
         "component": "CursorContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR12",
+      "behaviorTests": [
+        "@ontologyx/ui/cursor/__tests__/cursor.test.tsx"
+      ],
+      "browserScenarios": [
+        "gesture-drag-editing-cursor-certification"
+      ],
+      "requiredAxes": [
+        "cursor",
+        "hotspot",
+        "modality",
+        "nested-root",
+        "realm",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "DesktopShellLayout",
@@ -1783,7 +2178,7 @@
     "order": 30,
     "summary": "Desktop shell layout that places workspace, system bars, dock, side panels, transient and privileged slots around one native scene.",
     "usage": "Use as the top OXS desktop composition above SystemScaffold; keep window-management and output resize authority native.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Preserves the landmarks and labels owned by its child System/Component surfaces instead of inventing duplicate controls.",
     "rtl": "Panel/dock placement uses logical inline-start/inline-end edges.",
     "touch": "All actionable chrome is supplied by Components with the shared touch-target baseline.",
@@ -1794,7 +2189,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional consumer class name appended without changing component ownership.",
         "deprecated": false,
         "default": "''"
       },
@@ -1802,7 +2197,7 @@
         "name": "dock",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional dock composition using accepted Component controls.",
         "deprecated": false,
         "default": null
       },
@@ -1810,7 +2205,7 @@
         "name": "dockEdge",
         "type": "Extract<SystemSurfaceEdge, 'block-end' | 'inline-start' | 'inline-end'>",
         "optional": true,
-        "description": "",
+        "description": "Logical dock edge; inline start/end remain direction-safe.",
         "deprecated": false,
         "default": "'block-end'"
       },
@@ -1818,7 +2213,7 @@
         "name": "insets",
         "type": "SystemInsets",
         "optional": true,
-        "description": "",
+        "description": "Logical System insets supplied by the host without device-name branching.",
         "deprecated": false,
         "default": null
       },
@@ -1826,7 +2221,7 @@
         "name": "panel",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional nonmodal System panel composition.",
         "deprecated": false,
         "default": null
       },
@@ -1834,7 +2229,7 @@
         "name": "panelEdge",
         "type": "Extract<SystemSurfaceEdge, 'inline-start' | 'inline-end'>",
         "optional": true,
-        "description": "",
+        "description": "Logical panel edge; inline start/end remain direction-safe.",
         "deprecated": false,
         "default": "'inline-end'"
       },
@@ -1842,7 +2237,7 @@
         "name": "privileged",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional privileged System layer mounted only by the owning System composition.",
         "deprecated": false,
         "default": null
       },
@@ -1850,7 +2245,7 @@
         "name": "topBar",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional top System bar composition.",
         "deprecated": false,
         "default": null
       },
@@ -1858,7 +2253,7 @@
         "name": "transient",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional transient System layer; lifecycle authority stays with the caller.",
         "deprecated": false,
         "default": null
       },
@@ -1866,7 +2261,7 @@
         "name": "workspace",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned workspace content; native scene/window authority remains outside React.",
         "deprecated": false,
         "default": null
       }
@@ -1877,7 +2272,30 @@
         "title": "Desktop System layout library",
         "component": "SystemLayoutLibraryExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
+        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Dialog",
@@ -2018,7 +2436,27 @@
         "title": "Cross-root overlay authority",
         "component": "OverlayAuthorityExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "overlay-components-nested-dismissal-certification"
+      ],
+      "requiredAxes": [
+        "overlay-components",
+        "dialog",
+        "sheet",
+        "modal-isolation",
+        "focus",
+        "scroll-lock",
+        "escape",
+        "touch",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Disclosure",
@@ -2098,7 +2536,27 @@
         "title": "Disclosure heading + region",
         "component": "DisclosureContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
+        "@ontologyx/ui/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "disclosure-accordion-certification"
+      ],
+      "requiredAxes": [
+        "disclosure",
+        "controlled",
+        "heading",
+        "region",
+        "keyboard",
+        "touch",
+        "rtl",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Divider",
@@ -2163,7 +2621,23 @@
         "description": "Horizontal/vertical geometry, logical inset and decorative-vs-semantic accessibility remain explicit.",
         "component": "DividerSemanticExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR04",
+      "behaviorTests": [
+        "@ontologyx/ui/primitives/__tests__/visual-primitives.test.tsx"
+      ],
+      "browserScenarios": [
+        "surface-divider-visual-boundary-certification"
+      ],
+      "requiredAxes": [
+        "visual",
+        "divider",
+        "separator",
+        "logical-inset",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "EmptyState",
@@ -2227,7 +2701,27 @@
         "title": "Feedback semantics",
         "component": "FeedbackExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "feedback-lifecycle-certification"
+      ],
+      "requiredAxes": [
+        "feedback",
+        "live-region",
+        "timing",
+        "upsert",
+        "progress",
+        "loading",
+        "reduced-motion",
+        "responsive",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "FadeTransition",
@@ -2283,7 +2777,24 @@
         "title": "Interruptible semantic transitions",
         "component": "MotionLifecycleExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "@ontologyx/ui/motion/__tests__/motion.test.ts",
+        "@ontologyx/ui/motion/__tests__/transition-lifecycle.test.tsx"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "motion",
+        "interruption",
+        "reduced-motion",
+        "performance-budget",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "FieldGroup",
@@ -2332,7 +2843,26 @@
         "description": "A semantic field group keeps shared guidance separate from each native input relationship.",
         "component": "FieldGroupExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR07",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/fields.test.tsx"
+      ],
+      "browserScenarios": [
+        "field-native-form-certification"
+      ],
+      "requiredAxes": [
+        "fields",
+        "field-group",
+        "semantics",
+        "description",
+        "responsive",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "FieldSection",
@@ -2389,7 +2919,27 @@
         "description": "A labelled form section composes accepted field and action controls without taking ownership of their state.",
         "component": "FieldSectionExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR07",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/fields.test.tsx"
+      ],
+      "browserScenarios": [
+        "field-native-form-certification"
+      ],
+      "requiredAxes": [
+        "fields",
+        "field-section",
+        "semantics",
+        "heading",
+        "description",
+        "responsive",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "GestureRevealHandle",
@@ -2404,7 +2954,13 @@
     "rtl": "Reveal displacement is supplied by the owning composition; semantic start/end and physical system-edge gestures remain distinct contracts.",
     "touch": "Pan/reveal arbitration uses the shared Gesture Arena. Unclaimed pointer streams remain available to native scrolling/text selection and touch drag yields to native movement before long-press ownership.",
     "responsive": "Gesture and drag coordinates stay in the owning Window realm; pointer previews are projected into the owning portal host and edge auto-scroll follows live container geometry.",
-    "playground": null,
+    "playground": {
+      "preferredWidth": "medium",
+      "fixture": {
+        "gestureProps": {},
+        "children": "Reveal handle"
+      }
+    },
     "props": [
       {
         "name": "ariaLabel",
@@ -2454,7 +3010,30 @@
         "description": "Exercises reveal arbitration, threshold ownership, keyboard/pointer drag, portal preview and stationary edge auto-scroll without moving native host authority into the Component.",
         "component": "GestureRuntimeContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR12",
+      "behaviorTests": [
+        "@ontologyx/ui/gestures/__tests__/gesture-contract.test.tsx",
+        "@ontologyx/ui/drag-drop/__tests__/dragDrop.test.tsx"
+      ],
+      "browserScenarios": [
+        "gesture-drag-editing-cursor-certification"
+      ],
+      "requiredAxes": [
+        "gestures",
+        "arena",
+        "native-scroll",
+        "text-selection",
+        "drag-drop",
+        "pointer-continuation",
+        "preview",
+        "edge-autoscroll",
+        "keyboard",
+        "realm",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Grid",
@@ -2591,7 +3170,27 @@
         "description": "Intrinsic auto-fit tracks and an explicit four-column span grid share one finite, token-backed API.",
         "component": "GridTracksExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR03-B",
+      "behaviorTests": [
+        "@ontologyx/ui/primitives/__tests__/layout-boundaries.test.tsx"
+      ],
+      "browserScenarios": [
+        "grid-track-strategy-certification"
+      ],
+      "requiredAxes": [
+        "layout",
+        "grid",
+        "tracks",
+        "auto-fit",
+        "minmax",
+        "grid-span",
+        "responsive",
+        "polymorphism",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Heading",
@@ -2672,7 +3271,26 @@
         "description": "A real h3 can use the title scale without pretending to be an h2/h1.",
         "component": "HeadingSemanticExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR04",
+      "behaviorTests": [
+        "@ontologyx/ui/primitives/__tests__/visual-primitives.test.tsx"
+      ],
+      "browserScenarios": [
+        "typography-semantic-bidi-reflow-certification"
+      ],
+      "requiredAxes": [
+        "visual",
+        "typography",
+        "semantics",
+        "bidi",
+        "rtl",
+        "zoom",
+        "reflow",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Icon",
@@ -2687,7 +3305,13 @@
     "rtl": "Directional families declare semantic mirroring once; `mirror=\"auto\"` follows the Icon element’s resolved local direction, including nested RTL/LTR subtrees, without separate left/right glyph APIs.",
     "touch": "Never becomes a pointer/touch target by itself; Button/IconButton and other Components own hit targets.",
     "responsive": "Finite sizes preserve the shared viewBox/currentColor contract; state transitions do not change layout geometry.",
-    "playground": null,
+    "playground": {
+      "preferredWidth": "narrow",
+      "fixture": {
+        "name": "settings",
+        "label": "Settings icon"
+      }
+    },
     "props": [
       {
         "name": "glyph",
@@ -2757,7 +3381,34 @@
         "description": "The separate @ontologyx/ui/icons entry provides a broad static vocabulary and stateful animated families without forcing the pack into the main @ontologyx/ui entry.",
         "component": "IconPackExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR04",
+      "behaviorTests": [
+        "@ontologyx/ui/primitives/__tests__/visual-primitives.test.tsx",
+        "@ontologyx/ui/icons/__tests__/icon-pack.test.tsx"
+      ],
+      "browserScenarios": [
+        "icon-multistate-transition-certification",
+        "icon-pack-breadth-certification"
+      ],
+      "requiredAxes": [
+        "visual",
+        "icon",
+        "multi-state",
+        "transient-state",
+        "motion",
+        "reduced-motion",
+        "interruption",
+        "current-color",
+        "rtl",
+        "custom-glyph",
+        "a11y",
+        "icon-pack",
+        "static-pack",
+        "animated-pack"
+      ]
+    }
   },
   {
     "id": "IconButton",
@@ -2772,7 +3423,13 @@
     "rtl": "Directional glyphs mirror through Icon while the hit target and accessible name remain direction-independent.",
     "touch": "Visible glyph size stays compact but the Button-family hit target never shrinks below the current modality minimum.",
     "responsive": "Fits toolbars without target shrinkage; labels are non-visual so localization cannot change the visible control footprint.",
-    "playground": null,
+    "playground": {
+      "preferredWidth": "narrow",
+      "fixture": {
+        "icon": "settings",
+        "label": "Settings"
+      }
+    },
     "props": [
       {
         "name": "defaultPressed",
@@ -2862,7 +3519,27 @@
         "description": "Accessible naming, linked tooltip, destructive intent, loading and toggle state.",
         "component": "IconButtonContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR06",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/actions.test.tsx"
+      ],
+      "browserScenarios": [
+        "icon-button-action-contract-certification"
+      ],
+      "requiredAxes": [
+        "actions",
+        "icon-button",
+        "label",
+        "tooltip",
+        "target-size",
+        "toggle",
+        "rtl",
+        "coarse-pointer",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Inset",
@@ -3023,7 +3700,25 @@
         "description": "All → axis → edge precedence stays tokenized and follows logical writing direction.",
         "component": "InsetLogicalExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR03-B",
+      "behaviorTests": [
+        "@ontologyx/ui/primitives/__tests__/layout-boundaries.test.tsx"
+      ],
+      "browserScenarios": [
+        "inset-logical-spacing-certification"
+      ],
+      "requiredAxes": [
+        "layout",
+        "inset",
+        "logical-spacing",
+        "precedence",
+        "rtl",
+        "polymorphism",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Label",
@@ -3096,7 +3791,24 @@
         "description": "Compact strong/regular labels remain non-interactive span semantics.",
         "component": "LabelMetadataExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR04",
+      "behaviorTests": [
+        "@ontologyx/ui/primitives/__tests__/visual-primitives.test.tsx"
+      ],
+      "browserScenarios": [
+        "typography-semantic-bidi-reflow-certification"
+      ],
+      "requiredAxes": [
+        "visual",
+        "typography",
+        "semantics",
+        "rtl",
+        "reflow",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "List",
@@ -3160,7 +3872,26 @@
         "title": "Semantic list collection",
         "component": "DataListContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR09",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/navigation-data.test.tsx",
+        "@ontologyx/ui/components/__tests__/data-navigation.test.tsx"
+      ],
+      "browserScenarios": [
+        "list-navigation-data-certification"
+      ],
+      "requiredAxes": [
+        "navigation-data",
+        "semantic-html",
+        "list",
+        "navigation",
+        "localization",
+        "rtl",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "ListItem",
@@ -3272,7 +4003,26 @@
         "title": "Semantic list collection",
         "component": "DataListContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR09",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/navigation-data.test.tsx",
+        "@ontologyx/ui/components/__tests__/data-navigation.test.tsx"
+      ],
+      "browserScenarios": [
+        "list-navigation-data-certification"
+      ],
+      "requiredAxes": [
+        "navigation-data",
+        "semantic-html",
+        "list",
+        "navigation",
+        "localization",
+        "rtl",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "ListSection",
@@ -3336,7 +4086,26 @@
         "title": "Semantic list collection",
         "component": "DataListContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR09",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/navigation-data.test.tsx",
+        "@ontologyx/ui/components/__tests__/data-navigation.test.tsx"
+      ],
+      "browserScenarios": [
+        "list-navigation-data-certification"
+      ],
+      "requiredAxes": [
+        "navigation-data",
+        "semantic-html",
+        "list",
+        "navigation",
+        "localization",
+        "rtl",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "ListSeparator",
@@ -3368,7 +4137,26 @@
         "title": "Semantic list collection",
         "component": "DataListContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR09",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/navigation-data.test.tsx",
+        "@ontologyx/ui/components/__tests__/data-navigation.test.tsx"
+      ],
+      "browserScenarios": [
+        "list-navigation-data-certification"
+      ],
+      "requiredAxes": [
+        "navigation-data",
+        "semantic-html",
+        "list",
+        "navigation",
+        "localization",
+        "rtl",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Menu",
@@ -3470,7 +4258,27 @@
         "title": "Anchored menu",
         "component": "MenuPreviewExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "floating-menu-tooltip-certification"
+      ],
+      "requiredAxes": [
+        "floating",
+        "collision",
+        "menu",
+        "typeahead",
+        "tooltip",
+        "keyboard",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "MenuItem",
@@ -3510,7 +4318,27 @@
         "title": "Menu item contract",
         "component": "MenuPreviewExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "floating-menu-tooltip-certification"
+      ],
+      "requiredAxes": [
+        "floating",
+        "collision",
+        "menu",
+        "typeahead",
+        "tooltip",
+        "keyboard",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "MenuSeparator",
@@ -3533,7 +4361,27 @@
         "title": "Menu separator contract",
         "component": "MenuPreviewExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "floating-menu-tooltip-certification"
+      ],
+      "requiredAxes": [
+        "floating",
+        "collision",
+        "menu",
+        "typeahead",
+        "tooltip",
+        "keyboard",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "MotionTransition",
@@ -3602,7 +4450,24 @@
         "title": "Motion runtime authority",
         "component": "MotionAuthorityExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "@ontologyx/ui/motion/__tests__/motion.test.ts",
+        "@ontologyx/ui/motion/__tests__/transition-lifecycle.test.tsx"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "motion",
+        "interruption",
+        "reduced-motion",
+        "performance-budget",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "PageScaffold",
@@ -3612,7 +4477,7 @@
     "order": 90,
     "summary": "Generic application page scaffold with header, sidebar, content, footer and named inset slots.",
     "usage": "Use for ordinary developer application structure; OXS workspace/system-surface scaffolds remain System UI responsibilities.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Uses main/aside/footer landmarks while leaving caller-provided header semantics intact.",
     "rtl": "Sidebar start/end placement is logical and swaps naturally under RTL.",
     "touch": "Does not shrink child controls or create hover-only access.",
@@ -3623,7 +4488,7 @@
         "name": "children",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned content rendered inside this reusable visual boundary.",
         "deprecated": false,
         "default": null
       },
@@ -3631,7 +4496,7 @@
         "name": "contentLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible name for the primary reusable content region.",
         "deprecated": false,
         "default": null
       },
@@ -3639,7 +4504,7 @@
         "name": "contentRole",
         "type": "'main' | 'region'",
         "optional": true,
-        "description": "",
+        "description": "Semantic landmark role for the primary reusable content region.",
         "deprecated": false,
         "default": "'main'"
       },
@@ -3647,7 +4512,7 @@
         "name": "footer",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned footer region.",
         "deprecated": false,
         "default": null
       },
@@ -3655,7 +4520,7 @@
         "name": "header",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned page header region.",
         "deprecated": false,
         "default": null
       },
@@ -3663,7 +4528,7 @@
         "name": "inset",
         "type": "'none' | 'sm' | 'md' | 'lg'",
         "optional": true,
-        "description": "",
+        "description": "Named page-content inset token applied through logical spacing.",
         "deprecated": false,
         "default": "'md'"
       },
@@ -3671,7 +4536,7 @@
         "name": "sidebar",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional reusable sidebar content; adaptation remains container-driven.",
         "deprecated": false,
         "default": null
       },
@@ -3679,7 +4544,7 @@
         "name": "sidebarPosition",
         "type": "'start' | 'end'",
         "optional": true,
-        "description": "",
+        "description": "Logical start/end sidebar placement that remains correct in RTL.",
         "deprecated": false,
         "default": "'start'"
       }
@@ -3690,7 +4555,27 @@
         "title": "Application scaffold",
         "component": "ScaffoldExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR13",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/developer-compositions.test.tsx"
+      ],
+      "browserScenarios": [
+        "developer-compositions-adaptive-certification"
+      ],
+      "requiredAxes": [
+        "compositions",
+        "adaptive",
+        "container",
+        "min-size",
+        "nested-scroll",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Popover",
@@ -3829,7 +4714,27 @@
         "title": "Modal focus isolation",
         "component": "PopoverModalFocusExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "floating-menu-tooltip-certification"
+      ],
+      "requiredAxes": [
+        "floating",
+        "collision",
+        "menu",
+        "typeahead",
+        "tooltip",
+        "keyboard",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Progress",
@@ -3885,7 +4790,27 @@
         "title": "Feedback semantics",
         "component": "FeedbackExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "feedback-lifecycle-certification"
+      ],
+      "requiredAxes": [
+        "feedback",
+        "live-region",
+        "timing",
+        "upsert",
+        "progress",
+        "loading",
+        "reduced-motion",
+        "responsive",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Radio",
@@ -3941,7 +4866,27 @@
         "title": "Native selection + form reset",
         "component": "SelectionNativeContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
+        "@ontologyx/ui/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "selection-controls-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "native-semantics",
+        "uncontrolled",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reset",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "RadioGroup",
@@ -4029,7 +4974,27 @@
         "title": "Native selection + form reset",
         "component": "SelectionNativeContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
+        "@ontologyx/ui/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "selection-controls-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "native-semantics",
+        "uncontrolled",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reset",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "ReplaceTransition",
@@ -4085,7 +5050,24 @@
         "title": "Interruptible semantic transitions",
         "component": "MotionLifecycleExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "@ontologyx/ui/motion/__tests__/motion.test.ts",
+        "@ontologyx/ui/motion/__tests__/transition-lifecycle.test.tsx"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "motion",
+        "interruption",
+        "reduced-motion",
+        "performance-budget",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "RevealTransition",
@@ -4141,7 +5123,24 @@
         "title": "Interruptible semantic transitions",
         "component": "MotionLifecycleExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "@ontologyx/ui/motion/__tests__/motion.test.ts",
+        "@ontologyx/ui/motion/__tests__/transition-lifecycle.test.tsx"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "motion",
+        "interruption",
+        "reduced-motion",
+        "performance-budget",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Row",
@@ -4270,7 +5269,25 @@
         "description": "Inline-axis distribution follows LTR/RTL without reversing DOM order.",
         "component": "RowFlowExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR03-A",
+      "behaviorTests": [
+        "@ontologyx/ui/primitives/__tests__/layout-core.test.tsx"
+      ],
+      "browserScenarios": [
+        "logical-flow-layout-certification"
+      ],
+      "requiredAxes": [
+        "layout",
+        "row",
+        "polymorphism",
+        "rtl",
+        "logical-order",
+        "reflow",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SafeArea",
@@ -4383,7 +5400,25 @@
         "description": "Explicit edge combinations consume only persistent UiRoot safe-area variables.",
         "component": "SafeAreaEdgesExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR03-B",
+      "behaviorTests": [
+        "@ontologyx/ui/primitives/__tests__/layout-boundaries.test.tsx"
+      ],
+      "browserScenarios": [
+        "safe-area-logical-edge-certification"
+      ],
+      "requiredAxes": [
+        "layout",
+        "safe-area",
+        "logical-edges",
+        "persistent-insets",
+        "occlusion-isolation",
+        "rtl",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "ScaleTransition",
@@ -4439,7 +5474,24 @@
         "title": "Interruptible semantic transitions",
         "component": "MotionLifecycleExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "@ontologyx/ui/motion/__tests__/motion.test.ts",
+        "@ontologyx/ui/motion/__tests__/transition-lifecycle.test.tsx"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "motion",
+        "interruption",
+        "reduced-motion",
+        "performance-budget",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Scrim",
@@ -4503,7 +5555,27 @@
         "title": "Caller-owned scrim dismissal",
         "component": "ScrimOwnershipExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "overlay-components-nested-dismissal-certification"
+      ],
+      "requiredAxes": [
+        "overlay-components",
+        "dialog",
+        "sheet",
+        "modal-isolation",
+        "focus",
+        "scroll-lock",
+        "escape",
+        "touch",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "ScrollSnapItem",
@@ -4535,7 +5607,25 @@
         "title": "Logical nested scroll, restoration and snap",
         "component": "ScrollViewContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "@ontologyx/ui/scroll/__tests__/scroll-view.test.tsx",
+        "@ontologyx/ui/scroll/__tests__/physics.test.ts"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "scroll",
+        "snap",
+        "variable-geometry",
+        "rtl",
+        "resize",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "ScrollView",
@@ -4616,7 +5706,28 @@
         "description": "Exercises nested wheel ownership, remount restoration and variable-width start/center/end snap geometry.",
         "component": "ScrollViewContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "@ontologyx/ui/scroll/__tests__/scroll-view.test.tsx",
+        "@ontologyx/ui/scroll/__tests__/physics.test.ts"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "scroll",
+        "logical-coordinates",
+        "rtl",
+        "nested-scroll",
+        "native-chaining",
+        "restoration",
+        "snap",
+        "resize",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SearchField",
@@ -4862,7 +5973,31 @@
         "description": "Clear and suggestions requests pause while an IME composition is active, then resume without stealing focus.",
         "component": "SearchFieldCompositionExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR07",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/fields.test.tsx",
+        "@ontologyx/ui/editing/__tests__/editing.test.tsx"
+      ],
+      "browserScenarios": [
+        "search-field-composition-certification"
+      ],
+      "requiredAxes": [
+        "fields",
+        "search-field",
+        "searchbox",
+        "composition",
+        "clear",
+        "suggestions",
+        "focus",
+        "keyboard",
+        "touch",
+        "target-size",
+        "rtl",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SegmentedControl",
@@ -4877,7 +6012,23 @@
     "rtl": "Horizontal roving follows logical direction.",
     "touch": "Each segment preserves target policy.",
     "responsive": "Intrinsic or full-width.",
-    "playground": null,
+    "playground": {
+      "preferredWidth": "medium",
+      "fixture": {
+        "label": "Density",
+        "options": [
+          {
+            "value": "compact",
+            "label": "Compact"
+          },
+          {
+            "value": "comfortable",
+            "label": "Comfortable"
+          }
+        ],
+        "defaultValue": "comfortable"
+      }
+    },
     "props": [
       {
         "name": "defaultValue",
@@ -4950,7 +6101,27 @@
         "title": "Segmented + independent toggle groups",
         "component": "SelectionGroupContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
+        "@ontologyx/ui/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "selection-controls-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "native-semantics",
+        "uncontrolled",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reset",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Select",
@@ -5212,7 +6383,27 @@
         "description": "Required validity, reset, disabled options and trigger-retained listbox interaction share one selection owner.",
         "component": "SelectContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
+        "@ontologyx/ui/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "tabs-select-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "select",
+        "listbox",
+        "typeahead",
+        "form",
+        "focus-restoration",
+        "keyboard",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SharedBounds",
@@ -5260,7 +6451,25 @@
         "title": "Shared bounds interruption and cleanup",
         "component": "SharedBoundsLifecycleExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "@ontologyx/ui/motion/__tests__/transition-lifecycle.test.tsx"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "motion",
+        "shared-bounds",
+        "interruption",
+        "reduced-motion",
+        "performance-budget",
+        "resize",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Sheet",
@@ -5436,7 +6645,27 @@
         "title": "Sheet interaction",
         "component": "SheetPreviewExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "overlay-components-nested-dismissal-certification"
+      ],
+      "requiredAxes": [
+        "overlay-components",
+        "dialog",
+        "sheet",
+        "modal-isolation",
+        "focus",
+        "scroll-lock",
+        "escape",
+        "touch",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Skeleton",
@@ -5476,7 +6705,27 @@
         "title": "Feedback semantics",
         "component": "FeedbackExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "feedback-lifecycle-certification"
+      ],
+      "requiredAxes": [
+        "feedback",
+        "live-region",
+        "timing",
+        "upsert",
+        "progress",
+        "loading",
+        "reduced-motion",
+        "responsive",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Slider",
@@ -5486,18 +6735,24 @@
     "order": 20,
     "summary": "Single numeric value control with shared pan ownership, keyboard steps, logical RTL direction and optional marks.",
     "usage": "Use for bounded numeric adjustment when direct manipulation is more useful than text entry.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Exposes slider value/min/max/orientation semantics and Home/End/Page keys.",
     "rtl": "Horizontal arrows/value growth are logical.",
     "touch": "Uses shared pan arena.",
     "responsive": "Fills its container.",
-    "playground": null,
+    "playground": {
+      "preferredWidth": "medium",
+      "fixture": {
+        "label": "Volume",
+        "defaultValue": 64
+      }
+    },
     "props": [
       {
         "name": "defaultValue",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Initial uncontrolled value used only when no controlled value is supplied.",
         "deprecated": false,
         "default": null
       },
@@ -5505,7 +6760,7 @@
         "name": "disabled",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Disables interaction while retaining visible semantic structure.",
         "deprecated": false,
         "default": "false"
       },
@@ -5513,7 +6768,7 @@
         "name": "formatValue",
         "type": "(value: number) => string",
         "optional": true,
-        "description": "",
+        "description": "Formats visible value text while preserving numeric slider semantics.",
         "deprecated": false,
         "default": null
       },
@@ -5521,7 +6776,7 @@
         "name": "label",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Accessible and visible label for the slider value control.",
         "deprecated": false,
         "default": null
       },
@@ -5529,7 +6784,7 @@
         "name": "marks",
         "type": "readonly SliderMark[]",
         "optional": true,
-        "description": "",
+        "description": "Optional semantic/reference marks rendered along the slider track.",
         "deprecated": false,
         "default": null
       },
@@ -5537,7 +6792,7 @@
         "name": "max",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Upper bound used for native slider range semantics.",
         "deprecated": false,
         "default": "100"
       },
@@ -5545,7 +6800,7 @@
         "name": "min",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Lower value bound used for semantic range presentation.",
         "deprecated": false,
         "default": "0"
       },
@@ -5553,7 +6808,7 @@
         "name": "onValueChange",
         "type": "(value: number) => void",
         "optional": true,
-        "description": "",
+        "description": "Reports committed value changes to controlled or observing callers.",
         "deprecated": false,
         "default": null
       },
@@ -5561,7 +6816,7 @@
         "name": "orientation",
         "type": "'horizontal' | 'vertical'",
         "optional": true,
-        "description": "",
+        "description": "Logical control orientation exposed through native ARIA semantics.",
         "deprecated": false,
         "default": "'horizontal'"
       },
@@ -5569,7 +6824,7 @@
         "name": "readOnly",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Prevents mutation while retaining focusable/readable range semantics.",
         "deprecated": false,
         "default": "false"
       },
@@ -5577,7 +6832,7 @@
         "name": "step",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Positive increment used for keyboard and pointer value normalization.",
         "deprecated": false,
         "default": "1"
       },
@@ -5585,12 +6840,30 @@
         "name": "value",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Controlled value; caller remains authoritative when supplied.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [],
+    "certification": {
+      "owner": "UIR08-closeout",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "selection-controls-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "slider",
+        "range",
+        "keyboard",
+        "touch",
+        "rtl",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SlideTransition",
@@ -5654,7 +6927,25 @@
         "title": "Interruptible semantic transitions",
         "component": "MotionLifecycleExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR11",
+      "behaviorTests": [
+        "@ontologyx/ui/motion/__tests__/motion.test.ts",
+        "@ontologyx/ui/motion/__tests__/transition-lifecycle.test.tsx"
+      ],
+      "browserScenarios": [
+        "scroll-motion-certification"
+      ],
+      "requiredAxes": [
+        "motion",
+        "interruption",
+        "reduced-motion",
+        "performance-budget",
+        "rtl",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Snackbar",
@@ -5742,7 +7033,27 @@
         "title": "Snackbar",
         "component": "SnackbarExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "feedback-lifecycle-certification"
+      ],
+      "requiredAxes": [
+        "feedback",
+        "live-region",
+        "timing",
+        "upsert",
+        "progress",
+        "loading",
+        "reduced-motion",
+        "responsive",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Spacer",
@@ -5791,7 +7102,23 @@
         "description": "Inline and block spacers reserve only the selected logical dimension and remain permanently hidden from accessibility APIs.",
         "component": "SpacerAxisExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR03-B",
+      "behaviorTests": [
+        "@ontologyx/ui/primitives/__tests__/layout-boundaries.test.tsx"
+      ],
+      "browserScenarios": [
+        "spacer-logical-axis-certification"
+      ],
+      "requiredAxes": [
+        "layout",
+        "spacer",
+        "logical-axis",
+        "decorative",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Spinner",
@@ -5871,7 +7198,27 @@
         "title": "OX boot loading choreography",
         "component": "SpinnerExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "feedback-lifecycle-certification"
+      ],
+      "requiredAxes": [
+        "feedback",
+        "live-region",
+        "timing",
+        "upsert",
+        "progress",
+        "loading",
+        "reduced-motion",
+        "responsive",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Stack",
@@ -6000,7 +7347,24 @@
         "description": "Token gap plus start/center/end/stretch alignment without manual margins.",
         "component": "StackFlowExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR03-A",
+      "behaviorTests": [
+        "@ontologyx/ui/primitives/__tests__/layout-core.test.tsx"
+      ],
+      "browserScenarios": [
+        "logical-flow-layout-certification"
+      ],
+      "requiredAxes": [
+        "layout",
+        "stack",
+        "polymorphism",
+        "logical-order",
+        "reflow",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "StatusIndicator",
@@ -6056,7 +7420,27 @@
         "title": "Feedback semantics",
         "component": "FeedbackExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "feedback-lifecycle-certification"
+      ],
+      "requiredAxes": [
+        "feedback",
+        "live-region",
+        "timing",
+        "upsert",
+        "progress",
+        "loading",
+        "reduced-motion",
+        "responsive",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Surface",
@@ -6121,7 +7505,25 @@
         "description": "Material, elevation, radius, border and clipping stay finite and token-backed without interactive pseudo-state ownership.",
         "component": "SurfaceMaterialBoundaryExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR04",
+      "behaviorTests": [
+        "@ontologyx/ui/primitives/__tests__/visual-primitives.test.tsx"
+      ],
+      "browserScenarios": [
+        "surface-divider-visual-boundary-certification"
+      ],
+      "requiredAxes": [
+        "visual",
+        "surface",
+        "material",
+        "elevation",
+        "border",
+        "static-state",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Switch",
@@ -6201,7 +7603,27 @@
         "title": "Switch + toggle state",
         "component": "SelectionStateContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
+        "@ontologyx/ui/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "selection-controls-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "native-semantics",
+        "uncontrolled",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reset",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SystemApplicationBrowser",
@@ -6211,7 +7633,7 @@
     "order": 30,
     "summary": "Reusable OXS application-browsing layout with System search/header and grid or list presentation.",
     "usage": "Use inside Launcher or other OXS application surfaces; application lifecycle and filtering policy remain outside the layout.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Uses SearchField, ApplicationItem, List/TileGrid and ContentState semantics with one application-browser region label.",
     "rtl": "Search and collection layout stay logical; icons/actions keep Component-owned direction behavior.",
     "touch": "Application actions use Component press semantics and coarse-pointer hit targets.",
@@ -6241,7 +7663,7 @@
         "name": "actions",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned action region composed from public Components.",
         "deprecated": false,
         "default": null
       },
@@ -6249,7 +7671,7 @@
         "name": "apps",
         "type": "readonly SystemApplicationItem[]",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned application view models; routing and launch authority remain external.",
         "deprecated": false,
         "default": null
       },
@@ -6257,7 +7679,7 @@
         "name": "browserLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible name for the application-browser region.",
         "deprecated": false,
         "default": "'Application browser'"
       },
@@ -6265,7 +7687,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional consumer class name appended without changing component ownership.",
         "deprecated": false,
         "default": "''"
       },
@@ -6273,7 +7695,7 @@
         "name": "collectionLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible name for the rendered collection.",
         "deprecated": false,
         "default": "'Applications'"
       },
@@ -6281,7 +7703,7 @@
         "name": "emptyDescription",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Caller-owned empty-state supporting description.",
         "deprecated": false,
         "default": "'No applications match your search.'"
       },
@@ -6289,7 +7711,7 @@
         "name": "emptyTitle",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Caller-owned empty-state title.",
         "deprecated": false,
         "default": "'No applications found'"
       },
@@ -6297,7 +7719,7 @@
         "name": "interactive",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Whether search and activation are enabled while preserving visible structure.",
         "deprecated": false,
         "default": "true"
       },
@@ -6305,7 +7727,7 @@
         "name": "onActivate",
         "type": "(id: string) => void",
         "optional": false,
-        "description": "",
+        "description": "Reports activation by stable identity; execution authority remains external.",
         "deprecated": false,
         "default": null
       },
@@ -6313,7 +7735,7 @@
         "name": "onQueryChange",
         "type": "(query: string) => void",
         "optional": false,
-        "description": "",
+        "description": "Reports query changes without taking ownership of filtering policy.",
         "deprecated": false,
         "default": null
       },
@@ -6321,7 +7743,7 @@
         "name": "pendingApplicationId",
         "type": "string | null",
         "optional": true,
-        "description": "",
+        "description": "Stable application identity currently awaiting caller-owned launch completion.",
         "deprecated": false,
         "default": null
       },
@@ -6329,7 +7751,7 @@
         "name": "presentation",
         "type": "'grid' | 'list'",
         "optional": true,
-        "description": "",
+        "description": "Container-friendly collection presentation without device detection.",
         "deprecated": false,
         "default": "'grid'"
       },
@@ -6337,7 +7759,7 @@
         "name": "query",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned search/filter query.",
         "deprecated": false,
         "default": null
       },
@@ -6345,7 +7767,7 @@
         "name": "searchLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible name for the search field.",
         "deprecated": false,
         "default": "'Search applications'"
       },
@@ -6353,7 +7775,7 @@
         "name": "searchPlaceholder",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional search-field placeholder; never used as the accessible name.",
         "deprecated": false,
         "default": "'Search apps'"
       },
@@ -6361,7 +7783,7 @@
         "name": "subtitle",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned supporting title text.",
         "deprecated": false,
         "default": "'What do you want to open?'"
       },
@@ -6369,12 +7791,35 @@
         "name": "title",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Caller-owned visible title; reusable UI never supplies product meaning.",
         "deprecated": false,
         "default": "'Applications'"
       }
     ],
-    "examples": []
+    "examples": [],
+    "certification": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
+        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SystemBar",
@@ -6384,18 +7829,25 @@
     "order": 40,
     "summary": "Logical block-start/block-end OXS system bar composed over the public Toolbar Component.",
     "usage": "Use for top/bottom shell status and action chrome; keep backend status data outside.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Toolbar semantics provide one labelled action region and preserve child control names.",
     "rtl": "Leading/center/trailing groups are logical and reverse naturally under RTL.",
     "touch": "Compact/comfortable density never bypasses Component touch targets.",
     "responsive": "Groups wrap/collapse within their container instead of switching on named device classes.",
-    "playground": null,
+    "playground": {
+      "preferredWidth": "wide",
+      "fixture": {
+        "label": "Top system bar",
+        "leading": "Online",
+        "trailing": "12:42"
+      }
+    },
     "props": [
       {
         "name": "center",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional center group between logical leading and trailing System bar content.",
         "deprecated": false,
         "default": null
       },
@@ -6403,7 +7855,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional consumer class name appended without changing component ownership.",
         "deprecated": false,
         "default": "''"
       },
@@ -6411,7 +7863,7 @@
         "name": "density",
         "type": "'compact' | 'comfortable'",
         "optional": true,
-        "description": "",
+        "description": "Named visual density that does not weaken Component touch-target contracts.",
         "deprecated": false,
         "default": "'comfortable'"
       },
@@ -6419,7 +7871,7 @@
         "name": "edge",
         "type": "Extract<SystemSurfaceEdge, 'block-start' | 'block-end'>",
         "optional": true,
-        "description": "",
+        "description": "Logical surface edge; start/end semantics remain correct in RTL.",
         "deprecated": false,
         "default": "'block-start'"
       },
@@ -6427,7 +7879,7 @@
         "name": "label",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Accessible toolbar label for the System bar.",
         "deprecated": false,
         "default": null
       },
@@ -6435,7 +7887,7 @@
         "name": "leading",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional logical-start content; direction follows the owning UI environment.",
         "deprecated": false,
         "default": null
       },
@@ -6443,12 +7895,35 @@
         "name": "trailing",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional logical-end content; direction follows the owning UI environment.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [],
+    "certification": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
+        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SystemChromeGroup",
@@ -6458,18 +7933,24 @@
     "order": 40,
     "summary": "Small labelled grouping helper for System status/actions placed inside bars, docks and panels.",
     "usage": "Use only to group already-built Component controls/status in OXS chrome.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Creates a named group without replacing child control semantics.",
     "rtl": "Content/trailing slots use logical flow.",
     "touch": "Does not alter child control hit targets.",
     "responsive": "Allows grouped chrome content to wrap within its parent container.",
-    "playground": null,
+    "playground": {
+      "preferredWidth": "wide",
+      "fixture": {
+        "label": "System chrome group",
+        "children": "Chrome controls"
+      }
+    },
     "props": [
       {
         "name": "children",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned content rendered inside this reusable visual boundary.",
         "deprecated": false,
         "default": null
       },
@@ -6477,7 +7958,7 @@
         "name": "label",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Accessible group label for related System chrome content.",
         "deprecated": false,
         "default": null
       },
@@ -6485,12 +7966,35 @@
         "name": "trailing",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional logical-end content; direction follows the owning UI environment.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [],
+    "certification": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
+        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SystemCommandSurface",
@@ -6500,7 +8004,7 @@
     "order": 50,
     "summary": "System command/search dialog composed from Dialog, SearchField, List and ScrollView Components.",
     "usage": "Pass command view-models and activation callbacks; command discovery/execution authority remains outside the visual surface.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Dialog focus lifecycle and labelled command list come from shared overlay/list Components.",
     "rtl": "Search, metadata and command rows use logical Component layout.",
     "touch": "Commands remain tappable while keyboard search/focus works through Component contracts.",
@@ -6531,7 +8035,7 @@
         "name": "collectionLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible name for the rendered collection.",
         "deprecated": false,
         "default": "'Commands'"
       },
@@ -6539,7 +8043,7 @@
         "name": "commands",
         "type": "readonly SystemCommandItem[]",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned filtered command view models; execution policy remains external.",
         "deprecated": false,
         "default": null
       },
@@ -6547,7 +8051,7 @@
         "name": "emptyDescription",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Caller-owned empty-state supporting description.",
         "deprecated": false,
         "default": "'Try another search.'"
       },
@@ -6555,7 +8059,7 @@
         "name": "emptyTitle",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Caller-owned empty-state title.",
         "deprecated": false,
         "default": "'No commands found'"
       },
@@ -6563,7 +8067,7 @@
         "name": "onActivate",
         "type": "(id: string) => void",
         "optional": false,
-        "description": "",
+        "description": "Reports activation by stable identity; execution authority remains external.",
         "deprecated": false,
         "default": null
       },
@@ -6571,7 +8075,7 @@
         "name": "onOpenChange",
         "type": "(open: boolean) => void",
         "optional": false,
-        "description": "",
+        "description": "Reports requested visibility changes without taking ownership of command-surface state.",
         "deprecated": false,
         "default": null
       },
@@ -6579,7 +8083,7 @@
         "name": "onQueryChange",
         "type": "(query: string) => void",
         "optional": false,
-        "description": "",
+        "description": "Reports query changes without taking ownership of filtering policy.",
         "deprecated": false,
         "default": null
       },
@@ -6587,7 +8091,7 @@
         "name": "open",
         "type": "boolean",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned controlled visibility state for this System surface.",
         "deprecated": false,
         "default": null
       },
@@ -6595,7 +8099,7 @@
         "name": "query",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned search/filter query.",
         "deprecated": false,
         "default": null
       },
@@ -6603,7 +8107,7 @@
         "name": "searchLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible name for the search field.",
         "deprecated": false,
         "default": "'Search commands'"
       },
@@ -6611,7 +8115,7 @@
         "name": "searchPlaceholder",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional search-field placeholder; never used as the accessible name.",
         "deprecated": false,
         "default": "'Type a command'"
       },
@@ -6619,12 +8123,33 @@
         "name": "title",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Caller-owned visible title; reusable UI never supplies product meaning.",
         "deprecated": false,
         "default": "'Commands'"
       }
     ],
-    "examples": []
+    "examples": [],
+    "certification": {
+      "owner": "UIR15",
+      "behaviorTests": [
+        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "privileged-system-surfaces-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "privileged",
+        "host-boundary",
+        "occlusion",
+        "transient",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reduced-motion",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SystemDock",
@@ -6634,18 +8159,24 @@
     "order": 40,
     "summary": "OXS dock placement for block-end or logical side edges using Component toolbar/actions.",
     "usage": "Use for System-owned app/action dock placement; application launching and pinning policy remain outside.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "One labelled toolbar groups dock actions and keeps individual action semantics intact.",
     "rtl": "Side placement uses inline-start/inline-end rather than physical left/right.",
     "touch": "Dock actions inherit Component hit targets and press behavior.",
     "responsive": "Dock geometry can move between horizontal and vertical edges without changing action implementation.",
-    "playground": null,
+    "playground": {
+      "preferredWidth": "wide",
+      "fixture": {
+        "label": "System dock",
+        "children": "Application actions"
+      }
+    },
     "props": [
       {
         "name": "children",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned content rendered inside this reusable visual boundary.",
         "deprecated": false,
         "default": null
       },
@@ -6653,7 +8184,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional consumer class name appended without changing component ownership.",
         "deprecated": false,
         "default": "''"
       },
@@ -6661,7 +8192,7 @@
         "name": "edge",
         "type": "Extract<SystemSurfaceEdge, 'block-end' | 'inline-start' | 'inline-end'>",
         "optional": true,
-        "description": "",
+        "description": "Logical surface edge; start/end semantics remain correct in RTL.",
         "deprecated": false,
         "default": "'block-end'"
       },
@@ -6669,7 +8200,7 @@
         "name": "label",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible toolbar label for the System dock.",
         "deprecated": false,
         "default": "'System dock'"
       },
@@ -6677,12 +8208,35 @@
         "name": "trailing",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional logical-end content; direction follows the owning UI environment.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [],
+    "certification": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
+        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SystemKeyboardHost",
@@ -6692,7 +8246,7 @@
     "order": 50,
     "summary": "Privileged OXS touch-keyboard surface with shared Component press semantics and a typed command boundary.",
     "usage": "Mount only from OXS System composition with compositor-owned surface/session state. Hosts route emitted commands to their native text-input/IME authority.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Every key is a native Button with explicit names; modifier state is exposed with aria-pressed and alternate groups are labelled.",
     "rtl": "Persian and other RTL layouts own key-plane direction while the privileged host keeps logical safe-area and block-end geometry.",
     "touch": "Large Component-owned targets, shared long-press cancellation, alternates and repeat avoid a keyboard-private gesture engine.",
@@ -6716,7 +8270,7 @@
         "name": "availableLanguages",
         "type": "readonly SystemKeyboardLanguage[]",
         "optional": true,
-        "description": "",
+        "description": "Languages the host currently exposes for keyboard switching.",
         "deprecated": false,
         "default": null
       },
@@ -6724,7 +8278,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional consumer class name appended without changing component ownership.",
         "deprecated": false,
         "default": "''"
       },
@@ -6732,7 +8286,7 @@
         "name": "label",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible group label for the privileged touch keyboard.",
         "deprecated": false,
         "default": "'System touch keyboard'"
       },
@@ -6740,7 +8294,7 @@
         "name": "occludesContent",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Marks whether this privileged keyboard contributes transient content occlusion.",
         "deprecated": false,
         "default": "true"
       },
@@ -6748,7 +8302,7 @@
         "name": "onCommand",
         "type": "(command: SystemKeyboardCommand) => void",
         "optional": false,
-        "description": "",
+        "description": "Emits typed keyboard commands to the host-owned text-input/IME authority.",
         "deprecated": false,
         "default": null
       },
@@ -6756,7 +8310,7 @@
         "name": "state",
         "type": "SystemKeyboardSurfaceState",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned privileged keyboard surface/session state from the native text-input boundary.",
         "deprecated": false,
         "default": null
       }
@@ -6767,7 +8321,29 @@
         "title": "Privileged touch keyboard",
         "component": "SystemKeyboardExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR15",
+      "behaviorTests": [
+        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx",
+        "@ontologyx/ui/system/__tests__/system-keyboard.test.tsx"
+      ],
+      "browserScenarios": [
+        "privileged-system-surfaces-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "privileged",
+        "host-boundary",
+        "occlusion",
+        "transient",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reduced-motion",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SystemLauncher",
@@ -6777,18 +8353,31 @@
     "order": 20,
     "summary": "OXS application-launcher surface backed by the shared SystemApplicationBrowser layout.",
     "usage": "Shell owns launcher visibility/application lifecycle state and passes it here; application code should use generic search/tile/list Components instead.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Search, application activation, focus handling and sheet dismissal inherit shared Component semantics.",
     "rtl": "Search flow and application collection use logical Component layout; no Primitive-level directional workaround remains.",
     "touch": "Bottom-sheet, search and application actions use the shared touch/gesture/press stack.",
     "responsive": "Application browser adapts by container while the launcher owns only System presentation.",
-    "playground": null,
+    "playground": {
+      "preferredWidth": "wide",
+      "fixture": {
+        "open": true,
+        "query": "",
+        "apps": [
+          {
+            "id": "browser",
+            "name": "Browser",
+            "icon": "browser"
+          }
+        ]
+      }
+    },
     "props": [
       {
         "name": "apps",
         "type": "readonly SystemLauncherItem[]",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned application view models; routing and launch authority remain external.",
         "deprecated": false,
         "default": null
       },
@@ -6796,7 +8385,7 @@
         "name": "onClose",
         "type": "() => void",
         "optional": false,
-        "description": "",
+        "description": "Requests closure while visibility ownership remains with the caller.",
         "deprecated": false,
         "default": null
       },
@@ -6804,7 +8393,7 @@
         "name": "onLaunch",
         "type": "(id: string) => boolean",
         "optional": false,
-        "description": "",
+        "description": "Requests launch by stable application identity and returns caller policy outcome.",
         "deprecated": false,
         "default": null
       },
@@ -6812,7 +8401,7 @@
         "name": "onQueryChange",
         "type": "(query: string) => void",
         "optional": false,
-        "description": "",
+        "description": "Reports query changes without taking ownership of filtering policy.",
         "deprecated": false,
         "default": null
       },
@@ -6820,7 +8409,7 @@
         "name": "open",
         "type": "boolean",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned controlled visibility state for this System surface.",
         "deprecated": false,
         "default": null
       },
@@ -6828,7 +8417,7 @@
         "name": "presentation",
         "type": "'grid' | 'list'",
         "optional": true,
-        "description": "",
+        "description": "Container-friendly collection presentation without device detection.",
         "deprecated": false,
         "default": "'grid'"
       },
@@ -6836,7 +8425,7 @@
         "name": "query",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned search/filter query.",
         "deprecated": false,
         "default": null
       },
@@ -6844,7 +8433,7 @@
         "name": "transition",
         "type": "BottomSheetProps['transition']",
         "optional": true,
-        "description": "",
+        "description": "Optional shared BottomSheet transition descriptor; motion policy remains UiRoot-owned.",
         "deprecated": false,
         "default": null
       }
@@ -6855,7 +8444,30 @@
         "title": "System launcher",
         "component": "SystemLauncherExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
+        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SystemLockLayout",
@@ -6865,18 +8477,24 @@
     "order": 50,
     "summary": "UI-only lock/auth shell composition with explicit identity, authentication, status and action regions.",
     "usage": "Authentication backend and secure session authority must be injected; this layout never validates credentials itself.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Lock screen landmark contains Component-owned authentication/actions with caller-provided naming.",
     "rtl": "Centered content and logical action layout remain direction-neutral.",
     "touch": "Authentication controls use public Component hit targets and focus semantics.",
     "responsive": "Central auth card clamps and reflows across narrow/wide outputs.",
-    "playground": null,
+    "playground": {
+      "preferredWidth": "medium",
+      "fixture": {
+        "primary": "12:42",
+        "authentication": "Authentication controls"
+      }
+    },
     "props": [
       {
         "name": "actions",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned action region composed from public Components.",
         "deprecated": false,
         "default": null
       },
@@ -6884,7 +8502,7 @@
         "name": "authentication",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Caller-owned authentication controls; credential validation is never performed here.",
         "deprecated": false,
         "default": null
       },
@@ -6892,7 +8510,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional consumer class name appended without changing component ownership.",
         "deprecated": false,
         "default": "''"
       },
@@ -6900,7 +8518,7 @@
         "name": "contentRole",
         "type": "'main' | 'region'",
         "optional": true,
-        "description": "",
+        "description": "Semantic landmark role for the primary reusable content region.",
         "deprecated": false,
         "default": "'region'"
       },
@@ -6908,7 +8526,7 @@
         "name": "identity",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned identity presentation.",
         "deprecated": false,
         "default": null
       },
@@ -6916,7 +8534,7 @@
         "name": "label",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible landmark label for the lock/authentication surface.",
         "deprecated": false,
         "default": "'Lock screen'"
       },
@@ -6924,7 +8542,7 @@
         "name": "primary",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Required primary lock-screen content; authentication semantics remain caller-owned.",
         "deprecated": false,
         "default": null
       },
@@ -6932,7 +8550,7 @@
         "name": "secondary",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional secondary lock-screen content.",
         "deprecated": false,
         "default": null
       },
@@ -6940,12 +8558,33 @@
         "name": "status",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned status presentation.",
         "deprecated": false,
         "default": null
       }
     ],
-    "examples": []
+    "examples": [],
+    "certification": {
+      "owner": "UIR15",
+      "behaviorTests": [
+        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "privileged-system-surfaces-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "privileged",
+        "host-boundary",
+        "occlusion",
+        "transient",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reduced-motion",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SystemNotificationCenter",
@@ -6955,7 +8594,7 @@
     "order": 30,
     "summary": "Backend-neutral OXS notification-center presentation over List/ContentState/ScrollView Components.",
     "usage": "Pass notification view-models from the System owner; delivery, persistence and permission semantics stay outside React.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "One labelled notification region contains list items with optional activation semantics.",
     "rtl": "Metadata/trailing state use logical list layout.",
     "touch": "Activated items use Component list interaction and touch targets.",
@@ -6984,7 +8623,7 @@
         "name": "actions",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned action region composed from public Components.",
         "deprecated": false,
         "default": null
       },
@@ -6992,7 +8631,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional consumer class name appended without changing component ownership.",
         "deprecated": false,
         "default": "''"
       },
@@ -7000,7 +8639,7 @@
         "name": "collectionLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible name for the rendered collection.",
         "deprecated": false,
         "default": "'Notifications'"
       },
@@ -7008,7 +8647,7 @@
         "name": "emptyDescription",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Caller-owned empty-state supporting description.",
         "deprecated": false,
         "default": "'New notifications will appear here.'"
       },
@@ -7016,7 +8655,7 @@
         "name": "emptyTitle",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Caller-owned empty-state title.",
         "deprecated": false,
         "default": "'No notifications'"
       },
@@ -7024,7 +8663,7 @@
         "name": "items",
         "type": "readonly SystemNotificationItem[]",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned notification view models; delivery and persistence remain external.",
         "deprecated": false,
         "default": null
       },
@@ -7032,7 +8671,7 @@
         "name": "label",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible landmark label for the notification center.",
         "deprecated": false,
         "default": "'Notification center'"
       },
@@ -7040,7 +8679,7 @@
         "name": "title",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Caller-owned visible title; reusable UI never supplies product meaning.",
         "deprecated": false,
         "default": "'Notifications'"
       },
@@ -7048,12 +8687,33 @@
         "name": "unreadLabel",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Caller-owned unread-state label.",
         "deprecated": false,
         "default": "'New'"
       }
     ],
-    "examples": []
+    "examples": [],
+    "certification": {
+      "owner": "UIR15",
+      "behaviorTests": [
+        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "privileged-system-surfaces-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "privileged",
+        "host-boundary",
+        "occlusion",
+        "transient",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reduced-motion",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SystemOsd",
@@ -7063,7 +8723,7 @@
     "order": 50,
     "summary": "Compact transient System OSD for status/value feedback such as volume or brightness.",
     "usage": "Render from System state only; hardware mutation and timeout policy stay with the owning runtime.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "StatusIndicator/Progress expose readable status/value semantics.",
     "rtl": "Icon/content flow is logical.",
     "touch": "OSD is informational and does not create hover-only actions.",
@@ -7074,7 +8734,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional consumer class name appended without changing component ownership.",
         "deprecated": false,
         "default": "''"
       },
@@ -7082,7 +8742,7 @@
         "name": "icon",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional decorative/status icon rendered beside the OSD content.",
         "deprecated": false,
         "default": null
       },
@@ -7090,7 +8750,7 @@
         "name": "label",
         "type": "string",
         "optional": false,
-        "description": "",
+        "description": "Accessible status label for the OSD and its determinate value when present.",
         "deprecated": false,
         "default": null
       },
@@ -7098,7 +8758,7 @@
         "name": "max",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Upper value bound used for semantic progress presentation.",
         "deprecated": false,
         "default": "100"
       },
@@ -7106,7 +8766,7 @@
         "name": "status",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned status presentation.",
         "deprecated": false,
         "default": null
       },
@@ -7114,7 +8774,7 @@
         "name": "tone",
         "type": "BadgeTone",
         "optional": true,
-        "description": "",
+        "description": "Semantic status tone applied through accepted Component color roles.",
         "deprecated": false,
         "default": "'neutral'"
       },
@@ -7122,7 +8782,7 @@
         "name": "value",
         "type": "number",
         "optional": true,
-        "description": "",
+        "description": "Controlled value; caller remains authoritative when supplied.",
         "deprecated": false,
         "default": null
       }
@@ -7133,7 +8793,28 @@
         "title": "Transient and privileged layouts",
         "component": "SystemTransientExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR15",
+      "behaviorTests": [
+        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "privileged-system-surfaces-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "privileged",
+        "host-boundary",
+        "occlusion",
+        "transient",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reduced-motion",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SystemPanel",
@@ -7143,18 +8824,24 @@
     "order": 40,
     "summary": "Nonmodal System side-panel layout with Component AppBar/Card/ScrollView behavior.",
     "usage": "Use for backend-neutral side chrome or transient panels, not for generic application sidebars.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Panel label comes from its title while children retain their own semantics.",
     "rtl": "Panels attach to logical inline edges.",
     "touch": "Scrollable panel content and controls use shared Component runtime behavior.",
     "responsive": "Width presets clamp to available container space and collapse safely on narrow surfaces.",
-    "playground": null,
+    "playground": {
+      "preferredWidth": "medium",
+      "fixture": {
+        "title": "System panel",
+        "children": "Panel content"
+      }
+    },
     "props": [
       {
         "name": "actions",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned action region composed from public Components.",
         "deprecated": false,
         "default": null
       },
@@ -7162,7 +8849,7 @@
         "name": "children",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned content rendered inside this reusable visual boundary.",
         "deprecated": false,
         "default": null
       },
@@ -7170,7 +8857,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional consumer class name appended without changing component ownership.",
         "deprecated": false,
         "default": "''"
       },
@@ -7178,7 +8865,7 @@
         "name": "edge",
         "type": "Extract<SystemSurfaceEdge, 'inline-start' | 'inline-end'>",
         "optional": true,
-        "description": "",
+        "description": "Logical surface edge; start/end semantics remain correct in RTL.",
         "deprecated": false,
         "default": "'inline-end'"
       },
@@ -7186,7 +8873,7 @@
         "name": "kind",
         "type": "Extract<SystemSurfaceKind, 'chrome' | 'transient'>",
         "optional": true,
-        "description": "",
+        "description": "Chooses whether the panel participates as persistent chrome or transient System UI.",
         "deprecated": false,
         "default": "'chrome'"
       },
@@ -7194,7 +8881,7 @@
         "name": "label",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional accessible panel label; falls back to a string title when available.",
         "deprecated": false,
         "default": null
       },
@@ -7202,7 +8889,7 @@
         "name": "subtitle",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned supporting title text.",
         "deprecated": false,
         "default": null
       },
@@ -7210,7 +8897,7 @@
         "name": "title",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned visible title; reusable UI never supplies product meaning.",
         "deprecated": false,
         "default": null
       },
@@ -7218,12 +8905,35 @@
         "name": "width",
         "type": "'sm' | 'md' | 'lg'",
         "optional": true,
-        "description": "",
+        "description": "Named panel width bounded by the current container.",
         "deprecated": false,
         "default": "'md'"
       }
     ],
-    "examples": []
+    "examples": [],
+    "certification": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
+        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SystemQuickSettings",
@@ -7233,7 +8943,7 @@
     "order": 30,
     "summary": "OXS quick-settings composition for Component toggles, sliders and status groups without backend ownership.",
     "usage": "Provide System state/actions as Component controls inside sections; hardware/network policy stays native/backend-owned.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Each Card section labels its contained Component controls.",
     "rtl": "Section grid and controls follow logical Component layout.",
     "touch": "Switch/Slider/Button interactions retain their shared touch and keyboard semantics.",
@@ -7262,7 +8972,7 @@
         "name": "actions",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned action region composed from public Components.",
         "deprecated": false,
         "default": null
       },
@@ -7270,7 +8980,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional consumer class name appended without changing component ownership.",
         "deprecated": false,
         "default": "''"
       },
@@ -7278,7 +8988,7 @@
         "name": "label",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible landmark label for the quick-settings composition.",
         "deprecated": false,
         "default": "'Quick settings'"
       },
@@ -7286,7 +8996,7 @@
         "name": "sections",
         "type": "readonly SystemQuickSettingSection[]",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned ordered section models for this reusable System composition.",
         "deprecated": false,
         "default": null
       },
@@ -7294,7 +9004,7 @@
         "name": "subtitle",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned supporting title text.",
         "deprecated": false,
         "default": null
       },
@@ -7302,12 +9012,33 @@
         "name": "title",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Caller-owned visible title; reusable UI never supplies product meaning.",
         "deprecated": false,
         "default": "'Quick settings'"
       }
     ],
-    "examples": []
+    "examples": [],
+    "certification": {
+      "owner": "UIR15",
+      "behaviorTests": [
+        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "privileged-system-surfaces-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "privileged",
+        "host-boundary",
+        "occlusion",
+        "transient",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reduced-motion",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SystemScaffold",
@@ -7317,7 +9048,7 @@
     "order": 10,
     "summary": "OXS-specific slot host for workspace, chrome, transient and privileged System surfaces.",
     "usage": "Use only in OXS System/Shell composition. Ordinary applications should use PageScaffold instead.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Preserves child landmarks and keeps privileged/transient layers structurally distinct; child surfaces own their interactive semantics.",
     "rtl": "Inset names and edge semantics are logical block/inline values.",
     "touch": "Does not create controls; System children retain Component-owned touch behavior.",
@@ -7328,7 +9059,7 @@
         "name": "chrome",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional System chrome layer composed from accepted Components.",
         "deprecated": false,
         "default": null
       },
@@ -7336,7 +9067,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional consumer class name appended without changing component ownership.",
         "deprecated": false,
         "default": "''"
       },
@@ -7344,7 +9075,7 @@
         "name": "insets",
         "type": "SystemInsets",
         "optional": true,
-        "description": "",
+        "description": "Logical System insets supplied by the host without device-name branching.",
         "deprecated": false,
         "default": null
       },
@@ -7352,7 +9083,7 @@
         "name": "privileged",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional privileged System layer mounted only by the owning System composition.",
         "deprecated": false,
         "default": null
       },
@@ -7360,7 +9091,7 @@
         "name": "transient",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional transient System layer; lifecycle authority stays with the caller.",
         "deprecated": false,
         "default": null
       },
@@ -7368,7 +9099,7 @@
         "name": "workspace",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned workspace content; native scene/window authority remains outside React.",
         "deprecated": false,
         "default": null
       }
@@ -7379,7 +9110,30 @@
         "title": "System ownership boundary",
         "component": "SystemBoundaryExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
+        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SystemSettingsLayout",
@@ -7389,18 +9143,30 @@
     "order": 30,
     "summary": "OXS settings scaffold with adaptive System navigation and scrollable Component-owned content.",
     "usage": "Use for System settings pages; sections and field controls must be public Components.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "AdaptiveNavigation is labelled and content is exposed as the main settings region.",
     "rtl": "Navigation/content ordering follows logical direction and Component navigation semantics.",
     "touch": "Navigation and form content keep Component touch/focus behavior.",
     "responsive": "Container queries move between split and single-column settings layouts.",
-    "playground": null,
+    "playground": {
+      "preferredWidth": "wide",
+      "fixture": {
+        "title": "System settings",
+        "sections": [
+          {
+            "value": "display",
+            "label": "Display"
+          }
+        ],
+        "children": "Settings content"
+      }
+    },
     "props": [
       {
         "name": "actions",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned action region composed from public Components.",
         "deprecated": false,
         "default": null
       },
@@ -7408,7 +9174,7 @@
         "name": "children",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned content rendered inside this reusable visual boundary.",
         "deprecated": false,
         "default": null
       },
@@ -7416,7 +9182,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional consumer class name appended without changing component ownership.",
         "deprecated": false,
         "default": "''"
       },
@@ -7424,7 +9190,7 @@
         "name": "contentLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible name for the primary reusable content region.",
         "deprecated": false,
         "default": null
       },
@@ -7432,7 +9198,7 @@
         "name": "defaultValue",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Initial uncontrolled value used only when no controlled value is supplied.",
         "deprecated": false,
         "default": null
       },
@@ -7440,7 +9206,7 @@
         "name": "navigationLabel",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible name for settings navigation.",
         "deprecated": false,
         "default": "'Settings sections'"
       },
@@ -7448,7 +9214,7 @@
         "name": "onValueChange",
         "type": "(value: string) => void",
         "optional": true,
-        "description": "",
+        "description": "Reports committed value changes to controlled or observing callers.",
         "deprecated": false,
         "default": null
       },
@@ -7456,7 +9222,7 @@
         "name": "sections",
         "type": "readonly NavigationItem[]",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned ordered section models for this reusable System composition.",
         "deprecated": false,
         "default": null
       },
@@ -7464,7 +9230,7 @@
         "name": "subtitle",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned supporting title text.",
         "deprecated": false,
         "default": null
       },
@@ -7472,7 +9238,7 @@
         "name": "title",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Caller-owned visible title; reusable UI never supplies product meaning.",
         "deprecated": false,
         "default": "'Settings'"
       },
@@ -7480,7 +9246,7 @@
         "name": "value",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Controlled value; caller remains authoritative when supplied.",
         "deprecated": false,
         "default": null
       }
@@ -7491,7 +9257,30 @@
         "title": "Adaptive System settings",
         "component": "SystemSettingsExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
+        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SystemSurface",
@@ -7501,7 +9290,7 @@
     "order": 10,
     "summary": "System-only semantic wrapper for chrome, transient and privileged surfaces with explicit edge/occlusion metadata.",
     "usage": "Use for OXS surface classification and compositor-facing layout semantics, not as a generic application Card/Panel replacement.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Optional labels describe grouped System regions while interactive children remain native Component controls.",
     "rtl": "Edges use logical block/inline naming so semantic start/end survive RTL.",
     "touch": "Surface classification does not alter child hit targets or invent hover behavior.",
@@ -7519,7 +9308,7 @@
         "name": "children",
         "type": "ReactNode",
         "optional": false,
-        "description": "",
+        "description": "Caller-owned content rendered inside this reusable visual boundary.",
         "deprecated": false,
         "default": null
       },
@@ -7527,7 +9316,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional consumer class name appended without changing component ownership.",
         "deprecated": false,
         "default": "''"
       },
@@ -7535,7 +9324,7 @@
         "name": "edge",
         "type": "SystemSurfaceEdge",
         "optional": true,
-        "description": "",
+        "description": "Logical surface edge; start/end semantics remain correct in RTL.",
         "deprecated": false,
         "default": "'none'"
       },
@@ -7543,7 +9332,7 @@
         "name": "kind",
         "type": "SystemSurfaceKind",
         "optional": false,
-        "description": "",
+        "description": "System surface classification used for host-neutral placement and policy.",
         "deprecated": false,
         "default": null
       },
@@ -7551,7 +9340,7 @@
         "name": "label",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional accessible label for this classified System surface.",
         "deprecated": false,
         "default": null
       },
@@ -7559,12 +9348,35 @@
         "name": "occludesContent",
         "type": "boolean",
         "optional": true,
-        "description": "",
+        "description": "Declares whether this surface contributes transient host content occlusion.",
         "deprecated": false,
         "default": "false"
       }
     ],
-    "examples": []
+    "examples": [],
+    "certification": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
+        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "SystemWorkspace",
@@ -7574,18 +9386,25 @@
     "order": 20,
     "summary": "OXS desktop/workspace visual composition separated from compositor/window-scene authority.",
     "usage": "Use as the System-owned visual host around native workspace/window content; do not move WM/compositor authority into React.",
-    "status": "candidate",
+    "status": "accepted",
     "accessibility": "Exposes a workspace landmark and reuses AppBar/StatusIndicator semantics for visible chrome.",
     "rtl": "System bar content follows logical Component layout.",
     "touch": "Visible chrome consumes Component hit-target policy rather than feature-local controls.",
     "responsive": "Fills available output space and inherits System inset/safe-area contracts.",
-    "playground": null,
+    "playground": {
+      "preferredWidth": "wide",
+      "fixture": {
+        "title": "OXS workspace",
+        "status": "Ready",
+        "children": "Workspace content"
+      }
+    },
     "props": [
       {
         "name": "children",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Caller-owned content rendered inside this reusable visual boundary.",
         "deprecated": false,
         "default": null
       },
@@ -7593,7 +9412,7 @@
         "name": "className",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional consumer class name appended without changing component ownership.",
         "deprecated": false,
         "default": "''"
       },
@@ -7601,7 +9420,7 @@
         "name": "label",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Accessible landmark label for the workspace region.",
         "deprecated": false,
         "default": "'Desktop workspace'"
       },
@@ -7609,7 +9428,7 @@
         "name": "status",
         "type": "string",
         "optional": true,
-        "description": "",
+        "description": "Optional caller-owned workspace status text rendered in System chrome.",
         "deprecated": false,
         "default": "'Desktop'"
       },
@@ -7617,12 +9436,35 @@
         "name": "title",
         "type": "ReactNode",
         "optional": true,
-        "description": "",
+        "description": "Caller-owned visible title; reusable UI never supplies product meaning.",
         "deprecated": false,
         "default": "'OXS'"
       }
     ],
-    "examples": []
+    "examples": [],
+    "certification": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
+        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "TabPanel",
@@ -7686,7 +9528,28 @@
         "title": "Manual/automatic tabs",
         "component": "TabsContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/navigation-data.test.tsx",
+        "@ontologyx/ui/components/__tests__/data-navigation.test.tsx"
+      ],
+      "browserScenarios": [
+        "tabs-select-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "tabs",
+        "manual-activation",
+        "automatic-activation",
+        "roving-focus",
+        "relationships",
+        "rtl",
+        "keyboard",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Tabs",
@@ -7817,7 +9680,28 @@
         "title": "Manual/automatic tabs",
         "component": "TabsContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/navigation-data.test.tsx",
+        "@ontologyx/ui/components/__tests__/data-navigation.test.tsx"
+      ],
+      "browserScenarios": [
+        "tabs-select-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "tabs",
+        "manual-activation",
+        "automatic-activation",
+        "roving-focus",
+        "relationships",
+        "rtl",
+        "keyboard",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Text",
@@ -7906,7 +9790,29 @@
         "description": "Persian/English text, explicit selection and a long unbreakable token reflow inside a narrow container.",
         "component": "TextMixedCopyExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR04",
+      "behaviorTests": [
+        "@ontologyx/ui/primitives/__tests__/visual-primitives.test.tsx"
+      ],
+      "browserScenarios": [
+        "typography-semantic-bidi-reflow-certification"
+      ],
+      "requiredAxes": [
+        "visual",
+        "typography",
+        "semantics",
+        "bidi",
+        "rtl",
+        "font-fallback",
+        "long-string",
+        "zoom",
+        "reflow",
+        "selection",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "TextArea",
@@ -8091,7 +9997,34 @@
         "description": "Textarea selection, character guidance and native form/reset behavior share the canonical field frame.",
         "component": "TextAreaNativeExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR07",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/fields.test.tsx",
+        "@ontologyx/ui/editing/__tests__/editing.test.tsx"
+      ],
+      "browserScenarios": [
+        "field-native-form-certification",
+        "editable-text-host-occlusion-certification"
+      ],
+      "requiredAxes": [
+        "fields",
+        "text-area",
+        "native-form",
+        "selection",
+        "composition",
+        "reset",
+        "submission",
+        "multiline",
+        "ime",
+        "host-adapter",
+        "occlusion",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "TextField",
@@ -8280,7 +10213,38 @@
         "description": "A delayed paste is invalidated when its root swaps clipboard transport; stale text never enters the active field.",
         "component": "ClipboardRaceExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR07",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/fields.test.tsx",
+        "@ontologyx/ui/editing/__tests__/editing.test.tsx"
+      ],
+      "browserScenarios": [
+        "field-native-form-certification",
+        "editable-text-host-occlusion-certification"
+      ],
+      "requiredAxes": [
+        "fields",
+        "text-field",
+        "native-form",
+        "controlled",
+        "uncontrolled",
+        "autofill",
+        "validation",
+        "reset",
+        "submission",
+        "selection",
+        "composition",
+        "secure-input",
+        "ime",
+        "host-adapter",
+        "occlusion",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Tile",
@@ -8400,7 +10364,30 @@
         "title": "Measured spatial tile navigation",
         "component": "TileGridContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR09",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/navigation-data.test.tsx",
+        "@ontologyx/ui/components/__tests__/data-navigation.test.tsx",
+        "@ontologyx/ui/components/__tests__/developer-compositions.test.tsx"
+      ],
+      "browserScenarios": [
+        "tile-grid-spatial-navigation-certification"
+      ],
+      "requiredAxes": [
+        "navigation-data",
+        "tile-grid",
+        "geometry",
+        "roving-focus",
+        "reorder",
+        "focus-continuity",
+        "rtl",
+        "keyboard",
+        "touch",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "TileGrid",
@@ -8448,7 +10435,30 @@
         "title": "Measured spatial tile navigation",
         "component": "TileGridContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR09",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/navigation-data.test.tsx",
+        "@ontologyx/ui/components/__tests__/data-navigation.test.tsx",
+        "@ontologyx/ui/components/__tests__/developer-compositions.test.tsx"
+      ],
+      "browserScenarios": [
+        "tile-grid-spatial-navigation-certification"
+      ],
+      "requiredAxes": [
+        "navigation-data",
+        "tile-grid",
+        "geometry",
+        "roving-focus",
+        "reorder",
+        "focus-continuity",
+        "rtl",
+        "keyboard",
+        "touch",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "ToastHost",
@@ -8463,7 +10473,18 @@
     "rtl": "Placement uses logical inline-end and message layout follows writing direction.",
     "touch": "Pointer/focus interaction pauses auto-dismiss so actions are not time pressured.",
     "responsive": "Host width clamps on narrow containers and respects safe-area tokens.",
-    "playground": null,
+    "playground": {
+      "preferredWidth": "medium",
+      "fixture": {
+        "items": [
+          {
+            "id": "ready",
+            "message": "Ready",
+            "durationMs": 60000
+          }
+        ]
+      }
+    },
     "props": [
       {
         "name": "items",
@@ -8504,7 +10525,27 @@
         "title": "Toast queue",
         "component": "ToastQueueExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "feedback-lifecycle-certification"
+      ],
+      "requiredAxes": [
+        "feedback",
+        "live-region",
+        "timing",
+        "upsert",
+        "progress",
+        "loading",
+        "reduced-motion",
+        "responsive",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "ToggleButton",
@@ -8657,7 +10698,27 @@
         "title": "Independent pressed action",
         "component": "ToggleButtonContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
+        "@ontologyx/ui/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "selection-controls-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "native-semantics",
+        "uncontrolled",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reset",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "ToggleGroup",
@@ -8672,7 +10733,25 @@
     "rtl": "Roving focus follows logical direction.",
     "touch": "Members inherit Button targets.",
     "responsive": "Parent layout owns wrapping.",
-    "playground": null,
+    "playground": {
+      "preferredWidth": "medium",
+      "fixture": {
+        "label": "View options",
+        "options": [
+          {
+            "value": "grid",
+            "label": "Grid"
+          },
+          {
+            "value": "list",
+            "label": "List"
+          }
+        ],
+        "defaultValue": [
+          "grid"
+        ]
+      }
+    },
     "props": [
       {
         "name": "defaultValue",
@@ -8737,7 +10816,27 @@
         "title": "Segmented + independent toggle groups",
         "component": "SelectionGroupContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR08",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
+        "@ontologyx/ui/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "selection-controls-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "native-semantics",
+        "uncontrolled",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reset",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Toolbar",
@@ -8793,7 +10892,28 @@
         "title": "Roving command toolbar",
         "component": "ToolbarContractExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR06",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/actions.test.tsx",
+        "@ontologyx/ui/components/__tests__/data-navigation.test.tsx"
+      ],
+      "browserScenarios": [
+        "action-group-toolbar-certification"
+      ],
+      "requiredAxes": [
+        "actions",
+        "toolbar",
+        "roving",
+        "keyboard",
+        "rtl",
+        "home-end",
+        "overflow",
+        "target-size",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Tooltip",
@@ -8857,7 +10977,27 @@
         "title": "Supplemental help",
         "component": "TooltipPreviewExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR10",
+      "behaviorTests": [
+        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
+      ],
+      "browserScenarios": [
+        "floating-menu-tooltip-certification"
+      ],
+      "requiredAxes": [
+        "floating",
+        "collision",
+        "menu",
+        "typeahead",
+        "tooltip",
+        "keyboard",
+        "rtl",
+        "touch",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "UiRoot",
@@ -9027,7 +11167,26 @@
         "title": "Nested root certification",
         "component": "UiRootNestedCertificationExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR02-C",
+      "behaviorTests": [
+        "@ontologyx/ui/adaptive/__tests__/ui-root-certification.test.tsx"
+      ],
+      "browserScenarios": [
+        "uiroot-nested-runtime-certification"
+      ],
+      "requiredAxes": [
+        "foundations",
+        "uiroot",
+        "nested-roots",
+        "inheritance",
+        "portal",
+        "modal-isolation",
+        "focus",
+        "a11y"
+      ]
+    }
   },
   {
     "id": "Wrap",
@@ -9156,6 +11315,23 @@
         "description": "Peers wrap from available container space while preserving logical order.",
         "component": "WrapFlowExample"
       }
-    ]
+    ],
+    "certification": {
+      "owner": "UIR03-A",
+      "behaviorTests": [
+        "@ontologyx/ui/primitives/__tests__/layout-core.test.tsx"
+      ],
+      "browserScenarios": [
+        "logical-flow-layout-certification"
+      ],
+      "requiredAxes": [
+        "layout",
+        "wrap",
+        "polymorphism",
+        "responsive",
+        "reflow",
+        "a11y"
+      ]
+    }
   }
 ]

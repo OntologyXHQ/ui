@@ -28,9 +28,10 @@ pnpm quality        # fast canonical gates: architecture/catalog/types/behavior
 pnpm verify         # full repository acceptance including Studio/build/package
 pnpm build          # package + Studio production builds
 pnpm package:smoke  # pack, install into a clean consumer, typecheck and Vite-build
-pnpm release:check  # verify + production artifact + tarball consumer smoke
+pnpm release:check  # G0..G7 + production artifact + tarball smoke + frozen V1 budgets when present
 pnpm snapshot       # fast tracked-source handoff snapshot
 pnpm package:tarball
+OXS_CONSUMER_ROOT=/home/l/Workspace/OXS pnpm v1:closeout  # full V1 RC closeout + isolated real-OXS validation
 pnpm studio:build    # production Studio artifact
 pnpm studio:preview  # preview built Studio on :4174
 ```
@@ -43,9 +44,9 @@ Production direction is `Foundations → Primitives → Components → System UI
 
 `@ontologyx/ui` is an MIT-licensed public package under the `ontologyx` npm organization. The first bootstrap publish is interactive; subsequent tagged releases use npm Trusted Publishing from `OntologyXHQ/ui` and remain guarded by `NPM_PUBLISH_ENABLED=true`.
 
-## Active rebuild frontier
+## V1 closeout frontier
 
-The canonical plan is `docs/roadmap/UI_TASK_LIST.md`. `UIR00` reset completion truth and quality gates; `UIR01` now provides production-Studio browser acceptance on an installed Chrome/Chromium before any public visual export can be promoted from `candidate` to `accepted`. `UIR02` Foundations reacceptance is now closed: semantic tokens, environment semantics and `UiRoot` nesting/SSR/realm ownership are certified, making `UiRoot` the first post-reset `accepted` export. `UIR03` is now closed: all nine Layout primitives are reaccepted with finite logical APIs, dedicated Studio examples, behavior ownership and component-owned G6 evidence. `UIR04` is also closed: Text/Heading/Label/Code have bounded semantic/reflow contracts, Surface/Divider keep static visual/separator ownership, and Icon now supports immutable multi-state glyph families with explicit transient transition states, interruption retargeting and reduced-motion settlement. `UIR05` is now closed: input authority is root-scoped, overlays keep UiRoot-local modal/isolation state while one broker per concrete Document realm owns Escape/outside-event arbitration, and motion clocks/observers/timers follow the concrete Window realm with interruption and reduced-motion settlement. `UIR06` Actions and command controls is now closed: Button/IconButton/ActionGroup/Toolbar have dedicated native-action, target, roving and overflow contracts. The OX Spinner also supports a lazy Canvas renderer for boot-scale choreography while SVG remains the lightweight default and Button loading stays SVG. `UIR07` is now closed too: FieldGroup/FieldSection/TextField/SearchField/TextArea preserve native form semantics, composition-safe search, secure text-session redaction and host-owned IME/keyboard boundaries with logical occlusion response. `UIR08` Selection and disclosure controls is the next reacceptance frontier. Native Wayland/compositor/IME implementations stay in OXS or another host consumer.
+The reset/reacceptance program now converges on one stable `@ontologyx/ui@1.0.0` release candidate: all 100 intended public visual exports are promoted to `accepted`, certification ownership covers every accepted export, developer compositions and System UI are bound to dedicated behavior/browser journeys, and Studio renders the real public exports while exposing certification evidence instead of inferred coverage. The canonical closeout is `OXS_CONSUMER_ROOT=/path/to/OXS pnpm v1:closeout`; it records UIR11–UIR16 as DONE only after full G0..G7 acceptance, measured artifact-budget freeze/check, and isolated validation of the packed candidate against the current OXS consumer. UIR17 remains RELEASE READY until the explicit stable npm/tag operation completes. Native Wayland/compositor/IME authority remains outside this repository.
 
 ## Studio deployment
 

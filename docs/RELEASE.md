@@ -6,60 +6,38 @@
 - npm package: `@ontologyx/ui`
 - license: MIT
 - Studio: `https://ontologyxhq.github.io/ui/`
-- first public prerelease: `0.1.0-beta.1` with npm dist-tag `beta`
+- V1 stable line: `1.0.0` and later stable versions publish with npm dist-tag `latest`
 
-## Local acceptance
+## Canonical local V1 closeout
 
 ```bash
 pnpm install --frozen-lockfile
-pnpm release:check
-pnpm package:tarball
+OXS_CONSUMER_ROOT=/path/to/OXS pnpm v1:closeout
 ```
 
-`release:check` proves catalog freshness, standalone boundaries, type checks, tests, package build, publication artifact shape, Studio production build, a Node-safe package import, and a clean Vite consumer installation/build from the packed tarball.
+`v1:closeout` is fix-forward: it formats and regenerates first, runs full G0..G7 release acceptance, emits the packed stable candidate, freezes/checks artifact budgets from measured V1 output, then validates that tarball in an isolated copy of the current OXS consumer supplied by `OXS_CONSUMER_ROOT`. Only after all of those gates pass does it record UIR11–UIR16 as DONE and the local UIR17 freeze tasks as complete. Validation failure preserves implementation/generated/formatted state and does not roll source back; failed isolated OXS state is retained for diagnosis.
 
-## Bootstrap the first public npm version
+The local closeout proves the artifact users receive: explicit CSS consumption, Node/SSR-safe imports, tree-shakeable ESM package exports, types, a clean fresh consumer install, Vite production build, production Studio, and the real-browser certification matrix.
 
-Trusted Publishing can only be attached after the package exists in the npm registry. For the first version, publish once interactively from the already-validated package:
+## Measured V1 artifact budgets
+
+The first successful V1 closeout freezes `docs/quality/V1_ARTIFACT_BUDGETS.json` from the actual built package, Studio and packed tarball. Limits are derived from those measured outputs with a small documented headroom instead of inherited arbitrary ceilings. Later release checks preserve that baseline and fail on regressions unless the budget file is explicitly reviewed/rebaselined.
+
+## Stable publication
+
+Registry publication is an explicit release operation after local closeout and real OXS release-candidate validation. The tagged release workflow verifies tag/package identity and publishes through npm Trusted Publishing; stable versions use `latest`.
 
 ```bash
-cd packages/ui
-npm publish --access public --tag beta
+git tag v1.0.0
+git push origin v1.0.0
 ```
 
-The npm account performing this bootstrap publish must satisfy npm's interactive publishing security requirements.
+The release workflow must not publish a tag whose version differs from `packages/ui/package.json`. `scripts/check-release-tag.mjs` is the canonical identity check.
 
-Then configure GitHub Actions as the package's trusted publisher (npm CLI >= 11.15.0 and account-level 2FA are required for `npm trust`):
+## Real OXS consumer
 
-```bash
-npm install -g npm@^11.15.0
-npm trust github @ontologyx/ui \
-  --file release.yml \
-  --repo OntologyXHQ/ui \
-  --allow-publish \
-  --yes
-npm trust list @ontologyx/ui
-```
-
-Finally enable automated npm publication for future release tags:
-
-```bash
-gh variable set NPM_PUBLISH_ENABLED -R OntologyXHQ/ui --body true
-```
-
-## Tagged releases
-
-The release workflow verifies the complete repository, validates tag/package identity, publishes through npm OIDC when the exact version is not already present, and creates the corresponding GitHub Release. Prerelease versions use the `beta` npm dist-tag; stable versions use `latest`.
-
-For the bootstrap version, publish npm first, configure trust, then create/push the matching Git tag. The workflow detects that the exact npm version already exists and will not try to republish it.
-
-```bash
-git tag v0.1.0-beta.1
-git push origin v0.1.0-beta.1
-```
+Before moving the stable npm `latest` tag, `v1:closeout` validates the generated local tarball against the current OXS consumer rather than source-linking the UI repository. `scripts/validate-oxs-consumer.mjs` copies the current consumer into an isolated temporary root, rewrites only that copy to consume the packed candidate, performs an offline pnpm install, and runs the consumer's canonical `pnpm verify`. The original OXS source tree is never modified. Failure evidence is retained under `artifacts/oxs-consumer-validation/` and the isolated failing copy is preserved. The OXS verification remains a consumer/release operation so this standalone repository never gains product imports or compositor/native authority.
 
 ## Production Studio
 
-`pnpm studio:build` generates the catalog, builds the Studio, and validates the static production artifact. `pnpm studio:preview` serves the built artifact locally on port 4174.
-
-The `studio-pages.yml` workflow deploys `apps/ui-studio/dist` through GitHub Pages. Project Pages uses `/<repository>/` as the Vite base by default. Set repository variable `STUDIO_BASE_PATH=/` for a custom-domain/root deployment.
+`pnpm studio:build` generates the catalog, builds the Studio, and validates the static production artifact. `pnpm studio:preview` serves the built artifact locally. The Pages workflow deploys `apps/ui-studio/dist`; custom-domain/root deployments set the repository base-path variable rather than hard-coding routes in Studio source.

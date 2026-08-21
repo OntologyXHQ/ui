@@ -13,14 +13,23 @@ export type SystemNotificationItem = {
 };
 
 export type SystemNotificationCenterProps = {
+  /** Caller-owned visible title; reusable UI never supplies product meaning. */
   title?: ReactNode;
+  /** Caller-owned notification view models; delivery and persistence remain external. */
   items: readonly SystemNotificationItem[];
+  /** Optional caller-owned action region composed from public Components. */
   actions?: ReactNode;
+  /** Accessible landmark label for the notification center. */
   label?: string;
+  /** Accessible name for the rendered collection. */
   collectionLabel?: string;
+  /** Caller-owned unread-state label. */
   unreadLabel?: ReactNode;
+  /** Caller-owned empty-state title. */
   emptyTitle?: ReactNode;
+  /** Caller-owned empty-state supporting description. */
   emptyDescription?: ReactNode;
+  /** Optional consumer class name appended without changing component ownership. */
   className?: string;
 };
 
@@ -73,11 +82,17 @@ export type SystemQuickSettingSection = {
 };
 
 export type SystemQuickSettingsProps = {
+  /** Caller-owned visible title; reusable UI never supplies product meaning. */
   title?: ReactNode;
+  /** Optional caller-owned supporting title text. */
   subtitle?: ReactNode;
+  /** Caller-owned ordered section models for this reusable System composition. */
   sections: readonly SystemQuickSettingSection[];
+  /** Optional caller-owned action region composed from public Components. */
   actions?: ReactNode;
+  /** Accessible landmark label for the quick-settings composition. */
   label?: string;
+  /** Optional consumer class name appended without changing component ownership. */
   className?: string;
 };
 

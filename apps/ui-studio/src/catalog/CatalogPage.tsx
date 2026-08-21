@@ -22,24 +22,13 @@ import { CatalogExample } from './CatalogExample';
 import { CatalogComponentPreview, CatalogPlayground } from './CatalogPlayground';
 import { uiCatalog } from './generated/catalog.generated';
 import { filterCatalog } from './navigation';
-import { readCatalogRoute, type CatalogTab, updateCatalogRoute } from './routing';
+import { type CatalogTab, readCatalogRoute, updateCatalogRoute } from './routing';
 import type { UiCatalogEntry } from './types';
 
 const sectionOrder: readonly CatalogTab[] = ['overview', 'api', 'examples', 'playground'];
 
 function selectedEntry(requested: string | null) {
   return uiCatalog.find((entry) => entry.id === requested) ?? uiCatalog[0];
-}
-
-function coverage(entry: UiCatalogEntry) {
-  const missing: string[] = [];
-  if (!entry.examples.length && !entry.playground) missing.push('preview fixture/example');
-  if (entry.props.some((prop) => !prop.description)) missing.push('prop JSDoc');
-  if (!entry.accessibility.trim()) missing.push('accessibility guidance');
-  if (!entry.rtl.trim()) missing.push('RTL guidance');
-  if (!entry.touch.trim()) missing.push('touch guidance');
-  if (!entry.responsive.trim()) missing.push('responsive guidance');
-  return missing;
 }
 
 function GuidanceGrid({ entry }: { entry: UiCatalogEntry }) {
@@ -65,7 +54,7 @@ function GuidanceGrid({ entry }: { entry: UiCatalogEntry }) {
 }
 
 function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
-  const gaps = coverage(entry);
+  const certification = entry.certification;
   return (
     <Stack gap="xl">
       <Stack gap="md" className="ui-studio-entry-hero">
@@ -104,7 +93,7 @@ function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
         </Text>
       </Stack>
 
-      <CatalogComponentPreview entry={entry} />
+      <CatalogComponentPreview key={entry.id} entry={entry} />
 
       <Surface material="subtle" radius="md" className="ui-studio-import-card">
         <Stack gap="xs">
@@ -133,19 +122,40 @@ function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
         <GuidanceGrid entry={entry} />
       </Stack>
 
-      <Surface material="subtle" radius="lg" className="ui-studio-coverage-card">
+      <Surface
+        material="subtle"
+        radius="lg"
+        className="ui-studio-coverage-card"
+        data-studio-acceptance-evidence={certification ? 'bound' : 'unbound'}
+      >
         <Stack gap="sm">
           <Row justify="between" align="center" gap="sm">
-            <Label emphasis="strong">Documentation coverage</Label>
-            <Badge tone={gaps.length ? 'warning' : 'success'}>
-              {gaps.length ? `${gaps.length} gaps` : 'complete'}
+            <Label emphasis="strong">Acceptance evidence</Label>
+            <Badge tone={certification ? 'success' : 'warning'}>
+              {certification ? 'certification bound' : 'not certified'}
             </Badge>
           </Row>
-          {gaps.length ? (
-            <Text tone="secondary">Missing or incomplete: {gaps.join(', ')}.</Text>
+          {certification ? (
+            <Stack gap="xs">
+              <Text tone="secondary">
+                Owner: <Code data-studio-certification-owner>{certification.owner}</Code>
+              </Text>
+              <Text tone="secondary" wrap="pretty">
+                G5 behavior: <Code>{certification.behaviorTests.join(', ')}</Code>
+              </Text>
+              <Text tone="secondary" wrap="pretty">
+                G6 browser:{' '}
+                <Code data-studio-browser-scenario>
+                  {certification.browserScenarios.join(', ')}
+                </Code>
+              </Text>
+              <Text tone="secondary" wrap="pretty">
+                Required axes: <Code>{certification.requiredAxes.join(', ')}</Code>
+              </Text>
+            </Stack>
           ) : (
             <Text tone="secondary">
-              Guidance, API metadata, playground metadata and examples are present.
+              This export is not bound to an acceptance certification yet.
             </Text>
           )}
         </Stack>

@@ -25,7 +25,7 @@ export const uiDocs = defineUiDocsGroup([
       'Product-neutral content container with optional leading, title, description, actions and footer regions.',
     usage:
       'Use when repeated Surface + heading/action assembly would otherwise leak into application code; keep product state outside the card.',
-    status: 'candidate',
+    status: 'accepted',
     accessibility:
       'Associates title and description with the grouped card when supplied and preserves child semantics.',
     rtl: 'Leading/actions/footer regions use logical layout and inherit bidi direction.',
@@ -99,7 +99,7 @@ export const uiDocs = defineUiDocsGroup([
       'Generic application page scaffold with header, sidebar, content, footer and named inset slots.',
     usage:
       'Use for ordinary developer application structure; OXS workspace/system-surface scaffolds remain System UI responsibilities.',
-    status: 'candidate',
+    status: 'accepted',
     accessibility:
       'Uses main/aside/footer landmarks while leaving caller-provided header semantics intact.',
     rtl: 'Sidebar start/end placement is logical and swaps naturally under RTL.',
@@ -162,12 +162,13 @@ export const uiDocs = defineUiDocsGroup([
       'Reusable application identity tile separated from Launcher-specific state and layout.',
     usage:
       'Use with TileGrid for application collections; Launcher search, open/close state and launch policy stay outside this Component.',
-    status: 'candidate',
+    status: 'accepted',
     accessibility:
-      'The visible application name is the action name; image icons remain decorative unless the caller provides separate meaning.',
+      'The visible application name is the action name; image icons and visual badge metadata are excluded from that name unless the caller exposes separate meaning.',
     rtl: 'Name/metadata placement follows logical tile flow.',
     touch: 'Uses the shared Tile/Button interaction contract.',
     responsive: 'Application identity remains bounded across compact and roomy tile grids.',
+    playground: { preferredWidth: 'medium', fixture: { name: 'Browser', icon: 'browser' } },
     examples: [{ id: 'overview', title: 'Tiles + application items', component: 'TileExample' }],
   },
   {
@@ -179,12 +180,13 @@ export const uiDocs = defineUiDocsGroup([
       'Shared empty, error and loading composition with icon/status/actions slots and no product copy ownership.',
     usage:
       'Use for collection/page state replacement; supply application-specific title, description and actions.',
-    status: 'candidate',
+    status: 'accepted',
     accessibility:
       'Error state uses alert semantics, loading uses status semantics, and empty state stays neutral unless caller overrides role.',
     rtl: 'Centered or logical copy remains bidi-safe.',
     touch: 'Actions preserve their own shared touch contracts.',
     responsive: 'State copy and actions wrap within the containing region.',
+    playground: { preferredWidth: 'medium', fixture: { kind: 'empty', title: 'No items' } },
     examples: [{ id: 'overview', title: 'Content states', component: 'StateExample' }],
   },
 ] as const);

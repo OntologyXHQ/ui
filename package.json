@@ -1,6 +1,6 @@
 {
   "name": "ontologyx-ui-workspace",
-  "version": "0.1.0-beta.1",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.15.0",
@@ -15,7 +15,7 @@
     "test": "pnpm --filter @ontologyx/ui test && pnpm --filter @ontologyx/ui docs:test",
     "quality": "pnpm gate:architecture && pnpm gate:catalog && pnpm gate:types && pnpm gate:behavior",
     "verify": "pnpm quality && pnpm gate:studio && pnpm gate:browser",
-    "release:check": "pnpm verify && node scripts/check-studio-production.mjs && pnpm package:smoke",
+    "release:check": "pnpm verify && node scripts/check-studio-production.mjs && pnpm package:smoke && pnpm package:tarball && node scripts/check-v1-artifact-budgets.mjs --if-present",
     "gate:architecture": "python3 scripts/gates/check-architecture.py && node scripts/gates/check-foundations.mjs && node scripts/gates/check-environment.mjs && node scripts/gates/check-layout.mjs && node scripts/gates/check-visual.mjs && node scripts/gates/check-runtime-kernel.mjs && node scripts/gates/check-actions.mjs && node scripts/gates/check-fields.mjs && node scripts/gates/check-browser-fixture-scope.mjs && node scripts/gates/check-selection-disclosure.mjs && node scripts/gates/check-navigation-data.mjs && node scripts/gates/check-overlays-feedback.mjs && node scripts/gates/check-scroll-motion.mjs && node scripts/gates/check-gestures-drag-editing-cursor.mjs",
     "gate:catalog": "pnpm catalog:check && node scripts/gates/check-catalog-acceptance.mjs",
     "gate:types": "pnpm --filter @ontologyx/ui check && pnpm --filter @ontologyx/ui-studio check",
@@ -32,7 +32,12 @@
     "studio:preview": "pnpm --filter @ontologyx/ui-studio preview",
     "snapshot": "node scripts/create-snapshot.mjs",
     "gate:browser": "pnpm gate:build && node scripts/browser/run-browser-acceptance.mjs",
-    "uir11-12:closeout": "node scripts/closeout-uir11-uir12.mjs"
+    "uir11-12:closeout": "node scripts/closeout-uir11-uir12.mjs",
+    "v1:closeout": "node scripts/closeout-v1.mjs",
+    "v1:freeze:check": "node scripts/gates/check-v1-freeze.mjs",
+    "v1:oxs:check": "node scripts/validate-oxs-consumer.mjs",
+    "v1:budgets:freeze": "node scripts/freeze-v1-artifact-budgets.mjs",
+    "v1:budgets:check": "node scripts/check-v1-artifact-budgets.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.7",

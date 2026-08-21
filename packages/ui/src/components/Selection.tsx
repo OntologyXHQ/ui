@@ -431,17 +431,29 @@ export type SliderMark = {
 };
 
 export type SliderProps = Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'> & {
+  /** Accessible and visible label for the slider value control. */
   label: string;
+  /** Controlled value; caller remains authoritative when supplied. */
   value?: number;
+  /** Initial uncontrolled value used only when no controlled value is supplied. */
   defaultValue?: number;
+  /** Reports committed value changes to controlled or observing callers. */
   onValueChange?: (value: number) => void;
+  /** Lower value bound used for semantic range presentation. */
   min?: number;
+  /** Upper bound used for native slider range semantics. */
   max?: number;
+  /** Positive increment used for keyboard and pointer value normalization. */
   step?: number;
+  /** Logical control orientation exposed through native ARIA semantics. */
   orientation?: 'horizontal' | 'vertical';
+  /** Disables interaction while retaining visible semantic structure. */
   disabled?: boolean;
+  /** Prevents mutation while retaining focusable/readable range semantics. */
   readOnly?: boolean;
+  /** Optional semantic/reference marks rendered along the slider track. */
   marks?: readonly SliderMark[];
+  /** Formats visible value text while preserving numeric slider semantics. */
   formatValue?: (value: number) => string;
 };
 

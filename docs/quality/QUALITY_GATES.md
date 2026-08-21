@@ -68,6 +68,8 @@ The Studio is a real consumer, not a second component library:
 - raw `<button>`, `<input>`, `<select>`, and `<textarea>` are forbidden in Studio source;
 - product/host internals and source deep-imports are forbidden;
 - the Studio may orchestrate state/data but may not own a parallel visual SDK.
+- the primary component preview renders the actual public export whenever required props can be safely seeded; complex trigger-owned controls may fall back only to their own dedicated source example;
+- accepted entries expose bound certification owner, behavior-test references, browser-scenario IDs and required axes; inferred documentation-completeness badges are not acceptance evidence.
 
 ### G5 — build/package
 
@@ -99,6 +101,10 @@ The current harness proves the evidence system itself across real browser journe
 - UIR10 overlay/feedback certification proves shared Dialog/Sheet/Scrim ownership, owner-realm floating collision/Menu/Tooltip/ContextMenu behavior, stable-id ToastHost timing/live-region policy, and semantic progress/loading/empty feedback under reduced motion;
 - UIR11 scroll/motion certification proves owner-Document logical restoration, native exhausted-wheel chaining, live variable-geometry logical snap under RTL/LTR, resize reconciliation, interruption convergence, SharedBounds cleanup ownership, node-local semantic reduced-motion settlement across nested roots, transient compositor promotion only while active, and explicit frame-budget assessment (`>=30` sampled frames, budget-miss ratio `<=0.10`, long-frame ratio `<=0.02` by default);
 - UIR12 gesture/drag/editing/cursor certification proves pre-threshold native scroll/text-selection ownership before Gesture Arena claim, owner-Window continuation without Pointer Capture, one authoritative drag/drop session with stable target lifecycle, portal-local preview coordinates, stationary edge auto-scroll, keyboard parity, clipboard adapter/session generation race cancellation, and nested UiRoot cursor modality/theme/scale/hotspot intent while privileged/native cursor application remains host-owned;
+- UIR13 developer-composition certification proves real Card/PageScaffold/ApplicationItem/ContentState/AppBar composition, container-bounded min-size behavior, nested scroll ownership, coarse-pointer targets and logical RTL adaptation without product semantics;
+- UIR14 System UI core certification proves workspace/scaffold/chrome/launcher/settings surfaces remain Component-only, caller-owned for data/routing/state, adaptive and logical-direction safe;
+- UIR15 privileged System certification proves notification/quick-settings/OSD/command/lock/keyboard surfaces retain explicit privileged/occlusion/host-command boundaries while consuming shared Component interaction/accessibility behavior;
+- Studio V1 certification proves the self-hosted workbench renders real public exports, exposes generated API/JSDoc and bound certification owner/G5/G6/axis evidence, preserves search/deep links, and remains accessible under the public environment control plane;
 - browser console/page errors are blocking in product journeys; focused content inside `aria-hidden`/`inert` ancestry is checked as a direct DOM-semantic invariant rather than relying on browser warning transport.
 
 G6 writes machine-readable diagnostic evidence to `artifacts/browser-acceptance/latest.json` plus a timestamped sibling. Evidence contains the source fingerprint, Git HEAD when available, browser/version, axes, scenario results and axe summaries. Screenshots are not acceptance evidence and pixel snapshots are not used.
@@ -111,7 +117,7 @@ The harness also executes intentionally broken or adversarial ephemeral browser 
 
 `pnpm release:check`
 
-Extends G0..G6 with production Studio artifact checks and a fresh packed-tarball consumer install/typecheck/Node-import/Vite-build smoke. Release checks operate on the artifact users receive.
+Extends G0..G6 with production Studio artifact checks, a fresh packed-tarball consumer install/typecheck/Node-import/Vite-build smoke, a stable tarball artifact, and (after the first reviewed V1 freeze) measured package/Studio/tarball budget enforcement. Release checks operate on the artifact users receive.
 
 ## Canonical commands
 

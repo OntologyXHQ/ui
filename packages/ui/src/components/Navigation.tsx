@@ -376,10 +376,15 @@ export function Toolbar({
 }
 
 export type AppBarProps = Omit<HTMLAttributes<HTMLElement>, 'title'> & {
+  /** Caller-owned visible title; reusable UI never supplies product meaning. */
   title: ReactNode;
+  /** Optional caller-owned supporting title text. */
   subtitle?: ReactNode;
+  /** Optional logical-start content; direction follows the owning UI environment. */
   leading?: ReactNode;
+  /** Optional caller-owned action region composed from public Components. */
   actions?: ReactNode;
+  /** Semantic heading rank for the visible caller-owned title. */
   titleLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 };
 

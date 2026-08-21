@@ -42,6 +42,26 @@ export const uiDocs = defineUiDocsGroup([{
 `,
 );
 
+const fixtureCertificationsPath = path.join(root, 'CERTIFICATIONS.json');
+fs.writeFileSync(
+  fixtureCertificationsPath,
+  `${JSON.stringify(
+    {
+      schema: 1,
+      exports: {
+        FixtureCard: {
+          owner: 'catalog-fixture',
+          behaviorTests: ['fixture/behavior.test.tsx'],
+          browserScenarios: ['fixture-browser-certification'],
+          requiredAxes: ['fixture'],
+        },
+      },
+    },
+    null,
+    2,
+  )}\n`,
+);
+
 try {
   const catalog = buildCatalog({ uiRoot: root });
   const fixture = catalog.find((entry) => entry.exportName === 'FixtureCard');
@@ -53,7 +73,7 @@ try {
   if (fixture.order !== 10) throw new Error('fixture source-owned navigation order missing');
 
   const studioRoot = path.join(root, 'studio');
-  writeCatalog({ uiRoot: root, studioRoot });
+  writeCatalog({ uiRoot: root, studioRoot, certificationsPath: fixtureCertificationsPath });
   const generatedJson = path.join(
     studioRoot,
     'src',
@@ -62,14 +82,27 @@ try {
     'catalog.generated.json',
   );
   const generatedData = JSON.parse(fs.readFileSync(generatedJson, 'utf8'));
+  if (generatedData[0]?.certification?.owner !== 'catalog-fixture') {
+    throw new Error('fixture certification metadata was not attached to the generated catalog');
+  }
   fs.writeFileSync(generatedJson, `${JSON.stringify(generatedData)}\n`);
-  writeCatalog({ uiRoot: root, studioRoot, check: true });
+  writeCatalog({
+    uiRoot: root,
+    studioRoot,
+    check: true,
+    certificationsPath: fixtureCertificationsPath,
+  });
 
   generatedData[0].summary = 'Semantically stale fixture summary';
   fs.writeFileSync(generatedJson, `${JSON.stringify(generatedData, null, 4)}\n`);
   let semanticStaleDetected = false;
   try {
-    writeCatalog({ uiRoot: root, studioRoot, check: true });
+    writeCatalog({
+      uiRoot: root,
+      studioRoot,
+      check: true,
+      certificationsPath: fixtureCertificationsPath,
+    });
   } catch (error) {
     semanticStaleDetected =
       error instanceof Error && error.message.includes('catalog.generated.json');

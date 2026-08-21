@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { UiRoot } from '../../adaptive';
 import {
   Accordion,
+  AppBar,
   ApplicationItem,
   Card,
   ContentState,
@@ -19,6 +20,21 @@ function renderUi(node: ReactNode) {
 }
 
 describe('developer compositions', () => {
+  it('keeps AppBar product-neutral while preserving semantic heading and logical action regions', () => {
+    renderUi(
+      <AppBar
+        title="Workspace"
+        subtitle="Developer composition"
+        leading={<span>Leading</span>}
+        actions={<button type="button">Refresh</button>}
+        titleLevel={2}
+      />,
+    );
+    expect(screen.getByRole('heading', { level: 2, name: 'Workspace' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Refresh' })).toBeInTheDocument();
+    expect(screen.getByText('Developer composition')).toBeInTheDocument();
+  });
+
   it('associates card title/description without inventing child interaction', () => {
     renderUi(
       <Card title="Account" description="Local profile">
@@ -34,12 +50,20 @@ describe('developer compositions', () => {
     const activate = vi.fn();
     renderUi(
       <TileGrid label="Applications">
-        <ApplicationItem name="Browser" icon="browser" onActivate={activate} selected />
+        <ApplicationItem
+          name="Browser"
+          icon="browser"
+          badge={<span>2</span>}
+          onActivate={activate}
+          selected
+        />
         <Tile title="Static tile" description="Metadata" />
       </TileGrid>,
     );
     expect(screen.getByRole('group', { name: 'Applications' })).toBeInTheDocument();
     const browser = screen.getByRole('button', { name: 'Browser' });
+    expect(screen.getByText('2')).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Browser 2' })).not.toBeInTheDocument();
     expect(browser.closest('.ui-tile')).toHaveAttribute('data-selected', 'true');
     fireEvent.click(browser);
     expect(activate).toHaveBeenCalledTimes(1);
@@ -71,15 +95,13 @@ describe('developer compositions', () => {
         <ApplicationItem name="D" icon="settings" onActivate={() => {}} />
       </TileGrid>,
     );
-    const items = ['A', 'B', 'C', 'D'].map((name) => screen.getByRole('button', { name }));
-    const rects = [
-      { left: 0, top: 0 },
-      { left: 120, top: 0 },
-      { left: 0, top: 120 },
-      { left: 120, top: 120 },
-    ];
-    items.forEach((item, index) => {
-      const { left, top } = rects[index]!;
+    const itemRects = [
+      [screen.getByRole('button', { name: 'A' }), { left: 0, top: 0 }],
+      [screen.getByRole('button', { name: 'B' }), { left: 120, top: 0 }],
+      [screen.getByRole('button', { name: 'C' }), { left: 0, top: 120 }],
+      [screen.getByRole('button', { name: 'D' }), { left: 120, top: 120 }],
+    ] as const;
+    itemRects.forEach(([item, { left, top }]) => {
       vi.spyOn(item, 'getBoundingClientRect').mockReturnValue({
         x: left,
         y: top,
@@ -92,19 +114,20 @@ describe('developer compositions', () => {
         toJSON: () => ({}),
       });
     });
-    items[0]!.focus();
-    fireEvent.keyDown(items[0]!, { key: 'ArrowDown' });
-    expect(items[2]).toHaveFocus();
-    fireEvent.keyDown(items[2]!, { key: 'ArrowRight' });
-    expect(items[3]).toHaveFocus();
+    const [[itemA], [itemB], [itemC], [itemD]] = itemRects;
+    itemA.focus();
+    fireEvent.keyDown(itemA, { key: 'ArrowDown' });
+    expect(itemC).toHaveFocus();
+    fireEvent.keyDown(itemC, { key: 'ArrowRight' });
+    expect(itemD).toHaveFocus();
 
-    items[1]!.focus();
-    fireEvent.keyDown(items[1]!, { key: 'ArrowRight' });
-    expect(items[1]).toHaveFocus();
+    itemB.focus();
+    fireEvent.keyDown(itemB, { key: 'ArrowRight' });
+    expect(itemB).toHaveFocus();
 
-    items[3]!.focus();
-    fireEvent.keyDown(items[3]!, { key: 'ArrowDown' });
-    expect(items[3]).toHaveFocus();
+    itemD.focus();
+    fireEvent.keyDown(itemD, { key: 'ArrowDown' });
+    expect(itemD).toHaveFocus();
   });
 
   it('uses logical-order fallback only when TileGrid geometry is unavailable', () => {

@@ -1522,6 +1522,505 @@
         "realm",
         "a11y"
       ]
+    },
+    "Slider": {
+      "owner": "UIR08-closeout",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/selection.test.tsx"
+      ],
+      "browserScenarios": [
+        "selection-controls-certification"
+      ],
+      "requiredAxes": [
+        "selection",
+        "slider",
+        "range",
+        "keyboard",
+        "touch",
+        "rtl",
+        "a11y"
+      ]
+    },
+    "Card": {
+      "owner": "UIR13",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/developer-compositions.test.tsx"
+      ],
+      "browserScenarios": [
+        "developer-compositions-adaptive-certification"
+      ],
+      "requiredAxes": [
+        "compositions",
+        "adaptive",
+        "container",
+        "min-size",
+        "nested-scroll",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    },
+    "PageScaffold": {
+      "owner": "UIR13",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/developer-compositions.test.tsx"
+      ],
+      "browserScenarios": [
+        "developer-compositions-adaptive-certification"
+      ],
+      "requiredAxes": [
+        "compositions",
+        "adaptive",
+        "container",
+        "min-size",
+        "nested-scroll",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    },
+    "ApplicationItem": {
+      "owner": "UIR13",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/developer-compositions.test.tsx"
+      ],
+      "browserScenarios": [
+        "developer-compositions-adaptive-certification"
+      ],
+      "requiredAxes": [
+        "compositions",
+        "adaptive",
+        "container",
+        "min-size",
+        "nested-scroll",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    },
+    "ContentState": {
+      "owner": "UIR13",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/developer-compositions.test.tsx"
+      ],
+      "browserScenarios": [
+        "developer-compositions-adaptive-certification"
+      ],
+      "requiredAxes": [
+        "compositions",
+        "adaptive",
+        "container",
+        "min-size",
+        "nested-scroll",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    },
+    "AppBar": {
+      "owner": "UIR13",
+      "behaviorTests": [
+        "packages/ui/src/components/__tests__/data-navigation.test.tsx",
+        "packages/ui/src/components/__tests__/developer-compositions.test.tsx"
+      ],
+      "browserScenarios": [
+        "developer-compositions-adaptive-certification"
+      ],
+      "requiredAxes": [
+        "compositions",
+        "adaptive",
+        "container",
+        "min-size",
+        "nested-scroll",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    },
+    "SystemScaffold": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "packages/ui/src/system/__tests__/system-boundary.test.tsx",
+        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    },
+    "SystemSurface": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "packages/ui/src/system/__tests__/system-boundary.test.tsx",
+        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    },
+    "SystemLauncher": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "packages/ui/src/system/__tests__/system-boundary.test.tsx",
+        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    },
+    "SystemWorkspace": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "packages/ui/src/system/__tests__/system-boundary.test.tsx",
+        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    },
+    "DesktopShellLayout": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "packages/ui/src/system/__tests__/system-boundary.test.tsx",
+        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    },
+    "SystemApplicationBrowser": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "packages/ui/src/system/__tests__/system-boundary.test.tsx",
+        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    },
+    "SystemBar": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "packages/ui/src/system/__tests__/system-boundary.test.tsx",
+        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    },
+    "SystemDock": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "packages/ui/src/system/__tests__/system-boundary.test.tsx",
+        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    },
+    "SystemPanel": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "packages/ui/src/system/__tests__/system-boundary.test.tsx",
+        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    },
+    "SystemChromeGroup": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "packages/ui/src/system/__tests__/system-boundary.test.tsx",
+        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    },
+    "SystemSettingsLayout": {
+      "owner": "UIR14",
+      "behaviorTests": [
+        "packages/ui/src/system/__tests__/system-boundary.test.tsx",
+        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "system-ui-core-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "components-only",
+        "workspace",
+        "chrome",
+        "launcher",
+        "settings",
+        "adaptive",
+        "rtl",
+        "touch",
+        "keyboard",
+        "a11y"
+      ]
+    },
+    "SystemNotificationCenter": {
+      "owner": "UIR15",
+      "behaviorTests": [
+        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "privileged-system-surfaces-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "privileged",
+        "host-boundary",
+        "occlusion",
+        "transient",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reduced-motion",
+        "a11y"
+      ]
+    },
+    "SystemQuickSettings": {
+      "owner": "UIR15",
+      "behaviorTests": [
+        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "privileged-system-surfaces-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "privileged",
+        "host-boundary",
+        "occlusion",
+        "transient",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reduced-motion",
+        "a11y"
+      ]
+    },
+    "SystemOsd": {
+      "owner": "UIR15",
+      "behaviorTests": [
+        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "privileged-system-surfaces-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "privileged",
+        "host-boundary",
+        "occlusion",
+        "transient",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reduced-motion",
+        "a11y"
+      ]
+    },
+    "SystemCommandSurface": {
+      "owner": "UIR15",
+      "behaviorTests": [
+        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "privileged-system-surfaces-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "privileged",
+        "host-boundary",
+        "occlusion",
+        "transient",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reduced-motion",
+        "a11y"
+      ]
+    },
+    "SystemLockLayout": {
+      "owner": "UIR15",
+      "behaviorTests": [
+        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
+      ],
+      "browserScenarios": [
+        "privileged-system-surfaces-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "privileged",
+        "host-boundary",
+        "occlusion",
+        "transient",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reduced-motion",
+        "a11y"
+      ]
+    },
+    "SystemKeyboardHost": {
+      "owner": "UIR15",
+      "behaviorTests": [
+        "packages/ui/src/system/__tests__/system-layouts.test.tsx",
+        "packages/ui/src/system/__tests__/system-keyboard.test.tsx"
+      ],
+      "browserScenarios": [
+        "privileged-system-surfaces-certification"
+      ],
+      "requiredAxes": [
+        "system-ui",
+        "privileged",
+        "host-boundary",
+        "occlusion",
+        "transient",
+        "keyboard",
+        "touch",
+        "rtl",
+        "reduced-motion",
+        "a11y"
+      ]
     }
   }
 }

@@ -19,6 +19,7 @@ export const uiDocs = defineUiDocsGroup([
       'Visible glyph size stays compact but the Button-family hit target never shrinks below the current modality minimum.',
     responsive:
       'Fits toolbars without target shrinkage; labels are non-visual so localization cannot change the visible control footprint.',
+    playground: { preferredWidth: 'narrow', fixture: { icon: 'settings', label: 'Settings' } },
     examples: [
       {
         id: 'contract',

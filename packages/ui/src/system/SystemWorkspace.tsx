@@ -2,10 +2,15 @@ import type { ReactNode } from 'react';
 import { AppBar, StatusIndicator } from '../components';
 
 export type SystemWorkspaceProps = {
+  /** Caller-owned visible title; reusable UI never supplies product meaning. */
   title?: ReactNode;
+  /** Optional caller-owned workspace status text rendered in System chrome. */
   status?: string;
+  /** Accessible landmark label for the workspace region. */
   label?: string;
+  /** Caller-owned content rendered inside this reusable visual boundary. */
   children?: ReactNode;
+  /** Optional consumer class name appended without changing component ownership. */
   className?: string;
 };
 

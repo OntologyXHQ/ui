@@ -3,16 +3,27 @@ import type { NavigationItem } from '../components';
 import { AdaptiveNavigation, AppBar, PageScaffold, ScrollView } from '../components';
 
 export type SystemSettingsLayoutProps = {
+  /** Caller-owned visible title; reusable UI never supplies product meaning. */
   title?: ReactNode;
+  /** Optional caller-owned supporting title text. */
   subtitle?: ReactNode;
+  /** Accessible name for settings navigation. */
   navigationLabel?: string;
+  /** Accessible name for the primary reusable content region. */
   contentLabel?: string;
+  /** Caller-owned ordered section models for this reusable System composition. */
   sections: readonly NavigationItem[];
+  /** Controlled value; caller remains authoritative when supplied. */
   value?: string;
+  /** Initial uncontrolled value used only when no controlled value is supplied. */
   defaultValue?: string;
+  /** Reports committed value changes to controlled or observing callers. */
   onValueChange?: (value: string) => void;
+  /** Optional caller-owned action region composed from public Components. */
   actions?: ReactNode;
+  /** Caller-owned content rendered inside this reusable visual boundary. */
   children: ReactNode;
+  /** Optional consumer class name appended without changing component ownership. */
   className?: string;
 };
 

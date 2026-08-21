@@ -11,14 +11,24 @@ import { Button } from './Button';
 import { useControllableState } from './controlState';
 import { Spinner } from './Feedback';
 
-export type CardProps = Omit<HTMLAttributes<HTMLDivElement>, 'title'> & {
+type GroupCompositionRootProps = Omit<HTMLAttributes<HTMLFieldSetElement>, 'role'>;
+
+export type CardProps = Omit<GroupCompositionRootProps, 'title'> & {
+  /** Caller-owned visible title; reusable UI never supplies product meaning. */
   title?: ReactNode;
+  /** Semantic heading rank for the visible caller-owned title. */
   titleLevel?: 2 | 3 | 4 | 5 | 6;
+  /** Optional caller-owned supporting description. */
   description?: ReactNode;
+  /** Optional logical-start content; direction follows the owning UI environment. */
   leading?: ReactNode;
+  /** Optional caller-owned action region composed from public Components. */
   actions?: ReactNode;
+  /** Optional caller-owned footer region. */
   footer?: ReactNode;
+  /** Named internal spacing token; no product-specific measurements are accepted. */
   padding?: 'sm' | 'md' | 'lg';
+  /** Named surface emphasis using semantic UI tokens. */
   emphasis?: 'subtle' | 'default' | 'strong';
 };
 
@@ -40,10 +50,9 @@ export function Card({
   const labelled = Boolean(title);
   const described = Boolean(description);
   return (
-    <div
+    <fieldset
       {...props}
       className={`ui-card ui-card--${emphasis} ui-card--pad-${padding} ${className}`.trim()}
-      role={props.role ?? 'group'}
       aria-labelledby={props['aria-labelledby'] ?? (labelled ? titleId : undefined)}
       aria-describedby={props['aria-describedby'] ?? (described ? descriptionId : undefined)}
     >
@@ -67,7 +76,7 @@ export function Card({
       ) : null}
       {children ? <div className="ui-card__content">{children}</div> : null}
       {footer ? <div className="ui-card__footer">{footer}</div> : null}
-    </div>
+    </fieldset>
   );
 }
 
@@ -168,7 +177,7 @@ export type AccordionItem = {
   disabled?: boolean;
 };
 
-export type AccordionProps = Omit<HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> & {
+export type AccordionProps = Omit<GroupCompositionRootProps, 'onChange' | 'defaultValue'> & {
   /** Ordered disclosure items. */
   items: readonly AccordionItem[];
   /** Controlled open item values. */
@@ -197,7 +206,7 @@ export function Accordion({
   ...props
 }: AccordionProps) {
   const accordionId = useId().replace(/:/g, '');
-  const rootRef = useRef<HTMLDivElement | null>(null);
+  const rootRef = useRef<HTMLFieldSetElement | null>(null);
   const [current, setCurrent] = useControllableState<readonly string[]>({
     value,
     defaultValue: multiple ? defaultValue : defaultValue.slice(0, 1),
@@ -209,11 +218,10 @@ export function Accordion({
   );
   const visibleCurrent = multiple ? normalizedCurrent : normalizedCurrent.slice(0, 1);
   return (
-    <div
+    <fieldset
       {...props}
       ref={rootRef}
       className={`ui-accordion ${className}`.trim()}
-      role={props.role ?? 'group'}
       aria-label={props['aria-label'] ?? label}
       onKeyDown={(event) => {
         if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
@@ -307,7 +315,7 @@ export function Accordion({
           </div>
         );
       })}
-    </div>
+    </fieldset>
   );
 }
 
@@ -316,13 +324,21 @@ function safeCompositionId(value: string) {
 }
 
 export type PageScaffoldProps = Omit<HTMLAttributes<HTMLDivElement>, 'title'> & {
+  /** Optional caller-owned page header region. */
   header?: ReactNode;
+  /** Optional reusable sidebar content; adaptation remains container-driven. */
   sidebar?: ReactNode;
+  /** Logical start/end sidebar placement that remains correct in RTL. */
   sidebarPosition?: 'start' | 'end';
+  /** Optional caller-owned footer region. */
   footer?: ReactNode;
+  /** Caller-owned content rendered inside this reusable visual boundary. */
   children: ReactNode;
+  /** Named page-content inset token applied through logical spacing. */
   inset?: 'none' | 'sm' | 'md' | 'lg';
+  /** Accessible name for the primary reusable content region. */
   contentLabel?: string;
+  /** Semantic landmark role for the primary reusable content region. */
   contentRole?: 'main' | 'region';
 };
 
@@ -362,7 +378,7 @@ export function PageScaffold({
   );
 }
 
-export type TileGridProps = HTMLAttributes<HTMLDivElement> & {
+export type TileGridProps = GroupCompositionRootProps & {
   /** Named density preset for responsive grid tracks. @default comfortable */
   density?: 'compact' | 'comfortable' | 'roomy';
   /** Optional accessible group name. */
@@ -383,7 +399,7 @@ export function TileGrid({
   onKeyDown,
   ...props
 }: TileGridProps) {
-  const gridRef = useRef<HTMLDivElement | null>(null);
+  const gridRef = useRef<HTMLFieldSetElement | null>(null);
 
   useLayoutEffect(() => {
     if (!keyboardNavigation) return;
@@ -396,7 +412,7 @@ export function TileGrid({
     for (const item of items) item.tabIndex = item === active ? 0 : -1;
   });
 
-  const updateRovingTabStop = (event: ReactFocusEvent<HTMLDivElement>) => {
+  const updateRovingTabStop = (event: ReactFocusEvent<HTMLFieldSetElement>) => {
     const target = event.target;
     if (
       keyboardNavigation &&
@@ -410,11 +426,10 @@ export function TileGrid({
   };
 
   return (
-    <div
+    <fieldset
       {...props}
       ref={gridRef}
       className={`ui-tile-grid ui-tile-grid--${density} ${className}`.trim()}
-      role={props.role ?? 'group'}
       aria-label={props['aria-label'] ?? label}
       onFocusCapture={updateRovingTabStop}
       onKeyDown={(event) => {
@@ -423,7 +438,7 @@ export function TileGrid({
       }}
     >
       {children}
-    </div>
+    </fieldset>
   );
 }
 
@@ -431,7 +446,10 @@ function tileActions(root: HTMLElement | null) {
   return [...(root?.querySelectorAll<HTMLElement>(TILE_ACTION_SELECTOR) ?? [])];
 }
 
-function moveTileGridFocus(event: ReactKeyboardEvent<HTMLDivElement>, root: HTMLElement | null) {
+function moveTileGridFocus(
+  event: ReactKeyboardEvent<HTMLFieldSetElement>,
+  root: HTMLElement | null,
+) {
   const items = tileActions(root);
   if (!items.length) return;
   const activeElement = root?.ownerDocument.activeElement;
@@ -603,12 +621,17 @@ export function Tile({
 }
 
 export type ApplicationItemIcon = IconName | { src: string };
-export type ApplicationItemProps = Omit<TileProps, 'title' | 'leading'> & {
+export type ApplicationItemProps = Omit<TileProps, 'title' | 'leading' | 'badge'> & {
+  /** Optional visual badge/metadata excluded from the primary action accessible name. */
+  badge?: ReactNode;
+  /** Stable visible application name used as the primary action label. */
   name: string;
+  /** Application icon identity; built-in names or caller image sources remain presentation-only. */
   icon: ApplicationItemIcon;
 };
 
 export function ApplicationItem({
+  badge,
   icon,
   name,
   pendingLabel = 'Opening application',
@@ -623,6 +646,7 @@ export function ApplicationItem({
   return (
     <Tile
       {...props}
+      badge={badge ? <span aria-hidden="true">{badge}</span> : undefined}
       className={`ui-application-item ${props.className ?? ''}`.trim()}
       title={name}
       pendingLabel={pendingLabel}
@@ -637,12 +661,19 @@ export function ApplicationItem({
 
 export type ContentStateKind = 'empty' | 'error' | 'loading';
 export type ContentStateProps = Omit<HTMLAttributes<HTMLDivElement>, 'title'> & {
+  /** Semantic content state controlling empty/error/loading status behavior. */
   kind: ContentStateKind;
+  /** Caller-owned visible title; reusable UI never supplies product meaning. */
   title: ReactNode;
+  /** Semantic heading rank for the visible caller-owned title. */
   titleLevel?: 2 | 3 | 4 | 5 | 6;
+  /** Optional caller-owned supporting description. */
   description?: ReactNode;
+  /** Optional decorative or status icon supplied by the caller. */
   icon?: ReactNode;
+  /** Optional caller-owned action region composed from public Components. */
   actions?: ReactNode;
+  /** Optional caller-owned status presentation. */
   status?: ReactNode;
 };
 

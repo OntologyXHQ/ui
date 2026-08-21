@@ -33,6 +33,10 @@ export const uiDocs = defineUiDocsGroup([
     rtl: 'Placement uses logical inline-end and message layout follows writing direction.',
     touch: 'Pointer/focus interaction pauses auto-dismiss so actions are not time pressured.',
     responsive: 'Host width clamps on narrow containers and respects safe-area tokens.',
+    playground: {
+      preferredWidth: 'medium',
+      fixture: { items: [{ id: 'ready', message: 'Ready', durationMs: 60000 }] },
+    },
     examples: [{ id: 'overview', title: 'Toast queue', component: 'ToastQueueExample' }],
   },
   {

@@ -21,6 +21,10 @@ export const uiDocs = defineUiDocsGroup([
       'Pan/reveal arbitration uses the shared Gesture Arena. Unclaimed pointer streams remain available to native scrolling/text selection and touch drag yields to native movement before long-press ownership.',
     responsive:
       'Gesture and drag coordinates stay in the owning Window realm; pointer previews are projected into the owning portal host and edge auto-scroll follows live container geometry.',
+    playground: {
+      preferredWidth: 'medium',
+      fixture: { gestureProps: {}, children: 'Reveal handle' },
+    },
     examples: [
       {
         id: 'interaction-runtime',

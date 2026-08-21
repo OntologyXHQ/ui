@@ -19,22 +19,39 @@ export type SystemApplicationItem = {
 };
 
 export type SystemApplicationBrowserProps = {
+  /** Caller-owned visible title; reusable UI never supplies product meaning. */
   title?: ReactNode;
+  /** Optional caller-owned supporting title text. */
   subtitle?: ReactNode;
+  /** Caller-owned search/filter query. */
   query: string;
+  /** Caller-owned application view models; routing and launch authority remain external. */
   apps: readonly SystemApplicationItem[];
+  /** Reports query changes without taking ownership of filtering policy. */
   onQueryChange: (query: string) => void;
+  /** Reports activation by stable identity; execution authority remains external. */
   onActivate: (id: string) => void;
+  /** Stable application identity currently awaiting caller-owned launch completion. */
   pendingApplicationId?: string | null;
+  /** Container-friendly collection presentation without device detection. */
   presentation?: 'grid' | 'list';
+  /** Optional caller-owned action region composed from public Components. */
   actions?: ReactNode;
+  /** Accessible name for the search field. */
   searchLabel?: string;
+  /** Optional search-field placeholder; never used as the accessible name. */
   searchPlaceholder?: string;
+  /** Accessible name for the application-browser region. */
   browserLabel?: string;
+  /** Accessible name for the rendered collection. */
   collectionLabel?: string;
+  /** Caller-owned empty-state title. */
   emptyTitle?: ReactNode;
+  /** Caller-owned empty-state supporting description. */
   emptyDescription?: ReactNode;
+  /** Whether search and activation are enabled while preserving visible structure. */
   interactive?: boolean;
+  /** Optional consumer class name appended without changing component ownership. */
   className?: string;
 };
 

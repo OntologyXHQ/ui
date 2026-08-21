@@ -74,6 +74,24 @@ for primitive in ('Heading', 'Text', 'Label', 'Code'):
 if '.ui-studio-detail__tabs' in studio_css:
     issues.append('stacked Studio catalog must not retain the legacy tab-strip CSS')
 
+for token, message in (
+    ('data-studio-acceptance-evidence', 'Studio must expose bound certification evidence on accepted entry pages'),
+    ('entry.certification', 'Studio acceptance evidence must come from generated certification data'),
+    ('data-studio-certification-owner', 'Studio must expose the roadmap certification owner'),
+    ('data-studio-browser-scenario', 'Studio must expose real G6 scenario ownership'),
+):
+    if token not in catalog_page_text:
+        issues.append(message)
+if 'Documentation coverage' in catalog_page_text:
+    issues.append('Studio must not present inferred documentation coverage as acceptance evidence')
+
+CATALOG_PLAYGROUND = STUDIO / 'catalog' / 'CatalogPlayground.tsx'
+catalog_playground_text = CATALOG_PLAYGROUND.read_text(encoding='utf-8')
+if 'preferCanonicalExample' in catalog_playground_text:
+    issues.append('Studio component preview must prefer the real public export; family/canonical example preference is forbidden')
+if 'createElement(Component, resolved)' not in catalog_playground_text:
+    issues.append('Studio live preview must render the resolved public @ontologyx/ui export directly')
+
 api_scroll_region = re.search(
     r'<Box\s+(?P<attrs>[^>]*\bclassName="ui-studio-api-table-wrap"[^>]*)>',
     catalog_page_text,

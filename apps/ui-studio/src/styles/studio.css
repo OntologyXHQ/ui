@@ -1322,6 +1322,19 @@ body { overflow: hidden; background: #091019; color-scheme: dark light; }
   max-width: 100%;
 }
 
+/* Generated previews are independent runtime realms. Modal/portal surfaces must stay inside
+   their own sample instead of isolating or intercepting the surrounding Studio workbench. */
+.ui-studio-playground__sample > .ui-studio-preview-root {
+  position: relative;
+  width: 100%;
+  min-height: inherit;
+  isolation: isolate;
+}
+
+.ui-studio-preview-root > .ui-portal-root {
+  position: absolute;
+}
+
 .ui-studio-playground__sample[data-preferred-width='narrow'] > * {
   width: min(100%, 24rem);
 }

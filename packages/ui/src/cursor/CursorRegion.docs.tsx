@@ -19,6 +19,10 @@ export const uiDocs = defineUiDocsGroup([
       'UiRoot can suppress pointer presentation after touch/pen and nested roots retain independent cursor authority; touch interaction never depends on cursor visibility.',
     responsive:
       'Theme/nominal size/scale/hotspot are root-scoped host intent and remain independent from viewport-size adaptation.',
+    playground: {
+      preferredWidth: 'medium',
+      fixture: { role: 'pointer', children: 'Pointer cursor region' },
+    },
     examples: [
       {
         id: 'cursor-contract',

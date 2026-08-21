@@ -108,11 +108,17 @@ type SystemKeyboardCommandPayload = SystemKeyboardCommand extends infer Command
   : never;
 
 export type SystemKeyboardHostProps = {
+  /** Caller-owned privileged keyboard surface/session state from the native text-input boundary. */
   state: SystemKeyboardSurfaceState;
+  /** Emits typed keyboard commands to the host-owned text-input/IME authority. */
   onCommand: (command: SystemKeyboardCommand) => void;
+  /** Languages the host currently exposes for keyboard switching. */
   availableLanguages?: readonly SystemKeyboardLanguage[];
+  /** Accessible group label for the privileged touch keyboard. */
   label?: string;
+  /** Marks whether this privileged keyboard contributes transient content occlusion. */
   occludesContent?: boolean;
+  /** Optional consumer class name appended without changing component ownership. */
   className?: string;
 };
 

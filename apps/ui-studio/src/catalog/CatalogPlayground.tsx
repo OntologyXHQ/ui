@@ -12,8 +12,9 @@ import {
   Switch,
   Text,
   TextField,
+  UiRoot,
 } from '@ontologyx/ui';
-import { createElement, lazy, Suspense, type ComponentType, useMemo, useState } from 'react';
+import { type ComponentType, createElement, lazy, Suspense, useMemo, useState } from 'react';
 import { CatalogErrorBoundary } from './CatalogErrorBoundary';
 import { updateCatalogRoute } from './routing';
 import type { UiCatalogEntry, UiCatalogProp } from './types';
@@ -112,6 +113,7 @@ function initialProps(entry: UiCatalogEntry) {
 
 function canSeedRequiredProps(entry: UiCatalogEntry) {
   const fixture = entry.playground?.fixture ?? {};
+  if (entry.exportName === 'Icon' && ('name' in fixture || 'glyph' in fixture)) return true;
   return entry.props
     .filter((prop) => !prop.optional)
     .every((prop) => prop.name in fixture || seedValue(entry, prop) !== undefined);
@@ -267,16 +269,13 @@ function PreviewStage({
   props,
   state = 'rest',
   onChange,
-  preferCanonicalExample = false,
 }: {
   entry: UiCatalogEntry;
   props: Record<string, unknown>;
   state?: string;
   onChange?: (next: Record<string, unknown>) => void;
-  preferCanonicalExample?: boolean;
 }) {
   const Component = componentFor(entry);
-  const preferExample = preferCanonicalExample && entry.examples.length > 0;
   const resolved = bindInteractiveProps(entry, previewPropsForState(entry, props, state), onChange);
   const preferredWidth = entry.playground?.preferredWidth ?? 'wide';
   return (
@@ -286,11 +285,13 @@ function PreviewStage({
         data-studio-state={state}
         data-preferred-width={preferredWidth}
       >
-        {!preferExample && Component && canSeedRequiredProps(entry) ? (
-          createElement(Component, resolved)
-        ) : (
-          <CanonicalExampleFallback entry={entry} />
-        )}
+        <UiRoot className="ui-studio-preview-root">
+          {Component && canSeedRequiredProps(entry) ? (
+            createElement(Component, resolved)
+          ) : (
+            <CanonicalExampleFallback entry={entry} />
+          )}
+        </UiRoot>
       </div>
     </CatalogErrorBoundary>
   );
@@ -329,7 +330,7 @@ export function CatalogComponentPreview({
           </Stack>
           <Badge tone="success">public export</Badge>
         </Row>
-        <PreviewStage entry={entry} props={values} onChange={setValues} preferCanonicalExample />
+        <PreviewStage entry={entry} props={values} onChange={setValues} />
       </Stack>
     </Surface>
   );

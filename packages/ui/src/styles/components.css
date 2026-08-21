@@ -2046,6 +2046,8 @@
 }
 
 .ui-card {
+  margin: 0;
+  padding: 0;
   display: grid;
   gap: var(--oxs-space-md);
   border: var(--oxs-border-hairline) solid var(--oxs-color-border-subtle);
@@ -2174,6 +2176,9 @@
 }
 
 .ui-accordion {
+  margin: 0;
+  padding: 0;
+  border: 0;
   display: grid;
   gap: var(--oxs-space-2xs);
 }
@@ -2263,6 +2268,9 @@
 }
 
 .ui-tile-grid {
+  margin: 0;
+  padding: 0;
+  border: 0;
   display: grid;
   gap: var(--oxs-space-sm);
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 10.5rem), 1fr));

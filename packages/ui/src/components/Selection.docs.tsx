@@ -113,11 +113,12 @@ export const uiDocs = defineUiDocsGroup([
       'Single numeric value control with shared pan ownership, keyboard steps, logical RTL direction and optional marks.',
     usage:
       'Use for bounded numeric adjustment when direct manipulation is more useful than text entry.',
-    status: 'candidate',
+    status: 'accepted',
     accessibility: 'Exposes slider value/min/max/orientation semantics and Home/End/Page keys.',
     rtl: 'Horizontal arrows/value growth are logical.',
     touch: 'Uses shared pan arena.',
     responsive: 'Fills its container.',
+    playground: { preferredWidth: 'medium', fixture: { label: 'Volume', defaultValue: 64 } },
   },
   {
     exportName: 'SegmentedControl',
@@ -133,6 +134,17 @@ export const uiDocs = defineUiDocsGroup([
     rtl: 'Horizontal roving follows logical direction.',
     touch: 'Each segment preserves target policy.',
     responsive: 'Intrinsic or full-width.',
+    playground: {
+      preferredWidth: 'medium',
+      fixture: {
+        label: 'Density',
+        options: [
+          { value: 'compact', label: 'Compact' },
+          { value: 'comfortable', label: 'Comfortable' },
+        ],
+        defaultValue: 'comfortable',
+      },
+    },
     examples: [
       {
         id: 'group-contract',
@@ -155,6 +167,17 @@ export const uiDocs = defineUiDocsGroup([
     rtl: 'Roving focus follows logical direction.',
     touch: 'Members inherit Button targets.',
     responsive: 'Parent layout owns wrapping.',
+    playground: {
+      preferredWidth: 'medium',
+      fixture: {
+        label: 'View options',
+        options: [
+          { value: 'grid', label: 'Grid' },
+          { value: 'list', label: 'List' },
+        ],
+        defaultValue: ['grid'],
+      },
+    },
     examples: [
       {
         id: 'group-contract',

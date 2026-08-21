@@ -249,11 +249,12 @@ export const uiDocs = defineUiDocsGroup([
     order: 40,
     summary: 'Generic title/subtitle/leading/actions header composition.',
     usage: 'Use in developer application layouts; OXS system bars are composed later in System UI.',
-    status: 'candidate',
+    status: 'accepted',
     accessibility: 'Associates the header with its title and preserves child control semantics.',
     rtl: 'Leading/title/actions use logical regions.',
     touch: 'Interactive children preserve shared target policy.',
     responsive: 'Actions remain bounded while copy can truncate/wrap.',
+    playground: { preferredWidth: 'wide', fixture: { title: 'Application header' } },
   },
   {
     exportName: 'Badge',

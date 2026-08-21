@@ -1,3 +1,13 @@
+# Changelog
+
+## 1.0.0 — V1 stable UI platform
+
+- Reaccepted all 100 public visual exports through the zero-trust UIR00–UIR17 gate model; no candidate visual exports remain in the V1 catalog.
+- Closed developer compositions and adaptive scaffolds with container-driven PageScaffold, product-neutral Card/ApplicationItem/ContentState, AppBar, and the certified Slider range contract.
+- Reaccepted System UI core and privileged surfaces strictly over public Components; native/compositor, launch, authentication, delivery, persistence, hardware, and IME authority remain host-owned.
+- Made Studio a generated, self-hosted SDK workbench with real previews, API/JSDoc, searchable deep links, environment controls, error isolation, and browser certification evidence.
+- Hardened the package/release boundary for stable ESM/types/CSS exports, Node-safe imports, packed-tarball consumer verification, measured artifact budgets, isolated real-OXS release-candidate validation, production Studio, and real-browser acceptance.
+
 ## UIR10 — overlays and feedback closeout
 
 - Reaccepted twenty overlay/feedback exports around shared UiRoot/Document overlay authority, owner-realm floating geometry and timers, semantic Scrim ownership, stable toast upsert/live-region timing, native progress and reduced-motion-safe loading feedback.
@@ -13,7 +23,6 @@
 - Added dedicated G0 contracts, behavior tests, Studio examples and five G6 browser certifications. Expected catalog frontier after full verification: accepted=45, candidate=55, UIR10 NEXT.
 
 - Fixed generated catalog JSON semantic freshness after formatting.
-# Changelog
 - UIR07 TypeScript docs follow-up: native-form action rows now use the accepted `Wrap` primitive instead of passing a nonexistent `wrap` prop to the intentionally non-wrapping `Row` contract; source-wide UIR07 docs are audited against the UIR03 Layout API.
 - UIR07 Biome/generated-output follow-up: removed the final unused imports and iterable-callback lint error, and taught the catalog generator to emit identifier-safe module member access so generated Studio catalog imports are lint-clean at the source.
 - UIR07 Biome semantic follow-up: FieldGroup now renders native `fieldset`/`legend`, meaningful/decorative leading slots use explicit ARIA branches, and SearchField relies on native `type="search"` semantics without a redundant role.

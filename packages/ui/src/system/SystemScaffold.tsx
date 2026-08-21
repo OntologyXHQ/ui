@@ -8,11 +8,17 @@ export type SystemInsets = {
 };
 
 export type SystemScaffoldProps = {
+  /** Caller-owned workspace content; native scene/window authority remains outside React. */
   workspace: ReactNode;
+  /** Optional System chrome layer composed from accepted Components. */
   chrome?: ReactNode;
+  /** Optional transient System layer; lifecycle authority stays with the caller. */
   transient?: ReactNode;
+  /** Optional privileged System layer mounted only by the owning System composition. */
   privileged?: ReactNode;
+  /** Logical System insets supplied by the host without device-name branching. */
   insets?: SystemInsets;
+  /** Optional consumer class name appended without changing component ownership. */
   className?: string;
 };
 
@@ -25,11 +31,17 @@ export type SystemSurfaceEdge =
   | 'inline-start';
 
 export type SystemSurfaceProps = {
+  /** System surface classification used for host-neutral placement and policy. */
   kind: SystemSurfaceKind;
+  /** Logical surface edge; start/end semantics remain correct in RTL. */
   edge?: SystemSurfaceEdge;
+  /** Declares whether this surface contributes transient host content occlusion. */
   occludesContent?: boolean;
+  /** Optional accessible label for this classified System surface. */
   label?: string;
+  /** Optional consumer class name appended without changing component ownership. */
   className?: string;
+  /** Caller-owned content rendered inside this reusable visual boundary. */
   children: ReactNode;
 };
 

@@ -475,6 +475,7 @@ export function renderTypeScript(catalog) {
       lines.push(`    ${key}: ${JSON.stringify(entry[key])},`);
     }
     lines.push(`    playground: ${JSON.stringify(entry.playground)},`);
+    lines.push(`    certification: ${JSON.stringify(entry.certification ?? null)},`);
     lines.push(`    props: ${JSON.stringify(entry.props)},`);
     lines.push('    examples: [');
     for (const example of entry.examples) {
@@ -497,8 +498,36 @@ export function renderTypeScript(catalog) {
   return lines.join('\n');
 }
 
-export function writeCatalog({ uiRoot, studioRoot, check = false }) {
-  const catalog = buildCatalog({ uiRoot });
+export function writeCatalog({
+  uiRoot,
+  studioRoot,
+  check = false,
+  certificationsPath = path.resolve(uiRoot, '..', '..', 'docs', 'quality', 'CERTIFICATIONS.json'),
+}) {
+  const builtCatalog = buildCatalog({ uiRoot });
+  if (!fs.existsSync(certificationsPath)) {
+    throw new Error(
+      `UI certification manifest not found: ${certificationsPath}. Pass certificationsPath for isolated catalog fixtures or consumer workspaces.`,
+    );
+  }
+  const certificationDocument = JSON.parse(fs.readFileSync(certificationsPath, 'utf8'));
+  const certificationExports = certificationDocument?.exports ?? {};
+  const catalog = builtCatalog.map((entry) => {
+    const certification = certificationExports[entry.exportName];
+    return {
+      ...entry,
+      certification: certification
+        ? {
+            ...certification,
+            behaviorTests: certification.behaviorTests.map((testPath) =>
+              testPath.startsWith('packages/ui/src/')
+                ? `@ontologyx/ui/${testPath.slice('packages/ui/src/'.length)}`
+                : testPath,
+            ),
+          }
+        : null,
+    };
+  });
   const generatedRoot = path.join(studioRoot, 'src', 'catalog', 'generated');
   const jsonPath = path.join(generatedRoot, 'catalog.generated.json');
   const tsPath = path.join(generatedRoot, 'catalog.generated.ts');
