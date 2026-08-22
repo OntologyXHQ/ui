@@ -19,11 +19,26 @@ export type UiCatalogExample = {
   load: () => Promise<{ default: ComponentType }>;
 };
 
+export type UiCatalogPreview = {
+  component: string;
+  load: () => Promise<{ default: ComponentType }>;
+};
+
+export type UiCatalogStateModel = {
+  valueProp: string;
+  changeProp: string;
+  defaultProp: string | null;
+  mode: 'controlled' | 'controlled-uncontrolled';
+};
+
 export type UiCatalogCertification = {
   owner: string;
   behaviorTests: readonly string[];
+  behaviorSources: readonly string[];
   browserScenarios: readonly string[];
+  browserSource: string;
   requiredAxes: readonly string[];
+  result: 'certified';
 };
 
 export type UiCatalogEntry = {
@@ -40,6 +55,8 @@ export type UiCatalogEntry = {
   touch: string;
   responsive: string;
   certification: UiCatalogCertification | null;
+  preview: UiCatalogPreview | null;
+  stateModels: readonly UiCatalogStateModel[];
   playground: {
     preferredWidth?: 'narrow' | 'medium' | 'wide';
     controls?: readonly string[];

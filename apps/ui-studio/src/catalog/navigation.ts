@@ -1,4 +1,4 @@
-import type { UiCatalogEntry, UiCatalogLayer } from './types';
+import type { UiCatalogEntry, UiCatalogLayer, UiCatalogStatus } from './types';
 
 export const catalogLayerOrder: readonly UiCatalogLayer[] = [
   'foundations',
@@ -47,11 +47,20 @@ export function catalogSearchText(entry: UiCatalogEntry) {
     .toLocaleLowerCase();
 }
 
-export function filterCatalog(entries: readonly UiCatalogEntry[], query: string) {
+export function filterCatalog(
+  entries: readonly UiCatalogEntry[],
+  query: string,
+  filters: {
+    layer?: UiCatalogLayer | 'all';
+    status?: UiCatalogStatus | 'all';
+  } = {},
+) {
   const normalized = query.trim().normalize('NFKC').toLocaleLowerCase();
-  if (!normalized) return entries;
-  const terms = normalized.split(/\s+/).filter(Boolean);
+  const terms = normalized ? normalized.split(/\s+/).filter(Boolean) : [];
   return entries.filter((entry) => {
+    if (filters.layer && filters.layer !== 'all' && entry.layer !== filters.layer) return false;
+    if (filters.status && filters.status !== 'all' && entry.status !== filters.status) return false;
+    if (!terms.length) return true;
     const haystack = catalogSearchText(entry);
     return terms.every((term) => haystack.includes(term));
   });

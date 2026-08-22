@@ -8,6 +8,11 @@ export type UiDocsExample = {
   component: string;
 };
 
+export type UiDocsPreview = {
+  /** Dedicated source-owned preview component used only when scalar/static fixture seeding is insufficient. */
+  component: string;
+};
+
 export type UiDocsLiteral =
   | string
   | number
@@ -40,6 +45,8 @@ export type UiDocsDefinition = {
   touch: string;
   responsive: string;
   examples?: readonly UiDocsExample[];
+  /** Explicit per-export preview escape hatch for complex required props; never reuse a family demo implicitly. */
+  preview?: UiDocsPreview;
   playground?: UiDocsPlayground;
 };
 

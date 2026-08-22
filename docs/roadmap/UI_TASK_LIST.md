@@ -337,20 +337,20 @@ Closure target: Developer compositions remain product-neutral and only exist whe
 
 ---
 
-## UIR16 — Studio as a real product-quality SDK workbench — NEXT
+## UIR16 — Studio as a real product-quality SDK workbench — DONE
 
-- `UI-1601` Redesign Studio information architecture around accepted/candidate/experimental status and layer/category navigation.
-- `UI-1602` Give every public export a dedicated real preview; no family demo reused as a fake component example.
-- `UI-1603` Generate useful API docs with complete JSDoc, defaults and controlled/uncontrolled guidance.
-- `UI-1604` Replace inferred coverage badges with links/results from actual acceptance evidence.
-- `UI-1605` Make environment controls compact, responsive, keyboard/touch usable and self-hosted on public Components.
-- `UI-1606` Add search/deep-link/shareable state and robust error isolation.
-- `UI-1607` Remove all remaining parallel visual implementations and unreachable Studio source.
-- `UI-1608` Certify Studio itself through the browser gate.
+- `UI-1601` Redesign Studio information architecture around accepted/candidate/experimental status and layer/category navigation. **DONE**
+- `UI-1602` Give every public export a dedicated real preview; no family demo reused as a fake component example. **DONE**
+- `UI-1603` Generate useful API docs with complete JSDoc, defaults and controlled/uncontrolled guidance. **DONE**
+- `UI-1604` Replace inferred coverage badges with links/results from actual acceptance evidence. **DONE**
+- `UI-1605` Make environment controls compact, responsive, keyboard/touch usable and self-hosted on public Components. **DONE**
+- `UI-1606` Add search/deep-link/shareable state and robust error isolation. **DONE**
+- `UI-1607` Remove all remaining parallel visual implementations and unreachable Studio source. **DONE**
+- `UI-1608` Certify Studio itself through the browser gate. **DONE**
 
 ---
 
-## UIR17 — Cross-axis certification, package hardening and V1 freeze — TODO
+## UIR17 — Cross-axis certification, package hardening and V1 freeze — NEXT
 
 - `UI-1701` Ensure every intended V1 public export is `accepted` or explicitly removed/experimental/deprecated.
 - `UI-1702` Run full RTL/LTR, theme, density, responsive/container, touch/pointer, keyboard/focus, reduced-motion and accessibility matrix.

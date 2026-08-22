@@ -180,6 +180,7 @@ export const uiDocs = defineUiDocsGroup([
     rtl: 'Floating placement and command flow are writing-direction aware.',
     touch: 'Long press uses the shared press/gesture path.',
     responsive: 'Placement responds to viewport collision.',
+    preview: { component: 'ContextMenuStudioPreview' },
     examples: [{ id: 'preview', title: 'Context actions', component: 'ContextMenuPreviewExample' }],
   },
   {
@@ -196,6 +197,7 @@ export const uiDocs = defineUiDocsGroup([
     rtl: 'Placement uses logical alignment.',
     touch: 'Touch hover activation is intentionally suppressed.',
     responsive: 'Floating placement adapts around viewport edges.',
+    preview: { component: 'TooltipStudioPreview' },
     examples: [{ id: 'preview', title: 'Supplemental help', component: 'TooltipPreviewExample' }],
   },
 ] as const);
@@ -257,7 +259,7 @@ export function AlertDialogExample() {
   );
 }
 
-export function ContextMenuPreviewExample() {
+export function ContextMenuStudioPreview() {
   return (
     <ContextMenu
       ariaLabel="File actions"
@@ -278,12 +280,20 @@ export function ContextMenuPreviewExample() {
   );
 }
 
-export function TooltipPreviewExample() {
+export function ContextMenuPreviewExample() {
+  return <ContextMenuStudioPreview />;
+}
+
+export function TooltipStudioPreview() {
   return (
     <Tooltip content="Supplemental keyboard and pointer help">
       <Button variant="secondary">Hover or focus me</Button>
     </Tooltip>
   );
+}
+
+export function TooltipPreviewExample() {
+  return <TooltipStudioPreview />;
 }
 
 export function SheetPreviewExample() {

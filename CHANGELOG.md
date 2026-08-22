@@ -8,6 +8,13 @@
 - Made Studio a generated, self-hosted SDK workbench with real previews, API/JSDoc, searchable deep links, environment controls, error isolation, and browser certification evidence.
 - Hardened the package/release boundary for stable ESM/types/CSS exports, Node-safe imports, packed-tarball consumer verification, measured artifact budgets, isolated real-OXS release-candidate validation, production Studio, and real-browser acceptance.
 
+## UIR16 — Studio product-workbench closeout
+
+- Made catalog search, layer and lifecycle status first-class shareable URL state while preserving source-owned layer/category ordering and public Component controls.
+- Removed implicit first-example preview fallback: seedable exports render the real public component directly; complex trigger-owned exports require explicit source-owned dedicated previews.
+- Added generated controlled/uncontrolled state ownership guidance, source-linked certification evidence with explicit certified results, navigation-resettable error isolation, and a host-owned application-icon example for SystemApplicationBrowser.
+- Added a permanent UIR16 Studio workbench gate and strengthened the Studio G6 journey to certify filter persistence, dedicated previews, evidence links/results and the App Registry/icon-resolution boundary.
+
 ## UIR10 — overlays and feedback closeout
 
 - Reaccepted twenty overlay/feedback exports around shared UiRoot/Document overlay authority, owner-realm floating geometry and timers, semantic Scrim ownership, stable toast upsert/live-region timing, native progress and reduced-motion-safe loading feedback.

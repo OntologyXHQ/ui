@@ -18,7 +18,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Studio runs on port 5174. Its generated component page is one stacked reading flow—Overview, API, Examples and Playground stay mounted together and use the public OntologyX typography/layout surface rather than Studio-local tab chrome. Package publication is validated separately from the real packed tarball.
+Studio runs on port 5174. Its generated component page is one stacked reading flow—Overview, API, Examples and Playground stay mounted together and use the public OntologyX typography/layout surface rather than Studio-local tab chrome. Search plus layer/lifecycle filters are shareable URL state; accepted entries expose direct or explicit dedicated previews, generated state-ownership guidance, and source-linked G5/G6 certification evidence. System application examples receive host-resolved icon resources—the Studio/UI package never discovers installed apps or owns launch authority. Package publication is validated separately from the real packed tarball.
 
 ## Canonical commands
 

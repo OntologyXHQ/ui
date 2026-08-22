@@ -165,12 +165,15 @@ for path in sorted(module_files):
     text = path.read_text(encoding='utf-8')
     if raw_control_re.search(text):
         issues.append(f'raw reusable control in self-hosted Studio: {path.relative_to(ROOT)}')
-    if '@ontologyx/ui/src' in text or 'packages/ui/src' in text:
-        issues.append(f'Studio deep-imports UI source instead of package API: {path.relative_to(ROOT)}')
     if '@oxs/' in text or 'apps/shell' in text or 'crates/' in text:
         issues.append(f'Studio references host/product internals: {path.relative_to(ROOT)}')
     for match in import_re.finditer(text):
         specifier = match.group(1)
+        if specifier.startswith('@ontologyx/ui/src') or 'packages/ui/src' in specifier:
+            issues.append(
+                f'Studio deep-imports UI source instead of package API: {path.relative_to(ROOT)} -> {specifier}'
+            )
+            continue
         if specifier.startswith('.') or specifier.startswith('@ontologyx/ui-docs/'):
             continue
         if specifier not in allowed_external and not specifier.startswith('react/') and not specifier.startswith('react-dom/'):

@@ -1,4 +1,19 @@
+import type { UiCatalogLayer, UiCatalogStatus } from './types';
+
 export type CatalogTab = 'overview' | 'api' | 'examples' | 'playground';
+export type CatalogLayerFilter = UiCatalogLayer | 'all';
+export type CatalogStatusFilter = UiCatalogStatus | 'all';
+
+const layers = new Set<UiCatalogLayer>(['foundations', 'primitives', 'components', 'system']);
+const statuses = new Set<UiCatalogStatus>(['candidate', 'accepted', 'experimental', 'deprecated']);
+
+function readLayer(value: string | null): CatalogLayerFilter {
+  return value && layers.has(value as UiCatalogLayer) ? (value as UiCatalogLayer) : 'all';
+}
+
+function readStatus(value: string | null): CatalogStatusFilter {
+  return value && statuses.has(value as UiCatalogStatus) ? (value as UiCatalogStatus) : 'all';
+}
 
 export function readCatalogRoute() {
   const params = new URLSearchParams(window.location.search);
@@ -10,6 +25,9 @@ export function readCatalogRoute() {
       : 'overview') as CatalogTab,
     example: params.get('example'),
     state: params.get('state'),
+    query: params.get('q') ?? '',
+    layer: readLayer(params.get('layer')),
+    status: readStatus(params.get('status')),
   };
 }
 
@@ -19,6 +37,9 @@ export function updateCatalogRoute(
     tab: CatalogTab | null;
     example: string | null;
     state: string | null;
+    query: string | null;
+    layer: CatalogLayerFilter | null;
+    status: CatalogStatusFilter | null;
   }>,
   mode: 'push' | 'replace' = 'push',
 ) {
@@ -26,8 +47,17 @@ export function updateCatalogRoute(
   url.searchParams.set('ui-kit', '1');
   url.searchParams.set('view', 'catalog');
   for (const [key, value] of Object.entries(patch)) {
-    if (value === null || value === undefined || value === '') url.searchParams.delete(key);
-    else url.searchParams.set(key, value);
+    const param = key === 'query' ? 'q' : key;
+    if (
+      value === null ||
+      value === undefined ||
+      value === '' ||
+      ((param === 'layer' || param === 'status') && value === 'all')
+    ) {
+      url.searchParams.delete(param);
+    } else {
+      url.searchParams.set(param, String(value));
+    }
   }
   if (mode === 'push') window.history.pushState(null, '', url);
   else window.history.replaceState(null, '', url);

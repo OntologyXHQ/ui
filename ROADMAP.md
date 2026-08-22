@@ -33,7 +33,8 @@ Canonical gate contract: [`docs/quality/QUALITY_GATES.md`](docs/quality/QUALITY_
 - `UIR13` — Developer compositions and adaptive scaffolds: **DONE**
 - `UIR14` — System UI core: **DONE**
 - `UIR15` — Privileged System surfaces: **DONE**
-- `UIR16` — Studio as a real product-quality SDK workbench: **NEXT**
+- `UIR16` — Studio as a real product-quality SDK workbench: **DONE**
+- `UIR17` — Cross-axis certification, package hardening and V1 freeze: **NEXT**
 
 - Inter-batch Studio presentation follow-up — stacked generated docs + lazy Canvas OX boot renderer: **DONE** (not a numbered roadmap batch)
 

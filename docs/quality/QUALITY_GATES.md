@@ -73,6 +73,7 @@ The Studio is a real consumer, not a second component library:
 - the Studio may orchestrate state/data but may not own a parallel visual SDK.
 - the primary component preview renders the actual public export whenever required props can be safely seeded; complex trigger-owned controls may fall back only to their own dedicated source example;
 - accepted entries expose bound certification owner, behavior-test references, browser-scenario IDs and required axes; inferred documentation-completeness badges are not acceptance evidence.
+- the UIR16 workbench keeps search/layer/status filters in shareable URL state, requires every accepted export to render either directly or through an explicit per-export dedicated preview, generates controlled/uncontrolled state ownership from public props, links certification evidence back to repository-owned G5/G6 sources, resets isolated detail failures across navigation, and documents host-resolved application icons without moving discovery/icon-resolution/launch authority into the UI package.
 
 ### G5 — build/package
 

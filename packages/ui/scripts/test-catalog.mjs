@@ -18,7 +18,18 @@ fs.writeFileSync(
 fs.writeFileSync(
   path.join(src, 'components', 'FixtureCard.tsx'),
   `
-export type FixtureCardProps = { title: string; elevated?: boolean };
+export type FixtureCardProps = {
+  /** Visible fixture title. */
+  title: string;
+  /** Optional elevation state. */
+  elevated?: boolean;
+  /** Controlled fixture value. */
+  value?: string;
+  /** Uncontrolled fixture initializer. */
+  defaultValue?: string;
+  /** Reports controlled value changes. */
+  onValueChange?: (value: string) => void;
+};
 export function FixtureCard({ title, elevated = false }: FixtureCardProps) { return <div data-elevated={elevated}>{title}</div>; }
 `,
 );
@@ -37,8 +48,11 @@ const common = {
 };
 export const uiDocs = defineUiDocsGroup([{
   exportName: 'FixtureCard', ...common,
-  summary: 'Fixture summary', usage: 'Fixture usage', examples: [],
+  summary: 'Fixture summary', usage: 'Fixture usage',
+  preview: { component: 'FixtureCardPreview' },
+  examples: [],
 }] as const);
+export function FixtureCardPreview() { return null; }
 `,
 );
 
@@ -71,6 +85,16 @@ try {
   if (!fixture.props.some((prop) => prop.name === 'elevated' && prop.optional))
     throw new Error('fixture optional prop metadata missing');
   if (fixture.order !== 10) throw new Error('fixture source-owned navigation order missing');
+  if (fixture.preview?.component !== 'FixtureCardPreview') {
+    throw new Error('fixture dedicated preview metadata missing');
+  }
+  if (
+    fixture.stateModels?.[0]?.valueProp !== 'value' ||
+    fixture.stateModels?.[0]?.changeProp !== 'onValueChange' ||
+    fixture.stateModels?.[0]?.defaultProp !== 'defaultValue'
+  ) {
+    throw new Error('fixture controlled/uncontrolled state guidance missing');
+  }
 
   const studioRoot = path.join(root, 'studio');
   writeCatalog({ uiRoot: root, studioRoot, certificationsPath: fixtureCertificationsPath });
@@ -84,6 +108,13 @@ try {
   const generatedData = JSON.parse(fs.readFileSync(generatedJson, 'utf8'));
   if (generatedData[0]?.certification?.owner !== 'catalog-fixture') {
     throw new Error('fixture certification metadata was not attached to the generated catalog');
+  }
+  if (
+    generatedData[0]?.certification?.result !== 'certified' ||
+    generatedData[0]?.certification?.behaviorSources?.[0] !== 'fixture/behavior.test.tsx' ||
+    generatedData[0]?.certification?.browserSource !== 'scripts/browser/scenarios.mjs'
+  ) {
+    throw new Error('fixture source-linked certification evidence metadata missing');
   }
   fs.writeFileSync(generatedJson, `${JSON.stringify(generatedData)}\n`);
   writeCatalog({

@@ -4,11 +4,22 @@ import { Component } from 'react';
 
 type State = { error: Error | null };
 
-export class CatalogErrorBoundary extends Component<PropsWithChildren<{ label: string }>, State> {
+type CatalogErrorBoundaryProps = PropsWithChildren<{
+  label: string;
+  resetKey?: string;
+}>;
+
+export class CatalogErrorBoundary extends Component<CatalogErrorBoundaryProps, State> {
   state: State = { error: null };
 
   static getDerivedStateFromError(error: Error): State {
     return { error };
+  }
+
+  componentDidUpdate(previous: CatalogErrorBoundaryProps) {
+    if (this.state.error && previous.resetKey !== this.props.resetKey) {
+      this.setState({ error: null });
+    }
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {

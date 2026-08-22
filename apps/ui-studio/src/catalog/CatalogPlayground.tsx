@@ -246,20 +246,20 @@ function applicableStates(entry: UiCatalogEntry) {
   return states;
 }
 
-function CanonicalExampleFallback({ entry }: { entry: UiCatalogEntry }) {
-  const example = entry.examples[0];
-  const Example = useMemo(() => (example ? lazy(example.load) : null), [example]);
-  if (!example || !Example) {
+function DedicatedPreview({ entry }: { entry: UiCatalogEntry }) {
+  const preview = entry.preview;
+  const Preview = useMemo(() => (preview ? lazy(preview.load) : null), [preview]);
+  if (!preview || !Preview) {
     return (
       <Text tone="tertiary">
-        This export still needs source-owned preview fixture metadata before it can be rendered
+        This export needs an explicit source-owned dedicated preview before Studio can render it
         safely.
       </Text>
     );
   }
   return (
-    <Suspense fallback={<Text tone="tertiary">Loading canonical preview…</Text>}>
-      <Example />
+    <Suspense fallback={<Text tone="tertiary">Loading dedicated preview…</Text>}>
+      <Preview />
     </Suspense>
   );
 }
@@ -276,6 +276,7 @@ function PreviewStage({
   onChange?: (next: Record<string, unknown>) => void;
 }) {
   const Component = componentFor(entry);
+  const canRenderDirectly = Boolean(Component && canSeedRequiredProps(entry));
   const resolved = bindInteractiveProps(entry, previewPropsForState(entry, props, state), onChange);
   const preferredWidth = entry.playground?.preferredWidth ?? 'wide';
   return (
@@ -283,13 +284,14 @@ function PreviewStage({
       <div
         className="ui-studio-playground__sample"
         data-studio-state={state}
+        data-studio-preview-mode={canRenderDirectly ? 'direct' : 'dedicated'}
         data-preferred-width={preferredWidth}
       >
         <UiRoot className="ui-studio-preview-root">
-          {Component && canSeedRequiredProps(entry) ? (
+          {canRenderDirectly && Component ? (
             createElement(Component, resolved)
           ) : (
-            <CanonicalExampleFallback entry={entry} />
+            <DedicatedPreview entry={entry} />
           )}
         </UiRoot>
       </div>

@@ -23,7 +23,7 @@
     "gate:catalog": "pnpm catalog:check && node scripts/gates/check-catalog-acceptance.mjs",
     "gate:types": "pnpm --filter @ontologyx/ui check && pnpm --filter @ontologyx/ui-studio check",
     "gate:behavior": "pnpm --filter @ontologyx/ui test && pnpm --filter @ontologyx/ui docs:test",
-    "gate:studio": "python3 scripts/gates/check-studio.py",
+    "gate:studio": "python3 scripts/gates/check-studio.py && pnpm gate:studio-workbench",
     "gate:package": "pnpm --filter @ontologyx/ui build && pnpm --filter @ontologyx/ui pack:check",
     "gate:build": "pnpm gate:package && pnpm --filter @ontologyx/ui-studio build",
     "gate:browser:run": "node scripts/browser/run-browser-acceptance.mjs",
@@ -46,7 +46,9 @@
     "gate:system-ui-core": "node scripts/gates/check-system-ui-core.mjs",
     "uir14:closeout": "node scripts/closeout-uir14.mjs",
     "gate:privileged-system-surfaces": "node scripts/gates/check-privileged-system-surfaces.mjs",
-    "uir15:closeout": "node scripts/closeout-uir15.mjs"
+    "uir15:closeout": "node scripts/closeout-uir15.mjs",
+    "gate:studio-workbench": "node scripts/gates/check-studio-workbench.mjs",
+    "uir16:closeout": "node scripts/closeout-uir16.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.7",

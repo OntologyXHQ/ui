@@ -26,6 +26,7 @@ import { type CatalogTab, readCatalogRoute, updateCatalogRoute } from './routing
 import type { UiCatalogEntry } from './types';
 
 const sectionOrder: readonly CatalogTab[] = ['overview', 'api', 'examples', 'playground'];
+const repositorySourceBase = 'https://github.com/OntologyXHQ/ui/blob/main/';
 
 function selectedEntry(requested: string | null) {
   return uiCatalog.find((entry) => entry.id === requested) ?? uiCatalog[0];
@@ -136,19 +137,43 @@ function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
             </Badge>
           </Row>
           {certification ? (
-            <Stack gap="xs">
-              <Text tone="secondary">
-                Owner: <Code data-studio-certification-owner>{certification.owner}</Code>
-              </Text>
-              <Text tone="secondary" wrap="pretty">
-                G5 behavior: <Code>{certification.behaviorTests.join(', ')}</Code>
-              </Text>
-              <Text tone="secondary" wrap="pretty">
-                G6 browser:{' '}
-                <Code data-studio-browser-scenario>
-                  {certification.browserScenarios.join(', ')}
-                </Code>
-              </Text>
+            <Stack gap="sm">
+              <Row gap="sm" align="center" className="ui-studio-evidence-summary">
+                <Text tone="secondary">
+                  Owner: <Code data-studio-certification-owner>{certification.owner}</Code>
+                </Text>
+                <Badge tone="success" data-studio-certification-result={certification.result}>
+                  {certification.result}
+                </Badge>
+              </Row>
+              <Stack gap="xs" data-studio-evidence-links>
+                {certification.behaviorTests.map((test, index) => (
+                  <Text key={test} tone="secondary" wrap="pretty">
+                    G5 behavior:{' '}
+                    <a
+                      className="ui-studio-evidence-link"
+                      href={`${repositorySourceBase}${certification.behaviorSources[index]}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <Code>{test}</Code>
+                    </a>
+                  </Text>
+                ))}
+                {certification.browserScenarios.map((browserScenario) => (
+                  <Text key={browserScenario} tone="secondary" wrap="pretty">
+                    G6 browser:{' '}
+                    <a
+                      className="ui-studio-evidence-link"
+                      href={`${repositorySourceBase}${certification.browserSource}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <Code data-studio-browser-scenario>{browserScenario}</Code>
+                    </a>
+                  </Text>
+                ))}
+              </Stack>
               <Text tone="secondary" wrap="pretty">
                 Required axes: <Code>{certification.requiredAxes.join(', ')}</Code>
               </Text>
@@ -179,6 +204,36 @@ function ApiPanel({ entry }: { entry: UiCatalogEntry }) {
           generated reference.
         </Text>
       </Stack>
+      <Surface
+        material="subtle"
+        radius="md"
+        className="ui-studio-api-state-model"
+        data-studio-state-guidance
+      >
+        <Stack gap="xs">
+          <Label emphasis="strong">State ownership</Label>
+          {entry.stateModels.length ? (
+            entry.stateModels.map((model) => (
+              <Text key={`${model.valueProp}:${model.changeProp}`} tone="secondary" wrap="pretty">
+                <Code>{model.valueProp}</Code> + <Code>{model.changeProp}</Code>{' '}
+                {model.mode === 'controlled-uncontrolled' && model.defaultProp ? (
+                  <>
+                    support controlled ownership or uncontrolled initialization through{' '}
+                    <Code>{model.defaultProp}</Code>.
+                  </>
+                ) : (
+                  <>form a caller-controlled contract; no uncontrolled default prop is exposed.</>
+                )}
+              </Text>
+            ))
+          ) : (
+            <Text tone="tertiary" wrap="pretty">
+              No controlled value pair is exposed; state is either semantic/internal or driven by
+              caller content and event callbacks.
+            </Text>
+          )}
+        </Stack>
+      </Surface>
       {entry.props.length ? (
         <Box
           className="ui-studio-api-table-wrap"
@@ -392,7 +447,6 @@ function EntryWorkbench({
 
 export function CatalogPage() {
   const [, forceLocation] = useState(0);
-  const [query, setQuery] = useState('');
   useEffect(() => {
     const onPopState = () => forceLocation((value) => value + 1);
     window.addEventListener('popstate', onPopState);
@@ -401,7 +455,14 @@ export function CatalogPage() {
 
   const route = readCatalogRoute();
   const active = selectedEntry(route.entry);
-  const visible = useMemo(() => filterCatalog(uiCatalog, query), [query]);
+  const visible = useMemo(
+    () =>
+      filterCatalog(uiCatalog, route.query, {
+        layer: route.layer,
+        status: route.status,
+      }),
+    [route.layer, route.query, route.status],
+  );
   const propCount = useMemo(
     () => uiCatalog.reduce((total, entry) => total + entry.props.length, 0),
     [],
@@ -441,8 +502,12 @@ export function CatalogPage() {
         <StudioSidebar
           entries={visible}
           activeId={active.id}
-          query={query}
-          onQueryChange={setQuery}
+          query={route.query}
+          layer={route.layer}
+          status={route.status}
+          onQueryChange={(query) => updateCatalogRoute({ query }, 'replace')}
+          onLayerChange={(layer) => updateCatalogRoute({ layer }, 'replace')}
+          onStatusChange={(status) => updateCatalogRoute({ status }, 'replace')}
         />
       </Box>
       <Box as="section" className="ui-studio-shell__workspace">
@@ -464,7 +529,11 @@ export function CatalogPage() {
           ariaLabel={`${active.exportName} UI documentation`}
         >
           <Box className="ui-studio-workspace-content">
-            <CatalogErrorBoundary label={`${active.exportName} generated detail page`}>
+            <CatalogErrorBoundary
+              key={active.id}
+              label={`${active.exportName} generated detail page`}
+              resetKey={active.id}
+            >
               <EntryWorkbench entry={active} tab={route.tab} requestedExample={route.example} />
             </CatalogErrorBoundary>
           </Box>

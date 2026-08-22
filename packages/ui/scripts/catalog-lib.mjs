@@ -372,6 +372,26 @@ function propsForExport(program, record, exportName, srcRoot) {
   collect(rootType);
   return [...collected.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
+function stateModelsForProps(props) {
+  const names = new Set(props.map((prop) => prop.name));
+  const candidates = [
+    ['value', 'onValueChange', 'defaultValue'],
+    ['checked', 'onCheckedChange', 'defaultChecked'],
+    ['pressed', 'onPressedChange', 'defaultPressed'],
+    ['selected', 'onSelectedChange', 'defaultSelected'],
+    ['open', 'onOpenChange', 'defaultOpen'],
+    ['query', 'onQueryChange', 'defaultQuery'],
+  ];
+  return candidates
+    .filter(([valueProp, changeProp]) => names.has(valueProp) && names.has(changeProp))
+    .map(([valueProp, changeProp, defaultProp]) => ({
+      valueProp,
+      changeProp,
+      defaultProp: names.has(defaultProp) ? defaultProp : null,
+      mode: names.has(defaultProp) ? 'controlled-uncontrolled' : 'controlled',
+    }));
+}
+
 function moduleAliasForDocs(file, srcRoot) {
   const relative = path
     .relative(srcRoot, file)
@@ -419,6 +439,7 @@ export function buildCatalog({ uiRoot }) {
   return visualExports.map((exportName) => {
     const doc = byExport.get(exportName);
     const record = exports.get(exportName);
+    const props = propsForExport(program, record, exportName, srcRoot);
     return {
       id: exportName,
       exportName,
@@ -433,7 +454,9 @@ export function buildCatalog({ uiRoot }) {
       touch: doc.touch,
       responsive: doc.responsive,
       playground: doc.playground ?? null,
-      props: propsForExport(program, record, exportName, srcRoot),
+      preview: doc.preview ?? null,
+      stateModels: stateModelsForProps(props),
+      props,
       examples: (doc.examples ?? []).map((example) => ({ ...example })),
       docsModule: moduleAliasForDocs(doc.__file, srcRoot),
     };
@@ -476,6 +499,20 @@ export function renderTypeScript(catalog) {
     }
     lines.push(`    playground: ${JSON.stringify(entry.playground)},`);
     lines.push(`    certification: ${JSON.stringify(entry.certification ?? null)},`);
+    lines.push(`    stateModels: ${JSON.stringify(entry.stateModels)},`);
+    if (entry.preview) {
+      const previewAccess = /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(entry.preview.component)
+        ? `module.${entry.preview.component}`
+        : `module[${JSON.stringify(entry.preview.component)}]`;
+      lines.push('    preview: {');
+      lines.push(`      component: ${JSON.stringify(entry.preview.component)},`);
+      lines.push(
+        `      load: () => import(${JSON.stringify(entry.docsModule)}).then((module) => ({ default: ${previewAccess} })),`,
+      );
+      lines.push('    },');
+    } else {
+      lines.push('    preview: null,');
+    }
     lines.push(`    props: ${JSON.stringify(entry.props)},`);
     lines.push('    examples: [');
     for (const example of entry.examples) {
@@ -524,6 +561,9 @@ export function writeCatalog({
                 ? `@ontologyx/ui/${testPath.slice('packages/ui/src/'.length)}`
                 : testPath,
             ),
+            behaviorSources: [...certification.behaviorTests],
+            browserSource: 'scripts/browser/scenarios.mjs',
+            result: 'certified',
           }
         : null,
     };

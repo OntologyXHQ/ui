@@ -1,18 +1,24 @@
 import {
   Badge,
+  Box,
   Label,
   List,
   ListItem,
   ListSection,
+  Row,
   ScrollView,
   SearchField,
-  Row,
+  Select,
   Stack,
   Surface,
   Text,
 } from '@ontologyx/ui';
 import { groupCatalog } from '../catalog/navigation';
-import { updateCatalogRoute } from '../catalog/routing';
+import {
+  type CatalogLayerFilter,
+  type CatalogStatusFilter,
+  updateCatalogRoute,
+} from '../catalog/routing';
 import type { UiCatalogEntry } from '../catalog/types';
 
 const layerLabels = {
@@ -21,6 +27,22 @@ const layerLabels = {
   components: 'Components',
   system: 'System',
 } as const;
+
+const layerOptions = [
+  { value: 'all', label: 'All layers' },
+  { value: 'foundations', label: 'Foundations' },
+  { value: 'primitives', label: 'Primitives' },
+  { value: 'components', label: 'Components' },
+  { value: 'system', label: 'System' },
+] as const;
+
+const statusOptions = [
+  { value: 'all', label: 'All statuses' },
+  { value: 'accepted', label: 'Accepted' },
+  { value: 'candidate', label: 'Candidate' },
+  { value: 'experimental', label: 'Experimental' },
+  { value: 'deprecated', label: 'Deprecated' },
+] as const;
 
 function statusTone(status: UiCatalogEntry['status']) {
   if (status === 'accepted') return 'success' as const;
@@ -33,12 +55,20 @@ export function StudioSidebar({
   entries,
   activeId,
   query,
+  layer,
+  status,
   onQueryChange,
+  onLayerChange,
+  onStatusChange,
 }: {
   entries: readonly UiCatalogEntry[];
   activeId: string | undefined;
   query: string;
+  layer: CatalogLayerFilter;
+  status: CatalogStatusFilter;
   onQueryChange: (value: string) => void;
+  onLayerChange: (value: CatalogLayerFilter) => void;
+  onStatusChange: (value: CatalogStatusFilter) => void;
 }) {
   const groups = groupCatalog(entries);
   return (
@@ -48,7 +78,7 @@ export function StudioSidebar({
           <Label tone="accent" emphasis="strong">
             OntologyX UI Studio
           </Label>
-          <Text tone="tertiary">Generated · self-hosted · rebaseline</Text>
+          <Text tone="tertiary">Generated · self-hosted · acceptance-bound</Text>
         </Stack>
         <SearchField
           value={query}
@@ -57,6 +87,24 @@ export function StudioSidebar({
           placeholder="Components, props, guidance…"
           hideLabel
         />
+        <Box className="ui-studio-sidebar__filters" data-studio-catalog-filters>
+          <Select
+            label="Catalog layer"
+            hideLabel
+            fieldSize="sm"
+            options={layerOptions}
+            value={layer}
+            onValueChange={(value) => onLayerChange(value as CatalogLayerFilter)}
+          />
+          <Select
+            label="Lifecycle status"
+            hideLabel
+            fieldSize="sm"
+            options={statusOptions}
+            value={status}
+            onValueChange={(value) => onStatusChange(value as CatalogStatusFilter)}
+          />
+        </Box>
       </Stack>
 
       <ScrollView className="ui-studio-sidebar__scroll" ariaLabel="Generated UI catalog navigation">
@@ -105,7 +153,7 @@ export function StudioSidebar({
             </Stack>
           ))}
           {!groups.length ? (
-            <Text tone="tertiary">No catalog entries match this search.</Text>
+            <Text tone="tertiary">No catalog entries match these filters.</Text>
           ) : null}
         </Stack>
       </ScrollView>

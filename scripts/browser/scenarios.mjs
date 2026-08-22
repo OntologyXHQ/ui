@@ -236,15 +236,109 @@ export const browserScenarios = [
           'Studio acceptance evidence did not expose the real Button G6 scenario.',
         );
         assert.equal(
+          await workbench
+            .locator('[data-studio-certification-result]')
+            .getAttribute('data-studio-certification-result'),
+          'certified',
+          'Studio acceptance evidence did not expose a concrete certification result.',
+        );
+        assert.ok(
+          (await workbench.locator('[data-studio-evidence-links] a').count()) >= 2,
+          'Studio acceptance evidence did not expose source links for G5/G6 ownership.',
+        );
+        assert.equal(
           await workbench.getByText('No JSDoc yet.', { exact: true }).count(),
           0,
           'Accepted Studio API reference still contains inferred/missing prop documentation.',
         );
 
-        const catalogSearch = page.getByRole('searchbox', {
+        assert.equal(
+          await page.locator('[data-studio-catalog-filters]').count(),
+          1,
+          'Studio catalog did not expose its status/layer information-architecture filters.',
+        );
+        let catalogSearch = page.getByRole('searchbox', {
           name: 'Search UI catalog',
           exact: true,
         });
+        const catalogFilters = page.locator('[data-studio-catalog-filters]');
+        await catalogFilters.waitFor({ state: 'visible' });
+        let layerFilter = catalogFilters.getByRole('combobox', {
+          name: 'Catalog layer',
+          exact: true,
+        });
+        let statusFilter = catalogFilters.getByRole('combobox', {
+          name: 'Lifecycle status',
+          exact: true,
+        });
+        const filterGeometry = await catalogFilters.evaluate((element) => {
+          const rect = element.getBoundingClientRect();
+          const triggers = [...element.querySelectorAll('[role="combobox"]')].map((trigger) => {
+            const triggerRect = trigger.getBoundingClientRect();
+            return {
+              width: triggerRect.width,
+              height: triggerRect.height,
+              visibility: getComputedStyle(trigger).visibility,
+            };
+          });
+          return { width: rect.width, height: rect.height, triggers };
+        });
+        assert.ok(
+          filterGeometry.width > 0 &&
+            filterGeometry.height > 0 &&
+            filterGeometry.triggers.length === 2 &&
+            filterGeometry.triggers.every(
+              (trigger) =>
+                trigger.width > 0 && trigger.height >= 44 && trigger.visibility === 'visible',
+            ),
+          `Studio catalog filters are not visibly reachable: ${JSON.stringify(filterGeometry)}`,
+        );
+        await assertWithinViewport(layerFilter, 'Studio catalog layer filter');
+        await assertWithinViewport(statusFilter, 'Studio lifecycle status filter');
+
+        await layerFilter.click();
+        await page.getByRole('option', { name: 'Components', exact: true }).click();
+        await statusFilter.click();
+        await page.getByRole('option', { name: 'Accepted', exact: true }).click();
+        await catalogSearch.fill('Button');
+        let routeState = new URL(page.url()).searchParams;
+        assert.equal(
+          routeState.get('q'),
+          'Button',
+          'Studio search query is not shareable URL state.',
+        );
+        assert.equal(
+          routeState.get('layer'),
+          'components',
+          'Studio layer filter is not shareable.',
+        );
+        assert.equal(
+          routeState.get('status'),
+          'accepted',
+          'Studio status filter is not shareable.',
+        );
+
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        catalogSearch = page.getByRole('searchbox', { name: 'Search UI catalog', exact: true });
+        layerFilter = catalogFilters.getByRole('combobox', {
+          name: 'Catalog layer',
+          exact: true,
+        });
+        statusFilter = catalogFilters.getByRole('combobox', {
+          name: 'Lifecycle status',
+          exact: true,
+        });
+        await page.getByRole('button', { name: 'Open Button', exact: true }).waitFor({
+          state: 'visible',
+        });
+        assert.equal(
+          await catalogSearch.inputValue(),
+          'Button',
+          'Reload lost shareable catalog query.',
+        );
+
+        await layerFilter.click();
+        await page.getByRole('option', { name: 'All layers', exact: true }).click();
         await catalogSearch.fill('SystemKeyboardHost');
         const keyboardLink = page.getByRole('button', {
           name: 'Open SystemKeyboardHost',
@@ -269,6 +363,11 @@ export const browserScenarios = [
           'Studio catalog search navigation did not produce a durable deep link.',
         );
         assert.equal(
+          new URL(page.url()).searchParams.get('q'),
+          'SystemKeyboardHost',
+          'Studio search navigation lost the shareable query state.',
+        );
+        assert.equal(
           await keyboardWorkbench
             .locator('[data-studio-acceptance-evidence]')
             .getAttribute('data-studio-acceptance-evidence'),
@@ -276,9 +375,60 @@ export const browserScenarios = [
           'System Studio entry lost its real certification evidence binding.',
         );
 
+        await catalogSearch.fill('ContextMenu');
+        await page.getByRole('button', { name: 'Open ContextMenu', exact: true }).click();
+        const contextWorkbench = page.locator('[data-studio-entry="ContextMenu"]');
+        await contextWorkbench.waitFor({ state: 'visible' });
+        assert.equal(
+          await contextWorkbench
+            .locator('.ui-studio-component-preview [data-studio-preview-mode]')
+            .getAttribute('data-studio-preview-mode'),
+          'dedicated',
+          'Complex ContextMenu preview regressed to an inferred family/example fallback.',
+        );
+        await contextWorkbench
+          .locator('.ui-studio-component-preview')
+          .getByRole('button', { name: 'Right-click or long-press', exact: true })
+          .waitFor({ state: 'visible' });
+
+        await catalogSearch.fill('SystemApplicationBrowser');
+        await page
+          .getByRole('button', { name: 'Open SystemApplicationBrowser', exact: true })
+          .click();
+        const appBrowserWorkbench = page.locator('[data-studio-entry="SystemApplicationBrowser"]');
+        await appBrowserWorkbench.waitFor({ state: 'visible' });
+        const hostIcon = appBrowserWorkbench.locator(
+          '.ui-studio-component-preview .ui-application-item__image',
+        );
+        await hostIcon.waitFor({ state: 'visible' });
+        assert.ok(
+          (await hostIcon.getAttribute('src'))?.startsWith('data:image/svg+xml'),
+          'SystemApplicationBrowser Studio preview did not render a caller-supplied host icon resource.',
+        );
+        await appBrowserWorkbench
+          .getByText(
+            'Host/App Registry owns application discovery, icon resolution and launch authority; SystemApplicationBrowser only renders supplied view models.',
+            { exact: true },
+          )
+          .waitFor({ state: 'visible' });
+
+        routeState = new URL(page.url()).searchParams;
+        assert.equal(
+          routeState.get('q'),
+          'SystemApplicationBrowser',
+          'Studio final deep link lost its shareable catalog search.',
+        );
+
         const axe = await runAxe(page, 'Studio V1 workbench route');
         diagnostics.assertClean('Studio V1 workbench route');
-        return { axe, stacked, deepLinkEntry: 'SystemKeyboardHost' };
+        return {
+          axe,
+          stacked,
+          deepLinkEntry: 'SystemApplicationBrowser',
+          catalogFilters: 'shareable',
+          complexPreview: 'dedicated',
+          appIconOwnership: 'host',
+        };
       } finally {
         await context.close();
       }

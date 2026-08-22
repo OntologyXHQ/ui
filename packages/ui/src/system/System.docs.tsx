@@ -29,6 +29,10 @@ import {
 } from '@ontologyx/ui';
 import { defineUiDocsGroup } from '../docs/defineUiDocs';
 
+const hostResolvedApplicationIcon = {
+  src: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M4 5h6l2 2h8v12H4z%22/%3E%3C/svg%3E',
+} as const;
+
 export const uiDocs = defineUiDocsGroup([
   {
     exportName: 'SystemScaffold',
@@ -152,7 +156,7 @@ export const uiDocs = defineUiDocsGroup([
     summary:
       'Reusable OXS application-browsing layout with System search/header and grid or list presentation.',
     usage:
-      'Use inside Launcher or other OXS application surfaces; callers own application sourcing/ranking/routing while the layout applies only its deterministic text match to supplied view models.',
+      'Use inside Launcher or other OXS application surfaces; callers own application sourcing/ranking/routing and resolve installed-application icon resources before passing view models, while the layout applies only its deterministic text match and presentation.',
     status: 'accepted',
     accessibility:
       'Uses SearchField, ApplicationItem, List/TileGrid and ContentState semantics with one application-browser region label.',
@@ -166,7 +170,12 @@ export const uiDocs = defineUiDocsGroup([
         query: '',
         apps: [
           { id: 'browser', name: 'Browser', icon: 'browser', description: 'Web application' },
-          { id: 'files', name: 'Files', icon: 'files', description: 'Local files' },
+          {
+            id: 'files',
+            name: 'Files',
+            icon: hostResolvedApplicationIcon,
+            description: 'Local files · icon resolved by host registry',
+          },
         ],
       },
     },
@@ -590,9 +599,9 @@ export function SystemApplicationBrowserExample() {
         {
           id: 'files',
           name: 'Files',
-          icon: 'files' as const,
+          icon: hostResolvedApplicationIcon,
           keywords: ['folders'],
-          description: 'Local files',
+          description: 'Local files · icon resource resolved by host/App Registry',
         },
       ].filter((app) =>
         `${app.name} ${app.keywords.join(' ')}`.toLowerCase().includes(query.toLowerCase()),
@@ -609,6 +618,10 @@ export function SystemApplicationBrowserExample() {
         apps={apps}
         onQueryChange={setQuery}
         onActivate={setRequestedApplicationId}
+      />
+      <StatusIndicator
+        label="Host/App Registry owns application discovery, icon resolution and launch authority; SystemApplicationBrowser only renders supplied view models."
+        tone="neutral"
       />
       <StatusIndicator
         label={`Requested application id: ${requestedApplicationId}`}
