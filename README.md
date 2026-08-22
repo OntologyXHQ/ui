@@ -24,14 +24,17 @@ Studio runs on port 5174. Its generated component page is one stacked reading fl
 
 ```bash
 pnpm dev            # generate catalog and run Studio
-pnpm quality        # fast canonical gates: architecture/catalog/types/behavior
-pnpm verify         # full repository acceptance including Studio/build/package
+pnpm format         # formatter only; mutating and explicit
+pnpm lint           # explicit repo-wide Biome lint/debt audit; not part of canonical verify
+pnpm quality        # non-mutating fast gate: format freshness + architecture + catalog + types + behavior
 pnpm build          # package + Studio production builds
-pnpm package:smoke  # pack, install into a clean consumer, typecheck and Vite-build
-pnpm release:check  # G0..G7 + production artifact + tarball smoke + frozen V1 budgets when present
-pnpm snapshot       # fast tracked-source handoff snapshot
+pnpm gate:browser   # build once, then run focused production browser acceptance
+pnpm verify         # canonical G0..G6 acceptance; one production build, no release/consumer side effects
+pnpm release:check  # canonical local G0..G7 artifact proof; no OXS clone and no planning mutation
 pnpm package:tarball
-OXS_CONSUMER_ROOT=/home/l/Workspace/OXS pnpm v1:closeout  # full V1 RC closeout + isolated real-OXS validation
+pnpm package:smoke  # consume the already-built stable tarball in a fresh generic app
+pnpm v1:oxs:check -- /home/l/Workspace/OXS  # explicit cross-repository check, only when needed
+pnpm snapshot       # fast tracked-source handoff snapshot
 pnpm studio:build    # production Studio artifact
 pnpm studio:preview  # preview built Studio on :4174
 ```
@@ -46,7 +49,7 @@ Production direction is `Foundations → Primitives → Components → System UI
 
 ## V1 closeout frontier
 
-The reset/reacceptance program now converges on one stable `@ontologyx/ui@1.0.0` release candidate: all 100 intended public visual exports are promoted to `accepted`, certification ownership covers every accepted export, developer compositions and System UI are bound to dedicated behavior/browser journeys, and Studio renders the real public exports while exposing certification evidence instead of inferred coverage. The canonical closeout is `OXS_CONSUMER_ROOT=/path/to/OXS pnpm v1:closeout`; it records UIR11–UIR16 as DONE only after full G0..G7 acceptance, measured artifact-budget freeze/check, and isolated validation of the packed candidate against the current OXS consumer. UIR17 remains RELEASE READY until the explicit stable npm/tag operation completes. Native Wayland/compositor/IME authority remains outside this repository.
+The reset/reacceptance program converges on one stable `@ontologyx/ui@1.0.0` release candidate: all 100 intended public visual exports are promoted to `accepted`, certification ownership covers every accepted export, developer compositions and System UI are bound to dedicated behavior/browser journeys, and Studio renders the real public exports while exposing certification evidence instead of inferred coverage. Local convergence is deliberately simple: `pnpm verify` proves G0..G6 and `pnpm release:check` proves the packed G7 artifact without modifying planning files or touching OXS. Real OXS validation is a separate explicit cross-repository operation (`pnpm v1:oxs:check -- /path/to/OXS`) and stable npm/tag publication remains explicit. Native Wayland/compositor/IME authority remains outside this repository.
 
 ## Studio deployment
 

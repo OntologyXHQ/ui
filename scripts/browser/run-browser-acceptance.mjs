@@ -35,6 +35,20 @@ function parseScenarioSelection() {
   return { scenarioId, fromId };
 }
 
+function isRecoverableBrowserInfrastructureFailure(error) {
+  const message = String(error?.stack ?? error ?? '');
+  return /Target crashed|Browser closed|browser has been closed/i.test(message);
+}
+
+async function closeBrowserQuietly(browser) {
+  if (!browser) return;
+  try {
+    await browser.close();
+  } catch {
+    // A crashed browser may reject close(); there is nothing left to clean up.
+  }
+}
+
 function selectScenarios(selection) {
   if (selection.scenarioId) {
     const selected = browserScenarios.find((scenario) => scenario.id === selection.scenarioId);
@@ -153,33 +167,55 @@ async function main() {
 
     for (const scenario of selectedScenarios) {
       const scenarioStart = performance.now();
+      let infrastructureRetries = 0;
       process.stdout.write(`G6 browser: ${scenario.id} ... `);
-      try {
-        const detail = await scenario.run({ browser, baseUrl: preview.baseUrl });
-        const durationMs = Math.round(performance.now() - scenarioStart);
-        results.push({
-          id: scenario.id,
-          status: 'passed',
-          axes: scenario.axes,
-          accepts: scenario.accepts,
-          durationMs,
-          detail,
-        });
-        process.stdout.write(`passed (${durationMs}ms)\n`);
-      } catch (error) {
-        const durationMs = Math.round(performance.now() - scenarioStart);
-        results.push({
-          id: scenario.id,
-          status: 'failed',
-          axes: scenario.axes,
-          accepts: scenario.accepts,
-          durationMs,
-          error: String(error.stack ?? error),
-        });
-        failure = error;
-        process.stdout.write(`FAILED (${durationMs}ms)\n`);
-        break;
+      for (;;) {
+        try {
+          const detail = await scenario.run({ browser, baseUrl: preview.baseUrl });
+          const durationMs = Math.round(performance.now() - scenarioStart);
+          results.push({
+            id: scenario.id,
+            status: 'passed',
+            axes: scenario.axes,
+            accepts: scenario.accepts,
+            durationMs,
+            infrastructureRetries,
+            detail,
+          });
+          process.stdout.write(
+            `passed (${durationMs}ms${infrastructureRetries ? ', 1 browser retry' : ''})\n`,
+          );
+          break;
+        } catch (error) {
+          if (infrastructureRetries === 0 && isRecoverableBrowserInfrastructureFailure(error)) {
+            infrastructureRetries += 1;
+            process.stdout.write(
+              'browser target crashed; retrying once with a fresh browser process ... ',
+            );
+            await closeBrowserQuietly(browser);
+            const relaunched = await launchSystemBrowser();
+            browser = relaunched.browser;
+            browserSource = relaunched.source;
+            browserVersion = browser.version();
+            continue;
+          }
+
+          const durationMs = Math.round(performance.now() - scenarioStart);
+          results.push({
+            id: scenario.id,
+            status: 'failed',
+            axes: scenario.axes,
+            accepts: scenario.accepts,
+            durationMs,
+            infrastructureRetries,
+            error: String(error.stack ?? error),
+          });
+          failure = error;
+          process.stdout.write(`FAILED (${durationMs}ms)\n`);
+          break;
+        }
       }
+      if (failure) break;
     }
 
     if (!failure && !focusedRun) {
@@ -189,7 +225,7 @@ async function main() {
   } catch (error) {
     failure = error;
   } finally {
-    if (browser) await browser.close();
+    await closeBrowserQuietly(browser);
     await preview.stop();
   }
 

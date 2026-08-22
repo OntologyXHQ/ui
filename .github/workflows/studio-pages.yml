@@ -28,9 +28,10 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm release:check
+      - run: pnpm verify
         env:
           OXS_UI_STUDIO_BASE: ${{ vars.STUDIO_BASE_PATH || format('/{0}/', github.event.repository.name) }}
+      - run: node scripts/check-studio-production.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

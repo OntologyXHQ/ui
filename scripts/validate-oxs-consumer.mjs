@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { cp, mkdir, mkdtemp, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
@@ -13,59 +13,91 @@ if (positionalArgs.length > 1) {
   process.exit(1);
 }
 const consumerRootInput = positionalArgs[0] ?? process.env.OXS_CONSUMER_ROOT ?? '';
-const consumerRoot = path.resolve(consumerRootInput);
-const excludedCopySegments = new Set([
-  'node_modules',
-  'target',
-  'artifacts',
-  'dist',
-  '.next',
-  'coverage',
-]);
-const excludedWalkSegments = new Set([...excludedCopySegments, '.git']);
 
 function fail(message) {
   console.error(message);
   process.exit(1);
 }
 
+function run(command, args, cwd, options = {}) {
+  const result = spawnSync(command, args, {
+    cwd,
+    env: options.env ?? process.env,
+    stdio: options.capture ? ['ignore', 'pipe', 'pipe'] : 'inherit',
+    encoding: options.capture ? 'utf8' : undefined,
+  });
+  if (options.capture && result.status !== 0) {
+    const detail = String(result.stderr || result.stdout || '').trim();
+    throw new Error(`${command} ${args.join(' ')} failed${detail ? `: ${detail}` : ''}`);
+  }
+  return result;
+}
+
 if (!consumerRootInput) {
   fail('OXS consumer validation requires a consumer root: pnpm v1:oxs:check -- /path/to/OXS');
 }
 
-const consumerPackage = path.join(consumerRoot, 'package.json');
+const requestedRoot = path.resolve(consumerRootInput);
+const consumerPackage = path.join(requestedRoot, 'package.json');
 try {
   await stat(consumerPackage);
 } catch {
   fail(`OXS consumer package.json was not found at ${consumerPackage}`);
 }
 
+let consumerRoot;
+try {
+  consumerRoot = run('git', ['rev-parse', '--show-toplevel'], requestedRoot, {
+    capture: true,
+  }).stdout.trim();
+} catch (error) {
+  fail(
+    `OXS consumer validation requires a Git worktree: ${error instanceof Error ? error.message : error}`,
+  );
+}
+if (path.resolve(consumerRoot) !== requestedRoot) {
+  fail(`OXS consumer root must be the Git repository root. Resolved ${consumerRoot}`);
+}
+
+const dirty = run('git', ['status', '--porcelain', '--untracked-files=no'], consumerRoot, {
+  capture: true,
+}).stdout.trim();
+if (dirty) {
+  fail(
+    'OXS consumer validation requires a clean tracked worktree so the isolated checkout matches a concrete commit. Commit/stash OXS changes first.',
+  );
+}
+const consumerHead = run('git', ['rev-parse', 'HEAD'], consumerRoot, {
+  capture: true,
+}).stdout.trim();
+
 const uiPackage = JSON.parse(
   await readFile(path.join(repositoryRoot, 'packages/ui/package.json'), 'utf8'),
 );
 const artifactsRoot = path.join(repositoryRoot, 'artifacts');
-const artifactNames = await readdir(artifactsRoot).catch(() => []);
-const tarballName = artifactNames
-  .filter((name) => name.endsWith(`-${uiPackage.version}.tgz`) && name.includes('ontologyx-ui'))
-  .sort()
-  .at(-1);
-if (!tarballName) {
+const tarballName = `${uiPackage.name.replace(/^@/, '').replaceAll('/', '-')}-${uiPackage.version}.tgz`;
+const tarballPath = path.join(artifactsRoot, tarballName);
+try {
+  await stat(tarballPath);
+} catch {
   fail(
-    `No @ontologyx/ui@${uiPackage.version} tarball was found under ${artifactsRoot}. Run pnpm package:tarball first.`,
+    `No packed ${uiPackage.name}@${uiPackage.version} candidate was found at ${tarballPath}. Run pnpm package:tarball first.`,
   );
 }
-const tarballPath = path.join(artifactsRoot, tarballName);
+
+const excludedWalkSegments = new Set([
+  'node_modules',
+  'target',
+  'artifacts',
+  'dist',
+  '.next',
+  'coverage',
+  '.git',
+]);
 const tempParent = await mkdtemp(path.join(os.tmpdir(), 'ontologyx-ui-oxs-consumer-'));
 const tempRoot = path.join(tempParent, 'OXS');
 const evidenceRoot = path.join(artifactsRoot, 'oxs-consumer-validation');
 await mkdir(evidenceRoot, { recursive: true });
-
-function shouldCopy(source) {
-  const relative = path.relative(consumerRoot, source);
-  if (!relative) return true;
-  const segments = relative.split(path.sep);
-  return !segments.some((segment) => excludedCopySegments.has(segment));
-}
 
 async function collectPackageJson(root, files = []) {
   for (const entry of await readdir(root, { withFileTypes: true })) {
@@ -83,25 +115,20 @@ function replaceDependency(container, tarballSpecifier) {
   return true;
 }
 
-function run(command, args, cwd, env = process.env) {
-  console.log(`OXS RC consumer: ${command} ${args.join(' ')}`);
-  return spawnSync(command, args, { cwd, env, stdio: 'inherit' });
-}
-
-let phase = 'copy';
+let phase = 'worktree';
 const modifiedManifests = [];
 let installStatus = null;
 let verifyStatus = null;
 let success = false;
+let worktreeAdded = false;
 try {
   console.log(
-    `OXS RC consumer: cloning current working tree into isolated validation root ${tempRoot}`,
+    `OXS RC consumer: creating isolated Git worktree at ${tempRoot} from ${consumerHead}`,
   );
-  await cp(consumerRoot, tempRoot, {
-    recursive: true,
-    preserveTimestamps: true,
-    filter: shouldCopy,
-  });
+  const add = run('git', ['worktree', 'add', '--detach', tempRoot, consumerHead], consumerRoot);
+  if (add.status !== 0)
+    throw new Error(`git worktree add failed with status ${add.status ?? 'unknown'}.`);
+  worktreeAdded = true;
 
   phase = 'manifest-overlay';
   const tarballSpecifier = `file:${tarballPath}`;
@@ -130,33 +157,35 @@ try {
   }
 
   phase = 'install';
+  console.log('OXS RC consumer: pnpm install --offline --no-frozen-lockfile');
   const install = run('pnpm', ['install', '--offline', '--no-frozen-lockfile'], tempRoot);
   installStatus = install.status;
-  if (install.status !== 0) {
+  if (install.status !== 0)
     throw new Error(`Isolated OXS install failed with status ${install.status ?? 'unknown'}.`);
-  }
 
   phase = 'verify';
   const verifyEnv = {
     ...process.env,
     CARGO_TARGET_DIR: process.env.CARGO_TARGET_DIR ?? path.join(consumerRoot, 'target'),
   };
-  const verify = run('pnpm', ['verify'], tempRoot, verifyEnv);
+  console.log('OXS RC consumer: pnpm verify');
+  const verify = run('pnpm', ['verify'], tempRoot, { env: verifyEnv });
   verifyStatus = verify.status;
-  if (verify.status !== 0) {
+  if (verify.status !== 0)
     throw new Error(`OXS pnpm verify failed with status ${verify.status ?? 'unknown'}.`);
-  }
   success = true;
 } catch (error) {
   console.error(error instanceof Error ? error.message : error);
 } finally {
   const evidence = {
-    schema: 1,
+    schema: 2,
     createdAt: new Date().toISOString(),
-    uiPackage: `@ontologyx/ui@${uiPackage.version}`,
+    uiPackage: `${uiPackage.name}@${uiPackage.version}`,
     tarball: tarballPath,
     consumerRoot,
+    consumerHead,
     isolatedConsumerRoot: tempRoot,
+    isolation: 'git-worktree',
     modifiedManifests,
     phase,
     installStatus,
@@ -167,13 +196,17 @@ try {
   const timestampPath = path.join(evidenceRoot, `oxs-consumer-${timestamp}.json`);
   await writeFile(timestampPath, `${JSON.stringify(evidence, null, 2)}\n`);
   await writeFile(path.join(evidenceRoot, 'latest.json'), `${JSON.stringify(evidence, null, 2)}\n`);
+
   if (success) {
+    if (worktreeAdded) {
+      run('git', ['worktree', 'remove', '--force', tempRoot], consumerRoot);
+    }
     await rm(tempParent, { recursive: true, force: true });
     console.log(`OXS RC consumer validation PASSED. Evidence: ${timestampPath}`);
   } else {
-    console.error(
-      `OXS RC consumer validation FAILED during ${phase}. Isolated failure state preserved at ${tempRoot}`,
-    );
+    console.error(`OXS RC consumer validation FAILED during ${phase}.`);
+    if (worktreeAdded) console.error(`Isolated failing Git worktree preserved at ${tempRoot}`);
+    else await rm(tempParent, { recursive: true, force: true });
     console.error(`Evidence: ${timestampPath}`);
   }
 }

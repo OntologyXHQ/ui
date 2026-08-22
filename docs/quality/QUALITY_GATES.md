@@ -117,18 +117,21 @@ The harness also executes intentionally broken or adversarial ephemeral browser 
 
 `pnpm release:check`
 
-Extends G0..G6 with production Studio artifact checks, a fresh packed-tarball consumer install/typecheck/Node-import/Vite-build smoke, a stable tarball artifact, and (after the first reviewed V1 freeze) measured package/Studio/tarball budget enforcement. Release checks operate on the artifact users receive.
+Extends G0..G6 with production Studio artifact checks, a deterministic stable tarball artifact, a fresh packed-tarball generic consumer install/typecheck/Node-import/Vite-build smoke, the reviewed package/Studio/tarball budgets, and the V1 freeze contract. Release checks operate on the artifact users receive and remain local to this repository. Real OXS certification is an explicit cross-repository operation (`pnpm v1:oxs:check -- /path/to/OXS`), not an implicit part of G7.
 
 ## Canonical commands
 
 ```bash
-pnpm quality        # G0..G3: fast canonical development gate
-pnpm verify         # G0..G6: full repository acceptance
-pnpm release:check  # G0..G7: release artifact/consumer proof
-pnpm gate:browser   # focused G5 + G6 production browser acceptance
+pnpm quality        # G0..G3: non-mutating fast gate + Biome formatting freshness
+pnpm lint           # explicit repo-wide Biome lint/debt audit; intentionally separate from verify
+pnpm build          # production package + Studio builds
+pnpm gate:browser   # focused build + G6 production browser acceptance
+pnpm verify         # G0..G6: one production build, then browser acceptance against it
+pnpm release:check  # G0..G7: local release artifact proof; no OXS or planning mutation
+pnpm v1:oxs:check -- /path/to/OXS  # explicit cross-repository certification when required
 ```
 
-Focused gates may be rerun while debugging, but a part cannot close on a focused rerun alone.
+Focused gates may be rerun while debugging, but a part cannot close on a focused rerun alone. Repo-wide `pnpm lint` is tracked as a separate cleanup/migration gate until its existing rule debt is intentionally resolved; canonical acceptance must not silently turn that debt into unrelated runtime/API churn.
 
 ## Non-negotiable acceptance rules
 

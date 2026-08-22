@@ -1,45 +1,40 @@
-import { mkdtemp, mkdir, readdir, rm, writeFile } from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
+import { mkdir, mkdtemp, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import process from 'node:process';
 
 const root = process.cwd();
 const pnpm = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
-const temp = await mkdtemp(path.join(os.tmpdir(), 'oxs-ui-package-smoke-'));
+const temp = await mkdtemp(path.join(os.tmpdir(), 'ontologyx-ui-package-smoke-'));
+const manifest = JSON.parse(await readFile(path.join(root, 'packages/ui/package.json'), 'utf8'));
+const tarballName = `${manifest.name.replace(/^@/, '').replaceAll('/', '-')}-${manifest.version}.tgz`;
+const tarball = path.join(root, 'artifacts', tarballName);
 
 function run(args, cwd = root) {
   const result = spawnSync(pnpm, args, { cwd, stdio: 'inherit' });
-  if (result.status !== 0) {
-    throw new Error(`pnpm ${args.join(' ')} failed with ${result.status}`);
-  }
+  if (result.status !== 0) throw new Error(`pnpm ${args.join(' ')} failed with ${result.status}`);
 }
 
 function runNode(args, cwd = root) {
   const result = spawnSync(process.execPath, args, { cwd, stdio: 'inherit' });
-  if (result.status !== 0) {
-    throw new Error(`node ${args.join(' ')} failed with ${result.status}`);
-  }
+  if (result.status !== 0) throw new Error(`node ${args.join(' ')} failed with ${result.status}`);
 }
 
 try {
-  const packs = path.join(temp, 'packs');
-  await mkdir(packs);
-  run(['--dir', 'packages/ui', 'pack', '--pack-destination', packs]);
+  await stat(tarball).catch(() => {
+    throw new Error(
+      `Packed candidate is missing: ${tarball}. Run pnpm package:tarball or pnpm release:check first.`,
+    );
+  });
 
-  const tarballs = (await readdir(packs)).filter((name) => name.endsWith('.tgz'));
-  if (tarballs.length !== 1) {
-    throw new Error(`Expected one tarball, found ${tarballs.length}`);
-  }
-
-  const tarball = path.join(packs, tarballs[0]);
   const consumer = path.join(temp, 'consumer');
   await mkdir(path.join(consumer, 'src'), { recursive: true });
-
   await writeFile(
     path.join(consumer, 'package.json'),
     `${JSON.stringify(
       {
-        name: 'oxs-ui-package-smoke',
+        name: 'ontologyx-ui-package-smoke',
         private: true,
         type: 'module',
         dependencies: {
@@ -59,7 +54,6 @@ try {
       2,
     )}\n`,
   );
-
   await writeFile(
     path.join(consumer, 'tsconfig.json'),
     `${JSON.stringify(
@@ -80,17 +74,14 @@ try {
       2,
     )}\n`,
   );
-
   await writeFile(
     path.join(consumer, 'index.html'),
     '<div id="root"></div><script type="module" src="/src/main.tsx"></script>\n',
   );
-
   await writeFile(
     path.join(consumer, 'src/vite-env.d.ts'),
     '/// <reference types="vite/client" />\n',
   );
-
   await writeFile(
     path.join(consumer, 'src/main.tsx'),
     `import '@ontologyx/ui/styles.css';
@@ -134,7 +125,7 @@ export const Smoke = () => (
   run(['exec', 'tsc', '--noEmit', '-p', 'tsconfig.json', '--pretty', 'false'], consumer);
   run(['exec', 'vite', 'build'], consumer);
   console.log(
-    'Published-tarball consumer smoke passed: install · Node import (main/advanced/icons) · types · explicit styles export · Vite build.',
+    `Published-tarball consumer smoke passed for ${manifest.name}@${manifest.version}: install · Node import · types · explicit styles · Vite build.`,
   );
 } finally {
   await rm(temp, { recursive: true, force: true });
