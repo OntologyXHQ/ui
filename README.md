@@ -6,6 +6,7 @@ Standalone workspace for the `@ontologyx/ui` platform package and its self-hoste
 
 ```text
 apps/ui-studio/   self-hosted catalog, docs, examples and playground
+apps/ui-demo/     complete System UI demo composed from the public SDK
 packages/ui/      publishable @ontologyx/ui package
 docs/             canonical boundaries, release contract, roadmap/reference
 scripts/          standalone quality, package and release checks
@@ -15,15 +16,19 @@ scripts/          standalone quality, package and release checks
 
 ```bash
 pnpm install --frozen-lockfile
-pnpm dev
+pnpm dev ui       # UI Kit / Studio on :5174
+pnpm dev demo     # System demo on :5175
+pnpm dev          # both together
 ```
 
-Studio runs on port 5174. Its generated component page is one stacked reading flow—Overview, API, Examples and Playground stay mounted together and use the public OntologyX typography/layout surface rather than Studio-local tab chrome. Search plus layer/lifecycle filters are shareable URL state; accepted entries expose direct or explicit dedicated previews, generated state-ownership guidance, and source-linked G5/G6 certification evidence. System application examples receive host-resolved icon resources—the Studio/UI package never discovers installed apps or owns launch authority. Package publication is validated separately from the real packed tarball.
+Studio runs on port 5174 and the System demo on port 5175. Its generated component page is one stacked reading flow—Overview, API, Examples and Playground stay mounted together and use the public OntologyX typography/layout surface rather than Studio-local tab chrome. Search plus layer/lifecycle filters are shareable URL state; accepted entries expose direct or explicit dedicated previews, generated state-ownership guidance, and source-linked G5/G6 certification evidence. System application examples receive host-resolved icon resources—the Studio/UI package never discovers installed apps or owns launch authority. Package publication is validated separately from the real packed tarball. The demo is a consumer, not a second UI implementation: host/App Registry code resolves application metadata, image resources and launch policy while `@ontologyx/ui` renders those view models and reports stable activation IDs. Visual/performance capture writes canonical component screenshots plus render/frame/long-task/DOM evidence under `artifacts/visual-performance/`; screenshots are review evidence, while pass/fail uses conservative runtime metrics rather than brittle cross-machine pixel equality.
 
 ## Canonical commands
 
 ```bash
-pnpm dev            # generate catalog and run Studio
+pnpm dev ui         # generate catalog and run the UI Kit / Studio only
+pnpm dev demo       # run the complete System demo only
+pnpm dev            # run Studio and System demo together
 pnpm format         # formatter only; mutating and explicit
 pnpm lint           # explicit repo-wide Biome lint/debt audit; not part of canonical verify
 pnpm quality        # non-mutating fast gate: format freshness + architecture + catalog + types + behavior
@@ -37,6 +42,10 @@ pnpm v1:oxs:check -- /home/l/Workspace/OXS  # explicit cross-repository check, o
 pnpm snapshot       # fast tracked-source handoff snapshot
 pnpm studio:build    # production Studio artifact
 pnpm studio:preview  # preview built Studio on :4174
+pnpm demo:check      # typecheck + production-build the System demo
+pnpm demo:smoke      # real-browser demo smoke + screenshot + serious/critical axe check
+pnpm visual:check    # canonical screenshot corpus + conservative per-component performance budgets
+pnpm polish:check    # Studio contract + demo smoke + visual/performance evidence
 ```
 
 ## Architecture

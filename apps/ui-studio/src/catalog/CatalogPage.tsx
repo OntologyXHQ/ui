@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Code,
+  Disclosure,
   Divider,
   Grid,
   Heading,
@@ -59,9 +60,6 @@ function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
   return (
     <Stack gap="xl">
       <Stack gap="md" className="ui-studio-entry-hero">
-        <Label tone="accent" emphasis="strong">
-          Component profile
-        </Label>
         <Row gap="sm" className="ui-studio-entry-badges">
           <Badge tone="accent">{entry.layer}</Badge>
           <Badge>{entry.category}</Badge>
@@ -96,32 +94,27 @@ function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
 
       <CatalogComponentPreview key={entry.id} entry={entry} />
 
-      <Surface material="subtle" radius="md" className="ui-studio-import-card">
-        <Stack gap="xs">
-          <Label tone="accent" emphasis="strong">
-            Canonical import
-          </Label>
-          <Code
-            wrap="normal"
-            className="ui-studio-code-anywhere"
-          >{`import { ${entry.exportName} } from '@ontologyx/ui';`}</Code>
-        </Stack>
-      </Surface>
+      <Grid columns="auto-fit" minColumn="wide" gap="md" className="ui-studio-overview-grid">
+        <Surface material="subtle" radius="lg" className="ui-studio-import-card">
+          <Stack gap="sm">
+            <Row justify="between" align="center" gap="sm">
+              <Label emphasis="strong">Import</Label>
+              <Badge tone="accent">public API</Badge>
+            </Row>
+            <Code
+              wrap="normal"
+              className="ui-studio-code-anywhere"
+            >{`import { ${entry.exportName} } from '@ontologyx/ui';`}</Code>
+          </Stack>
+        </Surface>
 
-      <Stack gap="md">
-        <Stack gap="2xs">
-          <Label tone="accent" emphasis="strong">
-            Behavior guidance
-          </Label>
-          <Heading level={2} size="title">
-            Use it without breaking the platform contract
-          </Heading>
-          <Text tone="tertiary" wrap="pretty">
-            Accessibility, direction, touch and adaptation stay visible in the same reading flow.
-          </Text>
-        </Stack>
-        <GuidanceGrid entry={entry} />
-      </Stack>
+        <Surface material="subtle" radius="lg" className="ui-studio-contract-card">
+          <Stack gap="sm">
+            <Label emphasis="strong">Platform contract</Label>
+            <GuidanceGrid entry={entry} />
+          </Stack>
+        </Surface>
+      </Grid>
 
       <Surface
         material="subtle"
@@ -129,15 +122,18 @@ function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
         className="ui-studio-coverage-card"
         data-studio-acceptance-evidence={certification ? 'bound' : 'unbound'}
       >
-        <Stack gap="sm">
-          <Row justify="between" align="center" gap="sm">
-            <Label emphasis="strong">Acceptance evidence</Label>
-            <Badge tone={certification ? 'success' : 'warning'}>
-              {certification ? 'certification bound' : 'not certified'}
-            </Badge>
-          </Row>
+        <Disclosure
+          summary={certification ? 'Acceptance evidence' : 'Acceptance evidence unavailable'}
+          description={
+            certification
+              ? `${certification.owner} · ${certification.result} · ${certification.requiredAxes.length} required axes`
+              : 'This export has not been bound to certification evidence.'
+          }
+          defaultOpen={false}
+          headingLevel={2}
+        >
           {certification ? (
-            <Stack gap="sm">
+            <Stack gap="sm" className="ui-studio-coverage-card__body">
               <Row gap="sm" align="center" className="ui-studio-evidence-summary">
                 <Text tone="secondary">
                   Owner: <Code data-studio-certification-owner>{certification.owner}</Code>
@@ -149,7 +145,7 @@ function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
               <Stack gap="xs" data-studio-evidence-links>
                 {certification.behaviorTests.map((test, index) => (
                   <Text key={test} tone="secondary" wrap="pretty">
-                    G5 behavior:{' '}
+                    G5:{' '}
                     <a
                       className="ui-studio-evidence-link"
                       href={`${repositorySourceBase}${certification.behaviorSources[index]}`}
@@ -162,7 +158,7 @@ function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
                 ))}
                 {certification.browserScenarios.map((browserScenario) => (
                   <Text key={browserScenario} tone="secondary" wrap="pretty">
-                    G6 browser:{' '}
+                    G6:{' '}
                     <a
                       className="ui-studio-evidence-link"
                       href={`${repositorySourceBase}${certification.browserSource}`}
@@ -179,11 +175,9 @@ function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
               </Text>
             </Stack>
           ) : (
-            <Text tone="secondary">
-              This export is not bound to an acceptance certification yet.
-            </Text>
+            <Text tone="secondary">No certification is bound to this export yet.</Text>
           )}
-        </Stack>
+        </Disclosure>
       </Surface>
     </Stack>
   );
@@ -513,8 +507,8 @@ export function CatalogPage() {
       <Box as="section" className="ui-studio-shell__workspace">
         <AppBar
           className="ui-studio-appbar"
-          title={active.exportName}
-          subtitle={`${active.layer} / ${active.category}`}
+          title="OntologyX UI Studio"
+          subtitle={`${active.exportName} · ${active.layer} / ${active.category}`}
           actions={
             <Row gap="sm">
               <Badge tone="success">{uiCatalog.length} exports</Badge>

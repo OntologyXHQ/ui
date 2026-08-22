@@ -1274,7 +1274,7 @@ body { overflow: hidden; background: #091019; color-scheme: dark light; }
 
 @container oxs-ui (max-width: 68rem) {
   .ui-studio-shell {
-    grid-template-columns: minmax(15rem, 17rem) minmax(0, 1fr);
+    grid-template-columns: minmax(14.5rem, 16rem) minmax(0, 1fr);
     gap: var(--oxs-space-sm);
     padding: var(--oxs-space-sm);
   }
@@ -1611,4 +1611,154 @@ body { overflow: hidden; background: #091019; color-scheme: dark light; }
   padding: var(--oxs-space-sm);
   border: 1px solid var(--oxs-color-border-subtle);
   border-radius: var(--oxs-radius-md);
+}
+
+/* Pre-publication Studio polish: preview-first hierarchy with lower text density. */
+.ui-studio-stage {
+  background:
+    radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--oxs-color-accent) 12%, transparent), transparent 30rem),
+    #080b12;
+}
+
+.ui-studio-shell {
+  grid-template-columns: minmax(15.5rem, 18.5rem) minmax(0, 1fr);
+  gap: var(--oxs-space-sm);
+}
+
+.ui-studio-sidebar {
+  border-color: color-mix(in srgb, var(--oxs-color-border) 74%, transparent);
+  box-shadow: var(--oxs-elevation-2);
+}
+
+.ui-studio-sidebar__header {
+  gap: var(--oxs-space-xs);
+  padding: var(--oxs-space-sm);
+  background: color-mix(in srgb, var(--oxs-color-surface) 76%, transparent);
+}
+
+.ui-studio-sidebar__content {
+  padding-block-start: var(--oxs-space-md);
+}
+
+.ui-studio-sidebar__layer-heading {
+  color: var(--oxs-color-text-secondary);
+}
+
+.ui-studio-sidebar__category .ui-list-section__header {
+  padding-block: var(--oxs-space-2xs);
+  opacity: 0.82;
+}
+
+.ui-studio-sidebar__entry .ui-list-item__action {
+  border-radius: var(--oxs-radius-md);
+}
+
+.ui-studio-shell__workspace {
+  gap: var(--oxs-space-xs);
+}
+
+.ui-studio-appbar {
+  background: color-mix(in srgb, var(--oxs-color-surface-strong) 88%, transparent);
+  box-shadow: var(--oxs-elevation-1);
+}
+
+.ui-studio-environment {
+  padding: var(--oxs-space-xs);
+  border-color: color-mix(in srgb, var(--oxs-color-border-subtle) 70%, transparent);
+  background: color-mix(in srgb, var(--oxs-color-surface) 64%, transparent);
+}
+
+.ui-studio-workspace-content {
+  padding-block-start: var(--oxs-space-md);
+}
+
+.ui-studio-detail {
+  padding: clamp(var(--oxs-space-md), 2cqi, var(--oxs-space-xl));
+  border-color: color-mix(in srgb, var(--oxs-color-border-subtle) 62%, transparent);
+  background: color-mix(in srgb, var(--oxs-color-canvas-raised) 74%, transparent);
+  box-shadow: 0 1.5rem 4rem color-mix(in srgb, var(--oxs-color-canvas) 48%, transparent);
+}
+
+.ui-studio-entry-hero {
+  max-inline-size: 62rem;
+}
+
+.ui-studio-entry-hero .ui-heading {
+  letter-spacing: -0.035em;
+}
+
+.ui-studio-entry-summary {
+  max-width: 62ch;
+  font-size: clamp(var(--oxs-type-body-size), 1.25cqi, var(--oxs-type-title-size));
+}
+
+.ui-studio-component-preview {
+  padding: var(--oxs-space-sm);
+  border: var(--oxs-border-hairline) solid color-mix(in srgb, var(--oxs-color-accent-border) 56%, var(--oxs-color-border-subtle));
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--oxs-color-accent-soft) 34%, transparent), transparent 42%),
+    var(--oxs-color-surface-subtle);
+  box-shadow: var(--oxs-elevation-2);
+}
+
+.ui-studio-component-preview .ui-studio-playground__sample {
+  min-height: clamp(15rem, 31cqi, 25rem);
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--oxs-color-border) 72%, transparent);
+  background:
+    radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--oxs-color-accent-soft) 26%, transparent), transparent 46%),
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--oxs-color-border) 48%, transparent) 1px, transparent 0),
+    var(--oxs-color-canvas);
+  background-size: auto, 1.25rem 1.25rem, auto;
+}
+
+.ui-studio-overview-grid {
+  align-items: stretch;
+}
+
+.ui-studio-import-card,
+.ui-studio-contract-card {
+  min-width: 0;
+  padding: var(--oxs-space-md);
+}
+
+.ui-studio-contract-card .ui-studio-guidance-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--oxs-space-xs);
+}
+
+.ui-studio-contract-card .ui-studio-guidance-card {
+  padding: var(--oxs-space-sm);
+  background: color-mix(in srgb, var(--oxs-color-canvas-raised) 72%, transparent);
+}
+
+.ui-studio-coverage-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.ui-studio-coverage-card > .ui-disclosure {
+  border: 0;
+}
+
+.ui-studio-coverage-card .ui-disclosure__summary {
+  padding: var(--oxs-space-md);
+}
+
+.ui-studio-coverage-card .ui-disclosure__content {
+  padding: 0 var(--oxs-space-md) var(--oxs-space-md);
+}
+
+.ui-studio-detail__section:not(:first-child) > .ui-stack > .ui-stack:first-child {
+  max-width: 56rem;
+}
+
+.ui-studio-detail__section + .ui-divider {
+  opacity: 0.38;
+}
+
+@container oxs-ui (max-width: 68rem) {
+  .ui-studio-contract-card .ui-studio-guidance-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

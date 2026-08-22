@@ -74,12 +74,12 @@ export function StudioSidebar({
   return (
     <Surface className="ui-studio-sidebar" material="glass" radius="lg" elevation={1}>
       <Stack className="ui-studio-sidebar__header" gap="sm">
-        <Stack gap="3xs">
+        <Row justify="between" align="center" gap="sm">
           <Label tone="accent" emphasis="strong">
-            OntologyX UI Studio
+            Catalog
           </Label>
-          <Text tone="tertiary">Generated · self-hosted · acceptance-bound</Text>
-        </Stack>
+          <Badge size="sm">{entries.length}</Badge>
+        </Row>
         <SearchField
           value={query}
           onValueChange={onQueryChange}
@@ -119,7 +119,6 @@ export function StudioSidebar({
                 <ListSection
                   key={category.id}
                   title={category.label}
-                  description={`${category.entries.length} ${category.entries.length === 1 ? 'entry' : 'entries'}`}
                   className="ui-studio-sidebar__category"
                 >
                   <List label={`${layerLabels[group.layer]} / ${category.label}`}>
@@ -127,11 +126,12 @@ export function StudioSidebar({
                       <ListItem
                         key={entry.id}
                         primary={entry.exportName}
-                        secondary={entry.summary}
                         metadata={
-                          <Badge size="sm" tone={statusTone(entry.status)}>
-                            {entry.status}
-                          </Badge>
+                          entry.status === 'accepted' ? undefined : (
+                            <Badge size="sm" tone={statusTone(entry.status)}>
+                              {entry.status}
+                            </Badge>
+                          )
                         }
                         selected={entry.id === activeId}
                         selectionSemantics="current"
