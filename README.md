@@ -45,11 +45,11 @@ Production direction is `Foundations → Primitives → Components → System UI
 
 ## Publication safety
 
-`@ontologyx/ui` is an MIT-licensed public package under the `ontologyx` npm organization. The first bootstrap publish is interactive; subsequent tagged releases use npm Trusted Publishing from `OntologyXHQ/ui` and remain guarded by `NPM_PUBLISH_ENABLED=true`.
+`@ontologyx/ui` is an MIT-licensed public package under the `ontologyx` npm organization. Stable tagged releases use npm Trusted Publishing from `OntologyXHQ/ui` and remain guarded by `NPM_PUBLISH_ENABLED=true`; local closeout never tags, pushes or publishes implicitly.
 
 ## V1 closeout frontier
 
-The reset/reacceptance program converges on one stable `@ontologyx/ui@1.0.0` release candidate: all 100 intended public visual exports are promoted to `accepted`, certification ownership covers every accepted export, developer compositions and System UI are bound to dedicated behavior/browser journeys, and Studio renders the real public exports while exposing certification evidence instead of inferred coverage. Local convergence is deliberately simple: `pnpm verify` proves G0..G6 and `pnpm release:check` proves the packed G7 artifact without modifying planning files or touching OXS. Real OXS validation is a separate explicit cross-repository operation (`pnpm v1:oxs:check -- /path/to/OXS`) and stable npm/tag publication remains explicit. Native Wayland/compositor/IME authority remains outside this repository.
+The reset/reacceptance program converges on one stable `@ontologyx/ui@1.0.0` release candidate: all 100 intended public visual exports are promoted to `accepted`, certification ownership covers every accepted export, developer compositions and System UI are bound to dedicated behavior/browser journeys, and Studio renders the real public exports while exposing certification evidence instead of inferred coverage. Local convergence is deliberately simple: `pnpm verify` proves G0..G6 and `pnpm release:check` proves the packed G7 artifact without modifying planning files or touching OXS. Real OXS validation is a separate explicit cross-repository operation (`pnpm v1:oxs:check -- /path/to/OXS`). UIR17 first reaches a truthful `PUBLICATION READY` state after the final measured budgets, packed consumer and OXS RC all pass; only a verified Git tag plus registry `latest` publication can close `UI-1708`. Native Wayland/compositor/IME authority remains outside this repository.
 
 ## Studio deployment
 

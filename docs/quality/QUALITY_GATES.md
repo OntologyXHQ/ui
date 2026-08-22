@@ -121,7 +121,7 @@ The harness also executes intentionally broken or adversarial ephemeral browser 
 
 `pnpm release:check`
 
-Extends G0..G6 with production Studio artifact checks, a deterministic stable tarball artifact, a fresh packed-tarball generic consumer install/typecheck/Node-import/Vite-build smoke, the reviewed package/Studio/tarball budgets, and the V1 freeze contract. Release checks operate on the artifact users receive and remain local to this repository. Real OXS certification is an explicit cross-repository operation (`pnpm v1:oxs:check -- /path/to/OXS`), not an implicit part of G7.
+Extends G0..G6 with production Studio artifact checks, a deterministic stable tarball artifact, and a fresh packed-tarball generic consumer proof covering install, Node import, **SSR render**, types, explicit CSS consumption, Vite production build, **tree-shaking**, and one **React/React DOM peers** graph with no package-owned duplicate runtime. G7 also checks the final measured package/Studio/tarball budgets, the 100/100 certification freeze, cross-axis/adversarial browser evidence, and the stable publication contract. Release checks operate on the artifact users receive and remain local to this repository. Real OXS certification is an explicit cross-repository operation (`pnpm v1:oxs:check -- /path/to/OXS`), not an implicit part of normal G7.
 
 ## Canonical commands
 

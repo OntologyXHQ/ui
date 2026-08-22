@@ -350,15 +350,15 @@ Closure target: Developer compositions remain product-neutral and only exist whe
 
 ---
 
-## UIR17 — Cross-axis certification, package hardening and V1 freeze — NEXT
+## UIR17 — Cross-axis certification, package hardening and V1 freeze — PUBLICATION READY
 
-- `UI-1701` Ensure every intended V1 public export is `accepted` or explicitly removed/experimental/deprecated.
-- `UI-1702` Run full RTL/LTR, theme, density, responsive/container, touch/pointer, keyboard/focus, reduced-motion and accessibility matrix.
-- `UI-1703` Run adversarial lifecycle tests: nested roots, unmount, reorder, delayed events, portal nesting, resize/zoom and interrupted interactions.
-- `UI-1704` Freeze bundle/source/CSS budgets from measured V1 output rather than arbitrary historical ceilings.
-- `UI-1705` Prove Node/SSR import safety, explicit CSS consumption, tree-shakeable ESM and no duplicate React/runtime dependency.
-- `UI-1706` Prove fresh packed-tarball consumer install/types/Node import/Vite production build.
-- `UI-1707` Remove stale beta compatibility paths/docs and reconcile README/API/release docs with actual behavior.
-- `UI-1708` Revalidate OXS against the release candidate, publish the stable version, and move `latest` to stable.
+- `UI-1701` Ensure every intended V1 public export is `accepted` or explicitly removed/experimental/deprecated. **DONE**
+- `UI-1702` Run full RTL/LTR, theme, density, responsive/container, touch/pointer, keyboard/focus, reduced-motion and accessibility matrix. **DONE**
+- `UI-1703` Run adversarial lifecycle tests: nested roots, unmount, reorder, delayed events, portal nesting, resize/zoom and interrupted interactions. **DONE**
+- `UI-1704` Freeze bundle/source/CSS budgets from measured V1 output rather than arbitrary historical ceilings. **DONE**
+- `UI-1705` Prove Node/SSR import safety, explicit CSS consumption, tree-shakeable ESM and no duplicate React/runtime dependency. **DONE**
+- `UI-1706` Prove fresh packed-tarball consumer install/types/Node import/Vite production build. **DONE**
+- `UI-1707` Remove stale beta compatibility paths/docs and reconcile README/API/release docs with actual behavior. **DONE**
+- `UI-1708` Revalidate OXS against the release candidate, publish the stable version, and move `latest` to stable. **PUBLICATION READY** — real OXS RC passed; stable Git tag/npm `latest` publication remains explicit.
 
 V1 closes only when there are no unreviewed public visual exports pretending to be stable and the package/Studio/OXS consumer all agree on the same accepted API.

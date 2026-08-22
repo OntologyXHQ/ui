@@ -1,36 +1,38 @@
 {
-  "schema": 1,
+  "schema": 2,
   "packageVersion": "1.0.0",
-  "measuredAt": "2026-08-21T18:17:22.472Z",
-  "policy": "V1 measured output plus 10% or 1 KiB minimum headroom, rounded to the next KiB; rebaseline requires explicit review.",
+  "freezeOwner": "UIR17",
+  "measurement": "final-v1-release-candidate",
+  "measuredAt": "2026-08-22T17:39:57.322Z",
+  "policy": "Final V1 measured output plus 10% or 1 KiB minimum headroom, rounded to the next KiB; any post-freeze rebaseline requires explicit release review.",
   "metrics": {
     "packageJavaScript": {
-      "measuredBytes": 277754,
+      "measuredBytes": 278060,
       "limitBytes": 306176,
       "measuredFiles": 6
     },
     "packageCss": {
-      "measuredBytes": 104081,
-      "limitBytes": 114688,
+      "measuredBytes": 104482,
+      "limitBytes": 115712,
       "measuredFiles": 1
     },
     "packageTypes": {
-      "measuredBytes": 363059,
+      "measuredBytes": 363258,
       "limitBytes": 400384,
       "measuredFiles": 94
     },
     "studioJavaScript": {
-      "measuredBytes": 805538,
-      "limitBytes": 886784,
+      "measuredBytes": 838867,
+      "limitBytes": 923648,
       "measuredFiles": 25
     },
     "studioCss": {
-      "measuredBytes": 134652,
-      "limitBytes": 148480,
+      "measuredBytes": 136188,
+      "limitBytes": 150528,
       "measuredFiles": 1
     },
     "packedTarball": {
-      "measuredBytes": 143635,
+      "measuredBytes": 143838,
       "limitBytes": 158720,
       "measuredFiles": 1
     }

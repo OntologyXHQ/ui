@@ -8,6 +8,13 @@
 - Made Studio a generated, self-hosted SDK workbench with real previews, API/JSDoc, searchable deep links, environment controls, error isolation, and browser certification evidence.
 - Hardened the package/release boundary for stable ESM/types/CSS exports, Node-safe imports, packed-tarball consumer verification, measured artifact budgets, isolated real-OXS release-candidate validation, production Studio, and real-browser acceptance.
 
+## UIR17 — V1 release hardening and freeze
+
+- Added one final G7 release-hardening contract over 100/100 accepted exports, full cross-axis/adversarial G6 evidence, final measured artifact budgets, packed consumer evidence and stable publication policy.
+- Strengthened the published-tarball smoke to prove Node import, SSR rendering, explicit stylesheet consumption, TypeScript, Vite production bundling, ESM tree-shaking and a single consumer-owned React/React DOM peer graph.
+- Reconciled release/OXS documentation with the post-UI-split validator: current dirty non-ignored consumer state is isolated safely, the untouched OXS baseline gate runs before candidate injection, and direct candidate consumers own the final check/build proof.
+- Split UIR17 into a truthful release-candidate closeout and a registry-backed publication closeout: source planning can reach PUBLICATION READY locally, but UI-1708 is DONE only after the `v1.0.0` tag and npm `latest` are observable.
+
 ## UIR16 — Studio product-workbench closeout
 
 - Made catalog search, layer and lifecycle status first-class shareable URL state while preserving source-owned layer/category ordering and public Component controls.

@@ -6,6 +6,21 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
 const pkg = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
 const failures = [];
+if (pkg.type !== 'module') failures.push('package must remain ESM-only');
+if (pkg.dependencies && Object.keys(pkg.dependencies).length > 0) {
+  failures.push(
+    'package must keep zero runtime dependencies; React/runtime libraries belong in peerDependencies',
+  );
+}
+for (const peer of ['react', 'react-dom']) {
+  if (!pkg.peerDependencies?.[peer]) failures.push(`missing required peer dependency ${peer}`);
+}
+if (pkg.peerDependencies?.react !== pkg.devDependencies?.react) {
+  failures.push('react peer/dev versions must match for the frozen V1 release');
+}
+if (pkg.peerDependencies?.['react-dom'] !== pkg.devDependencies?.['react-dom']) {
+  failures.push('react-dom peer/dev versions must match for the frozen V1 release');
+}
 if (pkg.private === true) failures.push('package is still private');
 if (pkg.license !== 'MIT')
   failures.push('package license must be MIT for the public OntologyX release');

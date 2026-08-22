@@ -17,7 +17,7 @@
     "quality": "pnpm check && pnpm test",
     "build": "pnpm --filter @ontologyx/ui build && pnpm --filter @ontologyx/ui-studio build",
     "verify": "pnpm quality && pnpm gate:studio && pnpm gate:build && pnpm gate:browser:run",
-    "release:check": "pnpm verify && node scripts/check-studio-production.mjs && node scripts/create-tarball.mjs --from-build && node scripts/package-smoke.mjs && pnpm v1:budgets:check && pnpm v1:freeze:check",
+    "release:check": "pnpm verify && pnpm release:artifacts",
     "gate:architecture": "python3 scripts/gates/check-architecture.py && node scripts/gates/check-foundations.mjs && node scripts/gates/check-environment.mjs && node scripts/gates/check-layout.mjs && node scripts/gates/check-visual.mjs && node scripts/gates/check-runtime-kernel.mjs && node scripts/gates/check-actions.mjs && node scripts/gates/check-fields.mjs && node scripts/gates/check-browser-fixture-scope.mjs && node scripts/gates/check-selection-disclosure.mjs && node scripts/gates/check-navigation-data.mjs && node scripts/gates/check-developer-compositions.mjs && node scripts/gates/check-system-ui-core.mjs && node scripts/gates/check-privileged-system-surfaces.mjs && node scripts/gates/check-overlays-feedback.mjs && node scripts/gates/check-scroll-motion.mjs && node scripts/gates/check-gestures-drag-editing-cursor.mjs && node scripts/gates/check-command-contract.mjs",
     "gate:developer-compositions": "node scripts/gates/check-developer-compositions.mjs",
     "gate:catalog": "pnpm catalog:check && node scripts/gates/check-catalog-acceptance.mjs",
@@ -48,7 +48,13 @@
     "gate:privileged-system-surfaces": "node scripts/gates/check-privileged-system-surfaces.mjs",
     "uir15:closeout": "node scripts/closeout-uir15.mjs",
     "gate:studio-workbench": "node scripts/gates/check-studio-workbench.mjs",
-    "uir16:closeout": "node scripts/closeout-uir16.mjs"
+    "uir16:closeout": "node scripts/closeout-uir16.mjs",
+    "release:artifacts": "node scripts/check-studio-production.mjs && node scripts/create-tarball.mjs --from-build && node scripts/package-smoke.mjs && pnpm v1:budgets:check && pnpm v1:freeze:check && pnpm gate:v1-release-hardening",
+    "gate:v1-release-hardening": "node scripts/gates/check-v1-release-hardening.mjs",
+    "v1:budgets:rebaseline": "node scripts/rebaseline-uir17-artifact-budgets.mjs",
+    "uir17:closeout": "node scripts/closeout-uir17.mjs",
+    "uir17:publication:check": "node scripts/check-v1-publication.mjs",
+    "uir17:publication:closeout": "node scripts/closeout-uir17-publication.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.7",

@@ -28,14 +28,15 @@ Mutating maintenance is explicit:
 pnpm format             # formatter only
 pnpm lint               # explicit repo-wide Biome lint/debt audit
 pnpm catalog:generate   # regenerate checked-in catalog output
-pnpm v1:budgets:freeze  # explicit reviewed budget rebaseline only
+pnpm v1:budgets:freeze      # initial freeze only; refuses to overwrite an existing baseline
+pnpm v1:budgets:rebaseline  # UIR17 final measured-output rebaseline; explicit release-review operation
 ```
 
 `pnpm v1:closeout` remains a compatibility command, but it is validation-only and simply runs `pnpm release:check`. Planning/evidence claims are updated only after review of successful gate output.
 
 ## Measured V1 artifact budgets
 
-`docs/quality/V1_ARTIFACT_BUDGETS.json` is a reviewed baseline derived from measured V1 output. `pnpm release:check` only checks that baseline; it never silently creates or rewrites it. Any rebaseline is an explicit `pnpm v1:budgets:freeze` operation followed by review of the diff.
+`docs/quality/V1_ARTIFACT_BUDGETS.json` is a reviewed baseline derived from measured V1 output. `pnpm release:check` only checks that baseline; it never silently creates or rewrites it. The UIR17 final freeze is an explicit `pnpm v1:budgets:rebaseline` operation performed only after the verified package/Studio/tarball exist; later rebaselines require a new explicit release review. Normal `pnpm release:check` never rewrites budgets.
 
 ## Real OXS consumer
 
@@ -45,11 +46,30 @@ OXS validation is intentionally outside normal OXS-UI `verify` and `release:chec
 pnpm v1:oxs:check -- /path/to/OXS
 ```
 
-The command requires a clean tracked OXS Git worktree, creates a detached temporary Git worktree from that exact OXS commit, overlays only `@ontologyx/ui` dependency declarations in the temporary worktree, installs the already-packed candidate, and runs OXS's canonical `pnpm verify`. It does not recursively copy the OXS workspace, so ignored build caches such as Servo/Cargo output never enter the isolation step. The original OXS tracked source tree is not modified.
+The validator creates a detached temporary Git worktree from the concrete OXS `HEAD`, then overlays the caller's current **tracked changes plus untracked non-ignored files** without copying ignored build/cache output. It first installs the untouched dependency baseline and runs the **baseline OXS-owned root gate** (`pnpm quality` in the post-UI-split repository, with legacy `pnpm verify` support where applicable). Only after that baseline passes does it inject the already-packed `@ontologyx/ui` candidate into the isolated manifests, reinstall, and run each direct candidate consumer package `check`/`build` script. This preserves OXS policy/pinning authority while proving the release candidate against the user's actual current consumer state. The original OXS worktree is never modified.
 
-Successful temporary worktrees are removed automatically. On failure, evidence is written under `artifacts/oxs-consumer-validation/` and the failing temporary worktree is preserved for diagnosis.
+Successful temporary worktrees are removed automatically. On failure, evidence is written under `artifacts/oxs-consumer-validation/` and the failing temporary worktree is preserved for diagnosis. Offline install is attempted first; a network fallback is allowed only when pnpm reports a missing local tarball.
 
 This is an explicit cross-repository release certification, not a hidden prerequisite of day-to-day UI verification.
+
+
+## UIR17 release-candidate and publication closeout
+
+The final roadmap batch deliberately separates source/release-candidate proof from the external publication event:
+
+```bash
+OXS_CONSUMER_ROOT=/path/to/OXS pnpm uir17:closeout
+```
+
+That command regenerates the catalog, runs full G0..G6 verification, packs and consumes the candidate, rebaselines the final V1 artifact budgets from that verified output, validates the real OXS consumer, and moves planning only to **PUBLICATION READY**. It never tags, pushes or publishes.
+
+After the `v1.0.0` tag is pushed and the trusted release workflow has actually published `@ontologyx/ui@1.0.0` with dist-tag `latest`, run:
+
+```bash
+pnpm uir17:publication:closeout
+```
+
+The publication closeout verifies the Git tag, registry version and `latest` dist-tag before marking `UI-1708` and `UIR17` DONE.
 
 ## Stable publication
 

@@ -39,24 +39,37 @@ forbid('verify', [
   'catalog:generate',
   'v1:budgets:freeze',
 ]);
+expectEqual('release:check', 'pnpm verify && pnpm release:artifacts');
+expectEqual(
+  'release:artifacts',
+  'node scripts/check-studio-production.mjs && node scripts/create-tarball.mjs --from-build && node scripts/package-smoke.mjs && pnpm v1:budgets:check && pnpm v1:freeze:check && pnpm gate:v1-release-hardening',
+);
 forbid('release:check', [
   'v1:oxs:check',
   'v1:closeout',
   'format',
   'catalog:generate',
   'v1:budgets:freeze',
+  'v1:budgets:rebaseline',
 ]);
-
-for (const required of [
+forbid('release:artifacts', [
   'pnpm verify',
+  'v1:oxs:check',
+  'format',
+  'catalog:generate',
+  'v1:budgets:freeze',
+  'v1:budgets:rebaseline',
+]);
+for (const required of [
   'scripts/check-studio-production.mjs',
   'scripts/create-tarball.mjs --from-build',
   'scripts/package-smoke.mjs',
   'pnpm v1:budgets:check',
   'pnpm v1:freeze:check',
+  'pnpm gate:v1-release-hardening',
 ]) {
-  if (!(scripts['release:check'] ?? '').includes(required)) {
-    failures.push(`release:check must include ${required}`);
+  if (!(scripts['release:artifacts'] ?? '').includes(required)) {
+    failures.push(`release:artifacts must include ${required}`);
   }
 }
 
