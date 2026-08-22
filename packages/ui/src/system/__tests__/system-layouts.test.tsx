@@ -131,12 +131,19 @@ describe('System layout library', () => {
   });
 
   it('composes notification and quick-settings view models from public Components', () => {
+    const onNotificationActivate = vi.fn();
     render(
       <UiRoot>
         <SystemNotificationCenter
           items={[
-            { id: '1', title: 'Update ready', body: 'Restart when convenient', unread: true },
+            {
+              id: 'update-ready',
+              title: 'Update ready',
+              body: 'Restart when convenient',
+              unread: true,
+            },
           ]}
+          onActivate={onNotificationActivate}
         />
         <SystemQuickSettings
           sections={[
@@ -148,6 +155,8 @@ describe('System layout library', () => {
     );
     expect(screen.getByText('Update ready')).toBeInTheDocument();
     expect(screen.getByText('New')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Update ready/ }));
+    expect(onNotificationActivate).toHaveBeenCalledWith('update-ready');
     expect(screen.getByRole('switch', { name: 'Wi-Fi' })).toBeChecked();
     expect(screen.getByRole('slider', { name: 'Volume' })).toBeInTheDocument();
   });
@@ -174,6 +183,12 @@ describe('System layout library', () => {
       </UiRoot>,
     );
     expect(screen.getByRole('progressbar', { name: 'Volume' })).toHaveAttribute('value', '64');
+    const osdStatus = screen.getByRole('status');
+    expect(osdStatus).toHaveTextContent('Volume');
+    expect(osdStatus.closest('[data-oxs-system-surface]')).toHaveAttribute(
+      'data-oxs-system-edge',
+      'block-end',
+    );
     expect(screen.getByRole('region', { name: 'Lock screen' })).toBeInTheDocument();
     expect(
       screen

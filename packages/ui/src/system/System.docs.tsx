@@ -290,13 +290,21 @@ export const uiDocs = defineUiDocsGroup([
     summary:
       'Backend-neutral OXS notification-center presentation over List/ContentState/ScrollView Components.',
     usage:
-      'Pass notification view-models from the System owner; delivery, persistence and permission semantics stay outside React.',
+      'Pass notification view-models from the System owner and receive activation by stable id; delivery, persistence, permission and action policy stay outside React.',
     status: 'accepted',
     accessibility:
       'One labelled notification region contains list items with optional activation semantics.',
     rtl: 'Metadata/trailing state use logical list layout.',
     touch: 'Activated items use Component list interaction and touch targets.',
-    responsive: 'List and empty states fill available System panel/container space.',
+    responsive:
+      'List and empty states fill available System panel/container space; the containing System panel owns output safe-area placement.',
+    examples: [
+      {
+        id: 'notifications',
+        title: 'Host-neutral notification activation',
+        component: 'SystemNotificationCenterExample',
+      },
+    ],
     playground: {
       preferredWidth: 'wide',
       fixture: {
@@ -326,7 +334,8 @@ export const uiDocs = defineUiDocsGroup([
     accessibility: 'Each Card section labels its contained Component controls.',
     rtl: 'Section grid and controls follow logical Component layout.',
     touch: 'Switch/Slider/Button interactions retain their shared touch and keyboard semantics.',
-    responsive: 'Sections collapse from multi-column to single-column by container width.',
+    responsive:
+      'Sections collapse from multi-column to single-column by container width; hardware/output safe-area placement stays with the containing System host.',
     playground: {
       preferredWidth: 'wide',
       fixture: {
@@ -356,10 +365,12 @@ export const uiDocs = defineUiDocsGroup([
     usage:
       'Render from System state only; hardware mutation and timeout policy stay with the owning runtime.',
     status: 'accepted',
-    accessibility: 'StatusIndicator/Progress expose readable status/value semantics.',
+    accessibility:
+      'StatusIndicator announces the transient status politely while Progress exposes the determinate value; the OSD never captures pointer input.',
     rtl: 'Icon/content flow is logical.',
     touch: 'OSD is informational and does not create hover-only actions.',
-    responsive: 'Card clamps to the current output/container and safe region.',
+    responsive:
+      'Card clamps to the current output and stays above the maximum of logical safe-area and transient occlusion inputs.',
     examples: [
       {
         id: 'transient',
@@ -376,7 +387,7 @@ export const uiDocs = defineUiDocsGroup([
     summary:
       'System command/search dialog composed from Dialog, SearchField, List and ScrollView Components.',
     usage:
-      'Pass command view-models and activation callbacks; command discovery/execution authority remains outside the visual surface.',
+      'Pass command view-models and activation callbacks; command discovery/execution authority remains outside the visual surface and focus lookup stays in the owner Document realm.',
     status: 'accepted',
     accessibility:
       'Dialog focus lifecycle and labelled command list come from shared overlay/list Components.',
@@ -420,7 +431,8 @@ export const uiDocs = defineUiDocsGroup([
       'Lock screen landmark contains Component-owned authentication/actions with caller-provided naming.',
     rtl: 'Centered content and logical action layout remain direction-neutral.',
     touch: 'Authentication controls use public Component hit targets and focus semantics.',
-    responsive: 'Central auth card clamps and reflows across narrow/wide outputs.',
+    responsive:
+      'Central auth card clamps/reflows and keeps all four logical edges clear of persistent safe-area and transient occlusion inputs.',
     playground: {
       preferredWidth: 'medium',
       fixture: { primary: '12:42', authentication: 'Authentication controls' },
@@ -440,9 +452,9 @@ export const uiDocs = defineUiDocsGroup([
       'Every key is a native Button with explicit names; modifier state is exposed with aria-pressed and alternate groups are labelled.',
     rtl: 'Persian and other RTL layouts own key-plane direction while the privileged host keeps logical safe-area and block-end geometry.',
     touch:
-      'Large Component-owned targets, shared long-press cancellation, alternates and repeat avoid a keyboard-private gesture engine.',
+      'Large Component-owned targets, shared long-press cancellation, alternates and owner-Window repeat avoid a keyboard-private gesture engine; repeat stops when native visibility/session ownership is withdrawn.',
     responsive:
-      'Rows flex across narrow/wide containers, preserve minimum touch targets and consume logical safe-area padding.',
+      'Rows flex across narrow/wide containers, preserve minimum touch targets and consume persistent logical safe-area padding without consuming the occlusion produced by the keyboard itself.',
     playground: {
       preferredWidth: 'wide',
       fixture: {
@@ -549,7 +561,10 @@ export function SystemKeyboardExample() {
         />
       </div>
       <div className="ui-doc-system-keyboard-example__stage">
-        <SystemKeyboardHost state={state} onCommand={onCommand} />
+        <SystemScaffold
+          workspace={<div aria-hidden data-uir15-keyboard-workspace />}
+          privileged={<SystemKeyboardHost state={state} onCommand={onCommand} />}
+        />
       </div>
       <StatusIndicator
         label={lastCommand ? `Last command: ${lastCommand.type}` : 'Ready for input'}
@@ -694,6 +709,31 @@ export function SystemSettingsExample() {
           <Switch label="Example setting" defaultChecked />
         </Card>
       </SystemSettingsLayout>
+    </div>
+  );
+}
+
+export function SystemNotificationCenterExample() {
+  const [requestedNotificationId, setRequestedNotificationId] = useState('none');
+  return (
+    <div data-uir15-notification-example>
+      <SystemNotificationCenter
+        items={[
+          {
+            id: 'sync-complete',
+            title: 'Sync complete',
+            body: 'Workspace state is current.',
+            metadata: 'now',
+            unread: true,
+          },
+          { id: 'update-ready', title: 'Update ready', body: 'Restart when convenient.' },
+        ]}
+        onActivate={setRequestedNotificationId}
+      />
+      <StatusIndicator
+        label={`Requested notification id: ${requestedNotificationId}`}
+        tone={requestedNotificationId === 'none' ? 'neutral' : 'success'}
+      />
     </div>
   );
 }

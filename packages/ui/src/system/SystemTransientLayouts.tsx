@@ -43,7 +43,7 @@ export function SystemOsd({
   return (
     <SystemSurface
       kind="transient"
-      edge="none"
+      edge="block-end"
       label={label}
       className={`ui-system-osd ${className}`.trim()}
     >
@@ -55,7 +55,7 @@ export function SystemOsd({
             </span>
           ) : null}
           <div className="ui-system-osd__content">
-            <StatusIndicator label={label} tone={tone} />
+            <StatusIndicator label={label} tone={tone} announce />
             {status ? <div className="ui-system-osd__status">{status}</div> : null}
             {value === undefined ? null : <Progress label={label} value={value} max={max} />}
           </div>
@@ -142,10 +142,8 @@ export function SystemCommandSurface({
       buttons.at(-1)?.focus({ preventScroll: true });
       return;
     }
-    const current =
-      document.activeElement instanceof HTMLButtonElement
-        ? buttons.indexOf(document.activeElement)
-        : -1;
+    const activeElement = commandListRef.current?.ownerDocument.activeElement;
+    const current = activeElement ? buttons.indexOf(activeElement as HTMLButtonElement) : -1;
     const delta = event.key === 'ArrowDown' ? 1 : -1;
     const next =
       current < 0

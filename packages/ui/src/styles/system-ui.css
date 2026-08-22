@@ -403,8 +403,13 @@
 /* UIP12 · transient + privileged layouts */
 .ui-system-osd {
   position: absolute;
+  margin: 0;
   inset-inline: var(--oxs-layout-gutter);
-  inset-block-end: max(calc(var(--oxs-layout-gutter) * 2), var(--oxs-safe-block-end));
+  inset-block-end: max(
+    calc(var(--oxs-layout-gutter) * 2),
+    var(--oxs-safe-block-end),
+    var(--oxs-occlusion-block-end)
+  );
   display: grid;
   place-items: center;
   pointer-events: none;
@@ -412,7 +417,6 @@
 
 .ui-system-osd__card {
   inline-size: min(22rem, 100%);
-  pointer-events: auto;
 }
 
 .ui-system-osd__row {
@@ -456,10 +460,10 @@
   place-items: center;
   gap: var(--oxs-space-lg);
   padding:
-    max(var(--oxs-space-xl), var(--oxs-safe-block-start))
-    max(var(--oxs-space-lg), var(--oxs-safe-inline-end))
-    max(var(--oxs-space-xl), var(--oxs-safe-block-end))
-    max(var(--oxs-space-lg), var(--oxs-safe-inline-start));
+    max(var(--oxs-space-xl), var(--oxs-safe-block-start), var(--oxs-occlusion-block-start))
+    max(var(--oxs-space-lg), var(--oxs-safe-inline-end), var(--oxs-occlusion-inline-end))
+    max(var(--oxs-space-xl), var(--oxs-safe-block-end), var(--oxs-occlusion-block-end))
+    max(var(--oxs-space-lg), var(--oxs-safe-inline-start), var(--oxs-occlusion-inline-start));
 }
 
 .ui-system-lock-layout__status {

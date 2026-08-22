@@ -17,6 +17,8 @@ export type SystemNotificationCenterProps = {
   title?: ReactNode;
   /** Caller-owned notification view models; delivery and persistence remain external. */
   items: readonly SystemNotificationItem[];
+  /** Reports activation by stable notification identity; delivery/action policy remains external. */
+  onActivate?: (id: string) => void;
   /** Optional caller-owned action region composed from public Components. */
   actions?: ReactNode;
   /** Accessible landmark label for the notification center. */
@@ -36,6 +38,7 @@ export type SystemNotificationCenterProps = {
 export function SystemNotificationCenter({
   title = 'Notifications',
   items,
+  onActivate,
   actions,
   label = 'Notification center',
   collectionLabel = 'Notifications',
@@ -53,6 +56,7 @@ export function SystemNotificationCenter({
             {items.map((item) => (
               <ListItem
                 key={item.id}
+                data-system-notification-id={item.id}
                 primary={item.title}
                 secondary={item.body}
                 metadata={item.metadata}
@@ -61,7 +65,7 @@ export function SystemNotificationCenter({
                   item.trailing ??
                   (item.unread ? <Badge tone="accent">{unreadLabel}</Badge> : undefined)
                 }
-                onActivate={item.onActivate}
+                onActivate={item.onActivate ?? (onActivate ? () => onActivate(item.id) : undefined)}
               />
             ))}
           </List>
@@ -112,6 +116,7 @@ export function SystemQuickSettings({
           {sections.map((section) => (
             <Card
               key={section.id}
+              data-system-quick-setting-id={section.id}
               className="ui-system-quick-settings__section"
               title={section.title}
               description={section.description}

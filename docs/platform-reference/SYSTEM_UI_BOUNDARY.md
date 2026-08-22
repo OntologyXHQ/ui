@@ -45,7 +45,7 @@ Those owners feed typed state/commands across explicit boundaries.
 
 ## Privileged surfaces
 
-`SystemScaffold` includes a privileged surface host specifically so the future touch keyboard, lock/auth and similar surfaces have an explicit System place. This does not make them ordinary application widgets. See `SYSTEM_INPUT_SURFACES.md`.
+`SystemScaffold` includes a privileged surface host so the touch keyboard and other privileged System surfaces have an explicit ownership slot. UIR15 executable evidence mounts the canonical keyboard through that slot. This does not make privileged surfaces ordinary application widgets or move native authority into React. See `SYSTEM_INPUT_SURFACES.md`.
 
 ## Studio
 

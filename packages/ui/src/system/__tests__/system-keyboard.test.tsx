@@ -132,6 +132,46 @@ describe('System touch keyboard', () => {
     expect(repeatsAfterRelease).toBe(repeatsBeforeRelease);
   });
 
+  it('stops repeat immediately when compositor-owned visibility is withdrawn', () => {
+    vi.useFakeTimers();
+    const onCommand = vi.fn();
+    const { rerender } = render(
+      <UiRoot>
+        <div style={{ position: 'relative', width: 800, height: 420 }}>
+          <SystemKeyboardHost state={baseState} onCommand={onCommand} />
+        </div>
+      </UiRoot>,
+    );
+    const backspace = screen.getByRole('button', { name: 'Backspace' });
+    fireEvent.pointerDown(backspace, {
+      pointerId: 51,
+      pointerType: 'touch',
+      button: 0,
+      isPrimary: true,
+      clientX: 0,
+      clientY: 0,
+    });
+    act(() => vi.advanceTimersByTime(760));
+    const beforeHide = (onCommand.mock.calls as [SystemKeyboardCommand][]).filter(
+      ([command]) => command.type === 'backspace',
+    ).length;
+    expect(beforeHide).toBeGreaterThan(1);
+
+    rerender(
+      <UiRoot>
+        <div style={{ position: 'relative', width: 800, height: 420 }}>
+          <SystemKeyboardHost state={{ ...baseState, visible: false }} onCommand={onCommand} />
+        </div>
+      </UiRoot>,
+    );
+    act(() => vi.advanceTimersByTime(250));
+    const afterHide = (onCommand.mock.calls as [SystemKeyboardCommand][]).filter(
+      ([command]) => command.type === 'backspace',
+    ).length;
+    expect(afterHide).toBe(beforeHide);
+    expect(screen.queryByRole('group', { name: 'System touch keyboard' })).not.toBeInTheDocument();
+  });
+
   it('switches visual geometry by purpose/language without changing native lifecycle ownership', () => {
     const onCommand = renderKeyboard({ ...baseState, language: 'fa' });
     const keyboard = screen.getByRole('group', { name: 'System touch keyboard' });

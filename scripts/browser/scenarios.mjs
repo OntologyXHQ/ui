@@ -6252,6 +6252,7 @@ export const browserScenarios = [
           dir: 'rtl',
           pointer: 'coarse',
           motion: 'reduced',
+          insets: 'keyboard',
         });
         const volume = transient.getByRole('progressbar', { name: 'Volume', exact: true }).first();
         assert.equal(
@@ -6259,15 +6260,68 @@ export const browserScenarios = [
           '64',
           'SystemOsd lost semantic progress value.',
         );
+        const osdContract = await transient
+          .locator('.ui-system-osd')
+          .first()
+          .evaluate((element) => {
+            const root = element.closest('.ui-root');
+            const style = getComputedStyle(element);
+            const rootStyle = root ? getComputedStyle(root) : null;
+            return {
+              edge: element.getAttribute('data-oxs-system-edge'),
+              insetBlockEnd: Number.parseFloat(style.insetBlockEnd),
+              occlusionBlockEnd: Number.parseFloat(
+                rootStyle?.getPropertyValue('--oxs-occlusion-block-end') || '0',
+              ),
+              pointerEvents: style.pointerEvents,
+              animations: element.getAnimations({ subtree: true }).length,
+            };
+          });
+        assert.equal(osdContract.edge, 'block-end', 'SystemOsd lost logical block-end placement.');
+        assert.ok(
+          osdContract.insetBlockEnd >= osdContract.occlusionBlockEnd,
+          'SystemOsd did not stay clear of transient keyboard occlusion.',
+        );
+        assert.equal(
+          osdContract.pointerEvents,
+          'none',
+          'Informational SystemOsd captured pointer input.',
+        );
+        assert.equal(
+          osdContract.animations,
+          0,
+          'Reduced-motion SystemOsd retained autonomous animation.',
+        );
+        assert.equal(
+          await transient.locator('.ui-system-osd [role="status"]').count(),
+          1,
+          'SystemOsd lost its polite live status semantics.',
+        );
         assert.equal(
           await transient.getByRole('switch', { name: 'Wi-Fi', exact: true }).isVisible(),
           true,
           'SystemQuickSettings lost Component controls.',
         );
         assert.equal(
-          await transient.getByRole('region', { name: 'Lock screen', exact: true }).isVisible(),
-          true,
-          'SystemLockLayout lost its landmark.',
+          await transient.locator('[data-system-quick-setting-id="wireless"]').count(),
+          1,
+          'SystemQuickSettings lost stable caller-owned section identity.',
+        );
+        const lock = transient.getByRole('region', { name: 'Lock screen', exact: true });
+        assert.equal(await lock.isVisible(), true, 'SystemLockLayout lost its landmark.');
+        const lockContract = await lock.evaluate((element) => {
+          const root = element.closest('.ui-root');
+          const rootStyle = root ? getComputedStyle(root) : null;
+          return {
+            paddingBlockEnd: Number.parseFloat(getComputedStyle(element).paddingBlockEnd),
+            occlusionBlockEnd: Number.parseFloat(
+              rootStyle?.getPropertyValue('--oxs-occlusion-block-end') || '0',
+            ),
+          };
+        });
+        assert.ok(
+          lockContract.paddingBlockEnd >= lockContract.occlusionBlockEnd,
+          'SystemLockLayout did not keep authentication content clear of transient occlusion.',
         );
         await transient.getByRole('button', { name: 'Open commands', exact: true }).click();
         const commands = page.getByRole('dialog', { name: 'Commands', exact: true });
@@ -6286,32 +6340,71 @@ export const browserScenarios = [
           true,
         );
         await page.keyboard.press('Escape');
+        const transientAxe = await runAxe(page, 'UIR15 transient/privileged System surfaces');
 
         const notifications = await gotoCatalog(page, baseUrl, {
           entry: 'SystemNotificationCenter',
-          tab: 'playground',
+          tab: 'examples',
+          example: 'notifications',
           dir: 'rtl',
           pointer: 'coarse',
         });
-        assert.equal(
-          await notifications.getByText('Sync complete', { exact: true }).first().isVisible(),
-          true,
-          'SystemNotificationCenter did not render its caller-owned notification fixture.',
+        const syncNotification = notifications.getByRole('button', { name: /Sync complete/ });
+        await assertMinimumBlockSize(
+          syncNotification,
+          44,
+          'SystemNotificationCenter coarse-pointer notification action',
         );
+        await syncNotification.click();
+        assert.equal(
+          await notifications
+            .getByText('Requested notification id: sync-complete', { exact: true })
+            .isVisible(),
+          true,
+          'SystemNotificationCenter did not report activation by stable identity.',
+        );
+        const notificationsAxe = await runAxe(page, 'UIR15 notification center');
 
-        const keyboard = await gotoCatalog(page, baseUrl, {
+        let keyboard = await gotoCatalog(page, baseUrl, {
           entry: 'SystemKeyboardHost',
           tab: 'examples',
           example: 'keyboard',
           dir: 'rtl',
           pointer: 'coarse',
           motion: 'reduced',
+          viewport: 'phone',
+          insets: 'gesture',
         });
-        const host = keyboard.getByRole('group', { name: 'System touch keyboard', exact: true });
+        let host = keyboard.getByRole('group', { name: 'System touch keyboard', exact: true });
+        assert.equal(
+          await host.locator('xpath=ancestor::*[@data-oxs-privileged-surface-host][1]').count(),
+          1,
+          'SystemKeyboardHost was not mounted through the owning SystemScaffold privileged slot.',
+        );
         assert.equal(
           await host.locator('xpath=ancestor::*[@data-oxs-system-surface="privileged"][1]').count(),
           1,
           'SystemKeyboardHost escaped the privileged SystemSurface boundary.',
+        );
+        const safeAreaContract = await host.evaluate((element) => {
+          const root = element.closest('.ui-root');
+          const rootStyle = root ? getComputedStyle(root) : null;
+          return {
+            paddingBlockEnd: Number.parseFloat(getComputedStyle(element).paddingBlockEnd),
+            safeBlockEnd: Number.parseFloat(
+              rootStyle?.getPropertyValue('--oxs-safe-block-end') || '0',
+            ),
+            animations: element.getAnimations({ subtree: true }).length,
+          };
+        });
+        assert.ok(
+          safeAreaContract.paddingBlockEnd >= safeAreaContract.safeBlockEnd,
+          'SystemKeyboardHost did not consume persistent logical safe-area padding.',
+        );
+        assert.equal(
+          safeAreaContract.animations,
+          0,
+          'Reduced-motion SystemKeyboardHost retained autonomous animation.',
         );
         const key = host.getByRole('button').first();
         await assertMinimumBlockSize(key, 44, 'SystemKeyboardHost coarse-pointer key');
@@ -6321,11 +6414,40 @@ export const browserScenarios = [
           true,
           'SystemKeyboardHost did not emit a typed host command.',
         );
+        await host.getByRole('button', { name: 'Switch language', exact: true }).click();
+        assert.equal(
+          await host.getAttribute('dir'),
+          'rtl',
+          'Persian key plane did not switch to RTL.',
+        );
+        assert.equal(
+          await host.getByRole('button', { name: 'ض', exact: true }).isVisible(),
+          true,
+          'Persian key plane did not render after host-owned language request settlement.',
+        );
+
+        keyboard = await gotoCatalog(page, baseUrl, {
+          entry: 'SystemKeyboardHost',
+          tab: 'examples',
+          example: 'keyboard',
+          dir: 'rtl',
+          pointer: 'coarse',
+          motion: 'reduced',
+          viewport: 'phone',
+          insets: 'keyboard',
+        });
+        host = keyboard.getByRole('group', { name: 'System touch keyboard', exact: true });
         const hostContract = await host.evaluate((element) => {
           const surface = element.closest('[data-oxs-system-surface="privileged"]');
+          const root = element.closest('.ui-root');
+          const rootStyle = root ? getComputedStyle(root) : null;
           return {
             edge: surface?.getAttribute('data-oxs-system-edge'),
             occludes: surface?.getAttribute('data-oxs-occludes-content'),
+            paddingBlockEnd: Number.parseFloat(getComputedStyle(element).paddingBlockEnd),
+            occlusionBlockEnd: Number.parseFloat(
+              rootStyle?.getPropertyValue('--oxs-occlusion-block-end') || '0',
+            ),
           };
         });
         assert.equal(
@@ -6338,10 +6460,26 @@ export const browserScenarios = [
           'true',
           'SystemKeyboardHost lost explicit occlusion metadata.',
         );
+        assert.equal(
+          hostContract.occlusionBlockEnd,
+          280,
+          'Studio keyboard-occlusion preset did not project the host-owned transient inset.',
+        );
+        assert.ok(
+          hostContract.paddingBlockEnd < hostContract.occlusionBlockEnd,
+          'SystemKeyboardHost consumed the occlusion that it is responsible for producing.',
+        );
 
+        await assertNoGlobalHorizontalOverflow(page, 'UIR15 privileged System surfaces');
         const axe = await runAxe(page, 'UIR15 privileged System surfaces');
         diagnostics.assertClean('UIR15 privileged System surfaces');
-        return { hostContract, axe };
+        return {
+          osdContract,
+          lockContract,
+          safeAreaContract,
+          hostContract,
+          axe: [transientAxe, notificationsAxe, axe],
+        };
       } finally {
         await context.close();
       }

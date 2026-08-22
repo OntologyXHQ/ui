@@ -326,18 +326,18 @@ Closure target: Developer compositions remain product-neutral and only exist whe
 
 ---
 
-## UIR15 — Privileged System surfaces — NEXT
+## UIR15 — Privileged System surfaces — DONE
 
-- `UI-1501` Rebuild touch keyboard visual/state contract on accepted Components and input-session adapters.
-- `UI-1502` Rebuild notification center/quick controls as host-neutral System compositions.
-- `UI-1503` Rebuild OSD/transient surfaces with timing/accessibility/motion rules.
-- `UI-1504` Define safe-area/occlusion behavior for privileged surfaces.
-- `UI-1505` Prove ordinary feature code cannot accidentally take ownership of privileged System surfaces.
-- `UI-1506` Revalidate OXS integration without moving compositor/native authority into React.
+- `UI-1501` Rebuild touch keyboard visual/state contract on accepted Components and input-session adapters. **DONE**
+- `UI-1502` Rebuild notification center/quick controls as host-neutral System compositions. **DONE**
+- `UI-1503` Rebuild OSD/transient surfaces with timing/accessibility/motion rules. **DONE**
+- `UI-1504` Define safe-area/occlusion behavior for privileged surfaces. **DONE**
+- `UI-1505` Prove ordinary feature code cannot accidentally take ownership of privileged System surfaces. **DONE**
+- `UI-1506` Revalidate OXS integration without moving compositor/native authority into React. **DONE**
 
 ---
 
-## UIR16 — Studio as a real product-quality SDK workbench — TODO
+## UIR16 — Studio as a real product-quality SDK workbench — NEXT
 
 - `UI-1601` Redesign Studio information architecture around accepted/candidate/experimental status and layer/category navigation.
 - `UI-1602` Give every public export a dedicated real preview; no family demo reused as a fake component example.

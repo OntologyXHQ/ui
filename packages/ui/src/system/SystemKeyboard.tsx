@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Badge, Button } from '../components';
 import { SystemSurface } from './SystemScaffold';
 
@@ -319,22 +319,35 @@ export function SystemKeyboardHost({
 }: SystemKeyboardHostProps) {
   const [shift, setShift] = useState<SystemKeyboardShiftState>('off');
   const [alternateKeyId, setAlternateKeyId] = useState<string | null>(null);
-  const repeatTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const keyboardRef = useRef<HTMLDivElement | null>(null);
+  const repeatTimerRef = useRef<number | null>(null);
+  const repeatTimerWindowRef = useRef<Window | null>(null);
   const layout = useMemo(() => activeLayout(state), [state]);
   const secure = state.secure || state.contentPurpose === 'password';
   const active = Boolean(state.sessionId);
 
-  const stopRepeat = () => {
-    if (repeatTimerRef.current !== null) clearInterval(repeatTimerRef.current);
+  const stopRepeat = useCallback(() => {
+    if (repeatTimerRef.current !== null) {
+      repeatTimerWindowRef.current?.clearInterval(repeatTimerRef.current);
+    }
     repeatTimerRef.current = null;
-  };
+    repeatTimerWindowRef.current = null;
+  }, []);
 
-  useEffect(() => stopRepeat, []);
+  useEffect(() => stopRepeat, [stopRepeat]);
   useEffect(() => {
     setShift('off');
     setAlternateKeyId(null);
     stopRepeat();
-  }, [state.sessionId, state.language, state.layout, state.contentPurpose, secure]);
+  }, [
+    state.sessionId,
+    state.visible,
+    state.language,
+    state.layout,
+    state.contentPurpose,
+    secure,
+    stopRepeat,
+  ]);
 
   if (!state.visible) return null;
 
@@ -406,7 +419,10 @@ export function SystemKeyboardHost({
     if (!model.repeatable) return;
     activate(model, true);
     stopRepeat();
-    repeatTimerRef.current = setInterval(() => activate(model, true), 72);
+    const ownerWindow = keyboardRef.current?.ownerDocument.defaultView;
+    if (!ownerWindow) return;
+    repeatTimerWindowRef.current = ownerWindow;
+    repeatTimerRef.current = ownerWindow.setInterval(() => activate(model, true), 72);
   };
 
   const alternateKey = layout.rows.flat().find((candidate) => candidate.id === alternateKeyId);
@@ -420,6 +436,7 @@ export function SystemKeyboardHost({
       className={`ui-system-keyboard-host ${className}`.trim()}
     >
       <div
+        ref={keyboardRef}
         className="ui-system-keyboard"
         dir={layout.direction}
         role="group"

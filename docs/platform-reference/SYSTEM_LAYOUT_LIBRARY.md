@@ -39,15 +39,15 @@ These surfaces must not grow private button, gesture, cursor or overflow engines
 
 ## Notifications and quick settings
 
-`SystemNotificationCenter` accepts a UI view-model only and renders Component list/content-state semantics. Delivery, permission, persistence and scheduling are not owned here.
+`SystemNotificationCenter` accepts caller-owned view models, reports activation by stable notification id and renders Component list/content-state semantics. Delivery, permission, persistence, scheduling and action policy are not owned here.
 
 `SystemQuickSettings` accepts System state/actions as public Component controls inside Card sections. Network/audio/display/hardware mutation remains backend-owned.
 
 ## Transient and privileged layouts
 
-- `SystemOsd` — informational transient status/value surface.
+- `SystemOsd` — informational, pointer-transparent transient status/value surface; lifecycle timing remains caller-owned and placement avoids logical safe area plus external transient occlusion.
 - `SystemCommandSurface` — command/search dialog; command discovery/execution remains caller-owned.
-- `SystemLockLayout` — UI-only lock/auth shell regions; authentication remains external.
+- `SystemLockLayout` — UI-only lock/auth shell regions; authentication remains external and content avoids logical safe-area/transient-occlusion inputs.
 - `SystemKeyboardHost` — privileged block-end touch keyboard with stable layout/key models, secure/content-purpose presentation and typed command output. UIP16 supplies compositor/text-input/IME/physical-keyboard lifecycle.
 
 `SystemKeyboardHost` was only a reserved slot in UIP12; UIP15 now implements the real visual keyboard surface. Native text-input/IME/physical-keyboard/occlusion authority still remains UIP16.
