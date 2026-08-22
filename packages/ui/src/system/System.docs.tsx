@@ -152,7 +152,7 @@ export const uiDocs = defineUiDocsGroup([
     summary:
       'Reusable OXS application-browsing layout with System search/header and grid or list presentation.',
     usage:
-      'Use inside Launcher or other OXS application surfaces; application lifecycle and filtering policy remain outside the layout.',
+      'Use inside Launcher or other OXS application surfaces; callers own application sourcing/ranking/routing while the layout applies only its deterministic text match to supplied view models.',
     status: 'accepted',
     accessibility:
       'Uses SearchField, ApplicationItem, List/TileGrid and ContentState semantics with one application-browser region label.',
@@ -170,6 +170,13 @@ export const uiDocs = defineUiDocsGroup([
         ],
       },
     },
+    examples: [
+      {
+        id: 'application-browser',
+        title: 'Caller-owned application browser',
+        component: 'SystemApplicationBrowserExample',
+      },
+    ],
   },
   {
     exportName: 'SystemBar',
@@ -471,18 +478,13 @@ export function SystemBoundaryExample() {
         </SystemSurface>
       }
       privileged={
-        <SystemKeyboardHost
-          state={{
-            surfaceId: 'docs-keyboard',
-            sessionId: 'docs-session',
-            visible: true,
-            language: 'en',
-            layout: 'letters',
-            contentPurpose: 'text',
-            secure: false,
-          }}
-          onCommand={() => undefined}
-        />
+        <SystemSurface kind="privileged" edge="block-end" label="Privileged host preview">
+          <Card
+            padding="sm"
+            title="Privileged host slot"
+            description="UIR14 proves only the structural host; privileged behavior belongs to UIR15."
+          />
+        </SystemSurface>
       }
     />
   );
@@ -557,6 +559,50 @@ export function SystemKeyboardExample() {
   );
 }
 
+export function SystemApplicationBrowserExample() {
+  const [query, setQuery] = useState('');
+  const [requestedApplicationId, setRequestedApplicationId] = useState('none');
+  const apps = useMemo(
+    () =>
+      [
+        {
+          id: 'browser',
+          name: 'Browser',
+          icon: 'browser' as const,
+          keywords: ['web'],
+          description: 'Web application',
+        },
+        {
+          id: 'files',
+          name: 'Files',
+          icon: 'files' as const,
+          keywords: ['folders'],
+          description: 'Local files',
+        },
+      ].filter((app) =>
+        `${app.name} ${app.keywords.join(' ')}`.toLowerCase().includes(query.toLowerCase()),
+      ),
+    [query],
+  );
+
+  return (
+    <div data-uir14-application-browser-example>
+      <SystemApplicationBrowser
+        title="Applications"
+        subtitle="Caller-owned view models and activation"
+        query={query}
+        apps={apps}
+        onQueryChange={setQuery}
+        onActivate={setRequestedApplicationId}
+      />
+      <StatusIndicator
+        label={`Requested application id: ${requestedApplicationId}`}
+        tone={requestedApplicationId === 'none' ? 'neutral' : 'success'}
+      />
+    </div>
+  );
+}
+
 export function SystemLauncherExample() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -590,24 +636,38 @@ export function SystemLauncherExample() {
 
 export function SystemLayoutLibraryExample() {
   return (
-    <div className="ui-doc-system-layout-preview">
+    <div className="ui-doc-system-layout-preview" data-uir14-layout-library>
       <DesktopShellLayout
-        workspace={<SystemWorkspace title="OXS" status="Layout preview" />}
+        workspace={
+          <SystemWorkspace title="OXS" status="Layout preview">
+            <Card
+              className="ui-doc-system-layout-preview__scene"
+              title="Native scene slot"
+              description="Window/compositor authority remains outside React."
+            />
+          </SystemWorkspace>
+        }
         topBar={
           <SystemBar
             label="Top system bar"
-            leading={<StatusIndicator label="Online" tone="success" />}
+            leading={
+              <SystemChromeGroup label="Connectivity" trailing={<Badge>2</Badge>}>
+                <StatusIndicator label="Online" tone="success" />
+              </SystemChromeGroup>
+            }
             trailing={<Badge>12:42</Badge>}
           />
         }
+        dockEdge="inline-start"
         dock={
-          <SystemDock>
+          <SystemDock edge="inline-start">
             <Button size="sm">Apps</Button>
             <Button size="sm">Files</Button>
           </SystemDock>
         }
+        panelEdge="inline-end"
         panel={
-          <SystemPanel title="System panel" width="sm">
+          <SystemPanel title="System panel" width="sm" edge="inline-end">
             <StatusIndicator label="All services ready" tone="success" />
           </SystemPanel>
         }

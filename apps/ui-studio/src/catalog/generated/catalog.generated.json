@@ -7638,7 +7638,7 @@
     "category": "Layouts",
     "order": 30,
     "summary": "Reusable OXS application-browsing layout with System search/header and grid or list presentation.",
-    "usage": "Use inside Launcher or other OXS application surfaces; application lifecycle and filtering policy remain outside the layout.",
+    "usage": "Use inside Launcher or other OXS application surfaces; callers own application sourcing/ranking/routing while the layout applies only its deterministic text match to supplied view models.",
     "status": "accepted",
     "accessibility": "Uses SearchField, ApplicationItem, List/TileGrid and ContentState semantics with one application-browser region label.",
     "rtl": "Search and collection layout stay logical; icons/actions keep Component-owned direction behavior.",
@@ -7677,7 +7677,7 @@
         "name": "apps",
         "type": "readonly SystemApplicationItem[]",
         "optional": false,
-        "description": "Caller-owned application view models; routing and launch authority remain external.",
+        "description": "Caller-owned candidate application view models; sourcing/ranking/routing authority remains external.",
         "deprecated": false,
         "default": null
       },
@@ -7741,7 +7741,7 @@
         "name": "onQueryChange",
         "type": "(query: string) => void",
         "optional": false,
-        "description": "Reports query changes without taking ownership of filtering policy.",
+        "description": "Reports the controlled query; the layout applies only its documented deterministic text match.",
         "deprecated": false,
         "default": null
       },
@@ -7802,7 +7802,13 @@
         "default": "'Applications'"
       }
     ],
-    "examples": [],
+    "examples": [
+      {
+        "id": "application-browser",
+        "title": "Caller-owned application browser",
+        "component": "SystemApplicationBrowserExample"
+      }
+    ],
     "certification": {
       "owner": "UIR14",
       "behaviorTests": [

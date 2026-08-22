@@ -2893,7 +2893,7 @@ export const browserScenarios = [
         const target = example.getByRole('button', { name: 'Studio drop target', exact: true });
         await source.scrollIntoViewIfNeeded();
         await target.scrollIntoViewIfNeeded();
-        let sourceBox = await source.boundingBox();
+        const sourceBox = await source.boundingBox();
         let targetBox = await target.boundingBox();
         assert.ok(
           sourceBox && targetBox,
@@ -3000,8 +3000,25 @@ export const browserScenarios = [
 
         // Re-resolve the drop target after drag ownership begins. The DragDrop runtime is
         // allowed to auto-scroll the nearest eligible ancestor while the pointer is stationary,
-        // so pre-drag bounding boxes cannot be used as a durable drop coordinate.
-        await target.scrollIntoViewIfNeeded();
+        // so pre-drag bounding boxes cannot be used as a durable drop coordinate. Do not use a
+        // Playwright actionability scroll here: it requires the element to become stable while
+        // active drag auto-scroll is explicitly allowed to keep its ancestors moving.
+        const activeScrollBox = await scroll.boundingBox();
+        assert.ok(
+          activeScrollBox,
+          'DnD scroll container lost measurable geometry after drag activation.',
+        );
+        await page.mouse.move(
+          activeScrollBox.x + activeScrollBox.width / 2,
+          activeScrollBox.y + activeScrollBox.height / 2,
+        );
+        await target.evaluate((element) => {
+          element.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
+        });
+        await page.evaluate(
+          () =>
+            new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+        );
         targetBox = await target.boundingBox();
         assert.ok(targetBox, 'Drop target lost measurable geometry after drag activation.');
         const targetCenter = {
@@ -3098,33 +3115,200 @@ export const browserScenarios = [
           assert.fail(`DnD drop did not commit. Runtime trace: ${JSON.stringify(state)}`);
         }
 
-        await scroll.evaluate((element) => {
+        // Edge auto-scroll is an independent acceptance axis. Reload the exact canonical
+        // fixture so a completed pointer drop cannot leak pending press/arena/session state into
+        // the second pointer stream. This keeps the evidence deterministic without weakening the
+        // runtime contract: the edge journey still uses real pointer ownership and stationary RAF
+        // auto-scroll in the owning Window.
+        example = await gotoCatalog(page, baseUrl, {
+          entry: 'GestureRevealHandle',
+          tab: 'examples',
+          example: 'interaction-runtime',
+          motion: 'full',
+        });
+        const edgeScroll = example.locator('[data-dnd-scroll]');
+        const edgeSource = example.getByRole('button', { name: 'Drag Studio card', exact: true });
+        await edgeScroll.evaluate((element) => {
+          element.scrollTop = 0;
+          element.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' });
+        });
+        await edgeSource.scrollIntoViewIfNeeded();
+        const edgeSourceBox = await edgeSource.boundingBox();
+        let edgeScrollBox = await edgeScroll.boundingBox();
+        assert.ok(
+          edgeSourceBox && edgeScrollBox,
+          'Fresh edge auto-scroll fixture lost measurable geometry.',
+        );
+        const edgeSourceCenter = {
+          x: edgeSourceBox.x + edgeSourceBox.width / 2,
+          y: edgeSourceBox.y + edgeSourceBox.height / 2,
+        };
+        const edgeSourceHit = await page.evaluate(({ x, y }) => {
+          const hit = document.elementFromPoint(x, y);
+          return (
+            hit?.closest('[data-oxs-drag-source]')?.getAttribute('data-oxs-drag-source') ?? null
+          );
+        }, edgeSourceCenter);
+        assert.equal(
+          edgeSourceHit,
+          'studio-drag-source',
+          'Fresh edge auto-scroll source center was not hit-testable.',
+        );
+        await page.evaluate(() => {
+          const trace = [];
+          const record = (event) => {
+            const target = event.target instanceof Element ? event.target : null;
+            trace.push({
+              type: event.type,
+              pointerId: event.pointerId,
+              pointerType: event.pointerType,
+              clientX: event.clientX,
+              clientY: event.clientY,
+              buttons: event.buttons,
+              defaultPrevented: event.defaultPrevented,
+              target:
+                target?.getAttribute('data-oxs-drag-source') ??
+                target?.getAttribute('data-oxs-drop-target') ??
+                target?.tagName ??
+                null,
+            });
+          };
+          for (const type of [
+            'pointerdown',
+            'gotpointercapture',
+            'pointermove',
+            'lostpointercapture',
+            'pointercancel',
+            'pointerup',
+          ]) {
+            window.addEventListener(type, record, true);
+          }
+          window.__oxsUir12DndTrace = trace;
+        });
+        await page.mouse.move(edgeSourceCenter.x, edgeSourceCenter.y);
+        await page.mouse.down();
+        await page.mouse.move(edgeSourceCenter.x + 12, edgeSourceCenter.y);
+        try {
+          await page.waitForFunction(
+            () =>
+              document
+                .querySelector('#example-interaction-runtime [data-uir12-interaction-runtime]')
+                ?.closest('.ui-root')
+                ?.querySelector('.ui-drag-drop-runtime')
+                ?.getAttribute('data-oxs-drag-active') === 'true',
+            null,
+            { timeout: 1200 },
+          );
+        } catch (_error) {
+          const state = await page.evaluate(() => {
+            const source = document.querySelector(
+              '#example-interaction-runtime [data-oxs-drag-source="studio-drag-source"]',
+            );
+            const runtime = document
+              .querySelector('#example-interaction-runtime [data-uir12-interaction-runtime]')
+              ?.closest('.ui-root')
+              ?.querySelector('.ui-drag-drop-runtime');
+            const rect = source?.getBoundingClientRect();
+            const point = rect
+              ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+              : { x: -1, y: -1 };
+            return {
+              runtimeActive: runtime?.getAttribute('data-oxs-drag-active') ?? null,
+              sourcePressed: source?.getAttribute('data-pressed') ?? null,
+              previewPresent: Boolean(document.querySelector('[data-dnd-preview-content]')),
+              hitAtSource:
+                document
+                  .elementFromPoint(point.x, point.y)
+                  ?.closest('[data-oxs-drag-source]')
+                  ?.getAttribute('data-oxs-drag-source') ?? null,
+              trace: window.__oxsUir12DndTrace ?? [],
+            };
+          });
+          assert.fail(
+            `Fresh edge pointer stream did not activate drag ownership. Runtime trace: ${JSON.stringify(state)}`,
+          );
+        }
+        // Drag activation may start RAF auto-scroll on a scrollable Studio ancestor before the
+        // pointer reaches this inner fixture. Never drive the edge journey with a pre-ownership
+        // bounding box: neutralize the active pointer inside the live container, let ancestor
+        // geometry settle, then derive the physical bottom edge from a fresh DOMRect.
+        edgeScrollBox = await edgeScroll.evaluate((element) => {
+          const rect = element.getBoundingClientRect();
+          return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+        });
+        await page.mouse.move(
+          edgeScrollBox.x + edgeScrollBox.width / 2,
+          edgeScrollBox.y + edgeScrollBox.height / 2,
+        );
+        await page.evaluate(
+          () =>
+            new Promise((resolve) =>
+              requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+            ),
+        );
+        await edgeScroll.evaluate((element) => {
           element.scrollTop = 0;
         });
-        await source.scrollIntoViewIfNeeded();
-        sourceBox = await source.boundingBox();
-        const scrollBox = await scroll.boundingBox();
-        assert.ok(sourceBox && scrollBox, 'Edge auto-scroll fixture lost measurable geometry.');
-        await page.mouse.move(
-          sourceBox.x + sourceBox.width / 2,
-          sourceBox.y + sourceBox.height / 2,
-        );
-        await page.mouse.down();
-        await page.mouse.move(
-          scrollBox.x + scrollBox.width / 2,
-          scrollBox.y + scrollBox.height - 5,
-          {
-            steps: 5,
-          },
-        );
-        await page.waitForFunction(
-          () =>
-            (document.querySelector('#example-interaction-runtime [data-dnd-scroll]')?.scrollTop ??
-              0) > 0,
-          null,
-          { timeout: 1800 },
-        );
-        const edgeScrolled = await scroll.evaluate((element) => element.scrollTop);
+        edgeScrollBox = await edgeScroll.evaluate((element) => {
+          const rect = element.getBoundingClientRect();
+          return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+        });
+        const liveEdgePoint = {
+          x: edgeScrollBox.x + edgeScrollBox.width / 2,
+          y: edgeScrollBox.y + edgeScrollBox.height - 5,
+        };
+        await page.evaluate((point) => {
+          window.__oxsUir12ExpectedEdgePoint = point;
+        }, liveEdgePoint);
+        await page.mouse.move(liveEdgePoint.x, liveEdgePoint.y, { steps: 5 });
+        try {
+          await page.waitForFunction(
+            () =>
+              (document.querySelector('#example-interaction-runtime [data-dnd-scroll]')
+                ?.scrollTop ?? 0) > 0,
+            null,
+            { timeout: 1800 },
+          );
+        } catch (_error) {
+          const state = await page.evaluate(() => {
+            const scroll = document.querySelector('#example-interaction-runtime [data-dnd-scroll]');
+            const runtime = document
+              .querySelector('#example-interaction-runtime [data-uir12-interaction-runtime]')
+              ?.closest('.ui-root')
+              ?.querySelector('.ui-drag-drop-runtime');
+            const rect = scroll?.getBoundingClientRect();
+            const point = rect
+              ? { x: rect.left + rect.width / 2, y: rect.bottom - 5 }
+              : { x: -1, y: -1 };
+            const trace = window.__oxsUir12DndTrace ?? [];
+            const lastPointerMove = [...trace]
+              .reverse()
+              .find((entry) => entry.type === 'pointermove');
+            const actualPointer = lastPointerMove
+              ? { x: lastPointerMove.clientX, y: lastPointerMove.clientY }
+              : null;
+            return {
+              runtimeActive: runtime?.getAttribute('data-oxs-drag-active') ?? null,
+              scrollTop: scroll?.scrollTop ?? null,
+              scrollHeight: scroll?.scrollHeight ?? null,
+              clientHeight: scroll?.clientHeight ?? null,
+              expectedEdgePoint: window.__oxsUir12ExpectedEdgePoint ?? null,
+              actualPointer,
+              hitAtExpectedEdge:
+                document.elementFromPoint(point.x, point.y)?.closest('[data-dnd-scroll]') !== null,
+              hitAtActualPointer: actualPointer
+                ? document
+                    .elementFromPoint(actualPointer.x, actualPointer.y)
+                    ?.closest('[data-dnd-scroll]') !== null
+                : null,
+              trace,
+            };
+          });
+          assert.fail(
+            `Stationary edge auto-scroll did not begin. Runtime trace: ${JSON.stringify(state)}`,
+          );
+        }
+        const edgeScrolled = await edgeScroll.evaluate((element) => element.scrollTop);
         assert.ok(
           edgeScrolled > 0,
           'Stationary drag did not trigger owner-realm edge auto-scroll.',
@@ -3132,11 +3316,24 @@ export const browserScenarios = [
         await page.keyboard.press('Escape');
         await page.mouse.up();
 
-        await scroll.evaluate((element) => {
+        // Keyboard drag is another independent modality axis. Start from a fresh canonical fixture
+        // rather than inheriting the cancelled pointer stream above.
+        example = await gotoCatalog(page, baseUrl, {
+          entry: 'GestureRevealHandle',
+          tab: 'examples',
+          example: 'interaction-runtime',
+          motion: 'full',
+        });
+        const keyboardScroll = example.locator('[data-dnd-scroll]');
+        const keyboardSource = example.getByRole('button', {
+          name: 'Drag Studio card',
+          exact: true,
+        });
+        await keyboardScroll.evaluate((element) => {
           element.scrollTop = 0;
         });
-        await source.scrollIntoViewIfNeeded();
-        await source.focus();
+        await keyboardSource.scrollIntoViewIfNeeded();
+        await keyboardSource.focus();
         await page.keyboard.press('Space');
         await page.waitForFunction(
           () =>
@@ -5772,6 +5969,19 @@ export const browserScenarios = [
           1,
           'SystemScaffold lost the privileged host boundary.',
         );
+        assert.equal(
+          await boundary
+            .getByRole('region', { name: 'Privileged host preview', exact: true })
+            .isVisible(),
+          true,
+          'UIR14 core fixture did not expose its structural privileged host slot.',
+        );
+        assert.equal(
+          await boundary.locator('[data-oxs-system-keyboard]').count(),
+          0,
+          'UIR14 core certification must not depend on UIR15 privileged keyboard behavior.',
+        );
+        await runAxe(page, 'UIR14 System scaffold boundary');
 
         const layout = await gotoCatalog(page, baseUrl, {
           entry: 'DesktopShellLayout',
@@ -5793,18 +6003,95 @@ export const browserScenarios = [
           true,
         );
         assert.equal(
+          await layout.getByRole('group', { name: 'Connectivity', exact: true }).isVisible(),
+          true,
+          'SystemChromeGroup is not represented by the UIR14 layout evidence.',
+        );
+        assert.equal(
+          await layout.getByText('Native scene slot', { exact: true }).isVisible(),
+          true,
+          'SystemWorkspace lost the caller-owned native scene slot.',
+        );
+        assert.equal(
           await layout.getByText('All services ready', { exact: true }).isVisible(),
           true,
         );
+        const logicalDock = layout.locator('.ui-system-dock[data-oxs-system-edge="inline-start"]');
+        const logicalPanel = layout.locator('.ui-system-panel[data-oxs-system-edge="inline-end"]');
+        const [dockBox, panelBox] = await Promise.all([
+          logicalDock.boundingBox(),
+          logicalPanel.boundingBox(),
+        ]);
+        assert.ok(dockBox && panelBox, 'System logical dock/panel geometry is unavailable.');
+        assert.ok(
+          dockBox.x + dockBox.width / 2 > panelBox.x + panelBox.width / 2,
+          'RTL inline-start dock and inline-end panel did not resolve to opposite logical edges.',
+        );
+        await runAxe(page, 'UIR14 desktop System layout');
+
+        const applicationBrowser = await gotoCatalog(page, baseUrl, {
+          entry: 'SystemApplicationBrowser',
+          tab: 'examples',
+          example: 'application-browser',
+          dir: 'rtl',
+          pointer: 'coarse',
+          viewport: 'phone',
+        });
+        const browserSearch = applicationBrowser.getByRole('searchbox', {
+          name: 'Search applications',
+          exact: true,
+        });
+        await browserSearch.fill('Files');
+        const directFiles = applicationBrowser.getByRole('button', {
+          name: /Files/,
+        });
+        assert.equal(await directFiles.isVisible(), true);
+        assert.equal(
+          await applicationBrowser.getByRole('button', { name: /Browser/ }).count(),
+          0,
+          'Caller-owned application projection did not update after the controlled query.',
+        );
+        await assertMinimumBlockSize(
+          directFiles,
+          44,
+          'SystemApplicationBrowser coarse-pointer application action',
+        );
+        await directFiles.focus();
+        await page.keyboard.press('Enter');
+        assert.equal(
+          await applicationBrowser
+            .getByText('Requested application id: files', { exact: true })
+            .isVisible(),
+          true,
+          'SystemApplicationBrowser did not report activation by stable identity.',
+        );
+        const browserOverflow = await applicationBrowser.evaluate(
+          (element) => element.scrollWidth - element.clientWidth,
+        );
+        assert.ok(
+          browserOverflow <= 1,
+          `SystemApplicationBrowser overflowed its phone container by ${browserOverflow}px.`,
+        );
+        await runAxe(page, 'UIR14 application browser');
 
         const launcher = await gotoCatalog(page, baseUrl, {
           entry: 'SystemLauncher',
           tab: 'examples',
           example: 'launcher',
+          dir: 'rtl',
           pointer: 'coarse',
+          viewport: 'phone',
         });
+        const launcherOwnerRoot = launcher.locator('xpath=ancestor::*[@data-oxs-scope][1]');
+        const launcherPortal = launcherOwnerRoot.locator(':scope > [data-oxs-portal-root]');
+        const launcherLayer = launcherPortal.locator(':scope > .ui-system-launcher-layer');
         await launcher.getByRole('button', { name: 'Open System Launcher', exact: true }).click();
-        const launcherDialog = page.getByRole('dialog', {
+        assert.equal(
+          await launcherLayer.count(),
+          1,
+          'SystemLauncher example did not resolve to exactly one owner-realm portal layer.',
+        );
+        const launcherDialog = launcherLayer.getByRole('dialog', {
           name: 'Application launcher',
           exact: true,
         });
@@ -5818,35 +6105,104 @@ export const browserScenarios = [
           exact: true,
         });
         await search.fill('Files');
-        assert.equal(
-          await launcherDialog.getByRole('button', { name: 'Files', exact: true }).isVisible(),
-          true,
-        );
+        const launcherFiles = launcherDialog.getByRole('button', {
+          name: 'Files',
+          exact: true,
+        });
+        assert.equal(await launcherFiles.isVisible(), true);
         assert.equal(
           await launcherDialog.getByRole('button', { name: 'Browser', exact: true }).count(),
           0,
         );
+        await assertMinimumBlockSize(
+          launcherFiles,
+          44,
+          'SystemLauncher coarse-pointer application action',
+        );
+        await runAxe(page, 'UIR14 System launcher');
+        const launcherLayerHandle = await launcherLayer.elementHandle();
+        assert.ok(launcherLayerHandle, 'SystemLauncher owner layer disappeared before dismissal.');
         await page.keyboard.press('Escape');
+        await page.waitForFunction(
+          (element) =>
+            element instanceof HTMLElement &&
+            element.dataset.open === 'false' &&
+            element.getAttribute('aria-hidden') === 'true',
+          launcherLayerHandle,
+        );
 
-        const settings = await gotoCatalog(page, baseUrl, {
+        const narrowSettings = await gotoCatalog(page, baseUrl, {
           entry: 'SystemSettingsLayout',
           tab: 'examples',
           example: 'settings',
           dir: 'rtl',
+          pointer: 'coarse',
+          viewport: 'phone',
         });
-        await settings.getByRole('button', { name: 'Input', exact: true }).click();
+        const inputSection = narrowSettings.getByRole('button', { name: 'Input', exact: true });
+        await assertMinimumBlockSize(inputSection, 44, 'SystemSettingsLayout coarse navigation');
+        await inputSection.click();
         assert.equal(
-          await settings.getByText('Current section: input', { exact: false }).isVisible(),
+          await narrowSettings.getByText('Current section: input', { exact: false }).isVisible(),
           true,
           'SystemSettingsLayout did not keep section state caller-owned.',
         );
-        assert.equal(
-          await settings
-            .getByRole('main', { name: 'System settings content', exact: true })
-            .isVisible(),
-          true,
+        const narrowMain = narrowSettings.getByRole('main', {
+          name: 'System settings content',
+          exact: true,
+        });
+        assert.equal(await narrowMain.isVisible(), true);
+        const narrowSidebar = narrowSettings.locator('.ui-page-scaffold__sidebar');
+        const [narrowSidebarBox, narrowMainBox] = await Promise.all([
+          narrowSidebar.boundingBox(),
+          narrowMain.boundingBox(),
+        ]);
+        assert.ok(
+          narrowSidebarBox && narrowMainBox,
+          'Narrow SystemSettingsLayout geometry is unavailable.',
+        );
+        assert.ok(
+          narrowSidebarBox.y + narrowSidebarBox.height <= narrowMainBox.y + 2,
+          'Narrow SystemSettingsLayout did not collapse navigation above content.',
+        );
+        await runAxe(page, 'UIR14 narrow System settings');
+
+        const wideSettings = await gotoCatalog(page, baseUrl, {
+          entry: 'SystemSettingsLayout',
+          tab: 'examples',
+          example: 'settings',
+          dir: 'rtl',
+          pointer: 'fine',
+          viewport: 'desktop',
+        });
+        const wideLayout = wideSettings.locator('.ui-system-settings-layout');
+        const wideSidebar = wideSettings.locator('.ui-page-scaffold__sidebar');
+        const wideMain = wideSettings.getByRole('main', {
+          name: 'System settings content',
+          exact: true,
+        });
+        const [wideLayoutBox, wideSidebarBox, wideMainBox] = await Promise.all([
+          wideLayout.boundingBox(),
+          wideSidebar.boundingBox(),
+          wideMain.boundingBox(),
+        ]);
+        assert.ok(
+          wideLayoutBox && wideSidebarBox && wideMainBox,
+          'Wide SystemSettingsLayout geometry is unavailable.',
+        );
+        const rootFontSize = await page.evaluate(() =>
+          Number.parseFloat(getComputedStyle(document.documentElement).fontSize),
+        );
+        assert.ok(
+          wideLayoutBox.width >= rootFontSize * 44,
+          `Wide SystemSettingsLayout fixture did not provide the 44rem container required by its split query (actual ${wideLayoutBox.width}px).`,
+        );
+        assert.ok(
+          Math.abs(wideSidebarBox.x - wideMainBox.x) > 80,
+          'Wide SystemSettingsLayout did not adapt into a split navigation/content composition.',
         );
 
+        await assertNoGlobalHorizontalOverflow(page, 'UIR14 System UI core');
         const axe = await runAxe(page, 'UIR14 System UI core');
         diagnostics.assertClean('UIR14 System UI core');
         return { axe };

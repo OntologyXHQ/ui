@@ -25,9 +25,9 @@ export type SystemApplicationBrowserProps = {
   subtitle?: ReactNode;
   /** Caller-owned search/filter query. */
   query: string;
-  /** Caller-owned application view models; routing and launch authority remain external. */
+  /** Caller-owned candidate application view models; sourcing/ranking/routing authority remains external. */
   apps: readonly SystemApplicationItem[];
-  /** Reports query changes without taking ownership of filtering policy. */
+  /** Reports the controlled query; the layout applies only its documented deterministic text match. */
   onQueryChange: (query: string) => void;
   /** Reports activation by stable identity; execution authority remains external. */
   onActivate: (id: string) => void;

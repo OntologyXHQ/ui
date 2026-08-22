@@ -75,8 +75,8 @@ function scanCallEnd(start) {
 
 const failures = [];
 const needle = 'gotoCatalog(';
-let cursor = 0;
-while ((cursor = source.indexOf(needle, cursor)) !== -1) {
+let cursor = source.indexOf(needle);
+while (cursor !== -1) {
   const open = cursor + needle.length - 1;
   const end = scanCallEnd(open);
   const call = source.slice(cursor, end + 1);
@@ -87,9 +87,10 @@ while ((cursor = source.indexOf(needle, cursor)) !== -1) {
       source.lastIndexOf('}', cursor - 1),
     ) + 1;
   const prefix = source.slice(statementStart, cursor).trim();
-  const consumesResult =
-    /(?:^|\b)(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=\s*await\s*$/.test(prefix) ||
-    /^[A-Za-z_$][\w$]*\s*=\s*await\s*$/.test(prefix);
+  // Comments may legitimately sit between the previous statement and an assignment that
+  // consumes gotoCatalog's canonical #example-<id> locator. Match the assignment suffix
+  // immediately before gotoCatalog instead of requiring it to begin the scanned prefix.
+  const consumesResult = /(?:\b(?:const|let|var)\s+)?[A-Za-z_$][\w$]*\s*=\s*await\s*$/.test(prefix);
   const line = source.slice(0, cursor).split('\n').length;
   if (/\bexample\s*:/.test(call) && !consumesResult) {
     failures.push(`line ${line}: example deep link ignores gotoCatalog's canonical fixture scope`);
@@ -104,7 +105,7 @@ while ((cursor = source.indexOf(needle, cursor)) !== -1) {
       );
     }
   }
-  cursor = end + 1;
+  cursor = source.indexOf(needle, end + 1);
 }
 
 const unscopedDomPatterns = [

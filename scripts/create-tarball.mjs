@@ -22,8 +22,12 @@ if (!fromBuild) {
 
 const result = spawnSync(
   pnpm,
-  ['--dir', 'packages/ui', 'pack', '--ignore-scripts', '--pack-destination', '../../artifacts'],
-  { cwd: root, stdio: 'inherit' },
+  ['--dir', 'packages/ui', 'pack', '--pack-destination', '../../artifacts'],
+  {
+    cwd: root,
+    stdio: 'inherit',
+    env: { ...process.env, npm_config_ignore_scripts: 'true' },
+  },
 );
 if (result.status !== 0) process.exit(result.status ?? 1);
 try {

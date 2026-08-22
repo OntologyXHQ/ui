@@ -315,18 +315,18 @@ Closure target: Developer compositions remain product-neutral and only exist whe
 
 ---
 
-## UIR14 — System UI core — NEXT
+## UIR14 — System UI core — DONE
 
-- `UI-1401` Re-audit the public System UI boundary; generic capability gaps move down to Components first.
-- `UI-1402` Rebuild desktop/workspace/scaffold layout vocabulary only from accepted Components.
-- `UI-1403` Rebuild launcher/application-browser layouts without owning product data/routing.
-- `UI-1404` Rebuild system bars/docks/settings shell around host-neutral commands/state.
-- `UI-1405` Prove System UI has zero direct Primitive imports.
-- `UI-1406` Revalidate the real OXS consumer after every System API migration.
+- `UI-1401` Re-audit the public System UI boundary; generic capability gaps move down to Components first. **DONE**
+- `UI-1402` Rebuild desktop/workspace/scaffold layout vocabulary only from accepted Components. **DONE**
+- `UI-1403` Rebuild launcher/application-browser layouts without owning product data/routing. **DONE**
+- `UI-1404` Rebuild system bars/docks/settings shell around host-neutral commands/state. **DONE**
+- `UI-1405` Prove System UI has zero direct Primitive imports. **DONE**
+- `UI-1406` Revalidate the real OXS consumer after every System API migration. **DONE**
 
 ---
 
-## UIR15 — Privileged System surfaces — TODO
+## UIR15 — Privileged System surfaces — NEXT
 
 - `UI-1501` Rebuild touch keyboard visual/state contract on accepted Components and input-session adapters.
 - `UI-1502` Rebuild notification center/quick controls as host-neutral System compositions.

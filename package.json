@@ -18,7 +18,7 @@
     "build": "pnpm --filter @ontologyx/ui build && pnpm --filter @ontologyx/ui-studio build",
     "verify": "pnpm quality && pnpm gate:studio && pnpm gate:build && pnpm gate:browser:run",
     "release:check": "pnpm verify && node scripts/check-studio-production.mjs && node scripts/create-tarball.mjs --from-build && node scripts/package-smoke.mjs && pnpm v1:budgets:check && pnpm v1:freeze:check",
-    "gate:architecture": "python3 scripts/gates/check-architecture.py && node scripts/gates/check-foundations.mjs && node scripts/gates/check-environment.mjs && node scripts/gates/check-layout.mjs && node scripts/gates/check-visual.mjs && node scripts/gates/check-runtime-kernel.mjs && node scripts/gates/check-actions.mjs && node scripts/gates/check-fields.mjs && node scripts/gates/check-browser-fixture-scope.mjs && node scripts/gates/check-selection-disclosure.mjs && node scripts/gates/check-navigation-data.mjs && node scripts/gates/check-developer-compositions.mjs && node scripts/gates/check-overlays-feedback.mjs && node scripts/gates/check-scroll-motion.mjs && node scripts/gates/check-gestures-drag-editing-cursor.mjs && node scripts/gates/check-command-contract.mjs",
+    "gate:architecture": "python3 scripts/gates/check-architecture.py && node scripts/gates/check-foundations.mjs && node scripts/gates/check-environment.mjs && node scripts/gates/check-layout.mjs && node scripts/gates/check-visual.mjs && node scripts/gates/check-runtime-kernel.mjs && node scripts/gates/check-actions.mjs && node scripts/gates/check-fields.mjs && node scripts/gates/check-browser-fixture-scope.mjs && node scripts/gates/check-selection-disclosure.mjs && node scripts/gates/check-navigation-data.mjs && node scripts/gates/check-developer-compositions.mjs && node scripts/gates/check-system-ui-core.mjs && node scripts/gates/check-overlays-feedback.mjs && node scripts/gates/check-scroll-motion.mjs && node scripts/gates/check-gestures-drag-editing-cursor.mjs && node scripts/gates/check-command-contract.mjs",
     "gate:developer-compositions": "node scripts/gates/check-developer-compositions.mjs",
     "gate:catalog": "pnpm catalog:check && node scripts/gates/check-catalog-acceptance.mjs",
     "gate:types": "pnpm --filter @ontologyx/ui check && pnpm --filter @ontologyx/ui-studio check",
@@ -42,7 +42,9 @@
     "v1:oxs:check": "node scripts/validate-oxs-consumer.mjs",
     "v1:budgets:freeze": "node scripts/freeze-v1-artifact-budgets.mjs",
     "v1:budgets:check": "node scripts/check-v1-artifact-budgets.mjs",
-    "format:check": "biome format ."
+    "format:check": "biome format .",
+    "gate:system-ui-core": "node scripts/gates/check-system-ui-core.mjs",
+    "uir14:closeout": "node scripts/closeout-uir14.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.7",

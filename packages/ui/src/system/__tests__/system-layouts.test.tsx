@@ -5,6 +5,7 @@ import {
   DesktopShellLayout,
   SystemApplicationBrowser,
   SystemBar,
+  SystemChromeGroup,
   SystemCommandSurface,
   SystemDock,
   SystemKeyboardHost,
@@ -28,14 +29,25 @@ describe('System layout library', () => {
                 <div>Native scene</div>
               </SystemWorkspace>
             }
-            topBar={<SystemBar label="Top bar" leading={<span>Status</span>} />}
+            topBar={
+              <SystemBar
+                label="Top bar"
+                leading={
+                  <SystemChromeGroup label="Connectivity">
+                    <span>Status</span>
+                  </SystemChromeGroup>
+                }
+              />
+            }
+            dockEdge="inline-start"
             dock={
-              <SystemDock>
+              <SystemDock edge="inline-start">
                 <Button>Launcher</Button>
               </SystemDock>
             }
+            panelEdge="inline-end"
             panel={
-              <SystemPanel title="Side panel">
+              <SystemPanel title="Side panel" edge="inline-end">
                 <span>Panel content</span>
               </SystemPanel>
             }
@@ -47,7 +59,14 @@ describe('System layout library', () => {
     expect(screen.getByText('Native scene')).toBeInTheDocument();
     expect(screen.getByRole('toolbar', { name: 'Top bar' })).toBeInTheDocument();
     expect(screen.getByRole('toolbar', { name: 'System dock' })).toBeInTheDocument();
-    expect(screen.getByText('Panel content')).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Connectivity' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('toolbar', { name: 'System dock' }).closest('[data-oxs-system-surface]'),
+    ).toHaveAttribute('data-oxs-system-edge', 'inline-start');
+    expect(screen.getByText('Panel content').closest('[data-oxs-system-surface]')).toHaveAttribute(
+      'data-oxs-system-edge',
+      'inline-end',
+    );
   });
 
   it('supports application browsing in grid/list layouts with caller-owned activation policy', () => {
@@ -57,7 +76,10 @@ describe('System layout library', () => {
       <UiRoot>
         <SystemApplicationBrowser
           query=""
-          apps={[{ id: 'browser', name: 'Browser', icon: 'browser', description: 'Web' }]}
+          apps={[
+            { id: 'browser', name: 'Browser', icon: 'browser', description: 'Web' },
+            { id: 'files', name: 'Files', icon: 'files', description: 'Local folders' },
+          ]}
           onQueryChange={change}
           onActivate={activate}
         />
@@ -72,13 +94,18 @@ describe('System layout library', () => {
         <SystemApplicationBrowser
           query="web"
           presentation="list"
-          apps={[{ id: 'browser', name: 'Browser', icon: 'browser', description: 'Web' }]}
+          apps={[
+            { id: 'browser', name: 'Browser', icon: 'browser', description: 'Web' },
+            { id: 'files', name: 'Files', icon: 'files', description: 'Local folders' },
+          ]}
           onQueryChange={change}
           onActivate={activate}
         />
       </UiRoot>,
     );
     expect(screen.getByRole('list', { name: 'Applications' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Browser/ })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Files/ })).not.toBeInTheDocument();
   });
 
   it('keeps settings navigation adaptive while caller owns active section state', () => {

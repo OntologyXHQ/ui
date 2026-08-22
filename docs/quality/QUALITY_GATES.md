@@ -29,6 +29,7 @@ Protects repository and package ownership:
 - the interaction/runtime kernel keeps gesture/modal/motion state root-scoped; overlays sharing one Document arbitrate Escape/outside-pointer through one Document-realm broker while preserving UiRoot-local isolation/scroll/focus lineage; MotionClock/PerformanceObserver/timers/computed-style reads must resolve through the concrete owner Window realm rather than ambient globals.
 - accepted field/text-input Components preserve native form/reset/validation/autocomplete semantics, keep SearchField actions composition-safe, never expose secure preedit/committed values through UI helpers, publish metadata-only editable-text sessions to the host, and respond to transient keyboard occlusion only through combined logical environment insets.
 - developer compositions are product-neutral, reuse only accepted lower-layer contracts, avoid speculative `Section`/`ContentRegion`/`Sidebar`/`SplitView` wrappers, keep PageScaffold/AppBar adaptation container-driven, and require realistic nested-scroll Studio evidence before UIR13 can close.
+- System UI core stays above accepted Components: core files may not import Primitives/Foundations/runtime engines or UIR15 privileged surfaces, may not recreate raw interactive controls or host/router/storage/network authority, and must prove logical RTL chrome plus narrow/wide adaptive settings before UIR14 can close.
 
 ### G1 — catalog acceptance
 
@@ -127,6 +128,7 @@ pnpm quality        # G0..G3: non-mutating fast gate + Biome formatting freshnes
 pnpm lint           # explicit repo-wide Biome lint/debt audit; intentionally separate from verify
 pnpm build          # production package + Studio builds
 pnpm gate:browser   # focused build + G6 production browser acceptance
+pnpm gate:system-ui-core  # focused UIR14 architecture/evidence contract
 pnpm verify         # G0..G6: one production build, then browser acceptance against it
 pnpm release:check  # G0..G7: local release artifact proof; no OXS or planning mutation
 pnpm v1:oxs:check -- /path/to/OXS  # explicit cross-repository certification when required

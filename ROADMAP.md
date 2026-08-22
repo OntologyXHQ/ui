@@ -31,7 +31,8 @@ Canonical gate contract: [`docs/quality/QUALITY_GATES.md`](docs/quality/QUALITY_
 - `UIR11` — Scroll and motion: **DONE**
 - `UIR12` — Gestures, drag/drop, editing and cursor: **DONE**
 - `UIR13` — Developer compositions and adaptive scaffolds: **DONE**
-- `UIR14` — System UI core: **NEXT**
+- `UIR14` — System UI core: **DONE**
+- `UIR15` — Privileged System surfaces: **NEXT**
 
 - Inter-batch Studio presentation follow-up — stacked generated docs + lazy Canvas OX boot renderer: **DONE** (not a numbered roadmap batch)
 
