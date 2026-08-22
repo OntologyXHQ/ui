@@ -302,18 +302,20 @@ Closure target: Pan/swipe/reveal/edge-pan remain one root-scoped Gesture Arena w
 
 ---
 
-## UIR13 — Developer compositions and adaptive scaffolds — NEXT
+## UIR13 — Developer compositions and adaptive scaffolds — DONE
 
-- `UI-1301` Audit every current composition; remove wrappers that add no semantic/behavioral value.
-- `UI-1302` Rebuild card/section/empty-state/content-region compositions from accepted components.
-- `UI-1303` Rebuild app bar/sidebar/split/scaffold contracts for container-driven adaptation.
-- `UI-1304` Prove nested scroll ownership and min-size behavior in realistic app layouts.
-- `UI-1305` Keep product meaning out of reusable compositions.
-- `UI-1306` Add realistic Studio applications, not isolated placeholder boxes, as acceptance examples.
+- `UI-1301` Audit every current composition; remove wrappers that add no semantic/behavioral value. **DONE**
+- `UI-1302` Rebuild card/section/empty-state/content-region compositions from accepted components. **DONE**
+- `UI-1303` Rebuild app bar/sidebar/split/scaffold contracts for container-driven adaptation. **DONE**
+- `UI-1304` Prove nested scroll ownership and min-size behavior in realistic app layouts. **DONE**
+- `UI-1305` Keep product meaning out of reusable compositions. **DONE**
+- `UI-1306` Add realistic Studio applications, not isolated placeholder boxes, as acceptance examples. **DONE**
+
+Closure target: Developer compositions remain product-neutral and only exist when they add semantic structure, interaction ownership or adaptive layout beyond native HTML plus accepted primitives. `Card`, `PageScaffold`, `ApplicationItem`, `ContentState` and `AppBar` are the UIR13-owned V1 exports; `Disclosure`/`Accordion`, `TileGrid`/`Tile`, `EmptyState` and `ScrollView` retain their earlier owners. `PageScaffold` owns logical sidebar/content/footer landmarks and measured container adaptation; `AppBar` adapts from its own narrow inline container; Studio acceptance uses a realistic application scaffold with a genuinely overflowing nested ScrollView and a dedicated adaptive application-header example. `Section`, `ContentRegion`, `Sidebar` and `SplitView` remain intentionally absent until a distinct semantic/behavioral capability justifies a public API. Canonical `DONE` requires the dedicated G0 developer-composition gate plus the full `pnpm verify`; `pnpm uir13:closeout` advances planning only after those checks succeed and never rolls source back on failure.
 
 ---
 
-## UIR14 — System UI core — TODO
+## UIR14 — System UI core — NEXT
 
 - `UI-1401` Re-audit the public System UI boundary; generic capability gaps move down to Components first.
 - `UI-1402` Rebuild desktop/workspace/scaffold layout vocabulary only from accepted Components.

@@ -5614,6 +5614,26 @@ export const browserScenarios = [
           1,
           'PageScaffold realistic example lost nested ScrollView ownership.',
         );
+        const nestedScroll = scaffold.getByLabel('Scaffold scroll preview', { exact: true });
+        const nestedGeometry = await nestedScroll.evaluate((element) => ({
+          clientHeight: element.clientHeight,
+          scrollHeight: element.scrollHeight,
+          scrollTop: element.scrollTop,
+        }));
+        assert.ok(
+          nestedGeometry.scrollHeight > nestedGeometry.clientHeight + 1,
+          'PageScaffold realistic example did not create a genuinely scrollable nested region.',
+        );
+        await nestedScroll.evaluate((element) => {
+          element.scrollTop = 0;
+        });
+        await nestedScroll.hover();
+        await page.mouse.wheel(0, 220);
+        await page.waitForTimeout(100);
+        assert.ok(
+          (await nestedScroll.evaluate((element) => element.scrollTop)) > 0,
+          'Nested ScrollView did not retain scroll ownership inside PageScaffold.',
+        );
 
         const apps = await gotoCatalog(page, baseUrl, {
           entry: 'ApplicationItem',
@@ -5654,8 +5674,11 @@ export const browserScenarios = [
 
         const appBar = await gotoCatalog(page, baseUrl, {
           entry: 'AppBar',
-          tab: 'playground',
+          tab: 'examples',
+          example: 'application-header',
           dir: 'rtl',
+          viewport: 'phone',
+          pointer: 'coarse',
         });
         assert.equal(
           await appBar
@@ -5663,13 +5686,44 @@ export const browserScenarios = [
             .first()
             .isVisible(),
           true,
-          'AppBar live preview did not render the real public export.',
+          'AppBar realistic example did not render the real public export.',
         );
-        const direction = await appBar
+        const appBarGeometry = await appBar
           .locator('.ui-app-bar')
           .first()
-          .evaluate((element) => getComputedStyle(element).direction);
-        assert.equal(direction, 'rtl', 'AppBar did not inherit logical RTL direction.');
+          .evaluate((element) => {
+            const ownerWindow = element.ownerDocument.defaultView;
+            const copy = element.querySelector('.ui-app-bar__copy');
+            const title = element.querySelector('.ui-app-bar__title');
+            return {
+              direction: ownerWindow?.getComputedStyle(element).direction ?? null,
+              clientWidth: element.clientWidth,
+              scrollWidth: element.scrollWidth,
+              copyFlexBasis: copy ? (ownerWindow?.getComputedStyle(copy).flexBasis ?? null) : null,
+              titleWhiteSpace: title
+                ? (ownerWindow?.getComputedStyle(title).whiteSpace ?? null)
+                : null,
+            };
+          });
+        assert.equal(
+          appBarGeometry.direction,
+          'rtl',
+          'AppBar did not inherit logical RTL direction.',
+        );
+        assert.ok(
+          appBarGeometry.scrollWidth <= appBarGeometry.clientWidth + 1,
+          'AppBar leaked horizontal overflow in its phone/container fixture.',
+        );
+        assert.equal(
+          appBarGeometry.copyFlexBasis,
+          '100%',
+          'AppBar copy did not adapt from its measured narrow container.',
+        );
+        assert.equal(
+          appBarGeometry.titleWhiteSpace,
+          'normal',
+          'AppBar narrow-container copy remained viewport-style truncated instead of wrapping.',
+        );
 
         const axe = await runAxe(page, 'UIR13 developer compositions');
         diagnostics.assertClean('UIR13 developer compositions');

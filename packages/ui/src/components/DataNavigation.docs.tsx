@@ -253,8 +253,16 @@ export const uiDocs = defineUiDocsGroup([
     accessibility: 'Associates the header with its title and preserves child control semantics.',
     rtl: 'Leading/title/actions use logical regions.',
     touch: 'Interactive children preserve shared target policy.',
-    responsive: 'Actions remain bounded while copy can truncate/wrap.',
+    responsive:
+      'Container-driven narrow layouts move copy onto its own row and release title truncation without viewport detection.',
     playground: { preferredWidth: 'wide', fixture: { title: 'Application header' } },
+    examples: [
+      {
+        id: 'application-header',
+        title: 'Adaptive application header',
+        component: 'AppBarApplicationExample',
+      },
+    ],
   },
   {
     exportName: 'Badge',
@@ -572,6 +580,28 @@ export function NavigationExample() {
               <Button size="sm">New</Button>
             </ActionGroup>
           </Toolbar>
+        }
+      />
+    </div>
+  );
+}
+
+export function AppBarApplicationExample() {
+  return (
+    <div className="ui-doc-uir13-appbar-frame" data-uir13-appbar-example>
+      <AppBar
+        title="Application header"
+        subtitle="Container-driven reusable header with caller-owned commands"
+        leading={<Icon name="apps" />}
+        actions={
+          <ActionGroup label="Application actions">
+            <Button size="sm" variant="quiet">
+              Search
+            </Button>
+            <Button size="sm" variant="primary">
+              Create
+            </Button>
+          </ActionGroup>
         }
       />
     </div>

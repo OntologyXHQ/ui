@@ -1382,8 +1382,10 @@
 
 
 .ui-app-bar {
-  min-width: 0;
-  min-height: max(var(--oxs-control-height-lg), var(--oxs-touch-target-min));
+  min-inline-size: 0;
+  min-block-size: max(var(--oxs-control-height-lg), var(--oxs-touch-target-min));
+  container-type: inline-size;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: var(--oxs-space-sm);
   padding-block: var(--oxs-space-xs);
@@ -1396,7 +1398,7 @@
 }
 
 .ui-app-bar__copy {
-  min-width: 0;
+  min-inline-size: 0;
   flex: 1;
   display: grid;
   gap: var(--oxs-space-3xs);
@@ -1407,6 +1409,21 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+@container (max-width: 28rem) {
+  .ui-app-bar__copy {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .ui-app-bar__title,
+  .ui-app-bar__subtitle {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 }
 
 .ui-badge {

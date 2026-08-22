@@ -663,6 +663,30 @@ body { overflow: hidden; background: #091019; color-scheme: dark light; }
   align-items: center;
 }
 
+/* UIR13 · realistic developer-composition acceptance fixtures. */
+.ui-doc-uir13-application {
+  inline-size: 100%;
+  block-size: 30rem;
+}
+
+.ui-doc-uir13-sidebar {
+  padding: var(--oxs-space-sm);
+}
+
+.ui-doc-uir13-scroll {
+  block-size: 20rem;
+}
+
+.ui-doc-uir13-scroll-content {
+  padding-block-end: var(--oxs-space-lg);
+}
+
+.ui-doc-uir13-appbar-frame {
+  inline-size: 100%;
+  min-inline-size: 0;
+  container-type: inline-size;
+}
+
 .ui-doc-spinner-boot {
   min-inline-size: 0;
   inline-size: 100%;

@@ -1,5 +1,6 @@
 import {
   Accordion,
+  AppBar,
   ApplicationItem,
   Badge,
   Button,
@@ -9,6 +10,8 @@ import {
   Icon,
   PageScaffold,
   ScrollView,
+  Stack,
+  Text,
   Tile,
   TileGrid,
 } from '@ontologyx/ui';
@@ -265,23 +268,63 @@ export function AccordionContractExample() {
 export function ScaffoldExample() {
   return (
     <PageScaffold
-      className="ui-doc-scaffold"
-      header={<Card padding="sm" title="Developer page" description="Header slot" />}
+      className="ui-doc-uir13-application"
+      data-uir13-realistic-application
+      header={
+        <AppBar
+          title="Developer workspace"
+          subtitle="Container-driven reusable application scaffold"
+          leading={<Icon name="apps" />}
+          actions={
+            <Button size="sm" variant="primary">
+              Create
+            </Button>
+          }
+        />
+      }
       sidebar={
-        <Card padding="sm" title="Sections">
+        <Stack gap="xs" className="ui-doc-uir13-sidebar">
+          <Text variant="body-strong">Sections</Text>
           <Button fullWidth variant="secondary">
             Overview
           </Button>
-        </Card>
+          <Button fullWidth variant="quiet">
+            Activity
+          </Button>
+          <Button fullWidth variant="quiet">
+            Settings
+          </Button>
+        </Stack>
       }
-      footer={<span>Footer slot</span>}
+      footer={<Text tone="tertiary">Reusable footer region</Text>}
       contentLabel="Scaffold example content"
     >
-      <Card title="Main content" description="Container-driven sidebar collapse">
-        <ScrollView className="ui-doc-composition-scroll" ariaLabel="Scaffold scroll preview">
-          Reusable application content goes here.
-        </ScrollView>
-      </Card>
+      <ScrollView className="ui-doc-uir13-scroll" ariaLabel="Scaffold scroll preview">
+        <Stack gap="md" className="ui-doc-uir13-scroll-content">
+          <Card title="Overview" description="Generic application content stays caller-owned.">
+            <Text>
+              PageScaffold owns layout and landmarks while the nested ScrollView keeps its own
+              scrolling lifecycle.
+            </Text>
+          </Card>
+          <Card
+            title="Recent activity"
+            description="Long content proves bounded min-size behavior."
+          >
+            <Stack gap="sm">
+              {Array.from({ length: 8 }, (_, index) => (
+                <Text key={index}>Activity row {index + 1}: reusable developer content.</Text>
+              ))}
+            </Stack>
+          </Card>
+          <ContentState
+            kind="empty"
+            title="No queued work"
+            description="The caller owns domain meaning, policy and actions."
+            actions={<Button size="sm">Add item</Button>}
+          />
+        </Stack>
+      </ScrollView>
     </PageScaffold>
   );
 }

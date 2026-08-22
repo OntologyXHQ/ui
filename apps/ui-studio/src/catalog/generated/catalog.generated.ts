@@ -115,11 +115,17 @@ export const uiCatalog: readonly UiCatalogEntry[] = [
     accessibility: "Associates the header with its title and preserves child control semantics.",
     rtl: "Leading/title/actions use logical regions.",
     touch: "Interactive children preserve shared target policy.",
-    responsive: "Actions remain bounded while copy can truncate/wrap.",
+    responsive: "Container-driven narrow layouts move copy onto its own row and release title truncation without viewport detection.",
     playground: {"preferredWidth":"wide","fixture":{"title":"Application header"}},
     certification: {"owner":"UIR13","behaviorTests":["@ontologyx/ui/components/__tests__/data-navigation.test.tsx","@ontologyx/ui/components/__tests__/developer-compositions.test.tsx"],"browserScenarios":["developer-compositions-adaptive-certification"],"requiredAxes":["compositions","adaptive","container","min-size","nested-scroll","rtl","touch","keyboard","a11y"]},
     props: [{"name":"actions","type":"ReactNode","optional":true,"description":"Optional caller-owned action region composed from public Components.","deprecated":false,"default":null},{"name":"leading","type":"ReactNode","optional":true,"description":"Optional logical-start content; direction follows the owning UI environment.","deprecated":false,"default":null},{"name":"subtitle","type":"ReactNode","optional":true,"description":"Optional caller-owned supporting title text.","deprecated":false,"default":null},{"name":"title","type":"ReactNode","optional":false,"description":"Caller-owned visible title; reusable UI never supplies product meaning.","deprecated":false,"default":null},{"name":"titleLevel","type":"1 | 2 | 3 | 4 | 5 | 6","optional":true,"description":"Semantic heading rank for the visible caller-owned title.","deprecated":false,"default":"2"}],
     examples: [
+      {
+        id: "application-header",
+        title: "Adaptive application header",
+        description: "",
+        load: () => import("@ontologyx/ui-docs/components/DataNavigation.docs").then((module) => ({ default: module.AppBarApplicationExample })),
+      },
     ],
   },
   {

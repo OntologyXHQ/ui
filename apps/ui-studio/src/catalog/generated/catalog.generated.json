@@ -509,7 +509,7 @@
     "accessibility": "Associates the header with its title and preserves child control semantics.",
     "rtl": "Leading/title/actions use logical regions.",
     "touch": "Interactive children preserve shared target policy.",
-    "responsive": "Actions remain bounded while copy can truncate/wrap.",
+    "responsive": "Container-driven narrow layouts move copy onto its own row and release title truncation without viewport detection.",
     "playground": {
       "preferredWidth": "wide",
       "fixture": {
@@ -558,7 +558,13 @@
         "default": "2"
       }
     ],
-    "examples": [],
+    "examples": [
+      {
+        "id": "application-header",
+        "title": "Adaptive application header",
+        "component": "AppBarApplicationExample"
+      }
+    ],
     "certification": {
       "owner": "UIR13",
       "behaviorTests": [
