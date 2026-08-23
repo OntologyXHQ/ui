@@ -159,6 +159,8 @@ describe('System layout library', () => {
     expect(onNotificationActivate).toHaveBeenCalledWith('update-ready');
     expect(screen.getByRole('switch', { name: 'Wi-Fi' })).toBeChecked();
     expect(screen.getByRole('slider', { name: 'Volume' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /^Quick settings$/ })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /^Quick settings controls$/ })).toBeInTheDocument();
   });
 
   it('keeps OSD, lock and keyboard host as UI-only System surfaces', () => {

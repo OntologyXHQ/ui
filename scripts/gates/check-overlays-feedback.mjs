@@ -116,6 +116,16 @@ if (/floating-menu-tooltip-certification[\s\S]*?items\.nth\(/.test(scenarios)) {
   issues.push('floating Menu certification must not identify commands by ordinal position');
 }
 
+for (const token of [
+  "const contextMenu = page.getByRole('menu', { name: 'File actions', exact: true });",
+  "surface.getAttribute('data-ready') === 'true'",
+  'Number.parseFloat(style.opacity) >= 0.999',
+]) {
+  if (!scenarios.includes(token)) {
+    issues.push(`floating Menu a11y audit must wait for settled full-motion surface: ${token}`);
+  }
+}
+
 if (issues.length) {
   console.error('G0 overlays/feedback contract failed:');
   for (const issue of issues) console.error(` - ${issue}`);

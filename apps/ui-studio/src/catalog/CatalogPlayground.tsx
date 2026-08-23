@@ -246,7 +246,15 @@ function applicableStates(entry: UiCatalogEntry) {
   return states;
 }
 
-function DedicatedPreview({ entry }: { entry: UiCatalogEntry }) {
+function DedicatedPreview({
+  entry,
+  componentProps,
+  state,
+}: {
+  entry: UiCatalogEntry;
+  componentProps: Readonly<Record<string, unknown>>;
+  state: string;
+}) {
   const preview = entry.preview;
   const Preview = useMemo(() => (preview ? lazy(preview.load) : null), [preview]);
   if (!preview || !Preview) {
@@ -259,7 +267,7 @@ function DedicatedPreview({ entry }: { entry: UiCatalogEntry }) {
   }
   return (
     <Suspense fallback={<Text tone="tertiary">Loading dedicated preview…</Text>}>
-      <Preview />
+      <Preview componentProps={componentProps} state={state} />
     </Suspense>
   );
 }
@@ -276,7 +284,7 @@ function PreviewStage({
   onChange?: (next: Record<string, unknown>) => void;
 }) {
   const Component = componentFor(entry);
-  const canRenderDirectly = Boolean(Component && canSeedRequiredProps(entry));
+  const canRenderDirectly = Boolean(!entry.preview && Component && canSeedRequiredProps(entry));
   const resolved = bindInteractiveProps(entry, previewPropsForState(entry, props, state), onChange);
   const preferredWidth = entry.playground?.preferredWidth ?? 'wide';
   return (
@@ -291,7 +299,7 @@ function PreviewStage({
           {canRenderDirectly && Component ? (
             createElement(Component, resolved)
           ) : (
-            <DedicatedPreview entry={entry} />
+            <DedicatedPreview entry={entry} componentProps={resolved} state={state} />
           )}
         </UiRoot>
       </div>

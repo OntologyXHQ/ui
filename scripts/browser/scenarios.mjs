@@ -5773,10 +5773,20 @@ export const browserScenarios = [
         });
         await contextTrigger.focus();
         await page.keyboard.press('Shift+F10');
-        assert.equal(
-          await page.getByRole('menu', { name: 'File actions', exact: true }).isVisible(),
-          true,
-        );
+        const contextMenu = page.getByRole('menu', { name: 'File actions', exact: true });
+        assert.equal(await contextMenu.isVisible(), true);
+        await contextMenu.waitFor({ state: 'visible' });
+        // Playwright visibility does not mean the full-motion Popover opacity transition has
+        // settled. Audit the stable accessible state instead of racing axe against a 150ms fade.
+        await page.waitForFunction(() => {
+          const surface = document.querySelector('[role="menu"][aria-label="File actions"]');
+          if (!(surface instanceof HTMLElement)) return false;
+          const style = getComputedStyle(surface);
+          return (
+            surface.getAttribute('data-ready') === 'true' &&
+            Number.parseFloat(style.opacity) >= 0.999
+          );
+        });
 
         const axe = await runAxe(page, 'UIR10 floating menu tooltip');
         diagnostics.assertClean('UIR10 floating menu tooltip');
@@ -6350,6 +6360,46 @@ export const browserScenarios = [
         assert.ok(
           Math.abs(wideSidebarBox.x - wideMainBox.x) > 80,
           'Wide SystemSettingsLayout did not adapt into a split navigation/content composition.',
+        );
+        const wideNavigation = wideSettings.getByRole('navigation', {
+          name: 'Settings sections',
+          exact: true,
+        });
+        const wideNavigationItems = wideNavigation.getByRole('button');
+        assert.ok(
+          (await wideNavigationItems.count()) >= 2,
+          'Wide SystemSettingsLayout did not expose enough navigation items to certify its sidebar axis.',
+        );
+        const wideNavigationList = wideNavigation.locator('.ui-navigation__items');
+        const [wideFirstNavigationBox, wideSecondNavigationBox, wideNavigationLayout] =
+          await Promise.all([
+            wideNavigationItems.nth(0).boundingBox(),
+            wideNavigationItems.nth(1).boundingBox(),
+            wideNavigationList.evaluate((element) => {
+              const style = getComputedStyle(element);
+              return {
+                display: style.display,
+                flexDirection: style.flexDirection,
+                gridTemplateColumns: style.gridTemplateColumns,
+                width: element.getBoundingClientRect().width,
+              };
+            }),
+          ]);
+        assert.ok(
+          wideFirstNavigationBox && wideSecondNavigationBox,
+          'Wide SystemSettingsLayout navigation item geometry is unavailable.',
+        );
+        assert.ok(
+          wideSecondNavigationBox.y >
+            wideFirstNavigationBox.y + wideFirstNavigationBox.height * 0.55 &&
+            Math.abs(wideSecondNavigationBox.x - wideFirstNavigationBox.x) < 4,
+          `Wide SystemSettingsLayout navigation did not remain vertically stacked inside the split sidebar. Diagnostics: ${JSON.stringify(
+            {
+              first: wideFirstNavigationBox,
+              second: wideSecondNavigationBox,
+              layout: wideNavigationLayout,
+            },
+          )}`,
         );
 
         await assertNoGlobalHorizontalOverflow(page, 'UIR14 System UI core');

@@ -36,11 +36,11 @@ pnpm dev          # both together
 Screenshots are **review/regression evidence**, not a cross-machine pixel-perfect failure gate. Exact image equality is intentionally avoided because font rasterization, GPU backend and host Chrome differences create false failures. Pass/fail is based on gross-regression budgets for:
 
 - time until the component workbench is visible;
-- sampled frame p95;
+- sampled frame p95, measured from 20 post-settle animation frames with nearest-rank p95 semantics;
 - cumulative long-task duration when the browser exposes it;
 - workbench DOM size.
 
-Each screenshot receives a SHA-256 fingerprint in `latest.json` so changes can still be audited or compared in a fixed certification environment later.
+Each screenshot receives a SHA-256 fingerprint in `latest.json` so changes can still be audited or compared in a fixed certification environment later. The sampled frame maximum remains recorded as audit evidence, but a single scheduler/GC outlier is not mislabeled as p95 or treated as a gross-regression failure.
 
 `pnpm demo:smoke` separately browser-checks the System demo, captures a screenshot, verifies launcher → stable application activation and Quick Settings, and rejects serious/critical axe violations.
 

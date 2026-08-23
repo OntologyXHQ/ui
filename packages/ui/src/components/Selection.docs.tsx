@@ -73,6 +73,7 @@ export const uiDocs = defineUiDocsGroup([
     rtl: 'Indicator/copy order is logical.',
     touch: 'Whole labelled row activates.',
     responsive: 'Description wraps independently.',
+    preview: { component: 'RadioStudioPreview' },
     examples: [
       {
         id: 'native-contract',
@@ -187,6 +188,31 @@ export const uiDocs = defineUiDocsGroup([
     ],
   },
 ] as const);
+
+export function RadioStudioPreview({
+  componentProps,
+}: {
+  componentProps?: Readonly<Record<string, unknown>>;
+}) {
+  const props = componentProps ?? {};
+  const value = typeof props.value === 'string' && props.value ? props.value : 'Example';
+  const label = typeof props.label === 'string' && props.label ? props.label : 'Radio';
+  const description = typeof props.description === 'string' ? props.description : undefined;
+  const disabled = props.disabled === true;
+  const size = props.size === 'sm' || props.size === 'lg' ? props.size : 'md';
+
+  return (
+    <RadioGroup label={`${label} group`} name="studio-radio-preview">
+      <Radio
+        value={value}
+        label={label}
+        description={description}
+        disabled={disabled}
+        size={size}
+      />
+    </RadioGroup>
+  );
+}
 
 export function SelectionNativeContractExample() {
   const [submits, setSubmits] = useState('none');

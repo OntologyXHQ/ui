@@ -19,9 +19,14 @@ export type UiCatalogExample = {
   load: () => Promise<{ default: ComponentType }>;
 };
 
+export type UiCatalogDedicatedPreviewProps = {
+  componentProps: Readonly<Record<string, unknown>>;
+  state: string;
+};
+
 export type UiCatalogPreview = {
   component: string;
-  load: () => Promise<{ default: ComponentType }>;
+  load: () => Promise<{ default: ComponentType<UiCatalogDedicatedPreviewProps> }>;
 };
 
 export type UiCatalogStateModel = {

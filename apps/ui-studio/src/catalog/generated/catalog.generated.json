@@ -5235,7 +5235,9 @@
     "touch": "Whole labelled row activates.",
     "responsive": "Description wraps independently.",
     "playground": null,
-    "preview": null,
+    "preview": {
+      "component": "RadioStudioPreview"
+    },
     "stateModels": [],
     "props": [
       {
@@ -9728,7 +9730,7 @@
     "summary": "OXS quick-settings composition for Component toggles, sliders and status groups without backend ownership.",
     "usage": "Provide System state/actions as Component controls inside sections; hardware/network policy stays native/backend-owned.",
     "status": "accepted",
-    "accessibility": "Each Card section labels its contained Component controls.",
+    "accessibility": "The outer quick-settings landmark and its focusable scroll viewport use distinct accessible names; each Card section labels its contained Component controls.",
     "rtl": "Section grid and controls follow logical Component layout.",
     "touch": "Switch/Slider/Button interactions retain their shared touch and keyboard semantics.",
     "responsive": "Sections collapse from multi-column to single-column by container width; hardware/output safe-area placement stays with the containing System host.",
@@ -9769,6 +9771,14 @@
         "description": "Optional consumer class name appended without changing component ownership.",
         "deprecated": false,
         "default": "''"
+      },
+      {
+        "name": "collectionLabel",
+        "type": "string",
+        "optional": true,
+        "description": "Accessible name for the focusable quick-settings scroll viewport.",
+        "deprecated": false,
+        "default": "'Quick settings controls'"
       },
       {
         "name": "label",

@@ -1267,7 +1267,10 @@ export const uiCatalog: readonly UiCatalogEntry[] = [
     playground: null,
     certification: {"owner":"UIR08","behaviorTests":["@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx","@ontologyx/ui/components/__tests__/selection.test.tsx"],"browserScenarios":["selection-controls-certification"],"requiredAxes":["selection","native-semantics","uncontrolled","keyboard","touch","rtl","reset","a11y"],"behaviorSources":["packages/ui/src/components/__tests__/selection-disclosure.test.tsx","packages/ui/src/components/__tests__/selection.test.tsx"],"browserSource":"scripts/browser/scenarios.mjs","result":"certified"},
     stateModels: [],
-    preview: null,
+    preview: {
+      component: "RadioStudioPreview",
+      load: () => import("@ontologyx/ui-docs/components/Selection.docs").then((module) => ({ default: module.RadioStudioPreview })),
+    },
     props: [{"name":"description","type":"ReactNode","optional":true,"description":"Optional supporting description associated with the control.","deprecated":false,"default":null},{"name":"label","type":"ReactNode","optional":false,"description":"Visible control label and accessible name source.","deprecated":false,"default":null},{"name":"size","type":"ControlSize","optional":true,"description":"Shared control target scale.","deprecated":false,"default":"md"},{"name":"value","type":"string","optional":false,"description":"Stable native radio value owned by the surrounding RadioGroup.","deprecated":false,"default":null}],
     examples: [
       {
@@ -2190,7 +2193,7 @@ export const uiCatalog: readonly UiCatalogEntry[] = [
     summary: "OXS quick-settings composition for Component toggles, sliders and status groups without backend ownership.",
     usage: "Provide System state/actions as Component controls inside sections; hardware/network policy stays native/backend-owned.",
     status: "accepted",
-    accessibility: "Each Card section labels its contained Component controls.",
+    accessibility: "The outer quick-settings landmark and its focusable scroll viewport use distinct accessible names; each Card section labels its contained Component controls.",
     rtl: "Section grid and controls follow logical Component layout.",
     touch: "Switch/Slider/Button interactions retain their shared touch and keyboard semantics.",
     responsive: "Sections collapse from multi-column to single-column by container width; hardware/output safe-area placement stays with the containing System host.",
@@ -2198,7 +2201,7 @@ export const uiCatalog: readonly UiCatalogEntry[] = [
     certification: {"owner":"UIR15","behaviorTests":["@ontologyx/ui/system/__tests__/system-layouts.test.tsx"],"browserScenarios":["privileged-system-surfaces-certification"],"requiredAxes":["system-ui","privileged","host-boundary","occlusion","transient","keyboard","touch","rtl","reduced-motion","a11y"],"behaviorSources":["packages/ui/src/system/__tests__/system-layouts.test.tsx"],"browserSource":"scripts/browser/scenarios.mjs","result":"certified"},
     stateModels: [],
     preview: null,
-    props: [{"name":"actions","type":"ReactNode","optional":true,"description":"Optional caller-owned action region composed from public Components.","deprecated":false,"default":null},{"name":"className","type":"string","optional":true,"description":"Optional consumer class name appended without changing component ownership.","deprecated":false,"default":"''"},{"name":"label","type":"string","optional":true,"description":"Accessible landmark label for the quick-settings composition.","deprecated":false,"default":"'Quick settings'"},{"name":"sections","type":"readonly SystemQuickSettingSection[]","optional":false,"description":"Caller-owned ordered section models for this reusable System composition.","deprecated":false,"default":null},{"name":"subtitle","type":"ReactNode","optional":true,"description":"Optional caller-owned supporting title text.","deprecated":false,"default":null},{"name":"title","type":"ReactNode","optional":true,"description":"Caller-owned visible title; reusable UI never supplies product meaning.","deprecated":false,"default":"'Quick settings'"}],
+    props: [{"name":"actions","type":"ReactNode","optional":true,"description":"Optional caller-owned action region composed from public Components.","deprecated":false,"default":null},{"name":"className","type":"string","optional":true,"description":"Optional consumer class name appended without changing component ownership.","deprecated":false,"default":"''"},{"name":"collectionLabel","type":"string","optional":true,"description":"Accessible name for the focusable quick-settings scroll viewport.","deprecated":false,"default":"'Quick settings controls'"},{"name":"label","type":"string","optional":true,"description":"Accessible landmark label for the quick-settings composition.","deprecated":false,"default":"'Quick settings'"},{"name":"sections","type":"readonly SystemQuickSettingSection[]","optional":false,"description":"Caller-owned ordered section models for this reusable System composition.","deprecated":false,"default":null},{"name":"subtitle","type":"ReactNode","optional":true,"description":"Optional caller-owned supporting title text.","deprecated":false,"default":null},{"name":"title","type":"ReactNode","optional":true,"description":"Caller-owned visible title; reusable UI never supplies product meaning.","deprecated":false,"default":"'Quick settings'"}],
     examples: [
     ],
   },

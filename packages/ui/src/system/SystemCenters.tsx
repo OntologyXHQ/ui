@@ -96,6 +96,8 @@ export type SystemQuickSettingsProps = {
   actions?: ReactNode;
   /** Accessible landmark label for the quick-settings composition. */
   label?: string;
+  /** Accessible name for the focusable quick-settings scroll viewport. */
+  collectionLabel?: string;
   /** Optional consumer class name appended without changing component ownership. */
   className?: string;
 };
@@ -106,12 +108,13 @@ export function SystemQuickSettings({
   sections,
   actions,
   label = 'Quick settings',
+  collectionLabel = 'Quick settings controls',
   className = '',
 }: SystemQuickSettingsProps) {
   return (
     <section className={`ui-system-quick-settings ${className}`.trim()} aria-label={label}>
       <AppBar title={title} subtitle={subtitle} actions={actions} />
-      <ScrollView className="ui-system-quick-settings__scroll" ariaLabel={label}>
+      <ScrollView className="ui-system-quick-settings__scroll" ariaLabel={collectionLabel}>
         <div className="ui-system-quick-settings__grid">
           {sections.map((section) => (
             <Card

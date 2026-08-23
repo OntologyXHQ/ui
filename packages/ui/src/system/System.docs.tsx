@@ -1,4 +1,3 @@
-import { useMemo, useState } from 'react';
 import {
   Badge,
   Button,
@@ -13,7 +12,9 @@ import {
   SystemChromeGroup,
   SystemCommandSurface,
   SystemDock,
+  type SystemKeyboardCommand,
   SystemKeyboardHost,
+  type SystemKeyboardSurfaceState,
   SystemLauncher,
   SystemLockLayout,
   SystemNotificationCenter,
@@ -24,9 +25,8 @@ import {
   SystemSettingsLayout,
   SystemSurface,
   SystemWorkspace,
-  type SystemKeyboardCommand,
-  type SystemKeyboardSurfaceState,
 } from '@ontologyx/ui';
+import { useMemo, useState } from 'react';
 import { defineUiDocsGroup } from '../docs/defineUiDocs';
 
 const hostResolvedApplicationIcon = {
@@ -340,7 +340,8 @@ export const uiDocs = defineUiDocsGroup([
     usage:
       'Provide System state/actions as Component controls inside sections; hardware/network policy stays native/backend-owned.',
     status: 'accepted',
-    accessibility: 'Each Card section labels its contained Component controls.',
+    accessibility:
+      'The outer quick-settings landmark and its focusable scroll viewport use distinct accessible names; each Card section labels its contained Component controls.',
     rtl: 'Section grid and controls follow logical Component layout.',
     touch: 'Switch/Slider/Button interactions retain their shared touch and keyboard semantics.',
     responsive:

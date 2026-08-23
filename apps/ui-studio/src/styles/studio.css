@@ -1762,3 +1762,27 @@ body { overflow: hidden; background: #091019; color-scheme: dark light; }
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Pre-publication Studio responsive cascade authority repair. */
+/* Keep responsive layout rules after the later visual-polish overrides so a simulated
+   compact/phone viewport cannot be forced back into the desktop two-column shell. */
+@container oxs-ui (max-width: 68rem) {
+  .ui-studio-shell {
+    grid-template-columns: minmax(14.5rem, 16rem) minmax(0, 1fr);
+  }
+}
+
+@container oxs-ui (max-width: 52rem) {
+  .ui-studio-shell {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(13rem, 38dvh) minmax(0, 1fr);
+  }
+}
+
+@container oxs-ui (max-width: 32rem) {
+  .ui-studio-shell {
+    gap: var(--oxs-space-xs);
+    padding: var(--oxs-space-xs);
+  }
+}
+

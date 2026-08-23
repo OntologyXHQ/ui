@@ -321,6 +321,18 @@
   }
 }
 
+@container oxs-system (min-width: 56rem) {
+  .ui-system-launcher-layer .ui-sheet-panel {
+    inset-inline: 0;
+    inline-size: min(64rem, calc(100% - (2 * var(--oxs-layout-gutter))));
+    margin-inline: auto;
+  }
+
+  .ui-system-launcher {
+    max-block-size: min(68%, 36rem);
+  }
+}
+
 @container oxs-system (max-width: 44rem) {
   .ui-system-launcher-layer .ui-sheet-panel {
     inset-block-end: calc(var(--oxs-touch-target-min) + var(--oxs-space-xs) + var(--oxs-safe-block-end));
@@ -336,6 +348,7 @@
   block-size: min(46rem, 100%);
   min-block-size: 20rem;
   container-type: inline-size;
+  container-name: oxs-system-settings;
 }
 
 .ui-system-settings-layout .ui-page-scaffold__body {
@@ -358,15 +371,38 @@
   padding: var(--oxs-space-md);
 }
 
-@container (min-width: 44rem) {
+@container oxs-system-settings (min-width: 44rem) {
   .ui-system-settings-layout .ui-page-scaffold__body {
-    grid-template-columns: minmax(11rem, 15rem) minmax(0, 1fr);
+    grid-template-columns: minmax(12rem, 15rem) minmax(0, 1fr);
   }
 
   .ui-system-settings-layout .ui-page-scaffold__sidebar {
     border-block-end: 0;
     border-inline-end: var(--oxs-border-hairline) solid var(--oxs-color-border-subtle);
     overflow-x: visible;
+  }
+
+  /* SystemSettingsLayout owns a desktop sidebar. AdaptiveNavigation's own narrow
+     container must not collapse that sidebar back into a horizontal bar. */
+  .ui-system-settings-layout__navigation .ui-navigation__items {
+    inline-size: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ui-system-settings-layout__navigation .ui-navigation__item {
+    inline-size: 100%;
+    flex: none;
+    justify-content: flex-start;
+  }
+
+  .ui-system-settings-layout__navigation .ui-navigation__label {
+    position: static;
+    inline-size: auto;
+    block-size: auto;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
   }
 }
 

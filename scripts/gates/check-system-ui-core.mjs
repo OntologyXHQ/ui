@@ -165,6 +165,18 @@ for (const token of [
     issues.push(`SystemSettingsLayout host-neutral contract missing ${token}`);
 }
 
+for (const token of [
+  'container-name: oxs-system-settings;',
+  '@container oxs-system-settings (min-width: 44rem)',
+  '.ui-system-settings-layout__navigation .ui-navigation__items',
+  'display: grid;',
+  'grid-template-columns: minmax(0, 1fr);',
+  'inline-size: 100%;',
+]) {
+  if (!systemStyles.includes(token))
+    issues.push(`SystemSettingsLayout named-container geometry contract missing ${token}`);
+}
+
 for (const physical of [
   /\bleft\s*:/u,
   /\bright\s*:/u,
@@ -216,6 +228,7 @@ for (const token of [
   'Narrow SystemSettingsLayout did not collapse navigation above content.',
   'Wide SystemSettingsLayout fixture did not provide the 44rem container required by its split query',
   'Wide SystemSettingsLayout did not adapt into a split navigation/content composition.',
+  'Wide SystemSettingsLayout navigation did not remain vertically stacked inside the split sidebar.',
 ]) {
   if (!scenarios.includes(token)) issues.push(`UIR14 G6 evidence missing ${token}`);
 }

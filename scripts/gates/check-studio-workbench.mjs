@@ -97,8 +97,12 @@ for (const entry of catalog) {
 for (const [token, message] of [
   ['data-studio-preview-mode', 'Studio preview must publish direct/dedicated preview ownership'],
   [
-    '<DedicatedPreview entry={entry} />',
-    'complex previews must use explicit dedicated preview metadata',
+    '!entry.preview && Component && canSeedRequiredProps(entry)',
+    'explicit source-owned previews must override generic direct preview seeding',
+  ],
+  [
+    '<DedicatedPreview entry={entry} componentProps={resolved} state={state} />',
+    'dedicated previews must receive generated props/state instead of rendering as static fixtures',
   ],
 ]) {
   if (!playgroundText.includes(token)) issues.push(message);
@@ -107,6 +111,11 @@ if (playgroundText.includes('entry.examples[0]')) {
   issues.push(
     'Studio preview must never infer a component preview from the first family/example demo',
   );
+}
+
+const radioEntry = catalog.find((entry) => entry.exportName === 'Radio');
+if (radioEntry?.preview?.component !== 'RadioStudioPreview') {
+  issues.push('Radio must use a source-owned RadioGroup-backed dedicated preview');
 }
 
 for (const [token, message] of [

@@ -26,6 +26,11 @@ const budgets = {
   longTaskTotalMs: 750,
   domNodes: 5_000,
 };
+const frameSampling = {
+  warmupFrames: 2,
+  sampleFrames: 20,
+  percentile: 0.95,
+};
 
 const catalogPath = path.join(
   repoRoot,
@@ -113,29 +118,38 @@ try {
     );
     const visibleMs = performance.now() - started;
 
-    const metrics = await page.evaluate(async () => {
+    const metrics = await page.evaluate(async (sampling) => {
+      for (let index = 0; index < sampling.warmupFrames; index += 1) {
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+      }
+
       const intervals = [];
       let previous = performance.now();
-      for (let index = 0; index < 12; index += 1) {
+      for (let index = 0; index < sampling.sampleFrames; index += 1) {
         await new Promise((resolve) => requestAnimationFrame(resolve));
         const now = performance.now();
         intervals.push(now - previous);
         previous = now;
       }
       const sorted = [...intervals].sort((a, b) => a - b);
-      const frameP95Ms = sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * 0.95))] ?? 0;
+      const percentileIndex = Math.min(
+        sorted.length - 1,
+        Math.max(0, Math.ceil(sorted.length * sampling.percentile) - 1),
+      );
+      const frameP95Ms = sorted[percentileIndex] ?? 0;
       const root = document.querySelector('[data-studio-entry]');
       const preview = root?.querySelector('.ui-studio-component-preview');
       const longTasks = globalThis.__oxsVisualLongTasks ?? [];
       return {
         frameP95Ms,
         frameMaxMs: Math.max(...intervals, 0),
+        frameSampleCount: intervals.length,
         domNodes: root?.querySelectorAll('*').length ?? 0,
         previewNodes: preview?.querySelectorAll('*').length ?? 0,
         longTaskCount: longTasks.length,
         longTaskTotalMs: longTasks.reduce((total, task) => total + task.duration, 0),
       };
-    });
+    }, frameSampling);
 
     const screenshotPath = path.join(screenshotRoot, `${entry.id}.png`);
     await componentPreview.screenshot({ path: screenshotPath, animations: 'disabled' });
@@ -203,6 +217,7 @@ const report = {
     container: 'wide',
   },
   budgets,
+  frameSampling,
   summary: {
     entries: results.length,
     passed: results.filter((entry) => entry.passed).length,
