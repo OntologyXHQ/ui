@@ -1,7 +1,16 @@
 # Changelog
 
+## 2026-08-23 — Final V1 polish Part 4: cross-axis visual certification
+
+- Replaced six non-canonical CSS token references that could silently fall back to browser defaults across package, Studio, and demo surfaces.
+- Added a deterministic 4-environment × 12-sentinel visual matrix covering dark/light, LTR/RTL, compact/comfortable density, full/reduced motion, fine/coarse pointers, desktop/tablet/phone, and safe-area presets.
+- Extended `polish:check` so the final npm publication path retains cross-axis screenshot evidence in `artifacts/cross-axis-visual/latest.json`.
+- No public `@ontologyx/ui` API or runtime authority changed.
+
+
 ## 1.0.0 — V1 stable UI platform
 
+- Polished final V1 interaction states so checked/selected controls retain semantic emphasis through hover, keyboard focus is explicit on list/menu/select actions, coarse pointers avoid sticky hover treatments, and state transitions continue to resolve through the shared reduced-motion tokens.
 - Reaccepted all 100 public visual exports through the zero-trust UIR00–UIR17 gate model; no candidate visual exports remain in the V1 catalog.
 - Closed developer compositions and adaptive scaffolds with container-driven PageScaffold, product-neutral Card/ApplicationItem/ContentState, AppBar, and the certified Slider range contract.
 - Reaccepted System UI core and privileged surfaces strictly over public Components; native/compositor, launch, authentication, delivery, persistence, hardware, and IME authority remain host-owned.

@@ -35,21 +35,21 @@ function selectedEntry(requested: string | null) {
 
 function GuidanceGrid({ entry }: { entry: UiCatalogEntry }) {
   return (
-    <Grid columns="auto-fit" minColumn="wide" gap="md" className="ui-studio-guidance-grid">
+    <Grid columns="auto-fit" minColumn="wide" gap="xs" className="ui-studio-guidance-grid">
       {[
         ['Accessibility', entry.accessibility],
         ['RTL', entry.rtl],
         ['Touch', entry.touch],
         ['Responsive', entry.responsive],
       ].map(([label, value]) => (
-        <Surface key={label} material="subtle" radius="md" className="ui-studio-guidance-card">
-          <Stack gap="xs">
+        <Box key={label} className="ui-studio-guidance-card">
+          <Stack gap="2xs">
             <Label emphasis="strong">{label}</Label>
-            <Text tone="secondary" selectable>
+            <Text tone="secondary" variant="caption" selectable wrap="pretty">
               {value}
             </Text>
           </Stack>
-        </Surface>
+        </Box>
       ))}
     </Grid>
   );
@@ -59,7 +59,7 @@ function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
   const certification = entry.certification;
   return (
     <Stack gap="xl">
-      <Stack gap="md" className="ui-studio-entry-hero">
+      <Stack gap="sm" className="ui-studio-entry-hero">
         <Row gap="sm" className="ui-studio-entry-badges">
           <Badge tone="accent">{entry.layer}</Badge>
           <Badge>{entry.category}</Badge>
@@ -78,6 +78,11 @@ function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
         <Heading level={1} size="display">
           {entry.exportName}
         </Heading>
+      </Stack>
+
+      <CatalogComponentPreview key={entry.id} entry={entry} />
+
+      <Stack gap="xs" className="ui-studio-entry-copy">
         <Text
           className="ui-studio-entry-summary"
           variant="body-strong"
@@ -91,8 +96,6 @@ function OverviewPanel({ entry }: { entry: UiCatalogEntry }) {
           {entry.usage}
         </Text>
       </Stack>
-
-      <CatalogComponentPreview key={entry.id} entry={entry} />
 
       <Grid columns="auto-fit" minColumn="wide" gap="md" className="ui-studio-overview-grid">
         <Surface material="subtle" radius="lg" className="ui-studio-import-card">
@@ -194,8 +197,7 @@ function ApiPanel({ entry }: { entry: UiCatalogEntry }) {
           Props from TypeScript
         </Heading>
         <Text tone="tertiary" wrap="pretty">
-          OntologyX UI-owned props only. Native DOM props stay native instead of flooding the
-          generated reference.
+          Public package props generated from TypeScript.
         </Text>
       </Stack>
       <Surface
@@ -318,8 +320,7 @@ function ExamplesPanel({
           Examples
         </Heading>
         <Text tone="tertiary" wrap="pretty">
-          Real public-package examples stay in the document flow so comparison never requires
-          switching context.
+          Public-package examples rendered inline for direct comparison.
         </Text>
       </Stack>
       {entry.examples.length ? (
@@ -367,7 +368,7 @@ function PlaygroundSection({ entry }: { entry: UiCatalogEntry }) {
           Playground & state matrix
         </Heading>
         <Text tone="tertiary" wrap="pretty">
-          Tune safe scalar props and inspect canonical states without leaving this component page.
+          Adjust safe props and inspect canonical component states.
         </Text>
       </Stack>
       <CatalogPlayground key={entry.id} entry={entry} />
@@ -457,15 +458,6 @@ export function CatalogPage() {
       }),
     [route.layer, route.query, route.status],
   );
-  const propCount = useMemo(
-    () => uiCatalog.reduce((total, entry) => total + entry.props.length, 0),
-    [],
-  );
-  const exampleCount = useMemo(
-    () => uiCatalog.reduce((total, entry) => total + entry.examples.length, 0),
-    [],
-  );
-
   useEffect(() => {
     if (active && route.entry !== active.id) {
       updateCatalogRoute({ entry: active.id }, 'replace');
@@ -509,13 +501,7 @@ export function CatalogPage() {
           className="ui-studio-appbar"
           title="OntologyX UI Studio"
           subtitle={`${active.exportName} · ${active.layer} / ${active.category}`}
-          actions={
-            <Row gap="sm">
-              <Badge tone="success">{uiCatalog.length} exports</Badge>
-              <Badge>{propCount} props</Badge>
-              <Badge>{exampleCount} examples</Badge>
-            </Row>
-          }
+          actions={<Badge tone="success">{uiCatalog.length} exports</Badge>}
         />
         <StudioEnvironmentToolbar />
         <ScrollView

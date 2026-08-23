@@ -91,7 +91,13 @@ if (!demoIndex.includes('<link rel="icon" href="data:image/svg+xml,'))
 
 // Window-manager product-demo contract. Keep this independent of the older
 // product-polish checks so formatter changes cannot make patching brittle.
-for (const required of ['SystemApplicationBrowser', 'SharedBounds']) {
+for (const required of [
+  'SystemApplicationBrowser',
+  'SharedBounds',
+  '@ontologyx/ui/icons',
+  'OxMarkGlyph',
+  'HostApplicationIcon',
+]) {
   if (!demo.includes(required)) issues.push(`System demo WM surface contract missing ${required}`);
 }
 for (const required of [
@@ -133,6 +139,17 @@ for (const required of [
 if (demo.includes('<SystemLauncher')) {
   issues.push('Desktop demo must not regress to the BottomSheet-backed SystemLauncher surface');
 }
+for (const productLeak of [
+  'Workspaces + Recents',
+  'GNOME-style',
+  'Android-style',
+  'browser journeys',
+  'visual exports',
+  'UI 1.0',
+]) {
+  if (demo.includes(productLeak))
+    issues.push(`System demo exposes release/test language in the product surface: ${productLeak}`);
+}
 for (const required of [
   '.demo-workspace-stage',
   '.demo-workspace-scene',
@@ -142,6 +159,9 @@ for (const required of [
   '.demo-overview-recents',
   '.demo-overview-card',
   '.demo-dock-app[data-running',
+  '.demo-dock-app__button',
+  '.demo-dock-app__icon',
+  '.demo-system-home',
 ]) {
   if (!demoCss.includes(required))
     issues.push(`System demo visual/window contract missing ${required}`);

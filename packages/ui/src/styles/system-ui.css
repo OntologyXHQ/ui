@@ -569,7 +569,7 @@
 .ui-system-keyboard__status-copy {
   color: var(--oxs-color-text-tertiary);
   font-size: var(--oxs-type-caption-size);
-  line-height: var(--oxs-type-caption-line-height);
+  line-height: var(--oxs-type-caption-line);
 }
 
 .ui-system-keyboard__status-badges {

@@ -84,7 +84,7 @@ export function StudioSidebar({
           value={query}
           onValueChange={onQueryChange}
           label="Search UI catalog"
-          placeholder="Components, props, guidance…"
+          placeholder="Search components…"
           hideLabel
         />
         <Box className="ui-studio-sidebar__filters" data-studio-catalog-filters>
@@ -108,7 +108,7 @@ export function StudioSidebar({
       </Stack>
 
       <ScrollView className="ui-studio-sidebar__scroll" ariaLabel="Generated UI catalog navigation">
-        <Stack className="ui-studio-sidebar__content" gap="lg">
+        <Stack className="ui-studio-sidebar__content" gap="md">
           {groups.map((group) => (
             <Stack key={group.layer} gap="sm">
               <Row className="ui-studio-sidebar__layer-heading" justify="between" gap="sm">

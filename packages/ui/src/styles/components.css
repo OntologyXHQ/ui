@@ -385,13 +385,20 @@
   background: transparent;
   color: var(--oxs-color-text-primary);
   text-align: start;
+  transition:
+    background-color var(--oxs-motion-fast) var(--oxs-ease-standard),
+    box-shadow var(--oxs-motion-fast) var(--oxs-ease-standard),
+    opacity var(--oxs-motion-fast) var(--oxs-ease-standard);
 }
 
-.ui-select-option:hover,
-.ui-select-option:focus-visible,
 .ui-select-option[aria-selected='true'] {
   background: var(--oxs-color-accent-soft);
-  outline: none;
+}
+
+.ui-select-option:focus-visible {
+  background: var(--oxs-color-accent-soft);
+  outline: var(--oxs-focus-ring-width) solid var(--oxs-color-focus);
+  outline-offset: calc(var(--oxs-focus-ring-offset) * -1);
 }
 
 .ui-select-option:disabled {
@@ -575,6 +582,11 @@
   background: var(--oxs-color-control-hover);
 }
 
+.ui-root[data-oxs-pointer-precision='fine'] .ui-button[aria-pressed='true']:not(:disabled):hover {
+  border-color: var(--oxs-color-accent);
+  background: var(--oxs-color-accent-soft);
+}
+
 .ui-root[data-oxs-pointer-precision='fine'] .ui-button--primary:not(:disabled):hover {
   background: var(--oxs-color-accent-hover);
   border-color: transparent;
@@ -596,6 +608,19 @@
 .ui-root[data-oxs-pointer-precision='fine'] .ui-app-tile:not(:disabled):hover {
   border-color: var(--oxs-color-border);
   transform: translateY(-2px);
+}
+
+.ui-root[data-oxs-pointer-precision='fine'] .ui-app-tile[data-selected='true']:not(:disabled):hover {
+  border-color: var(--oxs-color-accent);
+  background: var(--oxs-color-accent-soft);
+}
+
+.ui-root[data-oxs-pointer-precision='fine'] .ui-select-option:not(:disabled):hover {
+  background: var(--oxs-color-control-hover);
+}
+
+.ui-root[data-oxs-pointer-precision='fine'] .ui-select-option[aria-selected='true']:not(:disabled):hover {
+  background: var(--oxs-color-accent-soft);
 }
 
 .ui-root[data-oxs-pointer-precision='coarse'] .ui-button,
@@ -1002,6 +1027,11 @@
   background: transparent;
   color: var(--oxs-color-text-secondary);
   user-select: none;
+  transition:
+    background-color var(--oxs-motion-fast) var(--oxs-ease-standard),
+    border-color var(--oxs-motion-fast) var(--oxs-ease-standard),
+    box-shadow var(--oxs-motion-fast) var(--oxs-ease-standard),
+    color var(--oxs-motion-fast) var(--oxs-ease-standard);
 }
 
 .ui-segmented__item[aria-checked='true'] {
@@ -1026,11 +1056,32 @@
   border-radius: var(--oxs-radius-sm);
 }
 
-.ui-root[data-oxs-pointer-precision='fine'] .ui-choice:not([data-disabled='true']):hover .ui-choice__indicator,
-.ui-root[data-oxs-pointer-precision='fine'] .ui-switch:not(:disabled):hover .ui-switch__track,
-.ui-root[data-oxs-pointer-precision='fine'] .ui-segmented__item:not(:disabled):hover {
+.ui-root[data-oxs-pointer-precision='fine']
+  .ui-choice:not([data-disabled='true']):hover
+  .ui-choice__native:not(:checked):not([aria-checked='mixed'])
+  + .ui-choice__indicator,
+.ui-root[data-oxs-pointer-precision='fine'] .ui-switch:not(:disabled):not([data-checked='true']):hover .ui-switch__track,
+.ui-root[data-oxs-pointer-precision='fine'] .ui-segmented__item:not(:disabled):not([aria-checked='true']):hover {
   border-color: var(--oxs-color-border-strong);
   background: var(--oxs-color-control-hover);
+}
+
+.ui-root[data-oxs-pointer-precision='fine']
+  .ui-choice:not([data-disabled='true']):hover
+  .ui-choice__native:checked
+  + .ui-choice__indicator,
+.ui-root[data-oxs-pointer-precision='fine']
+  .ui-choice:not([data-disabled='true']):hover
+  .ui-choice__native[aria-checked='mixed']
+  + .ui-choice__indicator,
+.ui-root[data-oxs-pointer-precision='fine'] .ui-switch[data-checked='true']:not(:disabled):hover .ui-switch__track {
+  border-color: var(--oxs-color-accent-hover);
+  background: var(--oxs-color-accent-hover);
+}
+
+.ui-root[data-oxs-pointer-precision='fine'] .ui-segmented__item[aria-checked='true']:not(:disabled):hover {
+  border-color: var(--oxs-color-border-strong);
+  background: var(--oxs-color-surface-strong);
 }
 
 .ui-root[data-oxs-pointer-precision='coarse'] .ui-choice,
@@ -1146,7 +1197,12 @@
     opacity var(--oxs-motion-fast) var(--oxs-ease-standard);
 }
 
-.ui-list-item__action:hover:not(:disabled) {
+.ui-list-item__action:focus-visible {
+  outline: var(--oxs-focus-ring-width) solid var(--oxs-color-focus);
+  outline-offset: calc(var(--oxs-focus-ring-offset) * -1);
+}
+
+.ui-root[data-oxs-pointer-precision='fine'] .ui-list-item__action:hover:not(:disabled) {
   background: var(--oxs-color-control-hover);
 }
 
@@ -1843,10 +1899,14 @@
   text-align: start;
 }
 
-.ui-menu-item:hover,
 .ui-menu-item:focus-visible {
   background: var(--oxs-color-control-hover);
-  outline: none;
+  outline: var(--oxs-focus-ring-width) solid var(--oxs-color-focus);
+  outline-offset: calc(var(--oxs-focus-ring-offset) * -1);
+}
+
+.ui-root[data-oxs-pointer-precision='fine'] .ui-menu-item:hover:not(:disabled) {
+  background: var(--oxs-color-control-hover);
 }
 
 .ui-menu-item:active {
@@ -2116,7 +2176,7 @@
 .ui-tile__title,
 .ui-disclosure__title {
   color: var(--oxs-color-text-primary);
-  font-weight: var(--oxs-weight-semibold);
+  font-weight: var(--oxs-weight-medium);
 }
 
 .ui-card__description,
@@ -2159,6 +2219,7 @@
   list-style: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--oxs-motion-fast) var(--oxs-ease-standard);
 }
 
 .ui-disclosure__summary:focus-visible {
@@ -2430,6 +2491,15 @@
   background: var(--oxs-color-control-hover);
 }
 
+.ui-root[data-oxs-pointer-precision='fine'] .ui-tile[data-selected='true'] .ui-tile__action:hover:not(:disabled) {
+  border-color: var(--oxs-color-accent);
+  background: var(--oxs-color-accent-soft);
+}
+
+.ui-root[data-oxs-pointer-precision='fine'] .ui-disclosure__summary:hover:not(:disabled) {
+  background: var(--oxs-color-control-hover);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ui-disclosure__chevron {
     transition-duration: var(--oxs-motion-reduced);
@@ -2478,7 +2548,7 @@
     box-shadow var(--oxs-motion-fast) var(--oxs-ease-standard);
 }
 
-.ui-gesture-reveal:hover {
+.ui-root[data-oxs-pointer-precision='fine'] .ui-gesture-reveal:hover {
   background: var(--oxs-color-control-hover);
   border-color: var(--oxs-color-border-strong);
 }

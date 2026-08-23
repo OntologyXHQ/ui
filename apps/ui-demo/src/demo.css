@@ -60,7 +60,7 @@ body {
     var(--demo-dock-clearance);
   background:
     radial-gradient(circle at 14% 13%, color-mix(in srgb, var(--oxs-color-accent) 19%, transparent) 0, transparent 29%),
-    radial-gradient(circle at 84% 19%, color-mix(in srgb, var(--oxs-color-positive) 9%, transparent) 0, transparent 26%),
+    radial-gradient(circle at 84% 19%, color-mix(in srgb, var(--oxs-color-success) 9%, transparent) 0, transparent 26%),
     radial-gradient(circle at 54% 96%, color-mix(in srgb, var(--oxs-color-accent) 7%, transparent) 0, transparent 31%),
     linear-gradient(145deg, color-mix(in srgb, var(--oxs-color-canvas-raised) 96%, #0f1727), var(--oxs-color-canvas));
 }
@@ -114,7 +114,7 @@ body {
 .demo-window__titlebar {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto;
   min-width: 0;
   align-items: center;
   gap: var(--oxs-space-md);
@@ -126,13 +126,6 @@ body {
 
 .demo-window__identity {
   min-inline-size: 0;
-}
-
-.demo-window__handle {
-  inline-size: 4.5rem;
-  block-size: 0.22rem;
-  border-radius: var(--oxs-radius-full);
-  background: color-mix(in srgb, var(--oxs-color-border-strong) 72%, transparent);
 }
 
 .demo-window__controls {
@@ -213,9 +206,17 @@ body {
 .demo-stat {
   min-block-size: 8rem;
   display: grid;
-  align-content: end;
+  align-content: start;
   gap: var(--oxs-space-xs);
   padding: var(--oxs-space-md);
+}
+
+.demo-stat .ui-icon {
+  color: var(--oxs-color-accent);
+}
+
+.demo-stat .ui-text:last-child {
+  max-inline-size: 18rem;
 }
 
 .demo-photo-grid {
@@ -305,7 +306,7 @@ body {
 }
 
 .demo-system-bar {
-  inline-size: min(76rem, 100%);
+  inline-size: min(70rem, 100%);
   padding-inline: 0;
 }
 
@@ -316,6 +317,15 @@ body {
   box-shadow:
     0 0.75rem 2rem color-mix(in srgb, black 18%, transparent),
     inset 0 1px color-mix(in srgb, white 7%, transparent);
+}
+
+.demo-system-home.ui-button {
+  padding-inline: var(--oxs-space-sm);
+  font-weight: 680;
+}
+
+.demo-system-home .ui-icon {
+  color: var(--oxs-color-accent);
 }
 
 .demo-shell .ui-desktop-shell-layout__dock {
@@ -456,9 +466,12 @@ body {
 }
 
 .ui-root[data-oxs-motion='reduced'] .demo-dock .ui-icon-button,
+.ui-root[data-oxs-motion='reduced'] .demo-dock-app__button.ui-button,
+.ui-root[data-oxs-motion='reduced'] .demo-dock-app__icon,
 .ui-root[data-oxs-motion='reduced'] .demo-root .ui-system-application-browser__grid .ui-tile__action {
   transition: none;
   translate: none;
+  transform: none;
 }
 
 @container oxs-ui (max-width: 64rem) {
@@ -520,6 +533,21 @@ body {
 
   .demo-system-bar .ui-system-bar__center {
     display: none;
+  }
+
+  .demo-system-home.ui-button {
+    inline-size: 2.3rem;
+    min-inline-size: 2.3rem;
+    padding-inline: 0;
+  }
+
+  .demo-system-home .ui-button__label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .demo-root .ui-system-launcher-layer .ui-sheet-panel {
@@ -616,17 +644,17 @@ body {
 }
 
 .demo-window-frame:not([data-focused='true']) .demo-window {
-  filter: saturate(0.8) brightness(0.9);
+  filter: saturate(0.9) brightness(0.96);
   box-shadow:
     0 1.1rem 3.2rem color-mix(in srgb, black 28%, transparent),
     var(--oxs-elevation-2);
 }
 
 .demo-window-frame[data-focused='true'] .demo-window {
-  border-color: color-mix(in srgb, var(--oxs-color-accent) 46%, var(--oxs-color-border-strong));
+  border-color: color-mix(in srgb, var(--oxs-color-accent) 38%, var(--oxs-color-border-strong));
   box-shadow:
     0 2rem 5.5rem color-mix(in srgb, black 48%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--oxs-color-accent) 24%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--oxs-color-accent) 18%, transparent),
     var(--oxs-elevation-3);
 }
 
@@ -695,22 +723,96 @@ body {
   display: inline-flex;
 }
 
+.demo-dock-app__button.ui-button {
+  position: relative;
+  inline-size: 3rem;
+  min-inline-size: 3rem;
+  block-size: 3rem;
+  min-block-size: 3rem;
+  padding: 0;
+  border-radius: 0.95rem;
+  transition:
+    translate var(--oxs-motion-fast) var(--oxs-ease-standard),
+    background var(--oxs-motion-fast) var(--oxs-ease-standard),
+    box-shadow var(--oxs-motion-fast) var(--oxs-ease-standard);
+}
+
+.demo-dock-app__button .ui-button__content {
+  gap: 0;
+}
+
+.demo-dock-app__button .ui-button__slot {
+  margin: 0;
+}
+
+.demo-dock-app__button .ui-button__label {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.demo-dock-app__icon {
+  inline-size: 2.15rem;
+  block-size: 2.15rem;
+  border-radius: 0.7rem;
+  box-shadow: 0 0.45rem 1rem color-mix(in srgb, black 28%, transparent);
+  transition: transform var(--oxs-motion-fast) var(--oxs-ease-standard);
+}
+
+.demo-dock-app__button:hover,
+.demo-dock-app__button:focus-visible {
+  translate: 0 -0.18rem;
+}
+
+.demo-dock-app__button:hover .demo-dock-app__icon,
+.demo-dock-app__button:focus-visible .demo-dock-app__icon {
+  transform: scale(1.04);
+}
+
+.demo-dock-app[data-focused='true'] .demo-dock-app__button {
+  background: color-mix(in srgb, var(--oxs-color-accent-soft) 52%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--oxs-color-accent) 26%, transparent);
+}
+
 .demo-dock-app[data-running='true']::after {
   content: '';
   position: absolute;
-  inset-inline: 32%;
-  inset-block-end: 0.15rem;
+  inset-inline: 34%;
+  inset-block-end: -0.12rem;
   block-size: 0.16rem;
   border-radius: var(--oxs-radius-full);
   background: var(--oxs-color-accent);
-  box-shadow: 0 0 0.6rem color-mix(in srgb, var(--oxs-color-accent) 58%, transparent);
+  box-shadow: 0 0 0.55rem color-mix(in srgb, var(--oxs-color-accent) 52%, transparent);
   pointer-events: none;
 }
 
 .demo-dock-app[data-count='2']::after,
 .demo-dock-app[data-count='3']::after,
 .demo-dock-app[data-count='4']::after {
-  inset-inline: 24%;
+  inset-inline: 27%;
+}
+
+.demo-dock-app__count {
+  position: absolute;
+  inset-block-start: -0.2rem;
+  inset-inline-end: -0.2rem;
+  z-index: 2;
+  min-inline-size: 1rem;
+  block-size: 1rem;
+  display: grid;
+  place-items: center;
+  padding-inline: 0.2rem;
+  border: 1px solid color-mix(in srgb, var(--oxs-color-canvas) 82%, transparent);
+  border-radius: var(--oxs-radius-full);
+  background: var(--oxs-color-accent);
+  color: var(--oxs-color-on-accent);
+  font-size: 0.62rem;
+  font-weight: 750;
+  line-height: 1;
+  pointer-events: none;
 }
 
 /* Desktop launcher is a bounded overlay. Its real drag handle owns dismissal. */
@@ -992,10 +1094,11 @@ body {
   font-weight: 700;
 }
 
-.demo-overview-card__titlebar img {
+.demo-overview-card__app-icon {
   inline-size: 1.75rem;
   block-size: 1.75rem;
   border-radius: 0.5rem;
+  box-shadow: var(--oxs-elevation-1);
 }
 
 .demo-overview-card__state {

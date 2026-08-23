@@ -41,6 +41,7 @@ import {
   type SystemCommandItem,
   type SystemNotificationItem,
 } from '@ontologyx/ui';
+import { OxMarkGlyph } from '@ontologyx/ui/icons';
 import {
   DEMO_WORKSPACES,
   createInitialDemoWindowManagerState,
@@ -68,6 +69,11 @@ function hostIcon(letter: string, from: string, to: string) {
   return { src: `data:image/svg+xml,${encodeURIComponent(svg)}` } as const;
 }
 
+function HostApplicationIcon({ app, className = '' }: { app: HostApplication; className?: string }) {
+  if (typeof app.icon === 'string') return <Icon name={app.kind === 'editor' ? 'editor' : app.kind} className={className} />;
+  return <img className={className} src={app.icon.src} alt="" />;
+}
+
 // This array stands in for an OXS App/Package Registry result. The UI SDK only renders it.
 const HOST_APPLICATIONS: readonly HostApplication[] = [
   { id: 'browser', name: 'Orbit', kind: 'browser', accent: '#6d7cff', icon: hostIcon('O', '#6375ff', '#884fff'), keywords: ['web', 'internet'], description: 'Browse the web' },
@@ -90,7 +96,7 @@ const COMMANDS: readonly SystemCommandItem[] = [
   { id: 'open-settings', label: 'Open settings', description: 'Show the Settings application.' },
   { id: 'toggle-quick', label: 'Toggle quick settings', description: 'Open or close the System quick-settings panel.' },
   { id: 'toggle-notifications', label: 'Toggle notifications', description: 'Open or close Notification Center.' },
-  { id: 'open-overview', label: 'Open window overview', description: 'Show Android-style recent windows inside the GNOME-style workspace model.' },
+  { id: 'open-overview', label: 'Open window overview', description: 'See open windows and move between workspaces.' },
   { id: 'next-workspace', label: 'Next workspace', description: 'Move focus to the next logical workspace.' },
 ] as const;
 
@@ -146,7 +152,7 @@ function SettingsContent({
         <Stack gap="xs" className="demo-settings-page__intro">
           <Label tone="accent" emphasis="strong">Connectivity</Label>
           <Heading level={2} size="heading">Network & wireless</Heading>
-          <Text tone="secondary" wrap="pretty">Control host-owned radios while the UI SDK owns interaction, focus and presentation.</Text>
+          <Text tone="secondary" wrap="pretty">Manage the connections available to this desktop.</Text>
         </Stack>
         <div className="demo-settings-grid">
           <Card title="Wireless" description="Available to this desktop session" padding="md">
@@ -173,7 +179,7 @@ function SettingsContent({
         <Stack gap="xs" className="demo-settings-page__intro">
           <Label tone="accent" emphasis="strong">System</Label>
           <Heading level={2} size="heading">Software updates</Heading>
-          <Text tone="secondary" wrap="pretty">OXS is current. Update policy and package resolution remain host-owned.</Text>
+          <Text tone="secondary" wrap="pretty">Your system is up to date and ready to use.</Text>
         </Stack>
         <Card title="OntologyX System" description="Stable channel" padding="md" leading={<Icon name="software" size="lg" />}>
           <Stack gap="md">
@@ -191,16 +197,16 @@ function SettingsContent({
       <Stack gap="xs" className="demo-settings-page__intro">
         <Label tone="accent" emphasis="strong">Personalization</Label>
         <Heading level={2} size="heading">Appearance & motion</Heading>
-        <Text tone="secondary" wrap="pretty">Tune the desktop without bypassing theme, motion or accessibility policy.</Text>
+        <Text tone="secondary" wrap="pretty">Choose how OXS looks and moves across this desktop.</Text>
       </Stack>
       <div className="demo-settings-grid">
         <Card title="Appearance" description="Theme and animation preferences" padding="md">
           <Stack gap="md">
-            <Switch label="Use dark appearance" description="Switch the complete UI environment theme" checked={darkAppearance} onCheckedChange={onDarkAppearanceChange} />
-            <Switch label="Animate workspace transitions" description="Uses the shared motion runtime and reduced-motion policy" checked={animateWorkspace} onCheckedChange={onAnimateWorkspaceChange} />
+            <Switch label="Use dark appearance" description="Use the darker desktop and application appearance" checked={darkAppearance} onCheckedChange={onDarkAppearanceChange} />
+            <Switch label="Animate workspace transitions" description="Show smooth transitions between desktop spaces" checked={animateWorkspace} onCheckedChange={onAnimateWorkspaceChange} />
           </Stack>
         </Card>
-        <Card title="Interface scale" description={`${interfaceScale}% · host-owned preference`} padding="md">
+        <Card title="Interface scale" description={`${interfaceScale}%`} padding="md">
           <Slider label="Interface scale" min={80} max={140} value={interfaceScale} onValueChange={onInterfaceScaleChange} marks={[{ value: 80, label: '80%' }, { value: 100, label: '100%' }, { value: 140, label: '140%' }]} />
         </Card>
       </div>
@@ -233,9 +239,8 @@ function DesktopContent(props: DesktopContentProps) {
   return (
     <Stack gap="lg" className="demo-app-content">
       <Row gap="md" align="center" className="demo-app-hero">
-        <img className="demo-app-content__icon" src={typeof active.icon === 'string' ? '' : active.icon.src} alt="" />
+        <HostApplicationIcon app={active} className="demo-app-content__icon" />
         <Stack gap="3xs">
-          <Text variant="caption" tone="secondary">Open application</Text>
           <Heading level={2} size="heading">{active.name}</Heading>
           <Text tone="secondary">{active.description}</Text>
         </Stack>
@@ -267,16 +272,16 @@ function DesktopContent(props: DesktopContentProps) {
         </Grid>
       ) : active.kind === 'editor' ? (
         <Card title="release-notes.md" description="Saved · Markdown" padding="lg" className="demo-content-card">
-          <Stack gap="sm"><Heading level={3} size="heading">OntologyX UI 1.0</Heading><Text tone="secondary" wrap="pretty">A platform-neutral UI SDK with first-class environment, interaction, motion, System surfaces and evidence-backed acceptance.</Text><Code>pnpm dev</Code></Stack>
+          <Stack gap="sm"><Heading level={3} size="heading">OXS 1.0 release notes</Heading><Text tone="secondary" wrap="pretty">A calmer desktop, faster workspace navigation and a consistent set of controls across system applications.</Text><Code>status: ready</Code></Stack>
         </Card>
       ) : (
         <Stack gap="md">
           <Surface material="subtle" radius="lg" className="demo-browser-bar"><Icon name="browser" /><Text tone="tertiary">ontologyx.dev/ui</Text></Surface>
-          <Card title="Build the system, not the screenshot" description="Public UI primitives compose into adaptive application and desktop surfaces." padding="lg" className="demo-content-card">
+          <Card title="Welcome to OXS" description="A focused desktop that keeps applications, workspaces and system controls within reach." padding="lg" className="demo-content-card">
             <Grid columns="auto-fit" minColumn="tile" gap="sm">
-              <Surface material="subtle" radius="md" className="demo-stat"><Heading level={3} size="heading">100</Heading><Text tone="secondary">visual exports</Text></Surface>
-              <Surface material="subtle" radius="md" className="demo-stat"><Heading level={3} size="heading">44</Heading><Text tone="secondary">browser journeys</Text></Surface>
-              <Surface material="subtle" radius="md" className="demo-stat"><Heading level={3} size="heading">V1</Heading><Text tone="secondary">stable contract</Text></Surface>
+              <Surface material="subtle" radius="md" className="demo-stat"><Icon name="apps" /><Text variant="body-strong">Applications</Text><Text tone="secondary">Launch and return to work quickly</Text></Surface>
+              <Surface material="subtle" radius="md" className="demo-stat"><Icon name="browser" /><Text variant="body-strong">Workspaces</Text><Text tone="secondary">Keep tasks separated without losing context</Text></Surface>
+              <Surface material="subtle" radius="md" className="demo-stat"><Icon name="settings" /><Text variant="body-strong">Controls</Text><Text tone="secondary">Adjust the system without leaving your flow</Text></Surface>
             </Grid>
           </Card>
         </Stack>
@@ -359,7 +364,7 @@ function OverviewCard({
     >
       <button type="button" className="demo-overview-card__preview" onClick={onActivate}>
         <div className="demo-overview-card__titlebar">
-          <img src={typeof app.icon === 'string' ? '' : app.icon.src} alt="" />
+          <HostApplicationIcon app={app} className="demo-overview-card__app-icon" />
           <span>{app.name}</span>
           {window.minimized ? <span className="demo-overview-card__state">minimized</span> : null}
         </div>
@@ -563,7 +568,17 @@ function DemoDesktop() {
       className="demo-system-bar"
       density="compact"
       label="System status bar"
-      leading={<Row gap="xs" align="center"><Button size="sm" variant="quiet" onClick={() => setLauncherOpen(true)} leading={<Icon name="apps" />}>OXS</Button><Badge tone="accent">UI 1.0</Badge></Row>}
+      leading={
+        <Button
+          size="sm"
+          variant="quiet"
+          className="demo-system-home"
+          onClick={() => setLauncherOpen(true)}
+          leading={<Icon glyph={OxMarkGlyph} size="sm" />}
+        >
+          Applications
+        </Button>
+      }
       center={
         <Row gap="sm" align="center" className="demo-system-bar__center-stack">
           <Clock />
@@ -596,13 +611,24 @@ function DemoDesktop() {
         const focused = focusedWindow?.appId === appId;
         const app = appById(appId);
         return (
-          <span key={appId} className="demo-dock-app" data-running={running > 0 || undefined} data-count={running || undefined}>
-            <IconButton
-              icon={app.kind === 'editor' ? 'editor' : app.kind}
-              label={`${running ? 'Focus or restore' : 'Open'} ${app.name}`}
-              pressed={focused}
+          <span
+            key={appId}
+            className="demo-dock-app"
+            data-running={running > 0 || undefined}
+            data-focused={focused || undefined}
+            data-count={running || undefined}
+          >
+            <Button
+              className="demo-dock-app__button"
+              size="md"
+              variant="quiet"
+              aria-label={`${running ? 'Focus or restore' : 'Open'} ${app.name}`}
+              leading={<HostApplicationIcon app={app} className="demo-dock-app__icon" />}
               onClick={() => activatePinnedApplication(appId)}
-            />
+            >
+              {app.name}
+            </Button>
+            {running > 1 ? <span className="demo-dock-app__count" aria-hidden>{running}</span> : null}
           </span>
         );
       })}
@@ -611,13 +637,13 @@ function DemoDesktop() {
 
   const sidePanel = panel === 'quick' ? (
     <SlideTransition key="quick" present direction="inline-end" spring="expressive" distance={18}>
-      <SystemPanel className="demo-side-panel" title="Control Center" subtitle="Quick system controls" edge="inline-end" width="md">
+      <SystemPanel className="demo-side-panel" title="Quick Settings" subtitle="Network, sound and devices" edge="inline-end" width="md">
         <SystemQuickSettings title="Controls" sections={quickSections} />
       </SystemPanel>
     </SlideTransition>
   ) : panel === 'notifications' ? (
     <SlideTransition key="notifications" present direction="inline-end" spring="expressive" distance={18}>
-      <SystemPanel className="demo-side-panel" title="Activity" subtitle="Recent notifications" edge="inline-end" width="md">
+      <SystemPanel className="demo-side-panel" title="Notifications" subtitle="Recent activity" edge="inline-end" width="md">
         <SystemNotificationCenter items={NOTIFICATIONS} onActivate={() => setPanel('none')} />
       </SystemPanel>
     </SlideTransition>
@@ -686,13 +712,12 @@ function DemoDesktop() {
               onPointerCancel={finishWindowDrag}
             >
               <Row gap="sm" align="center" className="demo-window__identity">
-                <img className="demo-window__app-icon" src={typeof app.icon === 'string' ? '' : app.icon.src} alt="" />
+                <HostApplicationIcon app={app} className="demo-window__app-icon" />
                 <Stack gap="3xs">
                   <Label emphasis="strong">{app.name}</Label>
                   <Text variant="caption" tone="tertiary">Workspace {window.workspaceId}</Text>
                 </Stack>
               </Row>
-              <div className="demo-window__handle" aria-hidden />
               <Row gap="3xs" className="demo-window__controls">
                 <Button className="demo-window-control" size="sm" variant="quiet" aria-label={`Minimize ${app.name}`} onClick={() => dispatchWindow({ type: 'minimize', id: window.id })}>−</Button>
                 <Button className="demo-window-control" size="sm" variant="quiet" aria-label={`${window.mode === 'maximized' ? 'Restore' : 'Maximize'} ${app.name}`} onClick={() => dispatchWindow({ type: 'toggle-maximize', id: window.id })}>{window.mode === 'maximized' ? '❐' : '□'}</Button>
@@ -762,9 +787,9 @@ function DemoDesktop() {
       <section role="dialog" aria-modal="true" aria-label="Window overview" className="demo-overview">
         <div className="demo-overview__header">
           <Stack gap="3xs">
-            <Label tone="accent" emphasis="strong">Workspaces + Recents</Label>
+            <Label tone="accent" emphasis="strong">Overview</Label>
             <Heading level={2} size="heading">Workspace {windowManager.activeWorkspaceId}</Heading>
-            <Text tone="secondary">Switch GNOME-style workspaces, then focus or swipe recent windows like Android.</Text>
+            <Text tone="secondary">Choose a workspace or return to an open window.</Text>
           </Stack>
           <Button variant="secondary" onClick={() => setOverviewOpen(false)}>Done</Button>
         </div>
@@ -865,7 +890,7 @@ function DemoDesktop() {
           <SystemApplicationBrowser
             className="demo-launcher__browser"
             title="Applications"
-            subtitle="Open a new window in the current workspace"
+            subtitle={`Workspace ${windowManager.activeWorkspaceId} · Search or open an application`}
             query={launcherQuery}
             apps={HOST_APPLICATIONS}
             onQueryChange={setLauncherQuery}

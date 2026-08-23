@@ -59,7 +59,8 @@
     "visual:check": "pnpm catalog:generate && pnpm --filter @ontologyx/ui-studio build && node scripts/visual-performance.mjs",
     "demo:check": "pnpm gate:demo",
     "demo:smoke": "pnpm gate:demo && node scripts/demo-smoke.mjs",
-    "polish:check": "pnpm release:check && node scripts/demo-smoke.mjs && pnpm visual:check"
+    "polish:check": "pnpm release:check && node scripts/demo-smoke.mjs && pnpm visual:check && node scripts/cross-axis-visual.mjs",
+    "visual:matrix": "pnpm catalog:generate && pnpm --filter @ontologyx/ui-studio build && node scripts/cross-axis-visual.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.7",

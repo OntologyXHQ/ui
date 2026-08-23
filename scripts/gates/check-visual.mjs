@@ -19,6 +19,9 @@ const packageJson = JSON.parse(fs.readFileSync(path.join(UI_ROOT, 'package.json'
 const css = fs.readFileSync(path.join(UI_ROOT, 'src/styles/primitives.css'), 'utf8');
 const componentCss = fs.readFileSync(path.join(UI_ROOT, 'src/styles/components.css'), 'utf8');
 const tokenCss = fs.readFileSync(path.join(UI_ROOT, 'src/styles/tokens.css'), 'utf8');
+const systemUiCss = fs.readFileSync(path.join(UI_ROOT, 'src/styles/system-ui.css'), 'utf8');
+const studioCss = fs.readFileSync(path.join(ROOT, 'apps/ui-studio/src/styles/studio.css'), 'utf8');
+const demoCss = fs.readFileSync(path.join(ROOT, 'apps/ui-demo/src/demo.css'), 'utf8');
 const buttonSource = fs.readFileSync(path.join(UI_ROOT, 'src/components/Button.tsx'), 'utf8');
 const feedbackSource = fs.readFileSync(path.join(UI_ROOT, 'src/components/Feedback.tsx'), 'utf8');
 const loadingMarkSource = fs.readFileSync(
@@ -35,6 +38,91 @@ const browserScenarioSource = fs.readFileSync(
 );
 const catalog = buildCatalog({ uiRoot: UI_ROOT });
 const issues = [];
+
+// Final V1 cross-axis polish: all authored semantic token references must use the
+// canonical token vocabulary. Runtime-position custom properties are intentionally
+// excluded; these aliases are static authoring mistakes that otherwise fail silently
+// because var() has no fallback.
+const nonCanonicalTokenAliases = [
+  ['--oxs-weight-semibold', componentCss, '--oxs-weight-medium'],
+  ['--oxs-type-caption-line-height', systemUiCss, '--oxs-type-caption-line'],
+  ['--oxs-weight-bold', studioCss, '--oxs-weight-strong'],
+  ['--oxs-motion-duration-normal', studioCss, '--oxs-motion-normal'],
+  ['--oxs-motion-easing-standard', studioCss, '--oxs-ease-standard'],
+  ['--oxs-color-positive', demoCss, '--oxs-color-success'],
+];
+for (const [legacy, source, canonical] of nonCanonicalTokenAliases) {
+  if (source.includes(legacy)) {
+    issues.push(`non-canonical visual token ${legacy}; use ${canonical}`);
+  }
+}
+
+// Final V1 interaction-state polish: semantic selected/checked state must survive
+// pointer hover, keyboard focus must remain explicit, and hover affordances that can
+// become sticky on touch are scoped to the resolved fine-pointer environment.
+const interactionPolishRequirements = [
+  [
+    ".ui-root[data-oxs-pointer-precision='fine'] .ui-button[aria-pressed='true']:not(:disabled):hover",
+    'pressed ToggleButton hover must preserve selected-state treatment',
+  ],
+  [
+    ".ui-root[data-oxs-pointer-precision='fine'] .ui-app-tile[data-selected='true']:not(:disabled):hover",
+    'selected AppTile hover must preserve selected-state treatment',
+  ],
+  [
+    ".ui-root[data-oxs-pointer-precision='fine'] .ui-select-option[aria-selected='true']:not(:disabled):hover",
+    'selected Select option hover must preserve selected-state treatment',
+  ],
+  [
+    ".ui-switch[data-checked='true']:not(:disabled):hover .ui-switch__track",
+    'checked Switch hover must retain accent authority',
+  ],
+  [
+    ".ui-segmented__item[aria-checked='true']:not(:disabled):hover",
+    'selected SegmentedControl hover must preserve selected treatment',
+  ],
+  [
+    ".ui-root[data-oxs-pointer-precision='fine'] .ui-tile[data-selected='true'] .ui-tile__action:hover:not(:disabled)",
+    'selected Tile hover must preserve selected treatment',
+  ],
+  ['.ui-list-item__action:focus-visible', 'ListItem action needs keyboard focus treatment'],
+  ['.ui-select-option:focus-visible', 'Select option needs keyboard focus treatment'],
+  ['.ui-menu-item:focus-visible', 'Menu item needs keyboard focus treatment'],
+  [
+    ".ui-root[data-oxs-pointer-precision='fine'] .ui-disclosure__summary:hover:not(:disabled)",
+    'Disclosure hover affordance must be fine-pointer scoped',
+  ],
+  [
+    ".ui-root[data-oxs-pointer-precision='fine'] .ui-gesture-reveal:hover",
+    'GestureReveal hover affordance must be fine-pointer scoped',
+  ],
+];
+for (const [token, message] of interactionPolishRequirements) {
+  if (!componentCss.includes(token)) issues.push(message);
+}
+for (const forbidden of [
+  /^\.ui-select-option:hover/m,
+  /^\.ui-list-item__action:hover/m,
+  /^\.ui-menu-item:hover/m,
+  /^\.ui-gesture-reveal:hover/m,
+]) {
+  if (forbidden.test(componentCss)) {
+    issues.push(`coarse-pointer sticky hover regression remains: ${forbidden}`);
+  }
+}
+if (
+  !/\.ui-choice:not\(\[data-disabled='true'\]\):hover[\s\S]{0,240}\.ui-choice__native:not\(:checked\):not\(\[aria-checked='mixed'\]\)/.test(
+    componentCss,
+  )
+) {
+  issues.push('Checkbox/Radio neutral hover must exclude checked and mixed native states');
+}
+for (const selector of ['.ui-select-option', '.ui-segmented__item', '.ui-disclosure__summary']) {
+  const start = componentCss.indexOf(`${selector} {`);
+  const end = start >= 0 ? componentCss.indexOf('}', start) : -1;
+  const block = start >= 0 && end >= 0 ? componentCss.slice(start, end + 1) : '';
+  if (!block.includes('transition:')) issues.push(`${selector}: visual state transition missing`);
+}
 
 const visualNames = new Set(['Text', 'Heading', 'Label', 'Code', 'Icon', 'Surface', 'Divider']);
 const acceptedVisual = catalog.filter(
