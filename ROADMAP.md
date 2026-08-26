@@ -1,41 +1,18 @@
 # OntologyX UI roadmap
 
-The UI roadmap was reset from zero on 2026-08-19 against Git baseline `fa05bb1a829851ac83df6a956dbce091cc128819`.
+`@ontologyx/ui` V1 is the frozen compatibility foundation. Active development now targets V2: a semantic UI runtime that lets developers and AI describe intent while OntologyX owns canonical presentation, interaction, accessibility and adaptation.
 
-The previous UIP00..UIP23 roadmap is no longer an active completion record. It remains historical extraction context only. Existing implementation is treated as candidate material and must be reaccepted under the new gate model.
-
-Canonical plan: [`docs/roadmap/UI_TASK_LIST.md`](docs/roadmap/UI_TASK_LIST.md)
-Canonical gate contract: [`docs/quality/QUALITY_GATES.md`](docs/quality/QUALITY_GATES.md)
+Canonical active tasks: [`docs/roadmap/UI_TASK_LIST.md`](docs/roadmap/UI_TASK_LIST.md)
+Canonical quality contract: [`docs/quality/QUALITY_GATES.md`](docs/quality/QUALITY_GATES.md)
 
 ## Frontier
 
-- `UIR00` — Rebaseline, truth reset and gate constitution: **DONE**
-- `UIR01` — Real browser acceptance harness: **DONE**
-- `UIR02` — Foundations reacceptance: **DONE**
-  - `UIR02-A` — Semantic token architecture: **DONE**
-  - `UIR02-B` — Environment semantics: **DONE**
-  - `UIR02-C` — UiRoot certification: **DONE**
-- `UIR03` — Layout primitives redesign: **DONE**
-  - `UIR03-A` — Core structural flow (`Box`, `Stack`, `Row`, `Wrap`): **DONE**
-  - `UIR03-B` — Grid/Container/Inset/SafeArea/Spacer: **DONE**
-- `UIR04` — Visual primitives (`Text`, `Heading`, `Label`, `Code`, `Icon`, `Surface`, `Divider`): **DONE**
-- `UIR05` — Interaction/runtime kernel: **DONE**
-  - `UIR05-A` — Input authority (Press/Focus/Typeahead/Selection/Gesture Arena): **DONE**
-  - `UIR05-B` — Overlay authority: **DONE**
-  - `UIR05-C` — Motion authority + kernel closeout: **DONE**
-- `UIR06` — Actions and command controls: **DONE**
-- `UIR07` — Fields, forms and text input: **DONE**
-- `UIR08` — Selection and disclosure controls: **DONE**
-- `UIR09` — Navigation and data presentation: **DONE**
-- `UIR10` — Overlays and feedback: **DONE**
-- `UIR11` — Scroll and motion: **DONE**
-- `UIR12` — Gestures, drag/drop, editing and cursor: **DONE**
-- `UIR13` — Developer compositions and adaptive scaffolds: **DONE**
-- `UIR14` — System UI core: **DONE**
-- `UIR15` — Privileged System surfaces: **DONE**
-- `UIR16` — Studio as a real product-quality SDK workbench: **DONE**
-- `UIR17` — Cross-axis certification, package hardening and V1 freeze: **PUBLICATION READY**
+- `V2-00` — planning and delivery cleanup: **DONE**
+- `V2-01` — semantic IR + command foundation: **ACTIVE**
+- `V2-02` — adaptive resolver + presentation policies: **NEXT**
+- `V2-03` — semantic collections + workspace model: **TODO**
+- `V2-04` — inspection + AI actionability contract: **TODO**
+- `V2-05` — Studio V2 compose/inspect/certify workflow: **TODO**
+- `V2-06` — architecture enforcement, migration and V2 release: **TODO**
 
-- Inter-batch Studio presentation follow-up — stacked generated docs + lazy Canvas OX boot renderer: **DONE** (not a numbered roadmap batch)
-
-No public visual export is considered accepted merely because it existed before this reset.
+V1 implementation evidence and certifications remain valid historical/release evidence; completed UIR batches are not active backlog.

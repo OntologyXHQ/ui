@@ -16,6 +16,17 @@ describe('UI package public surfaces', () => {
     expect(AdvancedUi).toHaveProperty('TypeaheadController');
   });
 
+  it('exposes the semantic V2 authoring/runtime core without exposing the provisional React bridge', () => {
+    expect(PublicUi).toHaveProperty('defineUi');
+    expect(PublicUi).toHaveProperty('ui');
+    expect(PublicUi).toHaveProperty('defineCommand');
+    expect(PublicUi).toHaveProperty('createUiCommandRegistry');
+    expect(PublicUi).toHaveProperty('resolveUiDefinition');
+    expect(PublicUi).toHaveProperty('validateUiDefinition');
+    expect(PublicUi).not.toHaveProperty('SemanticCommandGroup');
+    expect(PublicUi).not.toHaveProperty('SemanticConfirmation');
+  });
+
   it('keeps removed compatibility aliases off the canonical SDK', () => {
     expect(PublicUi).not.toHaveProperty('ApplicationLauncherPattern');
     expect(PublicUi).not.toHaveProperty('DesktopWorkspacePattern');

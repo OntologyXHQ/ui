@@ -14,9 +14,7 @@
     "responsive": "Sections fill their containing width and copy wraps naturally.",
     "playground": {
       "preferredWidth": "medium",
-      "controls": [
-        "multiple"
-      ],
+      "controls": ["multiple"],
       "fixture": {
         "items": [
           {
@@ -30,9 +28,7 @@
             "content": "Second section content"
           }
         ],
-        "defaultValue": [
-          "first"
-        ]
+        "defaultValue": ["first"]
       }
     },
     "preview": null,
@@ -115,9 +111,7 @@
         "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
         "@ontologyx/ui/components/__tests__/selection.test.tsx"
       ],
-      "browserScenarios": [
-        "disclosure-accordion-certification"
-      ],
+      "browserScenarios": ["disclosure-accordion-certification"],
       "requiredAxes": [
         "disclosure",
         "controlled",
@@ -179,12 +173,8 @@
     ],
     "certification": {
       "owner": "UIR06",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/actions.test.tsx"
-      ],
-      "browserScenarios": [
-        "action-group-toolbar-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/actions.test.tsx"],
+      "browserScenarios": ["action-group-toolbar-certification"],
       "requiredAxes": [
         "actions",
         "group",
@@ -194,9 +184,7 @@
         "rtl",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/actions.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/actions.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -216,16 +204,9 @@
     "responsive": "Auto mode changes bar → rail → drawer from container width, not device identity.",
     "playground": {
       "preferredWidth": "wide",
-      "controls": [
-        "mode"
-      ],
+      "controls": ["mode"],
       "options": {
-        "mode": [
-          "auto",
-          "bar",
-          "rail",
-          "drawer"
-        ]
+        "mode": ["auto", "bar", "rail", "drawer"]
       },
       "fixture": {
         "label": "Workspace navigation",
@@ -318,9 +299,7 @@
         "@ontologyx/ui/components/__tests__/navigation-data.test.tsx",
         "@ontologyx/ui/components/__tests__/data-navigation.test.tsx"
       ],
-      "browserScenarios": [
-        "list-navigation-data-certification"
-      ],
+      "browserScenarios": ["list-navigation-data-certification"],
       "requiredAxes": [
         "navigation-data",
         "semantic-html",
@@ -524,12 +503,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "overlay-components-nested-dismissal-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["overlay-components-nested-dismissal-certification"],
       "requiredAxes": [
         "overlay-components",
         "dialog",
@@ -541,9 +516,7 @@
         "touch",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -624,9 +597,7 @@
         "@ontologyx/ui/components/__tests__/data-navigation.test.tsx",
         "@ontologyx/ui/components/__tests__/developer-compositions.test.tsx"
       ],
-      "browserScenarios": [
-        "developer-compositions-adaptive-certification"
-      ],
+      "browserScenarios": ["developer-compositions-adaptive-certification"],
       "requiredAxes": [
         "compositions",
         "adaptive",
@@ -791,12 +762,8 @@
     ],
     "certification": {
       "owner": "UIR13",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/developer-compositions.test.tsx"
-      ],
-      "browserScenarios": [
-        "developer-compositions-adaptive-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/developer-compositions.test.tsx"],
+      "browserScenarios": ["developer-compositions-adaptive-certification"],
       "requiredAxes": [
         "compositions",
         "adaptive",
@@ -808,9 +775,7 @@
         "keyboard",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/developer-compositions.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/developer-compositions.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -858,12 +823,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "feedback-lifecycle-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["feedback-lifecycle-certification"],
       "requiredAxes": [
         "feedback",
         "live-region",
@@ -875,9 +836,7 @@
         "responsive",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -965,12 +924,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "feedback-lifecycle-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["feedback-lifecycle-certification"],
       "requiredAxes": [
         "feedback",
         "live-region",
@@ -982,9 +937,7 @@
         "responsive",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -1191,12 +1144,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "overlay-components-nested-dismissal-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["overlay-components-nested-dismissal-certification"],
       "requiredAxes": [
         "overlay-components",
         "dialog",
@@ -1208,9 +1157,7 @@
         "touch",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -1323,12 +1270,8 @@
     ],
     "certification": {
       "owner": "UIR03-A",
-      "behaviorTests": [
-        "@ontologyx/ui/primitives/__tests__/layout-core.test.tsx"
-      ],
-      "browserScenarios": [
-        "box-layout-boundary-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/primitives/__tests__/layout-core.test.tsx"],
+      "browserScenarios": ["box-layout-boundary-certification"],
       "requiredAxes": [
         "layout",
         "polymorphism",
@@ -1339,9 +1282,7 @@
         "rtl",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/primitives/__tests__/layout-core.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/primitives/__tests__/layout-core.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -1361,31 +1302,14 @@
     "responsive": "Intrinsic by default or full-inline-size on request; content truncation/wrapping stays inside the caller-owned layout.",
     "playground": {
       "preferredWidth": "medium",
-      "controls": [
-        "variant",
-        "intent",
-        "size",
-        "loading",
-        "fullWidth"
-      ],
+      "controls": ["variant", "intent", "size", "loading", "fullWidth"],
       "fixture": {
         "children": "Continue"
       },
       "options": {
-        "variant": [
-          "quiet",
-          "secondary",
-          "primary"
-        ],
-        "intent": [
-          "neutral",
-          "destructive"
-        ],
-        "size": [
-          "sm",
-          "md",
-          "lg"
-        ]
+        "variant": ["quiet", "secondary", "primary"],
+        "intent": ["neutral", "destructive"],
+        "size": ["sm", "md", "lg"]
       }
     },
     "preview": null,
@@ -1502,9 +1426,7 @@
         "@ontologyx/ui/components/__tests__/actions.test.tsx",
         "@ontologyx/ui/interaction/__tests__/press.test.tsx"
       ],
-      "browserScenarios": [
-        "button-action-contract-certification"
-      ],
+      "browserScenarios": ["button-action-contract-certification"],
       "requiredAxes": [
         "actions",
         "button",
@@ -1617,12 +1539,8 @@
     ],
     "certification": {
       "owner": "UIR13",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/developer-compositions.test.tsx"
-      ],
-      "browserScenarios": [
-        "developer-compositions-adaptive-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/developer-compositions.test.tsx"],
+      "browserScenarios": ["developer-compositions-adaptive-certification"],
       "requiredAxes": [
         "compositions",
         "adaptive",
@@ -1634,9 +1552,7 @@
         "keyboard",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/developer-compositions.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/developer-compositions.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -1743,9 +1659,7 @@
         "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
         "@ontologyx/ui/components/__tests__/selection.test.tsx"
       ],
-      "browserScenarios": [
-        "selection-controls-certification"
-      ],
+      "browserScenarios": ["selection-controls-certification"],
       "requiredAxes": [
         "selection",
         "native-semantics",
@@ -1840,12 +1754,8 @@
     ],
     "certification": {
       "owner": "UIR04",
-      "behaviorTests": [
-        "@ontologyx/ui/primitives/__tests__/visual-primitives.test.tsx"
-      ],
-      "browserScenarios": [
-        "typography-semantic-bidi-reflow-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/primitives/__tests__/visual-primitives.test.tsx"],
+      "browserScenarios": ["typography-semantic-bidi-reflow-certification"],
       "requiredAxes": [
         "visual",
         "typography",
@@ -1857,9 +1767,7 @@
         "reflow",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/primitives/__tests__/visual-primitives.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/primitives/__tests__/visual-primitives.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -1927,16 +1835,8 @@
         "@ontologyx/ui/motion/__tests__/motion.test.ts",
         "@ontologyx/ui/motion/__tests__/transition-lifecycle.test.tsx"
       ],
-      "browserScenarios": [
-        "scroll-motion-certification"
-      ],
-      "requiredAxes": [
-        "motion",
-        "interruption",
-        "reduced-motion",
-        "performance-budget",
-        "a11y"
-      ],
+      "browserScenarios": ["scroll-motion-certification"],
+      "requiredAxes": ["motion", "interruption", "reduced-motion", "performance-budget", "a11y"],
       "behaviorSources": [
         "packages/ui/src/motion/__tests__/motion.test.ts",
         "packages/ui/src/motion/__tests__/transition-lifecycle.test.tsx"
@@ -2061,12 +1961,8 @@
     ],
     "certification": {
       "owner": "UIR03-B",
-      "behaviorTests": [
-        "@ontologyx/ui/primitives/__tests__/layout-boundaries.test.tsx"
-      ],
-      "browserScenarios": [
-        "container-semantic-width-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/primitives/__tests__/layout-boundaries.test.tsx"],
+      "browserScenarios": ["container-semantic-width-certification"],
       "requiredAxes": [
         "layout",
         "container",
@@ -2076,9 +1972,7 @@
         "polymorphism",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/primitives/__tests__/layout-boundaries.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/primitives/__tests__/layout-boundaries.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -2172,12 +2066,8 @@
     ],
     "certification": {
       "owner": "UIR13",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/developer-compositions.test.tsx"
-      ],
-      "browserScenarios": [
-        "developer-compositions-adaptive-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/developer-compositions.test.tsx"],
+      "browserScenarios": ["developer-compositions-adaptive-certification"],
       "requiredAxes": [
         "compositions",
         "adaptive",
@@ -2189,9 +2079,7 @@
         "keyboard",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/developer-compositions.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/developer-compositions.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -2265,12 +2153,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "floating-menu-tooltip-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["floating-menu-tooltip-certification"],
       "requiredAxes": [
         "floating",
         "collision",
@@ -2282,9 +2166,7 @@
         "touch",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -2331,23 +2213,10 @@
     ],
     "certification": {
       "owner": "UIR12",
-      "behaviorTests": [
-        "@ontologyx/ui/cursor/__tests__/cursor.test.tsx"
-      ],
-      "browserScenarios": [
-        "gesture-drag-editing-cursor-certification"
-      ],
-      "requiredAxes": [
-        "cursor",
-        "hotspot",
-        "modality",
-        "nested-root",
-        "realm",
-        "a11y"
-      ],
-      "behaviorSources": [
-        "packages/ui/src/cursor/__tests__/cursor.test.tsx"
-      ],
+      "behaviorTests": ["@ontologyx/ui/cursor/__tests__/cursor.test.tsx"],
+      "browserScenarios": ["gesture-drag-editing-cursor-certification"],
+      "requiredAxes": ["cursor", "hotspot", "modality", "nested-root", "realm", "a11y"],
+      "behaviorSources": ["packages/ui/src/cursor/__tests__/cursor.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -2463,9 +2332,7 @@
         "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
         "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
       ],
-      "browserScenarios": [
-        "system-ui-core-certification"
-      ],
+      "browserScenarios": ["system-ui-core-certification"],
       "requiredAxes": [
         "system-ui",
         "components-only",
@@ -2638,12 +2505,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "overlay-components-nested-dismissal-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["overlay-components-nested-dismissal-certification"],
       "requiredAxes": [
         "overlay-components",
         "dialog",
@@ -2655,9 +2518,7 @@
         "touch",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -2756,9 +2617,7 @@
         "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
         "@ontologyx/ui/components/__tests__/selection.test.tsx"
       ],
-      "browserScenarios": [
-        "disclosure-accordion-certification"
-      ],
+      "browserScenarios": ["disclosure-accordion-certification"],
       "requiredAxes": [
         "disclosure",
         "controlled",
@@ -2845,22 +2704,10 @@
     ],
     "certification": {
       "owner": "UIR04",
-      "behaviorTests": [
-        "@ontologyx/ui/primitives/__tests__/visual-primitives.test.tsx"
-      ],
-      "browserScenarios": [
-        "surface-divider-visual-boundary-certification"
-      ],
-      "requiredAxes": [
-        "visual",
-        "divider",
-        "separator",
-        "logical-inset",
-        "a11y"
-      ],
-      "behaviorSources": [
-        "packages/ui/src/primitives/__tests__/visual-primitives.test.tsx"
-      ],
+      "behaviorTests": ["@ontologyx/ui/primitives/__tests__/visual-primitives.test.tsx"],
+      "browserScenarios": ["surface-divider-visual-boundary-certification"],
+      "requiredAxes": ["visual", "divider", "separator", "logical-inset", "a11y"],
+      "behaviorSources": ["packages/ui/src/primitives/__tests__/visual-primitives.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -2932,12 +2779,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "feedback-lifecycle-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["feedback-lifecycle-certification"],
       "requiredAxes": [
         "feedback",
         "live-region",
@@ -2949,9 +2792,7 @@
         "responsive",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -3019,16 +2860,8 @@
         "@ontologyx/ui/motion/__tests__/motion.test.ts",
         "@ontologyx/ui/motion/__tests__/transition-lifecycle.test.tsx"
       ],
-      "browserScenarios": [
-        "scroll-motion-certification"
-      ],
-      "requiredAxes": [
-        "motion",
-        "interruption",
-        "reduced-motion",
-        "performance-budget",
-        "a11y"
-      ],
+      "browserScenarios": ["scroll-motion-certification"],
+      "requiredAxes": ["motion", "interruption", "reduced-motion", "performance-budget", "a11y"],
       "behaviorSources": [
         "packages/ui/src/motion/__tests__/motion.test.ts",
         "packages/ui/src/motion/__tests__/transition-lifecycle.test.tsx"
@@ -3089,12 +2922,8 @@
     ],
     "certification": {
       "owner": "UIR07",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/fields.test.tsx"
-      ],
-      "browserScenarios": [
-        "field-native-form-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/fields.test.tsx"],
+      "browserScenarios": ["field-native-form-certification"],
       "requiredAxes": [
         "fields",
         "field-group",
@@ -3105,9 +2934,7 @@
         "touch",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/fields.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/fields.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -3172,12 +2999,8 @@
     ],
     "certification": {
       "owner": "UIR07",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/fields.test.tsx"
-      ],
-      "browserScenarios": [
-        "field-native-form-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/fields.test.tsx"],
+      "browserScenarios": ["field-native-form-certification"],
       "requiredAxes": [
         "fields",
         "field-section",
@@ -3189,9 +3012,7 @@
         "touch",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/fields.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/fields.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -3274,9 +3095,7 @@
         "@ontologyx/ui/gestures/__tests__/gesture-contract.test.tsx",
         "@ontologyx/ui/drag-drop/__tests__/dragDrop.test.tsx"
       ],
-      "browserScenarios": [
-        "gesture-drag-editing-cursor-certification"
-      ],
+      "browserScenarios": ["gesture-drag-editing-cursor-certification"],
       "requiredAxes": [
         "gestures",
         "arena",
@@ -3438,12 +3257,8 @@
     ],
     "certification": {
       "owner": "UIR03-B",
-      "behaviorTests": [
-        "@ontologyx/ui/primitives/__tests__/layout-boundaries.test.tsx"
-      ],
-      "browserScenarios": [
-        "grid-track-strategy-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/primitives/__tests__/layout-boundaries.test.tsx"],
+      "browserScenarios": ["grid-track-strategy-certification"],
       "requiredAxes": [
         "layout",
         "grid",
@@ -3455,9 +3270,7 @@
         "polymorphism",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/primitives/__tests__/layout-boundaries.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/primitives/__tests__/layout-boundaries.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -3546,12 +3359,8 @@
     ],
     "certification": {
       "owner": "UIR04",
-      "behaviorTests": [
-        "@ontologyx/ui/primitives/__tests__/visual-primitives.test.tsx"
-      ],
-      "browserScenarios": [
-        "typography-semantic-bidi-reflow-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/primitives/__tests__/visual-primitives.test.tsx"],
+      "browserScenarios": ["typography-semantic-bidi-reflow-certification"],
       "requiredAxes": [
         "visual",
         "typography",
@@ -3562,9 +3371,7 @@
         "reflow",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/primitives/__tests__/visual-primitives.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/primitives/__tests__/visual-primitives.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -3816,12 +3623,8 @@
     ],
     "certification": {
       "owner": "UIR06",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/actions.test.tsx"
-      ],
-      "browserScenarios": [
-        "icon-button-action-contract-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/actions.test.tsx"],
+      "browserScenarios": ["icon-button-action-contract-certification"],
       "requiredAxes": [
         "actions",
         "icon-button",
@@ -3833,9 +3636,7 @@
         "coarse-pointer",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/actions.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/actions.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -4004,12 +3805,8 @@
     ],
     "certification": {
       "owner": "UIR03-B",
-      "behaviorTests": [
-        "@ontologyx/ui/primitives/__tests__/layout-boundaries.test.tsx"
-      ],
-      "browserScenarios": [
-        "inset-logical-spacing-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/primitives/__tests__/layout-boundaries.test.tsx"],
+      "browserScenarios": ["inset-logical-spacing-certification"],
       "requiredAxes": [
         "layout",
         "inset",
@@ -4019,9 +3816,7 @@
         "polymorphism",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/primitives/__tests__/layout-boundaries.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/primitives/__tests__/layout-boundaries.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -4102,23 +3897,10 @@
     ],
     "certification": {
       "owner": "UIR04",
-      "behaviorTests": [
-        "@ontologyx/ui/primitives/__tests__/visual-primitives.test.tsx"
-      ],
-      "browserScenarios": [
-        "typography-semantic-bidi-reflow-certification"
-      ],
-      "requiredAxes": [
-        "visual",
-        "typography",
-        "semantics",
-        "rtl",
-        "reflow",
-        "a11y"
-      ],
-      "behaviorSources": [
-        "packages/ui/src/primitives/__tests__/visual-primitives.test.tsx"
-      ],
+      "behaviorTests": ["@ontologyx/ui/primitives/__tests__/visual-primitives.test.tsx"],
+      "browserScenarios": ["typography-semantic-bidi-reflow-certification"],
+      "requiredAxes": ["visual", "typography", "semantics", "rtl", "reflow", "a11y"],
+      "behaviorSources": ["packages/ui/src/primitives/__tests__/visual-primitives.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -4194,9 +3976,7 @@
         "@ontologyx/ui/components/__tests__/navigation-data.test.tsx",
         "@ontologyx/ui/components/__tests__/data-navigation.test.tsx"
       ],
-      "browserScenarios": [
-        "list-navigation-data-certification"
-      ],
+      "browserScenarios": ["list-navigation-data-certification"],
       "requiredAxes": [
         "navigation-data",
         "semantic-html",
@@ -4333,9 +4113,7 @@
         "@ontologyx/ui/components/__tests__/navigation-data.test.tsx",
         "@ontologyx/ui/components/__tests__/data-navigation.test.tsx"
       ],
-      "browserScenarios": [
-        "list-navigation-data-certification"
-      ],
+      "browserScenarios": ["list-navigation-data-certification"],
       "requiredAxes": [
         "navigation-data",
         "semantic-html",
@@ -4424,9 +4202,7 @@
         "@ontologyx/ui/components/__tests__/navigation-data.test.tsx",
         "@ontologyx/ui/components/__tests__/data-navigation.test.tsx"
       ],
-      "browserScenarios": [
-        "list-navigation-data-certification"
-      ],
+      "browserScenarios": ["list-navigation-data-certification"],
       "requiredAxes": [
         "navigation-data",
         "semantic-html",
@@ -4483,9 +4259,7 @@
         "@ontologyx/ui/components/__tests__/navigation-data.test.tsx",
         "@ontologyx/ui/components/__tests__/data-navigation.test.tsx"
       ],
-      "browserScenarios": [
-        "list-navigation-data-certification"
-      ],
+      "browserScenarios": ["list-navigation-data-certification"],
       "requiredAxes": [
         "navigation-data",
         "semantic-html",
@@ -4615,12 +4389,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "floating-menu-tooltip-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["floating-menu-tooltip-certification"],
       "requiredAxes": [
         "floating",
         "collision",
@@ -4632,9 +4402,7 @@
         "touch",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -4682,12 +4450,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "floating-menu-tooltip-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["floating-menu-tooltip-certification"],
       "requiredAxes": [
         "floating",
         "collision",
@@ -4699,9 +4463,7 @@
         "touch",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -4732,12 +4494,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "floating-menu-tooltip-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["floating-menu-tooltip-certification"],
       "requiredAxes": [
         "floating",
         "collision",
@@ -4749,9 +4507,7 @@
         "touch",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -4832,16 +4588,8 @@
         "@ontologyx/ui/motion/__tests__/motion.test.ts",
         "@ontologyx/ui/motion/__tests__/transition-lifecycle.test.tsx"
       ],
-      "browserScenarios": [
-        "scroll-motion-certification"
-      ],
-      "requiredAxes": [
-        "motion",
-        "interruption",
-        "reduced-motion",
-        "performance-budget",
-        "a11y"
-      ],
+      "browserScenarios": ["scroll-motion-certification"],
+      "requiredAxes": ["motion", "interruption", "reduced-motion", "performance-budget", "a11y"],
       "behaviorSources": [
         "packages/ui/src/motion/__tests__/motion.test.ts",
         "packages/ui/src/motion/__tests__/transition-lifecycle.test.tsx"
@@ -4941,12 +4689,8 @@
     ],
     "certification": {
       "owner": "UIR13",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/developer-compositions.test.tsx"
-      ],
-      "browserScenarios": [
-        "developer-compositions-adaptive-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/developer-compositions.test.tsx"],
+      "browserScenarios": ["developer-compositions-adaptive-certification"],
       "requiredAxes": [
         "compositions",
         "adaptive",
@@ -4958,9 +4702,7 @@
         "keyboard",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/developer-compositions.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/developer-compositions.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -5114,12 +4856,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "floating-menu-tooltip-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["floating-menu-tooltip-certification"],
       "requiredAxes": [
         "floating",
         "collision",
@@ -5131,9 +4869,7 @@
         "touch",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -5197,12 +4933,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "feedback-lifecycle-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["feedback-lifecycle-certification"],
       "requiredAxes": [
         "feedback",
         "live-region",
@@ -5214,9 +4946,7 @@
         "responsive",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -5286,9 +5016,7 @@
         "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
         "@ontologyx/ui/components/__tests__/selection.test.tsx"
       ],
-      "browserScenarios": [
-        "selection-controls-certification"
-      ],
+      "browserScenarios": ["selection-controls-certification"],
       "requiredAxes": [
         "selection",
         "native-semantics",
@@ -5409,9 +5137,7 @@
         "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
         "@ontologyx/ui/components/__tests__/selection.test.tsx"
       ],
-      "browserScenarios": [
-        "selection-controls-certification"
-      ],
+      "browserScenarios": ["selection-controls-certification"],
       "requiredAxes": [
         "selection",
         "native-semantics",
@@ -5493,16 +5219,8 @@
         "@ontologyx/ui/motion/__tests__/motion.test.ts",
         "@ontologyx/ui/motion/__tests__/transition-lifecycle.test.tsx"
       ],
-      "browserScenarios": [
-        "scroll-motion-certification"
-      ],
-      "requiredAxes": [
-        "motion",
-        "interruption",
-        "reduced-motion",
-        "performance-budget",
-        "a11y"
-      ],
+      "browserScenarios": ["scroll-motion-certification"],
+      "requiredAxes": ["motion", "interruption", "reduced-motion", "performance-budget", "a11y"],
       "behaviorSources": [
         "packages/ui/src/motion/__tests__/motion.test.ts",
         "packages/ui/src/motion/__tests__/transition-lifecycle.test.tsx"
@@ -5574,16 +5292,8 @@
         "@ontologyx/ui/motion/__tests__/motion.test.ts",
         "@ontologyx/ui/motion/__tests__/transition-lifecycle.test.tsx"
       ],
-      "browserScenarios": [
-        "scroll-motion-certification"
-      ],
-      "requiredAxes": [
-        "motion",
-        "interruption",
-        "reduced-motion",
-        "performance-budget",
-        "a11y"
-      ],
+      "browserScenarios": ["scroll-motion-certification"],
+      "requiredAxes": ["motion", "interruption", "reduced-motion", "performance-budget", "a11y"],
       "behaviorSources": [
         "packages/ui/src/motion/__tests__/motion.test.ts",
         "packages/ui/src/motion/__tests__/transition-lifecycle.test.tsx"
@@ -5724,24 +5434,10 @@
     ],
     "certification": {
       "owner": "UIR03-A",
-      "behaviorTests": [
-        "@ontologyx/ui/primitives/__tests__/layout-core.test.tsx"
-      ],
-      "browserScenarios": [
-        "logical-flow-layout-certification"
-      ],
-      "requiredAxes": [
-        "layout",
-        "row",
-        "polymorphism",
-        "rtl",
-        "logical-order",
-        "reflow",
-        "a11y"
-      ],
-      "behaviorSources": [
-        "packages/ui/src/primitives/__tests__/layout-core.test.tsx"
-      ],
+      "behaviorTests": ["@ontologyx/ui/primitives/__tests__/layout-core.test.tsx"],
+      "browserScenarios": ["logical-flow-layout-certification"],
+      "requiredAxes": ["layout", "row", "polymorphism", "rtl", "logical-order", "reflow", "a11y"],
+      "behaviorSources": ["packages/ui/src/primitives/__tests__/layout-core.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -5862,12 +5558,8 @@
     ],
     "certification": {
       "owner": "UIR03-B",
-      "behaviorTests": [
-        "@ontologyx/ui/primitives/__tests__/layout-boundaries.test.tsx"
-      ],
-      "browserScenarios": [
-        "safe-area-logical-edge-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/primitives/__tests__/layout-boundaries.test.tsx"],
+      "browserScenarios": ["safe-area-logical-edge-certification"],
       "requiredAxes": [
         "layout",
         "safe-area",
@@ -5877,9 +5569,7 @@
         "rtl",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/primitives/__tests__/layout-boundaries.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/primitives/__tests__/layout-boundaries.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -5947,16 +5637,8 @@
         "@ontologyx/ui/motion/__tests__/motion.test.ts",
         "@ontologyx/ui/motion/__tests__/transition-lifecycle.test.tsx"
       ],
-      "browserScenarios": [
-        "scroll-motion-certification"
-      ],
-      "requiredAxes": [
-        "motion",
-        "interruption",
-        "reduced-motion",
-        "performance-budget",
-        "a11y"
-      ],
+      "browserScenarios": ["scroll-motion-certification"],
+      "requiredAxes": ["motion", "interruption", "reduced-motion", "performance-budget", "a11y"],
       "behaviorSources": [
         "packages/ui/src/motion/__tests__/motion.test.ts",
         "packages/ui/src/motion/__tests__/transition-lifecycle.test.tsx"
@@ -6032,12 +5714,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "overlay-components-nested-dismissal-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["overlay-components-nested-dismissal-certification"],
       "requiredAxes": [
         "overlay-components",
         "dialog",
@@ -6049,9 +5727,7 @@
         "touch",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -6095,17 +5771,8 @@
         "@ontologyx/ui/scroll/__tests__/scroll-view.test.tsx",
         "@ontologyx/ui/scroll/__tests__/physics.test.ts"
       ],
-      "browserScenarios": [
-        "scroll-motion-certification"
-      ],
-      "requiredAxes": [
-        "scroll",
-        "snap",
-        "variable-geometry",
-        "rtl",
-        "resize",
-        "a11y"
-      ],
+      "browserScenarios": ["scroll-motion-certification"],
+      "requiredAxes": ["scroll", "snap", "variable-geometry", "rtl", "resize", "a11y"],
       "behaviorSources": [
         "packages/ui/src/scroll/__tests__/scroll-view.test.tsx",
         "packages/ui/src/scroll/__tests__/physics.test.ts"
@@ -6202,9 +5869,7 @@
         "@ontologyx/ui/scroll/__tests__/scroll-view.test.tsx",
         "@ontologyx/ui/scroll/__tests__/physics.test.ts"
       ],
-      "browserScenarios": [
-        "scroll-motion-certification"
-      ],
+      "browserScenarios": ["scroll-motion-certification"],
       "requiredAxes": [
         "scroll",
         "logical-coordinates",
@@ -6239,12 +5904,7 @@
     "responsive": "Fits narrow toolbars/containers without shrinking trailing actions below their target contract.",
     "playground": {
       "preferredWidth": "medium",
-      "controls": [
-        "value",
-        "disabled",
-        "readOnly",
-        "suggestionsAvailable"
-      ],
+      "controls": ["value", "disabled", "readOnly", "suggestionsAvailable"],
       "fixture": {
         "value": "Launcher",
         "label": "Search applications",
@@ -6484,9 +6144,7 @@
         "@ontologyx/ui/components/__tests__/fields.test.tsx",
         "@ontologyx/ui/editing/__tests__/editing.test.tsx"
       ],
-      "browserScenarios": [
-        "search-field-composition-certification"
-      ],
+      "browserScenarios": ["search-field-composition-certification"],
       "requiredAxes": [
         "fields",
         "search-field",
@@ -6627,9 +6285,7 @@
         "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
         "@ontologyx/ui/components/__tests__/selection.test.tsx"
       ],
-      "browserScenarios": [
-        "selection-controls-certification"
-      ],
+      "browserScenarios": ["selection-controls-certification"],
       "requiredAxes": [
         "selection",
         "native-semantics",
@@ -6663,11 +6319,7 @@
     "responsive": "Popup width follows the trigger minimum while shared collision handling keeps it inside the viewport.",
     "playground": {
       "preferredWidth": "medium",
-      "controls": [
-        "value",
-        "disabled",
-        "required"
-      ],
+      "controls": ["value", "disabled", "required"],
       "fixture": {
         "label": "Density",
         "value": "comfortable",
@@ -6930,9 +6582,7 @@
         "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
         "@ontologyx/ui/components/__tests__/selection.test.tsx"
       ],
-      "browserScenarios": [
-        "tabs-select-certification"
-      ],
+      "browserScenarios": ["tabs-select-certification"],
       "requiredAxes": [
         "selection",
         "select",
@@ -7002,12 +6652,8 @@
     ],
     "certification": {
       "owner": "UIR11",
-      "behaviorTests": [
-        "@ontologyx/ui/motion/__tests__/transition-lifecycle.test.tsx"
-      ],
-      "browserScenarios": [
-        "scroll-motion-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/motion/__tests__/transition-lifecycle.test.tsx"],
+      "browserScenarios": ["scroll-motion-certification"],
       "requiredAxes": [
         "motion",
         "shared-bounds",
@@ -7017,9 +6663,7 @@
         "resize",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/motion/__tests__/transition-lifecycle.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/motion/__tests__/transition-lifecycle.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -7210,12 +6854,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "overlay-components-nested-dismissal-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["overlay-components-nested-dismissal-certification"],
       "requiredAxes": [
         "overlay-components",
         "dialog",
@@ -7227,9 +6867,7 @@
         "touch",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -7277,12 +6915,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "feedback-lifecycle-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["feedback-lifecycle-certification"],
       "requiredAxes": [
         "feedback",
         "live-region",
@@ -7294,9 +6928,7 @@
         "responsive",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -7431,24 +7063,10 @@
     "examples": [],
     "certification": {
       "owner": "UIR08-closeout",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/selection.test.tsx"
-      ],
-      "browserScenarios": [
-        "selection-controls-certification"
-      ],
-      "requiredAxes": [
-        "selection",
-        "slider",
-        "range",
-        "keyboard",
-        "touch",
-        "rtl",
-        "a11y"
-      ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/selection.test.tsx"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/selection.test.tsx"],
+      "browserScenarios": ["selection-controls-certification"],
+      "requiredAxes": ["selection", "slider", "range", "keyboard", "touch", "rtl", "a11y"],
+      "behaviorSources": ["packages/ui/src/components/__tests__/selection.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -7524,9 +7142,7 @@
         "@ontologyx/ui/motion/__tests__/motion.test.ts",
         "@ontologyx/ui/motion/__tests__/transition-lifecycle.test.tsx"
       ],
-      "browserScenarios": [
-        "scroll-motion-certification"
-      ],
+      "browserScenarios": ["scroll-motion-certification"],
       "requiredAxes": [
         "motion",
         "interruption",
@@ -7634,12 +7250,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "feedback-lifecycle-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["feedback-lifecycle-certification"],
       "requiredAxes": [
         "feedback",
         "live-region",
@@ -7651,9 +7263,7 @@
         "responsive",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -7710,22 +7320,10 @@
     ],
     "certification": {
       "owner": "UIR03-B",
-      "behaviorTests": [
-        "@ontologyx/ui/primitives/__tests__/layout-boundaries.test.tsx"
-      ],
-      "browserScenarios": [
-        "spacer-logical-axis-certification"
-      ],
-      "requiredAxes": [
-        "layout",
-        "spacer",
-        "logical-axis",
-        "decorative",
-        "a11y"
-      ],
-      "behaviorSources": [
-        "packages/ui/src/primitives/__tests__/layout-boundaries.test.tsx"
-      ],
+      "behaviorTests": ["@ontologyx/ui/primitives/__tests__/layout-boundaries.test.tsx"],
+      "browserScenarios": ["spacer-logical-axis-certification"],
+      "requiredAxes": ["layout", "spacer", "logical-axis", "decorative", "a11y"],
+      "behaviorSources": ["packages/ui/src/primitives/__tests__/layout-boundaries.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -7745,22 +7343,10 @@
     "responsive": "Intrinsic; hero keeps the same brand geometry with a stronger display-scale stroke treatment.",
     "playground": {
       "preferredWidth": "wide",
-      "controls": [
-        "size",
-        "renderer",
-        "announce"
-      ],
+      "controls": ["size", "renderer", "announce"],
       "options": {
-        "size": [
-          "sm",
-          "md",
-          "lg",
-          "hero"
-        ],
-        "renderer": [
-          "svg",
-          "canvas"
-        ]
+        "size": ["sm", "md", "lg", "hero"],
+        "renderer": ["svg", "canvas"]
       },
       "fixture": {
         "size": "hero",
@@ -7813,12 +7399,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "feedback-lifecycle-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["feedback-lifecycle-certification"],
       "requiredAxes": [
         "feedback",
         "live-region",
@@ -7830,9 +7412,7 @@
         "responsive",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -7969,23 +7549,10 @@
     ],
     "certification": {
       "owner": "UIR03-A",
-      "behaviorTests": [
-        "@ontologyx/ui/primitives/__tests__/layout-core.test.tsx"
-      ],
-      "browserScenarios": [
-        "logical-flow-layout-certification"
-      ],
-      "requiredAxes": [
-        "layout",
-        "stack",
-        "polymorphism",
-        "logical-order",
-        "reflow",
-        "a11y"
-      ],
-      "behaviorSources": [
-        "packages/ui/src/primitives/__tests__/layout-core.test.tsx"
-      ],
+      "behaviorTests": ["@ontologyx/ui/primitives/__tests__/layout-core.test.tsx"],
+      "browserScenarios": ["logical-flow-layout-certification"],
+      "requiredAxes": ["layout", "stack", "polymorphism", "logical-order", "reflow", "a11y"],
+      "behaviorSources": ["packages/ui/src/primitives/__tests__/layout-core.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -8049,12 +7616,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "feedback-lifecycle-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["feedback-lifecycle-certification"],
       "requiredAxes": [
         "feedback",
         "live-region",
@@ -8066,9 +7629,7 @@
         "responsive",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -8141,12 +7702,8 @@
     ],
     "certification": {
       "owner": "UIR04",
-      "behaviorTests": [
-        "@ontologyx/ui/primitives/__tests__/visual-primitives.test.tsx"
-      ],
-      "browserScenarios": [
-        "surface-divider-visual-boundary-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/primitives/__tests__/visual-primitives.test.tsx"],
+      "browserScenarios": ["surface-divider-visual-boundary-certification"],
       "requiredAxes": [
         "visual",
         "surface",
@@ -8156,9 +7713,7 @@
         "static-state",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/primitives/__tests__/visual-primitives.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/primitives/__tests__/visual-primitives.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -8257,9 +7812,7 @@
         "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
         "@ontologyx/ui/components/__tests__/selection.test.tsx"
       ],
-      "browserScenarios": [
-        "selection-controls-certification"
-      ],
+      "browserScenarios": ["selection-controls-certification"],
       "requiredAxes": [
         "selection",
         "native-semantics",
@@ -8473,9 +8026,7 @@
         "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
         "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
       ],
-      "browserScenarios": [
-        "system-ui-core-certification"
-      ],
+      "browserScenarios": ["system-ui-core-certification"],
       "requiredAxes": [
         "system-ui",
         "components-only",
@@ -8585,9 +8136,7 @@
         "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
         "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
       ],
-      "browserScenarios": [
-        "system-ui-core-certification"
-      ],
+      "browserScenarios": ["system-ui-core-certification"],
       "requiredAxes": [
         "system-ui",
         "components-only",
@@ -8664,9 +8213,7 @@
         "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
         "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
       ],
-      "browserScenarios": [
-        "system-ui-core-certification"
-      ],
+      "browserScenarios": ["system-ui-core-certification"],
       "requiredAxes": [
         "system-ui",
         "components-only",
@@ -8838,12 +8385,8 @@
     "examples": [],
     "certification": {
       "owner": "UIR15",
-      "behaviorTests": [
-        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
-      ],
-      "browserScenarios": [
-        "privileged-system-surfaces-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/system/__tests__/system-layouts.test.tsx"],
+      "browserScenarios": ["privileged-system-surfaces-certification"],
       "requiredAxes": [
         "system-ui",
         "privileged",
@@ -8856,9 +8399,7 @@
         "reduced-motion",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/system/__tests__/system-layouts.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -8934,9 +8475,7 @@
         "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
         "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
       ],
-      "browserScenarios": [
-        "system-ui-core-certification"
-      ],
+      "browserScenarios": ["system-ui-core-certification"],
       "requiredAxes": [
         "system-ui",
         "components-only",
@@ -9050,9 +8589,7 @@
         "@ontologyx/ui/system/__tests__/system-layouts.test.tsx",
         "@ontologyx/ui/system/__tests__/system-keyboard.test.tsx"
       ],
-      "browserScenarios": [
-        "privileged-system-surfaces-certification"
-      ],
+      "browserScenarios": ["privileged-system-surfaces-certification"],
       "requiredAxes": [
         "system-ui",
         "privileged",
@@ -9188,9 +8725,7 @@
         "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
         "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
       ],
-      "browserScenarios": [
-        "system-ui-core-certification"
-      ],
+      "browserScenarios": ["system-ui-core-certification"],
       "requiredAxes": [
         "system-ui",
         "components-only",
@@ -9311,12 +8846,8 @@
     "examples": [],
     "certification": {
       "owner": "UIR15",
-      "behaviorTests": [
-        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
-      ],
-      "browserScenarios": [
-        "privileged-system-surfaces-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/system/__tests__/system-layouts.test.tsx"],
+      "browserScenarios": ["privileged-system-surfaces-certification"],
       "requiredAxes": [
         "system-ui",
         "privileged",
@@ -9329,9 +8860,7 @@
         "reduced-motion",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/system/__tests__/system-layouts.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -9461,12 +8990,8 @@
     ],
     "certification": {
       "owner": "UIR15",
-      "behaviorTests": [
-        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
-      ],
-      "browserScenarios": [
-        "privileged-system-surfaces-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/system/__tests__/system-layouts.test.tsx"],
+      "browserScenarios": ["privileged-system-surfaces-certification"],
       "requiredAxes": [
         "system-ui",
         "privileged",
@@ -9479,9 +9004,7 @@
         "reduced-motion",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/system/__tests__/system-layouts.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -9569,12 +9092,8 @@
     ],
     "certification": {
       "owner": "UIR15",
-      "behaviorTests": [
-        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
-      ],
-      "browserScenarios": [
-        "privileged-system-surfaces-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/system/__tests__/system-layouts.test.tsx"],
+      "browserScenarios": ["privileged-system-surfaces-certification"],
       "requiredAxes": [
         "system-ui",
         "privileged",
@@ -9587,9 +9106,7 @@
         "reduced-motion",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/system/__tests__/system-layouts.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -9697,9 +9214,7 @@
         "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
         "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
       ],
-      "browserScenarios": [
-        "system-ui-core-certification"
-      ],
+      "browserScenarios": ["system-ui-core-certification"],
       "requiredAxes": [
         "system-ui",
         "components-only",
@@ -9816,12 +9331,8 @@
     "examples": [],
     "certification": {
       "owner": "UIR15",
-      "behaviorTests": [
-        "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
-      ],
-      "browserScenarios": [
-        "privileged-system-surfaces-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/system/__tests__/system-layouts.test.tsx"],
+      "browserScenarios": ["privileged-system-surfaces-certification"],
       "requiredAxes": [
         "system-ui",
         "privileged",
@@ -9834,9 +9345,7 @@
         "reduced-motion",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/system/__tests__/system-layouts.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/system/__tests__/system-layouts.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -9920,9 +9429,7 @@
         "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
         "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
       ],
-      "browserScenarios": [
-        "system-ui-core-certification"
-      ],
+      "browserScenarios": ["system-ui-core-certification"],
       "requiredAxes": [
         "system-ui",
         "components-only",
@@ -10082,9 +9589,7 @@
         "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
         "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
       ],
-      "browserScenarios": [
-        "system-ui-core-certification"
-      ],
+      "browserScenarios": ["system-ui-core-certification"],
       "requiredAxes": [
         "system-ui",
         "components-only",
@@ -10186,9 +9691,7 @@
         "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
         "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
       ],
-      "browserScenarios": [
-        "system-ui-core-certification"
-      ],
+      "browserScenarios": ["system-ui-core-certification"],
       "requiredAxes": [
         "system-ui",
         "components-only",
@@ -10282,9 +9785,7 @@
         "@ontologyx/ui/system/__tests__/system-boundary.test.tsx",
         "@ontologyx/ui/system/__tests__/system-layouts.test.tsx"
       ],
-      "browserScenarios": [
-        "system-ui-core-certification"
-      ],
+      "browserScenarios": ["system-ui-core-certification"],
       "requiredAxes": [
         "system-ui",
         "components-only",
@@ -10377,9 +9878,7 @@
         "@ontologyx/ui/components/__tests__/navigation-data.test.tsx",
         "@ontologyx/ui/components/__tests__/data-navigation.test.tsx"
       ],
-      "browserScenarios": [
-        "tabs-select-certification"
-      ],
+      "browserScenarios": ["tabs-select-certification"],
       "requiredAxes": [
         "selection",
         "tabs",
@@ -10414,20 +9913,10 @@
     "responsive": "The tab strip can scroll/clip within constrained containers without device detection.",
     "playground": {
       "preferredWidth": "medium",
-      "controls": [
-        "activationMode",
-        "size"
-      ],
+      "controls": ["activationMode", "size"],
       "options": {
-        "activationMode": [
-          "automatic",
-          "manual"
-        ],
-        "size": [
-          "sm",
-          "md",
-          "lg"
-        ]
+        "activationMode": ["automatic", "manual"],
+        "size": ["sm", "md", "lg"]
       },
       "fixture": {
         "label": "Workbench sections",
@@ -10544,9 +10033,7 @@
         "@ontologyx/ui/components/__tests__/navigation-data.test.tsx",
         "@ontologyx/ui/components/__tests__/data-navigation.test.tsx"
       ],
-      "browserScenarios": [
-        "tabs-select-certification"
-      ],
+      "browserScenarios": ["tabs-select-certification"],
       "requiredAxes": [
         "selection",
         "tabs",
@@ -10658,12 +10145,8 @@
     ],
     "certification": {
       "owner": "UIR04",
-      "behaviorTests": [
-        "@ontologyx/ui/primitives/__tests__/visual-primitives.test.tsx"
-      ],
-      "browserScenarios": [
-        "typography-semantic-bidi-reflow-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/primitives/__tests__/visual-primitives.test.tsx"],
+      "browserScenarios": ["typography-semantic-bidi-reflow-certification"],
       "requiredAxes": [
         "visual",
         "typography",
@@ -10677,9 +10160,7 @@
         "selection",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/primitives/__tests__/visual-primitives.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/primitives/__tests__/visual-primitives.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -11260,9 +10741,7 @@
         "@ontologyx/ui/components/__tests__/data-navigation.test.tsx",
         "@ontologyx/ui/components/__tests__/developer-compositions.test.tsx"
       ],
-      "browserScenarios": [
-        "tile-grid-spatial-navigation-certification"
-      ],
+      "browserScenarios": ["tile-grid-spatial-navigation-certification"],
       "requiredAxes": [
         "navigation-data",
         "tile-grid",
@@ -11340,9 +10819,7 @@
         "@ontologyx/ui/components/__tests__/data-navigation.test.tsx",
         "@ontologyx/ui/components/__tests__/developer-compositions.test.tsx"
       ],
-      "browserScenarios": [
-        "tile-grid-spatial-navigation-certification"
-      ],
+      "browserScenarios": ["tile-grid-spatial-navigation-certification"],
       "requiredAxes": [
         "navigation-data",
         "tile-grid",
@@ -11434,12 +10911,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "feedback-lifecycle-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["feedback-lifecycle-certification"],
       "requiredAxes": [
         "feedback",
         "live-region",
@@ -11451,9 +10924,7 @@
         "responsive",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -11473,10 +10944,7 @@
     "responsive": "Shares Button sizing and full-width behavior.",
     "playground": {
       "preferredWidth": "medium",
-      "controls": [
-        "pressed",
-        "size"
-      ],
+      "controls": ["pressed", "size"],
       "fixture": {
         "children": "Pin panel"
       }
@@ -11625,9 +11093,7 @@
         "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
         "@ontologyx/ui/components/__tests__/selection.test.tsx"
       ],
-      "browserScenarios": [
-        "selection-controls-certification"
-      ],
+      "browserScenarios": ["selection-controls-certification"],
       "requiredAxes": [
         "selection",
         "native-semantics",
@@ -11673,9 +11139,7 @@
             "label": "List"
           }
         ],
-        "defaultValue": [
-          "grid"
-        ]
+        "defaultValue": ["grid"]
       }
     },
     "preview": null,
@@ -11758,9 +11222,7 @@
         "@ontologyx/ui/components/__tests__/selection-disclosure.test.tsx",
         "@ontologyx/ui/components/__tests__/selection.test.tsx"
       ],
-      "browserScenarios": [
-        "selection-controls-certification"
-      ],
+      "browserScenarios": ["selection-controls-certification"],
       "requiredAxes": [
         "selection",
         "native-semantics",
@@ -11842,9 +11304,7 @@
         "@ontologyx/ui/components/__tests__/actions.test.tsx",
         "@ontologyx/ui/components/__tests__/data-navigation.test.tsx"
       ],
-      "browserScenarios": [
-        "action-group-toolbar-certification"
-      ],
+      "browserScenarios": ["action-group-toolbar-certification"],
       "requiredAxes": [
         "actions",
         "toolbar",
@@ -11933,12 +11393,8 @@
     ],
     "certification": {
       "owner": "UIR10",
-      "behaviorTests": [
-        "@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"
-      ],
-      "browserScenarios": [
-        "floating-menu-tooltip-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/components/__tests__/overlays-feedback.test.tsx"],
+      "browserScenarios": ["floating-menu-tooltip-certification"],
       "requiredAxes": [
         "floating",
         "collision",
@@ -11950,9 +11406,7 @@
         "touch",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/components/__tests__/overlays-feedback.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/components/__tests__/overlays-feedback.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -12130,12 +11584,8 @@
     ],
     "certification": {
       "owner": "UIR02-C",
-      "behaviorTests": [
-        "@ontologyx/ui/adaptive/__tests__/ui-root-certification.test.tsx"
-      ],
-      "browserScenarios": [
-        "uiroot-nested-runtime-certification"
-      ],
+      "behaviorTests": ["@ontologyx/ui/adaptive/__tests__/ui-root-certification.test.tsx"],
+      "browserScenarios": ["uiroot-nested-runtime-certification"],
       "requiredAxes": [
         "foundations",
         "uiroot",
@@ -12146,9 +11596,7 @@
         "focus",
         "a11y"
       ],
-      "behaviorSources": [
-        "packages/ui/src/adaptive/__tests__/ui-root-certification.test.tsx"
-      ],
+      "behaviorSources": ["packages/ui/src/adaptive/__tests__/ui-root-certification.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }
@@ -12285,23 +11733,10 @@
     ],
     "certification": {
       "owner": "UIR03-A",
-      "behaviorTests": [
-        "@ontologyx/ui/primitives/__tests__/layout-core.test.tsx"
-      ],
-      "browserScenarios": [
-        "logical-flow-layout-certification"
-      ],
-      "requiredAxes": [
-        "layout",
-        "wrap",
-        "polymorphism",
-        "responsive",
-        "reflow",
-        "a11y"
-      ],
-      "behaviorSources": [
-        "packages/ui/src/primitives/__tests__/layout-core.test.tsx"
-      ],
+      "behaviorTests": ["@ontologyx/ui/primitives/__tests__/layout-core.test.tsx"],
+      "browserScenarios": ["logical-flow-layout-certification"],
+      "requiredAxes": ["layout", "wrap", "polymorphism", "responsive", "reflow", "a11y"],
+      "behaviorSources": ["packages/ui/src/primitives/__tests__/layout-core.test.tsx"],
       "browserSource": "scripts/browser/scenarios.mjs",
       "result": "certified"
     }

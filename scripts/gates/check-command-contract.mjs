@@ -46,7 +46,6 @@ expectEqual(
 );
 forbid('release:check', [
   'v1:oxs:check',
-  'v1:closeout',
   'format',
   'catalog:generate',
   'v1:budgets:freeze',
@@ -70,20 +69,6 @@ for (const required of [
 ]) {
   if (!(scripts['release:artifacts'] ?? '').includes(required)) {
     failures.push(`release:artifacts must include ${required}`);
-  }
-}
-
-const closeoutSource = await readFile(path.join(root, 'scripts/closeout-v1.mjs'), 'utf8');
-for (const forbidden of [
-  'ROADMAP.md',
-  'UI_TASK_LIST.md',
-  'writeFile',
-  "run(['format'])",
-  "run(['catalog:generate'])",
-  'v1:budgets:freeze',
-]) {
-  if (closeoutSource.includes(forbidden)) {
-    failures.push(`scripts/closeout-v1.mjs must remain validation-only; found ${forbidden}`);
   }
 }
 

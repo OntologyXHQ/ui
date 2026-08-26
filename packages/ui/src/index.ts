@@ -69,4 +69,5 @@ export {
   SlideTransition,
 } from './motion/Transition';
 export * from './primitives';
+export * from './semantic';
 export * from './system';

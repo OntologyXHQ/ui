@@ -18,7 +18,7 @@ pnpm verify
 pnpm release:check
 ```
 
-`pnpm verify` is the canonical G0..G6 repository acceptance. It is non-mutating, checks Biome formatting freshness without enabling the repository-wide lint migration, performs one production build, and then runs the real-browser suite against that build. `pnpm lint` remains an explicit cleanup gate until its existing rule debt is resolved deliberately.
+`pnpm verify` is the canonical G0..G6 repository acceptance. It is non-mutating, performs one production build, and then runs the real-browser suite against that build. Formatting remains an explicit mutating maintenance step before verification when source was edited. `pnpm lint` remains an explicit cleanup gate until its existing rule debt is resolved deliberately.
 
 `pnpm release:check` extends the same verified state with the G7 artifact checks: production Studio inspection, deterministic `@ontologyx/ui` tarball creation, a fresh generic packed-tarball consumer smoke, the reviewed V1 artifact budgets, and the V1 freeze contract. It does **not** format source, regenerate documentation, rewrite roadmap/task files, clone OXS, or freeze/rebaseline budgets.
 
@@ -31,8 +31,6 @@ pnpm catalog:generate   # regenerate checked-in catalog output
 pnpm v1:budgets:freeze      # initial freeze only; refuses to overwrite an existing baseline
 pnpm v1:budgets:rebaseline  # UIR17 final measured-output rebaseline; explicit release-review operation
 ```
-
-`pnpm v1:closeout` remains a compatibility command, but it is validation-only and simply runs `pnpm release:check`. Planning/evidence claims are updated only after review of successful gate output.
 
 ## Measured V1 artifact budgets
 
@@ -53,23 +51,9 @@ Successful temporary worktrees are removed automatically. On failure, evidence i
 This is an explicit cross-repository release certification, not a hidden prerequisite of day-to-day UI verification.
 
 
-## UIR17 release-candidate and publication closeout
+## Historical V1 closeout
 
-The final roadmap batch deliberately separates source/release-candidate proof from the external publication event:
-
-```bash
-OXS_CONSUMER_ROOT=/path/to/OXS pnpm uir17:closeout
-```
-
-That command regenerates the catalog, runs full G0..G6 verification, packs and consumes the candidate, rebaselines the final V1 artifact budgets from that verified output, validates the real OXS consumer, and moves planning only to **PUBLICATION READY**. It never tags, pushes or publishes.
-
-After the `v1.0.0` tag is pushed and the trusted release workflow has actually published `@ontologyx/ui@1.0.0` with dist-tag `latest`, run:
-
-```bash
-pnpm uir17:publication:closeout
-```
-
-The publication closeout verifies the Git tag, registry version and `latest` dist-tag before marking `UI-1708` and `UIR17` DONE.
+The numbered UIR closeout commands were development-era planning helpers and are no longer part of the active workspace command surface. Their audit documents remain historical evidence. Current release proof uses the generic `pnpm verify`, `pnpm release:check`, explicit real-OXS validation when required, and the tagged trusted-publishing workflow.
 
 ## Stable publication
 

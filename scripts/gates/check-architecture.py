@@ -74,6 +74,7 @@ zone_by_dir = {
     'components': 'components',
     'adaptive': 'components',
     'system': 'system',
+    'semantic': 'semantic',
     'cursor': 'engine',
     'drag-drop': 'engine',
     'editing': 'engine',
@@ -88,6 +89,7 @@ allowed_zone_edges = {
     'engine': {'foundations', 'engine'},
     'components': {'foundations', 'primitives', 'engine', 'components'},
     'system': {'components', 'system'},
+    'semantic': {'components', 'semantic'},
 }
 
 import_re = re.compile(
@@ -157,4 +159,4 @@ if issues:
         print(f' - {issue}')
     raise SystemExit(1)
 
-print('G0 architecture gate passed: package boundary · zero runtime deps · explicit CSS · source-zone dependency direction · host isolation · system-browser G6 tooling.')
+print('G0 architecture gate passed: package boundary · zero runtime deps · explicit CSS · source-zone dependency direction · semantic bridge isolation · host isolation · system-browser G6 tooling.')

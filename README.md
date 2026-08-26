@@ -1,6 +1,6 @@
 # OntologyX UI
 
-Standalone workspace for the `@ontologyx/ui` platform package and its self-hosted Studio. This repository was extracted from OXS so UI can evolve, build and release independently from the compositor/product repository. The active UI plan was reset from zero on 2026-08-19; pre-reset implementation is candidate material until reaccepted under the new quality gates.
+Standalone workspace for the `@ontologyx/ui` platform package, self-hosted Studio and System demo. V1 remains the accepted compatibility foundation; active work now targets the V2 semantic UI runtime described in `ROADMAP.md`.
 
 ## Workspace
 
@@ -31,7 +31,7 @@ pnpm dev demo       # run the complete System demo only
 pnpm dev            # run Studio and System demo together
 pnpm format         # formatter only; mutating and explicit
 pnpm lint           # explicit repo-wide Biome lint/debt audit; not part of canonical verify
-pnpm quality        # non-mutating fast gate: format freshness + architecture + catalog + types + behavior
+pnpm quality        # non-mutating fast gate: architecture + catalog + types + behavior
 pnpm build          # package + Studio production builds
 pnpm gate:browser   # build once, then run focused production browser acceptance
 pnpm verify         # canonical G0..G6 acceptance; one production build, no release/consumer side effects
@@ -56,9 +56,11 @@ Production direction is `Foundations → Primitives → Components → System UI
 
 `@ontologyx/ui` is an MIT-licensed public package under the `ontologyx` npm organization. Stable tagged releases use npm Trusted Publishing from `OntologyXHQ/ui` and remain guarded by `NPM_PUBLISH_ENABLED=true`; local closeout never tags, pushes or publishes implicitly.
 
-## V1 closeout frontier
+## V2 development frontier
 
-The reset/reacceptance program converges on one stable `@ontologyx/ui@1.0.0` release candidate: all 100 intended public visual exports are promoted to `accepted`, certification ownership covers every accepted export, developer compositions and System UI are bound to dedicated behavior/browser journeys, and Studio renders the real public exports while exposing certification evidence instead of inferred coverage. Local convergence is deliberately simple: `pnpm verify` proves G0..G6 and `pnpm release:check` proves the packed G7 artifact without modifying planning files or touching OXS. Real OXS validation is a separate explicit cross-repository operation (`pnpm v1:oxs:check -- /path/to/OXS`). UIR17 first reaches a truthful `PUBLICATION READY` state after the final measured budgets, packed consumer and OXS RC all pass; only a verified Git tag plus registry `latest` publication can close `UI-1708`. Native Wayland/compositor/IME authority remains outside this repository.
+V2 adds a versioned, JSON-serializable semantic IR and external command authority on top of the accepted V1 interaction/runtime foundation. The active plan intentionally avoids a component rewrite: semantic intent resolves into existing canonical Components/System surfaces first, then adaptive resolver, collection/workspace semantics, inspection/AI actionability and Studio tooling follow. See `ROADMAP.md` and `docs/roadmap/UI_TASK_LIST.md`.
+
+The normal development contract remains `pnpm quality` / `pnpm verify`. New V2 work should strengthen stable architecture rules only when a reusable invariant is proven; numbered patch/closeout checks are not part of the active workflow.
 
 ## Studio deployment
 

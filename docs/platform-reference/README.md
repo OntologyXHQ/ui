@@ -9,4 +9,4 @@ Current authority lives in:
 - `docs/architecture/BOUNDARIES.md`
 - current source/tests/generated catalog
 
-Historical `stable`, `DONE`, budget, fixture-matrix, or patch-ID claims in this directory are evidence of past work only. Every public visual export is reaccepted from `candidate` under the new gate model.
+Historical `stable`, `DONE`, budget, fixture-matrix, patch-ID and numbered-UIR claims in this directory are evidence of past work only. Active V2 planning lives only in `ROADMAP.md` and `docs/roadmap/UI_TASK_LIST.md`.

@@ -35,7 +35,6 @@ const qualityGates = read('docs/quality/QUALITY_GATES.md');
 const audit = read('docs/quality/UIR15_PRIVILEGED_SYSTEM_AUDIT.md');
 const packageJson = JSON.parse(read('package.json'));
 const tarball = read('scripts/create-tarball.mjs');
-const closeout = read('scripts/closeout-uir15.mjs');
 const oxsValidator = read('scripts/validate-oxs-consumer.mjs');
 
 for (const name of exportsUnderTest) {
@@ -222,9 +221,6 @@ if (
 ) {
   issues.push('package.json missing canonical gate:privileged-system-surfaces command');
 }
-if (packageJson.scripts?.['uir15:closeout'] !== 'node scripts/closeout-uir15.mjs') {
-  issues.push('package.json missing canonical uir15:closeout command');
-}
 if (!packageJson.scripts?.['gate:architecture']?.includes('check-privileged-system-surfaces.mjs')) {
   issues.push('canonical architecture gate does not include UIR15 privileged System contract');
 }
@@ -235,15 +231,6 @@ if (!tarball.includes("npm_config_ignore_scripts: 'true'")) {
   issues.push(
     'tarball creation does not suppress lifecycle scripts through pnpm/npm config environment',
   );
-}
-for (const token of [
-  "const taskIds = ['1501', '1502', '1503', '1504', '1505', '1506'];",
-  "runPnpm(['verify'])",
-  "runNode(['scripts/create-tarball.mjs', '--from-build'])",
-  "runPnpm(['v1:oxs:check', '--', oxsRoot])",
-  'UIR15 closeout PASSED. UIR15 is DONE and UIR16 is NEXT.',
-]) {
-  if (!closeout.includes(token)) issues.push(`UIR15 closeout contract missing ${token}`);
 }
 
 for (const token of [
@@ -278,5 +265,5 @@ if (issues.length) {
 }
 
 console.log(
-  'G0 UIR15 privileged System gate passed: 6 accepted exports · Component/System-only implementation · owner-realm keyboard repeat · host-neutral IDs/commands · logical safe-area/occlusion split · noninteractive reduced-motion-safe OSD · explicit OXS closeout.',
+  'G0 UIR15 privileged System gate passed: 6 accepted exports · Component/System-only implementation · owner-realm keyboard repeat · host-neutral IDs/commands · logical safe-area/occlusion split · noninteractive reduced-motion-safe OSD.',
 );
