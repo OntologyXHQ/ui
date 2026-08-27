@@ -4,6 +4,9 @@
 
 - Added versioned JSON-serializable semantic Author IR with command groups, collections, confirmations and host-bound form/field/choice/toggle semantics.
 - Added host-owned command, binding and source registries so executable behavior, live values and application data stay outside Author IR; Runtime IR reports unknown/mismatched capabilities deterministically.
+- Closed the adaptive resolver contract around resolved container/modality/density/direction/pointer state, keeping host preferences and viewport names out of Runtime IR.
+- Added deterministic command placement: compact/touch uses canonical menu, regular keeps three author-ordered actions inline with overflow, and wide keeps up to five inline while preserving command identity, availability, shortcut and intent.
+- Added dedicated real-browser Semantic Studio certification across regular pointer, compact touch and wide RTL/keyboard environments using the same Author IR.
 - Added canonical semantic React bridges and a dedicated Studio V2 workbench showing Author IR, resolved Runtime IR and live canonical rendering under the existing environment controls.
 - Kept V1 visual/runtime contracts intact and retained permissive fix-forward patch delivery without exact-SHA guards or validation rollback.
 

@@ -58,7 +58,7 @@ Production direction is `Foundations → Primitives → Components → System UI
 
 ## V2 development frontier
 
-V2 adds a versioned, JSON-serializable semantic IR and external command authority on top of the accepted V1 interaction/runtime foundation. The active plan intentionally avoids a component rewrite: semantic intent resolves into existing canonical Components/System surfaces first, then adaptive resolver, collection/workspace semantics, inspection/AI actionability and Studio tooling follow. See `ROADMAP.md` and `docs/roadmap/UI_TASK_LIST.md`.
+V2 adds a versioned, JSON-serializable semantic IR and external command/data authority on top of the accepted V1 interaction/runtime foundation. V2-02 now closes a resolved environment contract plus deterministic adaptive command/choice presentation over canonical V1 controls; active work moves to collection/workspace semantics without a component rewrite. See `ROADMAP.md` and `docs/roadmap/UI_TASK_LIST.md`.
 
 The normal development contract remains `pnpm quality` / `pnpm verify`. New V2 work should strengthen stable architecture rules only when a reusable invariant is proven; numbered patch/closeout checks are not part of the active workflow.
 

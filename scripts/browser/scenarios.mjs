@@ -9,6 +9,7 @@ import {
   attachRuntimeDiagnostics,
   focusByTab,
   gotoCatalog,
+  gotoSemanticWorkbench,
   performPointerCancel,
   performTouchLongPress,
   runAxe,
@@ -6090,6 +6091,160 @@ export const browserScenarios = [
       }
     },
     { accepts: ['Card', 'PageScaffold', 'ApplicationItem', 'ContentState', 'AppBar'] },
+  ),
+  scenario(
+    'semantic-adaptive-runtime-certification',
+    [
+      'semantic-ir',
+      'adaptive',
+      'container',
+      'commands',
+      'overflow',
+      'forms',
+      'touch',
+      'keyboard',
+      'rtl',
+      'a11y',
+      'studio',
+    ],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 1100, height: 820 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const regular = await gotoSemanticWorkbench(page, baseUrl, {
+          container: 'content',
+          modality: 'mouse',
+          pointer: 'fine',
+          density: 'comfortable',
+          dir: 'ltr',
+          viewport: 'desktop',
+        });
+        const regularGroup = regular.locator('[data-ui-ir-kind="command-group"]');
+        assert.equal(
+          await regularGroup.getAttribute('data-ui-ir-presentation'),
+          'inline-overflow',
+          'Regular semantic command policy did not keep bounded inline actions plus overflow.',
+        );
+        assert.deepEqual(
+          await regularGroup
+            .locator('[data-ui-command-placement="inline"]')
+            .evaluateAll((items) => items.map((item) => item.getAttribute('data-ui-command'))),
+          ['settings.save', 'settings.preview', 'settings.copy-link'],
+          'Regular semantic command placement drifted from deterministic author order.',
+        );
+        const regularOverflow = regularGroup.getByRole('button', {
+          name: 'Settings actions: More actions',
+          exact: true,
+        });
+        await regularOverflow.click();
+        const exportItem = page.getByRole('menuitem', { name: 'Export', exact: true });
+        const helpItem = page.getByRole('menuitem', { name: 'Help', exact: true });
+        assert.equal(await exportItem.isVisible(), true, 'Regular semantic overflow lost Export.');
+        assert.equal(await helpItem.isVisible(), true, 'Regular semantic overflow lost Help.');
+        await helpItem.click();
+        await regular.getByText('settings.help', { exact: true }).waitFor({ state: 'visible' });
+        assert.match(
+          await regular.innerText(),
+          /Last command:\s*settings\.help/u,
+          'Semantic overflow command did not execute through the host registry.',
+        );
+
+        const compact = await gotoSemanticWorkbench(page, baseUrl, {
+          container: 'compact',
+          modality: 'touch',
+          pointer: 'coarse',
+          density: 'comfortable',
+          dir: 'ltr',
+          viewport: 'phone',
+        });
+        const compactGroup = compact.locator('[data-ui-ir-kind="command-group"]');
+        assert.equal(
+          await compactGroup.getAttribute('data-ui-ir-presentation'),
+          'menu',
+          'Compact/touch semantic command policy did not collapse to a canonical menu.',
+        );
+        assert.equal(
+          await compact.locator('[data-ui-choice-presentation="select"]').count(),
+          1,
+          'Compact/touch semantic choice did not resolve to Select.',
+        );
+        const compactTrigger = compactGroup.getByRole('button', {
+          name: 'Settings actions',
+          exact: true,
+        });
+        await assertMinimumBlockSize(compactTrigger, 44, 'Semantic compact command trigger');
+        await compactTrigger.click();
+        const compactCopy = page.getByRole('menuitem', { name: 'Copy link', exact: true });
+        assert.equal(
+          await compactCopy.getAttribute('aria-keyshortcuts'),
+          'Control+Shift+C',
+          'Semantic compact menu lost command shortcut metadata.',
+        );
+        await page.keyboard.press('Escape');
+        const compactAxe = await runAxe(page, 'V2 semantic adaptive runtime compact');
+
+        const wide = await gotoSemanticWorkbench(page, baseUrl, {
+          container: 'wide',
+          modality: 'keyboard',
+          pointer: 'fine',
+          density: 'compact',
+          dir: 'rtl',
+          viewport: 'ultrawide',
+        });
+        const wideGroup = wide.locator('[data-ui-ir-kind="command-group"]');
+        assert.equal(
+          await wideGroup.getAttribute('data-ui-ir-presentation'),
+          'inline',
+          'Wide semantic command policy did not preserve the full inline command set.',
+        );
+        assert.equal(
+          await wideGroup.locator('[data-ui-command-placement="inline"]').count(),
+          5,
+          'Wide semantic command policy did not keep all five commands inline.',
+        );
+        assert.equal(
+          await wideGroup.locator('[data-ui-command-overflow-trigger]').count(),
+          0,
+          'Wide semantic command policy rendered an unnecessary overflow trigger.',
+        );
+        assert.equal(
+          await wide.locator('[data-ui-choice-presentation="segmented"]').count(),
+          1,
+          'Wide semantic choice did not preserve the segmented author preference.',
+        );
+        assert.equal(
+          await page.locator('.ui-studio-root').getAttribute('data-oxs-direction'),
+          'rtl',
+          'Semantic Studio did not resolve RTL through the owning UiRoot environment.',
+        );
+        const runtimeJson = wide.locator('[data-studio-semantic-json-panel="runtime"]');
+        assert.equal(
+          await runtimeJson.count(),
+          1,
+          'Semantic Runtime IR panel hook is missing or ambiguous.',
+        );
+        const runtimeText = await runtimeJson.innerText();
+        assert.match(runtimeText, /"container": "wide"/u, 'Runtime IR omitted resolved container.');
+        assert.match(
+          runtimeText,
+          /"modality": "keyboard"/u,
+          'Runtime IR omitted resolved modality.',
+        );
+        assert.match(runtimeText, /"direction": "rtl"/u, 'Runtime IR omitted resolved direction.');
+        assert.doesNotMatch(
+          runtimeText,
+          /"modality": "auto"/u,
+          'Runtime IR leaked preference state.',
+        );
+
+        const wideAxe = await runAxe(page, 'V2 semantic adaptive runtime wide');
+        diagnostics.assertClean('V2 semantic adaptive runtime');
+        return { compactAxe, wideAxe };
+      } finally {
+        await context.close();
+      }
+    },
   ),
   scenario(
     'system-ui-core-certification',

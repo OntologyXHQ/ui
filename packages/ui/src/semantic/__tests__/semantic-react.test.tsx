@@ -10,6 +10,7 @@ import {
   defineUiBinding,
   defineUiSource,
 } from '../data';
+import { createUiResolverEnvironment } from '../environment';
 import { SemanticCommandGroup, SemanticConfirmation, SemanticForm } from '../react';
 import { resolveUiDefinition } from '../resolve';
 
@@ -20,12 +21,28 @@ type Context = {
   reducedMotion: boolean;
 };
 
+const compactTouchEnvironment = createUiResolverEnvironment({
+  container: 'compact',
+  modality: 'touch',
+  density: 'comfortable',
+  direction: 'ltr',
+  pointerPrecision: 'coarse',
+});
+
+const regularMouseEnvironment = createUiResolverEnvironment({
+  container: 'regular',
+  modality: 'mouse',
+  density: 'comfortable',
+  direction: 'ltr',
+  pointerPrecision: 'fine',
+});
+
 function renderRoot(node: ReactNode) {
   return render(<UiRoot>{node}</UiRoot>);
 }
 
 describe('V2 semantic React bridge', () => {
-  it('renders a resolved command group through canonical ActionGroup and Button behavior', () => {
+  it('renders a resolved inline command group through canonical ActionGroup and Button behavior', () => {
     const execute = vi.fn();
     const context = { selected: true, name: 'OXS', appearance: 'system', reducedMotion: false };
     const registry = createUiCommandRegistry<Context>([
@@ -52,6 +69,79 @@ describe('V2 semantic React bridge', () => {
     expect(button).toHaveAttribute('data-ui-command', 'file.rename');
     fireEvent.click(button);
     expect(execute).toHaveBeenCalledTimes(1);
+  });
+
+  it('adapts the same command group to the canonical menu contract in compact context', () => {
+    const execute = vi.fn();
+    const context = { selected: true, name: 'OXS', appearance: 'system', reducedMotion: false };
+    const registry = createUiCommandRegistry<Context>([
+      defineCommand<Context>({ id: 'file.rename', label: 'Rename', execute }),
+    ]);
+    const definition = defineUi({
+      id: 'files.main',
+      nodes: [
+        ui.commandGroup({
+          label: 'File actions',
+          commands: [{ command: 'file.rename' }],
+          presentation: { preferred: 'inline' },
+        }),
+      ],
+    });
+    const runtime = resolveUiDefinition(definition, registry, context, {
+      environment: compactTouchEnvironment,
+    });
+    const node = runtime.nodes[0];
+    if (!node || node.kind !== 'command-group') throw new Error('Expected command group');
+
+    renderRoot(<SemanticCommandGroup node={node} registry={registry} context={context} />);
+    fireEvent.click(screen.getByRole('button', { name: 'File actions' }));
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Rename' }));
+    expect(execute).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders deterministic inline overflow through canonical Button and Menu contracts', () => {
+    const execute = vi.fn();
+    const context = { selected: true, name: 'OXS', appearance: 'system', reducedMotion: false };
+    const registry = createUiCommandRegistry<Context>(
+      ['one', 'two', 'three', 'four', 'five'].map((id, index) =>
+        defineCommand<Context>({
+          id: `action.${id}`,
+          label: id[0].toUpperCase() + id.slice(1),
+          ...(index === 3 ? { shortcut: 'Control+4' } : {}),
+          execute: () => execute(id),
+        }),
+      ),
+    );
+    const definition = defineUi({
+      id: 'commands.main',
+      nodes: [
+        ui.commandGroup({
+          label: 'Actions',
+          commands: ['one', 'two', 'three', 'four', 'five'].map((id) => ({
+            command: `action.${id}`,
+          })),
+        }),
+      ],
+    });
+    const runtime = resolveUiDefinition(definition, registry, context, {
+      environment: regularMouseEnvironment,
+    });
+    const node = runtime.nodes[0];
+    if (!node || node.kind !== 'command-group') throw new Error('Expected command group');
+
+    renderRoot(<SemanticCommandGroup node={node} registry={registry} context={context} />);
+
+    expect(screen.getByRole('button', { name: 'One' })).toHaveAttribute(
+      'data-ui-command-placement',
+      'inline',
+    );
+    expect(screen.queryByRole('button', { name: 'Four' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Actions: More actions' }));
+    const four = screen.getByRole('menuitem', { name: 'Four' });
+    expect(four).toHaveAttribute('aria-keyshortcuts', 'Control+4');
+    expect(four).toHaveAttribute('data-ui-command-placement', 'overflow');
+    fireEvent.click(four);
+    expect(execute).toHaveBeenCalledWith('four');
   });
 
   it('maps destructive confirmation semantics onto the accepted AlertDialog contract', () => {

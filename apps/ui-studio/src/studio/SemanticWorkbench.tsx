@@ -6,6 +6,7 @@ import {
   Code,
   createUiBindingRegistry,
   createUiCommandRegistry,
+  createUiResolverEnvironment,
   createUiSourceRegistry,
   defineCommand,
   defineUi,
@@ -21,8 +22,15 @@ import {
   Surface,
   Text,
   ui,
+  type UiResolverContainer,
+  type UiResolverEnvironment,
 } from '@ontologyx/ui';
-import { SemanticCommandGroup, SemanticConfirmation, SemanticForm } from '@ontologyx/ui/advanced';
+import {
+  SemanticCommandGroup,
+  SemanticConfirmation,
+  SemanticForm,
+  useUiEnvironment,
+} from '@ontologyx/ui/advanced';
 import { useMemo, useState } from 'react';
 import { updateStudioView } from '../catalog/routing';
 import { useStudioEnvironment } from './StudioEnvironment';
@@ -47,13 +55,16 @@ const semanticFixture = defineUi({
       commands: [
         { command: 'settings.save', emphasis: 'primary' },
         { command: 'settings.preview', emphasis: 'secondary' },
+        { command: 'settings.copy-link' },
+        { command: 'settings.export' },
+        { command: 'settings.help' },
       ],
       presentation: { preferred: 'inline' },
     }),
     ui.form({
       id: 'studio.settings-form',
       title: 'Semantic settings',
-      description: 'Values are host-owned; Author IR contains only stable binding/source IDs.',
+      description: 'Values are host-owned; the Author IR contains only stable binding/source IDs.',
       fields: [
         ui.field({
           id: 'studio.display-name',
@@ -67,7 +78,7 @@ const semanticFixture = defineUi({
           binding: 'settings.appearance',
           optionsSource: 'settings.appearance-options',
           label: 'Appearance',
-          description: 'A bounded options source rendered through the preferred canonical control.',
+          description: 'The segmented preference falls back to Select in compact/touch contexts.',
           presentation: { preferred: 'segmented' },
         }),
         ui.toggle({
@@ -157,6 +168,22 @@ const commands = createUiCommandRegistry<FixtureContext>([
     execute: ({ setLastCommand }) => setLastCommand('settings.preview'),
   }),
   defineCommand<FixtureContext>({
+    id: 'settings.copy-link',
+    label: 'Copy link',
+    shortcut: 'Control+Shift+C',
+    execute: ({ setLastCommand }) => setLastCommand('settings.copy-link'),
+  }),
+  defineCommand<FixtureContext>({
+    id: 'settings.export',
+    label: 'Export',
+    execute: ({ setLastCommand }) => setLastCommand('settings.export'),
+  }),
+  defineCommand<FixtureContext>({
+    id: 'settings.help',
+    label: 'Help',
+    execute: ({ setLastCommand }) => setLastCommand('settings.help'),
+  }),
+  defineCommand<FixtureContext>({
     id: 'settings.reset',
     label: 'Reset',
     intent: 'destructive',
@@ -174,9 +201,22 @@ const commands = createUiCommandRegistry<FixtureContext>([
   }),
 ]);
 
-function JsonPanel({ title, value }: { title: string; value: unknown }) {
+function adaptiveContainer(
+  environment: ReturnType<typeof useStudioEnvironment>['environment'],
+): UiResolverContainer {
+  if (environment.container === 'compact' || environment.viewport === 'phone') return 'compact';
+  if (environment.container === 'wide' || environment.viewport === 'ultrawide') return 'wide';
+  return 'regular';
+}
+
+function JsonPanel({ id, title, value }: { id: string; title: string; value: unknown }) {
   return (
-    <Surface material="subtle" radius="lg" className="ui-studio-semantic-panel">
+    <Surface
+      material="subtle"
+      radius="lg"
+      className="ui-studio-semantic-panel"
+      data-studio-semantic-json-panel={id}
+    >
       <Stack gap="sm">
         <Row justify="between" align="center" gap="sm">
           <Heading level={2} size="title">
@@ -194,6 +234,7 @@ function JsonPanel({ title, value }: { title: string; value: unknown }) {
 
 export function SemanticWorkbench() {
   const { environment } = useStudioEnvironment();
+  const resolvedEnvironment = useUiEnvironment();
   const [displayName, setDisplayName] = useState('OntologyX');
   const [appearance, setAppearance] = useState('system');
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -213,10 +254,16 @@ export function SemanticWorkbench() {
     [appearance, displayName, reducedMotion],
   );
 
-  const runtime = resolveUiDefinition(semanticFixture, commands, context, { bindings, sources });
+  const resolverEnvironment = createUiResolverEnvironment({
+    container: adaptiveContainer(environment),
+    modality: resolvedEnvironment.modality,
+    density: resolvedEnvironment.density,
+    direction: resolvedEnvironment.direction,
+    pointerPrecision: resolvedEnvironment.pointerPrecision,
+  });
+  const runtime = resolveSemanticFixture(context, resolverEnvironment);
   const commandGroup = runtime.nodes.find((node) => node.kind === 'command-group');
   const form = runtime.nodes.find((node) => node.kind === 'form');
-  const collection = runtime.nodes.find((node) => node.kind === 'collection');
   const confirmation = runtime.nodes.find((node) => node.kind === 'confirmation');
 
   return (
@@ -224,7 +271,7 @@ export function SemanticWorkbench() {
       <AppBar
         className="ui-studio-appbar"
         title="OntologyX UI Studio · Semantic V2"
-        subtitle="Author IR → registries → Runtime IR → canonical UI"
+        subtitle="Author IR → resolver → canonical UI"
         actions={
           <Row gap="sm" align="center">
             <Badge tone="warning">experimental</Badge>
@@ -246,29 +293,24 @@ export function SemanticWorkbench() {
             >
               <Stack gap="sm">
                 <Row gap="sm" align="center">
-                  <Badge tone="accent">V2-01</Badge>
-                  <Label emphasis="strong">First real semantic fixture</Label>
+                  <Badge tone="accent">V2-02</Badge>
+                  <Label emphasis="strong">Adaptive semantic runtime</Label>
                 </Row>
                 <Text tone="secondary" wrap="pretty">
-                  Author IR contains stable semantic references only. Host registries own values,
-                  bounded sources and executable behavior. Runtime IR is the serializable resolved
-                  snapshot consumed by canonical V1 components.
+                  Author IR contains stable semantic references only. The resolver consumes a
+                  resolved host environment, places larger command sets deterministically and
+                  projects canonical presentation without application-owned responsive branches.
                 </Text>
                 <Row gap="sm" className="ui-studio-semantic-facts">
-                  <Badge>theme: {environment.theme}</Badge>
-                  <Badge>direction: {environment.direction}</Badge>
-                  <Badge>density: {environment.density}</Badge>
+                  <Badge>container: {runtime.environment.container}</Badge>
+                  <Badge>input: {runtime.environment.modality}</Badge>
+                  <Badge>density: {runtime.environment.density}</Badge>
+                  <Badge>direction: {runtime.environment.direction}</Badge>
+                  <Badge>pointer: {runtime.environment.pointerPrecision}</Badge>
                   <Badge tone={runtime.diagnostics.length ? 'danger' : 'success'}>
                     diagnostics: {runtime.diagnostics.length}
                   </Badge>
-                  {collection?.kind === 'collection' ? (
-                    <Badge>source items: {collection.sourceState.itemCount ?? 0}</Badge>
-                  ) : null}
                 </Row>
-                <Text tone="tertiary" wrap="pretty">
-                  Studio environment still styles and drives the accepted V1 runtime. Semantic
-                  environment-based presentation resolution intentionally starts in V2-02.
-                </Text>
               </Stack>
             </Surface>
 
@@ -278,8 +320,8 @@ export function SemanticWorkbench() {
               gap="md"
               className="ui-studio-semantic-json-grid"
             >
-              <JsonPanel title="Author IR" value={semanticFixture} />
-              <JsonPanel title="Runtime IR" value={runtime} />
+              <JsonPanel id="author" title="Author IR" value={semanticFixture} />
+              <JsonPanel id="runtime" title="Runtime IR" value={runtime} />
             </Grid>
 
             <Surface
@@ -297,8 +339,8 @@ export function SemanticWorkbench() {
                     Live semantic preview
                   </Heading>
                   <Text tone="tertiary" wrap="pretty">
-                    Edit host-owned values below. The Author IR remains unchanged while Runtime IR
-                    reflects the latest resolved values.
+                    Change the Studio environment above. Compact/touch resolution deliberately
+                    overrides soft presentation preferences.
                   </Text>
                 </Stack>
 
@@ -335,4 +377,17 @@ export function SemanticWorkbench() {
       </ScrollView>
     </Box>
   );
+}
+
+function resolveSemanticFixture(context: FixtureContext, environment: UiResolverEnvironment) {
+  return importSemanticResolver(context, environment);
+}
+
+function importSemanticResolver(context: FixtureContext, environment: UiResolverEnvironment) {
+  // Kept as a named local boundary so the fixture makes the resolution step explicit in source/inspection.
+  return resolveUiDefinition(semanticFixture, commands, context, {
+    bindings,
+    sources,
+    environment,
+  });
 }

@@ -1,9 +1,12 @@
 import type { ChangeEvent, ReactNode } from 'react';
+import { useRef, useState } from 'react';
 import {
   ActionGroup,
   AlertDialog,
   Button,
   FieldSection,
+  Menu,
+  MenuItem,
   Radio,
   RadioGroup,
   SegmentedControl,
@@ -35,11 +38,62 @@ export function SemanticCommandGroup<Context>({
   context,
   onCommandError,
 }: SemanticCommandGroupProps<Context>) {
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const execute = (commandId: string) => {
     void registry.execute(commandId, context).catch((error: unknown) => {
       onCommandError?.(error, commandId);
     });
   };
+  const inlineCommands = node.commands.filter((command) => command.placement === 'inline');
+  const overflowCommands = node.commands.filter((command) => command.placement === 'overflow');
+  const menuOnly = node.resolvedPresentation === 'menu';
+  const menuCommands = menuOnly ? node.commands : overflowCommands;
+  const triggerLabel = menuOnly ? node.label : `${node.label}: More actions`;
+
+  const menu = menuCommands.length ? (
+    <>
+      <Button
+        ref={triggerRef}
+        variant={menuOnly ? 'secondary' : 'quiet'}
+        aria-haspopup="menu"
+        aria-expanded={menuOpen}
+        aria-label={triggerLabel}
+        data-ui-command-overflow-trigger
+        onClick={() => setMenuOpen((open) => !open)}
+      >
+        {menuOnly ? node.label : 'More'}
+      </Button>
+      <Menu
+        open={menuOpen}
+        onOpenChange={setMenuOpen}
+        anchorRef={triggerRef}
+        ariaLabel={`${node.label} commands`}
+      >
+        {menuCommands.map((command) => (
+          <MenuItem
+            key={command.id}
+            disabled={!command.enabled}
+            destructive={command.intent === 'destructive'}
+            aria-keyshortcuts={command.shortcut}
+            data-ui-command={command.id}
+            data-ui-command-placement="overflow"
+            onSelect={() => execute(command.id)}
+          >
+            {command.label}
+          </MenuItem>
+        ))}
+      </Menu>
+    </>
+  ) : null;
+
+  if (menuOnly) {
+    return (
+      <div data-ui-ir-kind={node.kind} data-ui-ir-id={node.id} data-ui-ir-presentation="menu">
+        {menu}
+      </div>
+    );
+  }
 
   return (
     <ActionGroup
@@ -47,8 +101,9 @@ export function SemanticCommandGroup<Context>({
       orientation="horizontal"
       data-ui-ir-kind={node.kind}
       data-ui-ir-id={node.id}
+      data-ui-ir-presentation={node.resolvedPresentation}
     >
-      {node.commands.map((command) => (
+      {inlineCommands.map((command) => (
         <Button
           key={command.id}
           variant={command.emphasis}
@@ -56,11 +111,13 @@ export function SemanticCommandGroup<Context>({
           disabled={!command.enabled}
           aria-keyshortcuts={command.shortcut}
           data-ui-command={command.id}
+          data-ui-command-placement="inline"
           onClick={() => execute(command.id)}
         >
           {command.label}
         </Button>
       ))}
+      {menu}
     </ActionGroup>
   );
 }
@@ -122,6 +179,8 @@ export function SemanticForm<Context>({
       onBindingError?.(error, bindingId);
     });
   };
+  const writeString = (bindingId: string, value: string) => write(bindingId, value);
+  const writeBoolean = (bindingId: string, value: boolean) => write(bindingId, value);
 
   return (
     <FieldSection
@@ -132,30 +191,12 @@ export function SemanticForm<Context>({
     >
       {node.fields.map((field) => {
         if (field.kind === 'field') {
-          return (
-            <SemanticField
-              key={field.id}
-              node={field}
-              onWrite={(bindingId, value) => write(bindingId, value)}
-            />
-          );
+          return <SemanticField key={field.id} node={field} onWrite={writeString} />;
         }
         if (field.kind === 'choice') {
-          return (
-            <SemanticChoice
-              key={field.id}
-              node={field}
-              onWrite={(bindingId, value) => write(bindingId, value)}
-            />
-          );
+          return <SemanticChoice key={field.id} node={field} onWrite={writeString} />;
         }
-        return (
-          <SemanticToggle
-            key={field.id}
-            node={field}
-            onWrite={(bindingId, value) => write(bindingId, value)}
-          />
-        );
+        return <SemanticToggle key={field.id} node={field} onWrite={writeBoolean} />;
       })}
     </FieldSection>
   );

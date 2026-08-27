@@ -361,6 +361,18 @@ export async function gotoCatalog(page, baseUrl, options = {}) {
   return requestedExample ?? workbench;
 }
 
+export async function gotoSemanticWorkbench(page, baseUrl, options = {}) {
+  const url = new URL(routeUrl(baseUrl, options));
+  url.searchParams.set('view', 'semantic');
+  for (const key of ['entry', 'tab', 'example', 'state']) url.searchParams.delete(key);
+  await page.goto(url.toString(), { waitUntil: 'networkidle' });
+  const workbench = page.locator('[data-studio-semantic-workbench]');
+  await workbench.waitFor({ state: 'visible' });
+  const route = new URL(page.url()).searchParams;
+  assert.equal(route.get('view'), 'semantic', 'Studio route did not preserve semantic view.');
+  return workbench;
+}
+
 export async function waitForStudioExampleControl(
   page,
   locator,

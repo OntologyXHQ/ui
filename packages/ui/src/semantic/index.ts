@@ -23,6 +23,17 @@ export {
   defineUiBinding,
   defineUiSource,
 } from './data';
+export type {
+  UiResolverCapability,
+  UiResolverContainer,
+  UiResolverDensity,
+  UiResolverDirection,
+  UiResolverEnvironment,
+  UiResolverEnvironmentInput,
+  UiResolverModality,
+  UiResolverPointerPrecision,
+} from './environment';
+export { createUiResolverEnvironment, DEFAULT_UI_RESOLVER_ENVIRONMENT } from './environment';
 export type { UiIrDiagnostic, UiIrDiagnosticCode } from './diagnostics';
 export {
   assertValidUiDefinition,
@@ -59,6 +70,7 @@ export type {
   UiRuntimeChoiceNode,
   UiRuntimeCollectionNode,
   UiRuntimeCommand,
+  UiRuntimeCommandPlacement,
   UiRuntimeCommandGroupNode,
   UiRuntimeConfirmationNode,
   UiRuntimeDefinition,

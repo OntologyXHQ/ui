@@ -8,6 +8,7 @@ import {
   defineUiSource,
 } from '../data';
 import { UiIrValidationError, validateUiDefinition } from '../diagnostics';
+import { createUiResolverEnvironment } from '../environment';
 import { resolveUiDefinition } from '../resolve';
 
 type Context = {
@@ -24,6 +25,19 @@ function createContext(): Context {
     appearance: 'system',
     reducedMotion: false,
   };
+}
+
+function resolverEnvironment(
+  overrides: Partial<Parameters<typeof createUiResolverEnvironment>[0]> = {},
+) {
+  return createUiResolverEnvironment({
+    container: 'regular',
+    modality: 'mouse',
+    density: 'comfortable',
+    direction: 'ltr',
+    pointerPrecision: 'fine',
+    ...overrides,
+  });
 }
 
 function createDataRegistries() {
@@ -159,7 +173,7 @@ describe('V2 semantic UI IR', () => {
     expect(() => defineUi(invalid as never)).toThrow(UiIrValidationError);
   });
 
-  it('keeps executable behavior in the command registry and resolves serializable runtime state', async () => {
+  it('keeps executable behavior in registries and resolves serializable runtime state', async () => {
     const executeDelete = vi.fn();
     const registry = createUiCommandRegistry<Context>([
       defineCommand<Context>({
@@ -198,6 +212,7 @@ describe('V2 semantic UI IR', () => {
     expect(runtime.diagnostics).toEqual([]);
     expect(runtime.nodes[0]).toMatchObject({
       kind: 'command-group',
+      resolvedPresentation: 'inline',
       commands: [
         { id: 'file.open', label: 'Open', enabled: false, emphasis: 'primary' },
         { id: 'file.delete', label: 'Delete', enabled: true, intent: 'destructive' },
@@ -216,7 +231,7 @@ describe('V2 semantic UI IR', () => {
     expect(executeDelete).toHaveBeenCalledTimes(1);
   });
 
-  it('resolves host-owned bindings and sources without putting application values or functions in Author IR', async () => {
+  it('resolves host-owned bindings and sources without putting application functions in IR', async () => {
     const context = createContext();
     const { bindings, sources } = createDataRegistries();
     const definition = defineUi({
@@ -245,17 +260,13 @@ describe('V2 semantic UI IR', () => {
             }),
           ],
         }),
-        ui.collection({
-          id: 'files.current',
-          source: 'files.current-directory',
-          commands: [],
-        }),
       ],
     });
 
     const runtime = resolveUiDefinition(definition, createUiCommandRegistry<Context>([]), context, {
       bindings,
       sources,
+      environment: resolverEnvironment(),
     });
 
     expect(runtime.diagnostics).toEqual([]);
@@ -274,10 +285,6 @@ describe('V2 semantic UI IR', () => {
           binding: { id: 'settings.reduced-motion', value: false },
         },
       ],
-    });
-    expect(runtime.nodes[1]).toMatchObject({
-      kind: 'collection',
-      sourceState: { id: 'files.current-directory', available: true, itemCount: 2 },
     });
     expect(JSON.parse(JSON.stringify(runtime))).toEqual(runtime);
 
@@ -339,6 +346,183 @@ describe('V2 semantic UI IR', () => {
       'unknown-binding',
       'source-kind-mismatch',
     ]);
+  });
+
+  it('treats author presentation as a soft preference under adaptive policy', () => {
+    const context = createContext();
+    const { bindings, sources } = createDataRegistries();
+    const registry = createUiCommandRegistry<Context>([
+      defineCommand<Context>({ id: 'file.open', label: 'Open', execute: () => undefined }),
+    ]);
+    const definition = defineUi({
+      id: 'adaptive.main',
+      nodes: [
+        ui.commandGroup({
+          label: 'File actions',
+          commands: [{ command: 'file.open' }],
+          presentation: { preferred: 'inline' },
+        }),
+        ui.form({
+          id: 'settings.form',
+          title: 'Settings',
+          fields: [
+            ui.choice({
+              id: 'appearance',
+              binding: 'settings.appearance',
+              optionsSource: 'settings.appearance-options',
+              label: 'Appearance',
+              presentation: { preferred: 'segmented' },
+            }),
+          ],
+        }),
+      ],
+    });
+
+    const compact = resolveUiDefinition(definition, registry, context, {
+      bindings,
+      sources,
+      environment: resolverEnvironment({
+        container: 'compact',
+        modality: 'touch',
+        pointerPrecision: 'coarse',
+      }),
+    });
+    const regular = resolveUiDefinition(definition, registry, context, {
+      bindings,
+      sources,
+      environment: resolverEnvironment(),
+    });
+
+    expect(compact.nodes[0]).toMatchObject({
+      kind: 'command-group',
+      resolvedPresentation: 'menu',
+    });
+    expect(compact.nodes[1]).toMatchObject({
+      kind: 'form',
+      fields: [{ kind: 'choice', resolvedPresentation: 'select' }],
+    });
+    expect(regular.nodes[0]).toMatchObject({
+      kind: 'command-group',
+      resolvedPresentation: 'inline',
+    });
+    expect(regular.nodes[1]).toMatchObject({
+      kind: 'form',
+      fields: [{ kind: 'choice', resolvedPresentation: 'segmented' }],
+    });
+  });
+
+  it('keeps resolver environment explicit, resolved and JSON-serializable', () => {
+    const environment = resolverEnvironment({
+      container: 'wide',
+      modality: 'keyboard',
+      density: 'compact',
+      direction: 'rtl',
+      capabilities: ['workspace.rename', 'workspace.rename', 'workspace.preview'],
+    });
+
+    expect(environment).toEqual({
+      container: 'wide',
+      modality: 'keyboard',
+      density: 'compact',
+      direction: 'rtl',
+      pointerPrecision: 'fine',
+      capabilities: ['workspace.rename', 'workspace.preview'],
+    });
+    expect(JSON.parse(JSON.stringify(environment))).toEqual(environment);
+    expect(() =>
+      createUiResolverEnvironment({
+        container: 'regular',
+        modality: 'auto' as never,
+        density: 'comfortable',
+        direction: 'ltr',
+        pointerPrecision: 'fine',
+      }),
+    ).toThrow('Invalid UI resolver modality: auto');
+  });
+
+  it('places larger command groups deterministically without losing command metadata', () => {
+    const context = createContext();
+    const registry = createUiCommandRegistry<Context>([
+      defineCommand<Context>({
+        id: 'a.one',
+        label: 'One',
+        shortcut: '1',
+        execute: () => undefined,
+      }),
+      defineCommand<Context>({
+        id: 'a.two',
+        label: 'Two',
+        shortcut: '2',
+        execute: () => undefined,
+      }),
+      defineCommand<Context>({ id: 'a.three', label: 'Three', execute: () => undefined }),
+      defineCommand<Context>({ id: 'a.four', label: 'Four', execute: () => undefined }),
+      defineCommand<Context>({ id: 'a.five', label: 'Five', execute: () => undefined }),
+    ]);
+    const definition = defineUi({
+      id: 'commands.main',
+      nodes: [
+        ui.commandGroup({
+          label: 'Actions',
+          commands: [
+            { command: 'a.one', emphasis: 'primary' },
+            { command: 'a.two', emphasis: 'secondary' },
+            { command: 'a.three' },
+            { command: 'a.four' },
+            { command: 'a.five' },
+          ],
+          presentation: { preferred: 'inline' },
+        }),
+      ],
+    });
+
+    const regular = resolveUiDefinition(definition, registry, context, {
+      environment: resolverEnvironment(),
+    });
+    const wide = resolveUiDefinition(definition, registry, context, {
+      environment: resolverEnvironment({ container: 'wide' }),
+    });
+    const compact = resolveUiDefinition(definition, registry, context, {
+      environment: resolverEnvironment({
+        container: 'compact',
+        modality: 'touch',
+        pointerPrecision: 'coarse',
+      }),
+    });
+
+    expect(regular.nodes[0]).toMatchObject({
+      kind: 'command-group',
+      resolvedPresentation: 'inline-overflow',
+      commands: [
+        { id: 'a.one', shortcut: '1', placement: 'inline' },
+        { id: 'a.two', shortcut: '2', placement: 'inline' },
+        { id: 'a.three', placement: 'inline' },
+        { id: 'a.four', placement: 'overflow' },
+        { id: 'a.five', placement: 'overflow' },
+      ],
+    });
+    expect(wide.nodes[0]).toMatchObject({
+      kind: 'command-group',
+      resolvedPresentation: 'inline',
+      commands: [
+        { id: 'a.one', placement: 'inline' },
+        { id: 'a.two', placement: 'inline' },
+        { id: 'a.three', placement: 'inline' },
+        { id: 'a.four', placement: 'inline' },
+        { id: 'a.five', placement: 'inline' },
+      ],
+    });
+    expect(compact.nodes[0]).toMatchObject({
+      kind: 'command-group',
+      resolvedPresentation: 'menu',
+      commands: [
+        { id: 'a.one', placement: 'overflow' },
+        { id: 'a.two', placement: 'overflow' },
+        { id: 'a.three', placement: 'overflow' },
+        { id: 'a.four', placement: 'overflow' },
+        { id: 'a.five', placement: 'overflow' },
+      ],
+    });
   });
 
   it('records unknown command references as runtime diagnostics instead of inventing behavior', () => {
