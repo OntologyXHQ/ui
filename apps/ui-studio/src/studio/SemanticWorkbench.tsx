@@ -22,13 +22,16 @@ import {
   Surface,
   Text,
   ui,
+  type UiCommandInvocation,
   type UiResolverContainer,
   type UiResolverEnvironment,
 } from '@ontologyx/ui';
 import {
+  SemanticCollection,
   SemanticCommandGroup,
   SemanticConfirmation,
   SemanticForm,
+  SemanticWorkspace,
   useUiEnvironment,
 } from '@ontologyx/ui/advanced';
 import { useMemo, useState } from 'react';
@@ -43,7 +46,10 @@ type FixtureContext = {
   setDisplayName: (value: string) => void;
   setAppearance: (value: string) => void;
   setReducedMotion: (value: boolean) => void;
+  selectedFiles: readonly string[];
+  setSelectedFiles: (value: readonly string[]) => void;
   setLastCommand: (value: string) => void;
+  setLastTarget: (value: string) => void;
 };
 
 const semanticFixture = defineUi({
@@ -90,12 +96,56 @@ const semanticFixture = defineUi({
       ],
     }),
     ui.collection({
+      id: 'studio.file-places',
+      source: 'files.places',
+      navigation: { mode: 'linear' },
+      presentation: { preferred: 'list' },
+    }),
+    ui.collection({
       id: 'studio.recent-files',
       source: 'files.recent',
-      selection: { mode: 'multiple' },
+      selection: { mode: 'multiple', binding: 'files.selection' },
       navigation: { mode: 'spatial' },
       commands: ['file.open'],
+      activationCommand: 'file.open',
       presentation: { preferred: 'grid' },
+    }),
+    ui.form({
+      id: 'studio.file-inspector',
+      title: 'File details',
+      description: 'Inspector data is derived from host-owned selection, not embedded in IR.',
+      fields: [
+        ui.field({
+          id: 'studio.selected-file',
+          binding: 'files.selected-label',
+          label: 'Selected file',
+          readOnly: true,
+        }),
+      ],
+    }),
+    ui.workspace({
+      id: 'studio.file-workspace',
+      label: 'Semantic file workspace',
+      regions: [
+        {
+          id: 'studio.file-sidebar',
+          role: 'sidebar',
+          label: 'Places',
+          content: ['studio.file-places'],
+        },
+        {
+          id: 'studio.file-pane',
+          role: 'pane',
+          label: 'Files',
+          content: ['studio.recent-files'],
+        },
+        {
+          id: 'studio.file-inspector-region',
+          role: 'inspector',
+          label: 'Inspector',
+          content: ['studio.file-inspector'],
+        },
+      ],
     }),
     ui.confirmation({
       id: 'studio.reset-confirmation',
@@ -132,6 +182,20 @@ const bindings = createUiBindingRegistry<FixtureContext>([
       if (typeof value === 'boolean') context.setReducedMotion(value);
     },
   }),
+  defineUiBinding<FixtureContext>({
+    id: 'files.selection',
+    kind: 'string-list',
+    read: ({ selectedFiles }) => selectedFiles,
+    write: (value, context) => {
+      if (Array.isArray(value) && value.every((item) => typeof item === 'string'))
+        context.setSelectedFiles(value);
+    },
+  }),
+  defineUiBinding<FixtureContext>({
+    id: 'files.selected-label',
+    kind: 'string',
+    read: ({ selectedFiles }) => selectedFiles[0] ?? 'No file selected',
+  }),
 ]);
 
 const sources = createUiSourceRegistry<FixtureContext>([
@@ -145,13 +209,27 @@ const sources = createUiSourceRegistry<FixtureContext>([
     ],
   }),
   defineUiSource<FixtureContext>({
-    id: 'files.recent',
+    id: 'files.places',
     kind: 'collection',
     read: () => [
-      { id: 'readme', label: 'README.md' },
-      { id: 'roadmap', label: 'ROADMAP.md' },
-      { id: 'tokens', label: 'tokens.ts' },
+      { id: 'home', label: 'Home', description: 'Personal files' },
+      { id: 'projects', label: 'Projects', description: 'Development workspaces' },
+      { id: 'downloads', label: 'Downloads', description: 'Recent transfers' },
     ],
+  }),
+  defineUiSource<FixtureContext>({
+    id: 'files.recent',
+    kind: 'collection',
+    read: () => ({
+      items: [
+        { id: 'readme', label: 'README.md', description: 'Project overview' },
+        { id: 'roadmap', label: 'ROADMAP.md', description: 'Active V2 frontier' },
+        { id: 'tokens', label: 'tokens.ts', description: 'Semantic token contracts' },
+      ],
+      offset: 0,
+      totalCount: 12,
+      hasMore: true,
+    }),
   }),
 ]);
 
@@ -197,7 +275,10 @@ const commands = createUiCommandRegistry<FixtureContext>([
   defineCommand<FixtureContext>({
     id: 'file.open',
     label: 'Open',
-    execute: ({ setLastCommand }) => setLastCommand('file.open'),
+    execute: ({ setLastCommand, setLastTarget }, invocation?: UiCommandInvocation) => {
+      setLastCommand('file.open');
+      setLastTarget(invocation?.target ?? 'none');
+    },
   }),
 ]);
 
@@ -238,7 +319,9 @@ export function SemanticWorkbench() {
   const [displayName, setDisplayName] = useState('OntologyX');
   const [appearance, setAppearance] = useState('system');
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<readonly string[]>([]);
   const [lastCommand, setLastCommand] = useState('none');
+  const [lastTarget, setLastTarget] = useState('none');
   const [confirmationOpen, setConfirmationOpen] = useState(false);
 
   const context = useMemo<FixtureContext>(
@@ -249,9 +332,12 @@ export function SemanticWorkbench() {
       setDisplayName,
       setAppearance,
       setReducedMotion,
+      selectedFiles,
+      setSelectedFiles,
       setLastCommand,
+      setLastTarget,
     }),
-    [appearance, displayName, reducedMotion],
+    [appearance, displayName, reducedMotion, selectedFiles],
   );
 
   const resolverEnvironment = createUiResolverEnvironment({
@@ -263,8 +349,12 @@ export function SemanticWorkbench() {
   });
   const runtime = resolveSemanticFixture(context, resolverEnvironment);
   const commandGroup = runtime.nodes.find((node) => node.kind === 'command-group');
-  const form = runtime.nodes.find((node) => node.kind === 'form');
+  const form = runtime.nodes.find(
+    (node) => node.kind === 'form' && node.id === 'studio.settings-form',
+  );
+  const workspace = runtime.nodes.find((node) => node.kind === 'workspace');
   const confirmation = runtime.nodes.find((node) => node.kind === 'confirmation');
+  const runtimeNode = (id: string) => runtime.nodes.find((node) => 'id' in node && node.id === id);
 
   return (
     <Box as="main" className="ui-studio-semantic-shell" data-studio-semantic-workbench>
@@ -293,13 +383,13 @@ export function SemanticWorkbench() {
             >
               <Stack gap="sm">
                 <Row gap="sm" align="center">
-                  <Badge tone="accent">V2-02</Badge>
-                  <Label emphasis="strong">Adaptive semantic runtime</Label>
+                  <Badge tone="accent">V2-03</Badge>
+                  <Label emphasis="strong">Semantic collections + workspace</Label>
                 </Row>
                 <Text tone="secondary" wrap="pretty">
-                  Author IR contains stable semantic references only. The resolver consumes a
-                  resolved host environment, places larger command sets deterministically and
-                  projects canonical presentation without application-owned responsive branches.
+                  Collection identity, bounded source snapshots, host-owned selection and workspace
+                  regions are resolved without coupling semantic meaning to list/grid layout or host
+                  window authority.
                 </Text>
                 <Row gap="sm" className="ui-studio-semantic-facts">
                   <Badge>container: {runtime.environment.container}</Badge>
@@ -351,6 +441,35 @@ export function SemanticWorkbench() {
                 {form?.kind === 'form' ? (
                   <SemanticForm node={form} bindings={bindings} context={context} />
                 ) : null}
+
+                {workspace?.kind === 'workspace' ? (
+                  <SemanticWorkspace
+                    node={workspace}
+                    renderContent={(semanticId, role) => {
+                      const node = runtimeNode(semanticId);
+                      if (node?.kind === 'collection') {
+                        return (
+                          <SemanticCollection
+                            node={node}
+                            commands={commands}
+                            bindings={bindings}
+                            context={context}
+                            label={role === 'sidebar' ? 'File places' : 'Current files'}
+                          />
+                        );
+                      }
+                      if (node?.kind === 'form') {
+                        return <SemanticForm node={node} bindings={bindings} context={context} />;
+                      }
+                      return null;
+                    }}
+                  />
+                ) : null}
+
+                <Row gap="sm" align="center">
+                  <Badge>selected: {selectedFiles.length}</Badge>
+                  <Badge>target: {lastTarget}</Badge>
+                </Row>
 
                 <Row gap="sm" align="center">
                   <Button variant="secondary" onClick={() => setConfirmationOpen(true)}>

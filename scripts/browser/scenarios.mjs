@@ -6247,6 +6247,143 @@ export const browserScenarios = [
     },
   ),
   scenario(
+    'semantic-collection-workspace-certification',
+    [
+      'semantic-ir',
+      'collection',
+      'workspace',
+      'selection',
+      'activation',
+      'bounded-source',
+      'spatial-navigation',
+      'adaptive',
+      'keyboard',
+      'a11y',
+      'studio',
+    ],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 1180, height: 860 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const wide = await gotoSemanticWorkbench(page, baseUrl, {
+          container: 'wide',
+          modality: 'keyboard',
+          pointer: 'fine',
+          density: 'comfortable',
+          dir: 'ltr',
+          viewport: 'desktop',
+        });
+        const workspace = wide.locator('[data-ui-ir-kind="workspace"]');
+        assert.equal(
+          await workspace.count(),
+          1,
+          'Semantic workspace root is missing or ambiguous.',
+        );
+        for (const role of ['sidebar', 'pane', 'inspector']) {
+          assert.equal(
+            await workspace.locator(`[data-ui-workspace-region="${role}"]`).count(),
+            1,
+            `Semantic workspace lost its ${role} region.`,
+          );
+        }
+
+        const sidebar = workspace.locator('[data-ui-workspace-region="sidebar"]');
+        const pane = workspace.locator('[data-ui-workspace-region="pane"]');
+        const inspector = workspace.locator('[data-ui-workspace-region="inspector"]');
+        assert.equal(
+          await sidebar.locator('[data-ui-ir-kind="collection"]').getAttribute('data-ui-ir-id'),
+          'studio.file-places',
+          'Semantic workspace sidebar did not render its distinct Places collection.',
+        );
+        assert.equal(
+          await inspector.locator('[data-ui-ir-kind="form"]').getAttribute('data-ui-ir-id'),
+          'studio.file-inspector',
+          'Semantic workspace inspector did not render its distinct host-derived details surface.',
+        );
+        const collection = pane.locator('[data-ui-ir-kind="collection"]');
+        assert.equal(
+          await collection.getAttribute('data-ui-collection-presentation'),
+          'grid',
+          'Wide semantic file collection did not preserve its grid preference.',
+        );
+        assert.equal(
+          await collection.getAttribute('data-ui-collection-total'),
+          '12',
+          'Bounded collection snapshot lost host-reported totalCount.',
+        );
+        assert.equal(
+          await collection.getAttribute('data-ui-collection-has-more'),
+          'true',
+          'Bounded collection snapshot lost hasMore metadata.',
+        );
+        assert.equal(
+          await collection.locator('[data-ui-collection-item]').count(),
+          3,
+          'Semantic collection rendered outside its bounded visible source window.',
+        );
+
+        const readme = collection.locator('[data-ui-collection-item="readme"]');
+        const roadmap = collection.locator('[data-ui-collection-item="roadmap"]');
+        const readmeAction = readme.locator('[data-ui-tile-action]');
+        const roadmapAction = roadmap.locator('[data-ui-tile-action]');
+        await readmeAction.focus();
+        await page.keyboard.press('ArrowRight');
+        assert.equal(
+          await roadmapAction.evaluate(
+            (element) => element === element.ownerDocument.activeElement,
+          ),
+          true,
+          'Semantic grid did not reuse certified spatial keyboard navigation.',
+        );
+
+        await readmeAction.click();
+        await wide.getByText('selected: 1', { exact: true }).waitFor({ state: 'visible' });
+        assert.equal(
+          await readme.getAttribute('data-ui-collection-selected'),
+          'true',
+          'Semantic collection selection did not round-trip through the host binding.',
+        );
+        assert.equal(
+          await inspector.locator('[data-ui-binding="files.selected-label"]').inputValue(),
+          'readme',
+          'Semantic inspector did not derive its value from host-owned collection selection.',
+        );
+
+        await roadmapAction.dblclick();
+        await wide.getByText('target: roadmap', { exact: true }).waitFor({ state: 'visible' });
+        assert.match(
+          await wide.innerText(),
+          /Last command:\s*file\.open/u,
+          'Semantic item activation did not execute through the host command registry.',
+        );
+
+        const compact = await gotoSemanticWorkbench(page, baseUrl, {
+          container: 'compact',
+          modality: 'touch',
+          pointer: 'coarse',
+          density: 'comfortable',
+          dir: 'ltr',
+          viewport: 'phone',
+        });
+        const compactPane = compact.locator('[data-ui-workspace-region="pane"]');
+        assert.equal(
+          await compactPane
+            .locator('[data-ui-ir-kind="collection"]')
+            .getAttribute('data-ui-collection-presentation'),
+          'list',
+          'Compact semantic collection did not adapt grid preference to canonical list presentation.',
+        );
+
+        const axe = await runAxe(page, 'V2 semantic collection workspace');
+        diagnostics.assertClean('V2 semantic collection workspace');
+        return { axe };
+      } finally {
+        await context.close();
+      }
+    },
+  ),
+  scenario(
     'system-ui-core-certification',
     [
       'system-ui',

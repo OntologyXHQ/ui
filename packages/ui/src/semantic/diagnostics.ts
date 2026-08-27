@@ -95,6 +95,9 @@ function validateNode(value: unknown, path: string, diagnostics: UiIrDiagnostic[
     case 'form':
       validateForm(value, path, diagnostics);
       return;
+    case 'workspace':
+      validateWorkspace(value, path, diagnostics);
+      return;
     default:
       diagnostics.push({
         code: 'invalid-node',
@@ -172,7 +175,16 @@ function validateCollection(
 ) {
   validateAllowedKeys(
     value,
-    ['kind', 'id', 'source', 'selection', 'navigation', 'commands', 'presentation'],
+    [
+      'kind',
+      'id',
+      'source',
+      'selection',
+      'navigation',
+      'commands',
+      'activationCommand',
+      'presentation',
+    ],
     path,
     diagnostics,
   );
@@ -187,7 +199,7 @@ function validateCollection(
         message: 'Collection selection must be an object.',
       });
     } else {
-      validateAllowedKeys(value.selection, ['mode'], `${path}.selection`, diagnostics);
+      validateAllowedKeys(value.selection, ['mode', 'binding'], `${path}.selection`, diagnostics);
       validateEnum(
         value.selection.mode,
         ['none', 'single', 'multiple'],
@@ -195,6 +207,8 @@ function validateCollection(
         'Selection mode must be none, single or multiple.',
         diagnostics,
       );
+      if (value.selection.binding !== undefined)
+        validateId(value.selection.binding, `${path}.selection.binding`, diagnostics);
     }
   }
 
@@ -217,6 +231,9 @@ function validateCollection(
     }
   }
 
+  if (value.activationCommand !== undefined)
+    validateId(value.activationCommand, `${path}.activationCommand`, diagnostics);
+
   if (value.commands !== undefined) {
     if (!Array.isArray(value.commands)) {
       diagnostics.push({
@@ -238,6 +255,81 @@ function validateCollection(
     'Collection presentation preference must be list or grid.',
     diagnostics,
   );
+}
+
+function validateWorkspace(
+  value: Record<string, unknown>,
+  path: string,
+  diagnostics: UiIrDiagnostic[],
+) {
+  validateAllowedKeys(value, ['kind', 'id', 'label', 'regions'], path, diagnostics);
+  validateId(value.id, `${path}.id`, diagnostics);
+  requireString(value.label, `${path}.label`, 'Workspace label', diagnostics);
+  if (!Array.isArray(value.regions) || value.regions.length === 0) {
+    diagnostics.push({
+      code: 'invalid-node',
+      path: `${path}.regions`,
+      message: 'Workspace requires at least one region.',
+    });
+    return;
+  }
+  const seen = new Set<string>();
+  const seenRoles = new Set<string>();
+  value.regions.forEach((region, index) => {
+    const regionPath = `${path}.regions[${index}]`;
+    if (!isPlainObject(region)) {
+      diagnostics.push({
+        code: 'invalid-node',
+        path: regionPath,
+        message: 'Workspace region must be an object.',
+      });
+      return;
+    }
+    validateAllowedKeys(region, ['id', 'role', 'label', 'content'], regionPath, diagnostics);
+    validateId(region.id, `${regionPath}.id`, diagnostics);
+    if (typeof region.id === 'string' && seen.has(region.id))
+      diagnostics.push({
+        code: 'invalid-node',
+        path: `${regionPath}.id`,
+        message: `Duplicate workspace region id: ${region.id}.`,
+      });
+    if (typeof region.id === 'string') seen.add(region.id);
+    validateEnum(
+      region.role,
+      ['sidebar', 'pane', 'inspector'],
+      `${regionPath}.role`,
+      'Workspace region role must be sidebar, pane or inspector.',
+      diagnostics,
+    );
+    if (typeof region.role === 'string') {
+      if (seenRoles.has(region.role)) {
+        diagnostics.push({
+          code: 'invalid-node',
+          path: `${regionPath}.role`,
+          message: `Workspace currently allows at most one ${region.role} region.`,
+        });
+      }
+      seenRoles.add(region.role);
+    }
+    requireString(region.label, `${regionPath}.label`, 'Workspace region label', diagnostics);
+    if (!Array.isArray(region.content) || region.content.length === 0)
+      diagnostics.push({
+        code: 'invalid-node',
+        path: `${regionPath}.content`,
+        message: 'Workspace region requires at least one semantic content ID.',
+      });
+    else
+      region.content.forEach((id, contentIndex) =>
+        validateId(id, `${regionPath}.content[${contentIndex}]`, diagnostics),
+      );
+  });
+  if (!seenRoles.has('pane')) {
+    diagnostics.push({
+      code: 'invalid-node',
+      path: `${path}.regions`,
+      message: 'Workspace requires exactly one primary pane region.',
+    });
+  }
 }
 
 function validateConfirmation(

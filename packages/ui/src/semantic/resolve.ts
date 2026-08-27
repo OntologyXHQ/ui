@@ -18,6 +18,7 @@ import type {
   UiIrVersion,
   UiSemanticId,
   UiToggleNode,
+  UiWorkspaceNode,
 } from './model';
 
 export type UiResolutionServices<Context> = {
@@ -41,13 +42,27 @@ export type UiRuntimeCommandGroupNode = Omit<UiCommandGroupNode, 'commands'> & {
 export type UiRuntimeCollectionSource = {
   id: UiSemanticId;
   available: boolean;
-  itemCount: number | null;
+  items: readonly import('./data').UiSourceItem[];
+  offset: number;
+  totalCount: number | null;
+  hasMore: boolean;
 };
 
-export type UiRuntimeCollectionNode = UiCollectionNode & {
-  availableCommands: readonly UiResolvedCommand[];
-  sourceState: UiRuntimeCollectionSource;
+export type UiRuntimeCollectionSelection = {
+  mode: import('./model').UiSelectionMode;
+  binding: (UiResolvedBinding & { kind: 'string-list'; value: readonly string[] }) | null;
+  selected: readonly UiSemanticId[];
 };
+
+export type UiRuntimeCollectionNode = Omit<UiCollectionNode, 'selection' | 'activationCommand'> & {
+  availableCommands: readonly UiResolvedCommand[];
+  activationCommand: UiResolvedCommand | null;
+  selection: UiRuntimeCollectionSelection;
+  sourceState: UiRuntimeCollectionSource;
+  resolvedPresentation: import('./model').UiCollectionPresentation;
+};
+
+export type UiRuntimeWorkspaceNode = UiWorkspaceNode;
 
 export type UiRuntimeConfirmationNode = UiConfirmationNode & {
   command: UiResolvedCommand;
@@ -83,7 +98,8 @@ export type UiRuntimeNode =
   | UiRuntimeCommandGroupNode
   | UiRuntimeCollectionNode
   | UiRuntimeConfirmationNode
-  | UiRuntimeFormNode;
+  | UiRuntimeFormNode
+  | UiRuntimeWorkspaceNode;
 
 export type UiRuntimeDefinition = {
   irVersion: UiIrVersion;
@@ -99,7 +115,8 @@ export type UiRuntimeDiagnosticCode =
   | 'unknown-binding'
   | 'binding-kind-mismatch'
   | 'unknown-source'
-  | 'source-kind-mismatch';
+  | 'source-kind-mismatch'
+  | 'workspace-reference-missing';
 
 export type UiRuntimeDiagnostic = {
   code: UiRuntimeDiagnosticCode;
@@ -117,6 +134,9 @@ export function resolveUiDefinition<Context>(
   services: UiResolutionServices<Context> = {},
 ): UiRuntimeDefinition {
   const diagnostics: UiRuntimeDiagnostic[] = [];
+  const semanticNodeIds = new Set(
+    definition.nodes.flatMap((node) => ('id' in node && node.id ? [node.id] : [])),
+  );
   const environment = services.environment ?? DEFAULT_UI_RESOLVER_ENVIRONMENT;
   const nodes = definition.nodes.flatMap<UiRuntimeNode>((node, index) => {
     const path = `$.nodes[${index}]`;
@@ -168,6 +188,12 @@ export function resolveUiDefinition<Context>(
           return [command];
         },
       );
+      const activationCommand = node.activationCommand
+        ? registry.resolve(node.activationCommand, context)
+        : null;
+      if (node.activationCommand && !activationCommand)
+        diagnostics.push(unknownCommand(`${path}.activationCommand`, node.activationCommand));
+
       const source = services.sources?.resolve(node.source, context) ?? null;
       if (services.sources && !source)
         diagnostics.push(unknownSource(`${path}.source`, node.source));
@@ -176,17 +202,61 @@ export function resolveUiDefinition<Context>(
           sourceKindMismatch(`${path}.source`, node.source, 'collection', source.kind),
         );
       }
+
+      let selectionBinding: UiRuntimeCollectionSelection['binding'] = null;
+      const selectionMode = node.selection?.mode ?? 'none';
+      if (selectionMode !== 'none' && node.selection?.binding) {
+        const binding = resolveBinding(
+          services.bindings,
+          node.selection.binding,
+          'string-list',
+          `${path}.selection.binding`,
+          context,
+          diagnostics,
+        );
+        if (binding?.kind === 'string-list' && Array.isArray(binding.value))
+          selectionBinding = binding as UiRuntimeCollectionSelection['binding'];
+      }
+      const hostSelection = [...new Set(selectionBinding?.value ?? [])];
+      const selected =
+        selectionMode === 'none'
+          ? []
+          : selectionMode === 'single'
+            ? hostSelection.slice(0, 1)
+            : hostSelection;
+      const resolvedPresentation = resolveCollectionPresentation(node, environment);
       return [
         {
           ...node,
           availableCommands,
+          activationCommand,
+          selection: { mode: selectionMode, binding: selectionBinding, selected },
           sourceState: {
             id: node.source,
             available: source?.kind === 'collection',
-            itemCount: source?.kind === 'collection' ? source.items.length : null,
+            items: source?.kind === 'collection' ? source.items : [],
+            offset: source?.kind === 'collection' ? source.offset : 0,
+            totalCount: source?.kind === 'collection' ? source.totalCount : null,
+            hasMore: source?.kind === 'collection' ? source.hasMore : false,
           },
+          resolvedPresentation,
         },
       ];
+    }
+
+    if (node.kind === 'workspace') {
+      node.regions.forEach((region, regionIndex) =>
+        region.content.forEach((contentId, contentIndex) => {
+          if (!semanticNodeIds.has(contentId)) {
+            diagnostics.push({
+              code: 'workspace-reference-missing',
+              path: `${path}.regions[${regionIndex}].content[${contentIndex}]`,
+              message: `Workspace content reference is not present in this semantic surface: ${contentId}.`,
+            });
+          }
+        }),
+      );
+      return [{ ...node }];
     }
 
     if (node.kind === 'confirmation') {
@@ -301,7 +371,7 @@ function resolveForm<Context>(
 function resolveBinding<Context>(
   registry: UiBindingRegistry<Context> | undefined,
   id: UiSemanticId,
-  expected: 'string' | 'boolean',
+  expected: 'string' | 'boolean' | 'string-list',
   path: string,
   context: Context,
   diagnostics: UiRuntimeDiagnostic[],
@@ -316,6 +386,15 @@ function resolveBinding<Context>(
     return null;
   }
   return binding;
+}
+
+function resolveCollectionPresentation(
+  node: UiCollectionNode,
+  environment: UiResolverEnvironment,
+): import('./model').UiCollectionPresentation {
+  if (node.presentation?.preferred === 'list') return 'list';
+  if (environment.container === 'compact') return 'list';
+  return node.presentation?.preferred ?? 'list';
 }
 
 function resolveCommandGroupPresentation(

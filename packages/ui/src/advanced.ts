@@ -14,5 +14,13 @@ export type {
   SemanticCommandGroupProps,
   SemanticConfirmationProps,
   SemanticFormProps,
+  SemanticCollectionProps,
+  SemanticWorkspaceProps,
 } from './semantic/react';
-export { SemanticCommandGroup, SemanticConfirmation, SemanticForm } from './semantic/react';
+export {
+  SemanticCollection,
+  SemanticCommandGroup,
+  SemanticConfirmation,
+  SemanticForm,
+  SemanticWorkspace,
+} from './semantic/react';

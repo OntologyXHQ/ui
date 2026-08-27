@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — V2-03 semantic collections + workspace
+
+- Added stable collection item identity, host-owned string-list selection, command-target activation and linear/spatial navigation semantics independently from List/Grid presentation.
+- Replaced eager collection-array assumptions with a bounded source-window contract (512-item ceiling, offset/optional total/hasMore metadata) while keeping off-window selection intact for future virtualization.
+- Added semantic Workspace regions for one primary pane plus optional sidebar/inspector composition; window, process and native authority remain outside `@ontologyx/ui`.
+- Added provisional advanced React bridges for semantic Collection and Workspace over accepted List/TileGrid/PageScaffold surfaces, without expanding the frozen 100-export V1 visual catalog.
+- Expanded the Semantic Studio workbench into a real Files workspace with distinct Places, Files and Inspector regions plus host-derived selection details.
+- Added dedicated G6 `semantic-collection-workspace-certification` coverage for bounded windows, spatial navigation, selection round-trip, command activation, adaptive grid→list resolution and accessibility.
+
 ## Unreleased — V2 semantic runtime foundation
 
 - Added versioned JSON-serializable semantic Author IR with command groups, collections, confirmations and host-bound form/field/choice/toggle semantics.

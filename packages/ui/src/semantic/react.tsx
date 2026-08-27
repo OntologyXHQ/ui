@@ -5,6 +5,11 @@ import {
   AlertDialog,
   Button,
   FieldSection,
+  List,
+  ListItem,
+  PageScaffold,
+  Tile,
+  TileGrid,
   Menu,
   MenuItem,
   Radio,
@@ -18,11 +23,13 @@ import type { UiCommandRegistry } from './commands';
 import type { UiBindingRegistry } from './data';
 import type {
   UiRuntimeChoiceNode,
+  UiRuntimeCollectionNode,
   UiRuntimeCommandGroupNode,
   UiRuntimeConfirmationNode,
   UiRuntimeFieldNode,
   UiRuntimeFormNode,
   UiRuntimeToggleNode,
+  UiRuntimeWorkspaceNode,
 } from './resolve';
 
 export type SemanticCommandGroupProps<Context> = {
@@ -319,5 +326,141 @@ function SemanticToggle({
         onCheckedChange={(checked) => onWrite(node.binding.id, checked)}
       />
     </div>
+  );
+}
+
+export type SemanticCollectionProps<Context> = {
+  node: UiRuntimeCollectionNode;
+  commands: UiCommandRegistry<Context>;
+  bindings?: UiBindingRegistry<Context>;
+  context: Context;
+  label?: string;
+  onCommandError?: (error: unknown, commandId: string) => void;
+  onBindingError?: (error: unknown, bindingId: string) => void;
+};
+
+export function SemanticCollection<Context>({
+  node,
+  commands,
+  bindings,
+  context,
+  label,
+  onCommandError,
+  onBindingError,
+}: SemanticCollectionProps<Context>) {
+  const selected = new Set(node.selection.selected);
+  const selectable = node.selection.mode !== 'none' && Boolean(node.selection.binding?.writable);
+  const setSelection = (itemId: string) => {
+    const binding = node.selection.binding;
+    const item = node.sourceState.items.find((candidate) => candidate.id === itemId);
+    if (item?.disabled || !binding?.writable || !bindings || node.selection.mode === 'none') return;
+    const next =
+      node.selection.mode === 'single'
+        ? [itemId]
+        : selected.has(itemId)
+          ? node.selection.selected.filter((id) => id !== itemId)
+          : [...node.selection.selected, itemId];
+    void bindings.write(binding.id, next, context).catch((error: unknown) => {
+      onBindingError?.(error, binding.id);
+    });
+  };
+  const activate = (itemId: string) => {
+    const command = node.activationCommand;
+    const item = node.sourceState.items.find((candidate) => candidate.id === itemId);
+    if (item?.disabled || !command?.enabled) return;
+    void commands
+      .execute(command.id, context, { target: itemId, selection: node.selection.selected })
+      .catch((error: unknown) => onCommandError?.(error, command.id));
+  };
+  const itemProps = (itemId: string) => ({
+    selected: selected.has(itemId),
+    disabled: node.sourceState.items.find((item) => item.id === itemId)?.disabled ?? false,
+    onActivate: selectable
+      ? () => setSelection(itemId)
+      : node.activationCommand
+        ? () => activate(itemId)
+        : undefined,
+    onDoubleClick: selectable && node.activationCommand ? () => activate(itemId) : undefined,
+    'data-ui-collection-item': itemId,
+    'data-ui-collection-selected': selected.has(itemId) || undefined,
+  });
+
+  const common = {
+    'data-ui-ir-kind': node.kind,
+    'data-ui-ir-id': node.id,
+    'data-ui-collection-source': node.sourceState.id,
+    'data-ui-collection-offset': node.sourceState.offset,
+    'data-ui-collection-total': node.sourceState.totalCount ?? undefined,
+    'data-ui-collection-has-more': node.sourceState.hasMore || undefined,
+    'data-ui-collection-presentation': node.resolvedPresentation,
+  } as const;
+
+  if (node.resolvedPresentation === 'grid') {
+    return (
+      <TileGrid
+        {...common}
+        label={label ?? node.id}
+        keyboardNavigation={node.navigation?.mode === 'spatial'}
+      >
+        {node.sourceState.items.map((item) => (
+          <Tile
+            key={item.id}
+            title={item.label}
+            description={item.description}
+            {...itemProps(item.id)}
+          />
+        ))}
+      </TileGrid>
+    );
+  }
+
+  return (
+    <List {...common} label={label ?? node.id}>
+      {node.sourceState.items.map((item) => (
+        <ListItem
+          key={item.id}
+          primary={item.label}
+          secondary={item.description}
+          {...itemProps(item.id)}
+        />
+      ))}
+    </List>
+  );
+}
+
+export type SemanticWorkspaceProps = {
+  node: UiRuntimeWorkspaceNode;
+  renderContent: (semanticId: string, regionRole: 'sidebar' | 'pane' | 'inspector') => ReactNode;
+};
+
+export function SemanticWorkspace({ node, renderContent }: SemanticWorkspaceProps) {
+  const sidebar = node.regions.find((region) => region.role === 'sidebar');
+  const pane = node.regions.find((region) => region.role === 'pane');
+  const inspector = node.regions.find((region) => region.role === 'inspector');
+  const renderRegion = (region: typeof sidebar) =>
+    region ? (
+      <section
+        aria-label={region.label}
+        data-ui-workspace-region={region.role}
+        data-ui-workspace-region-id={region.id}
+      >
+        {region.content.map((id) => (
+          <div key={id}>{renderContent(id, region.role)}</div>
+        ))}
+      </section>
+    ) : null;
+
+  return (
+    <PageScaffold
+      data-ui-ir-kind={node.kind}
+      data-ui-ir-id={node.id}
+      contentLabel={pane?.label ?? node.label}
+      sidebar={renderRegion(sidebar)}
+      sidebarPosition="start"
+      inset="sm"
+    >
+      <div data-ui-workspace-pane>{renderRegion(pane)}</div>
+      {inspector ? <aside data-ui-workspace-inspector>{renderRegion(inspector)}</aside> : null}
+    </PageScaffold>
   );
 }

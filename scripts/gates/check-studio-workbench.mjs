@@ -186,6 +186,12 @@ for (const [token, message] of [
   ['Author IR', 'semantic workbench must expose Author IR'],
   ['Runtime IR', 'semantic workbench must expose Runtime IR'],
   ['SemanticForm', 'semantic workbench must render the canonical semantic form bridge'],
+  ['SemanticCollection', 'semantic workbench must render the canonical semantic collection bridge'],
+  ['SemanticWorkspace', 'semantic workbench must render the semantic workspace bridge'],
+  [
+    'totalCount: 12',
+    'semantic workbench must prove a bounded collection snapshot rather than an eager full-data assumption',
+  ],
 ]) {
   if (!semanticText.includes(token)) issues.push(message);
 }

@@ -1,12 +1,14 @@
 export { defineUi, ui } from './authoring';
 export type {
   UiCommandDefinition,
+  UiCommandInvocation,
   UiCommandRegistry,
   UiResolvedCommand,
 } from './commands';
 export { createUiCommandRegistry, defineCommand } from './commands';
 export type {
   UiBindingDefinition,
+  UiCollectionSnapshot,
   UiBindingKind,
   UiBindingRegistry,
   UiBindingValue,
@@ -16,12 +18,14 @@ export type {
   UiSourceItem,
   UiSourceKind,
   UiSourceRegistry,
+  UiSourceReadResult,
 } from './data';
 export {
   createUiBindingRegistry,
   createUiSourceRegistry,
   defineUiBinding,
   defineUiSource,
+  UI_SOURCE_SNAPSHOT_MAX_ITEMS,
 } from './data';
 export type {
   UiResolverCapability,
@@ -63,12 +67,17 @@ export type {
   UiSelectionMode,
   UiSemanticId,
   UiToggleNode,
+  UiWorkspaceNode,
+  UiWorkspaceRegion,
+  UiWorkspaceRegionRole,
 } from './model';
 export { UI_IR_VERSION } from './model';
 export type {
   UiResolutionServices,
   UiRuntimeChoiceNode,
   UiRuntimeCollectionNode,
+  UiRuntimeCollectionSelection,
+  UiRuntimeCollectionSource,
   UiRuntimeCommand,
   UiRuntimeCommandPlacement,
   UiRuntimeCommandGroupNode,
@@ -81,5 +90,6 @@ export type {
   UiRuntimeFormNode,
   UiRuntimeNode,
   UiRuntimeToggleNode,
+  UiRuntimeWorkspaceNode,
 } from './resolve';
 export { resolveUiDefinition } from './resolve';

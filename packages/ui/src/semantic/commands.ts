@@ -1,12 +1,17 @@
 import type { UiCommandIntent, UiSemanticId } from './model';
 
+export type UiCommandInvocation = {
+  target?: UiSemanticId;
+  selection?: readonly UiSemanticId[];
+};
+
 export type UiCommandDefinition<Context = unknown> = {
   id: UiSemanticId;
   label: string;
   intent?: UiCommandIntent;
   shortcut?: string;
   isAvailable?: (context: Context) => boolean;
-  execute: (context: Context) => void | Promise<void>;
+  execute: (context: Context, invocation?: UiCommandInvocation) => void | Promise<void>;
 };
 
 export type UiResolvedCommand = {
@@ -20,7 +25,7 @@ export type UiResolvedCommand = {
 export type UiCommandRegistry<Context = unknown> = {
   has(id: UiSemanticId): boolean;
   resolve(id: UiSemanticId, context: Context): UiResolvedCommand | null;
-  execute(id: UiSemanticId, context: Context): Promise<boolean>;
+  execute(id: UiSemanticId, context: Context, invocation?: UiCommandInvocation): Promise<boolean>;
 };
 
 export function defineCommand<Context>(
@@ -55,11 +60,11 @@ export function createUiCommandRegistry<Context>(
         enabled: definition.isAvailable?.(context) ?? true,
       };
     },
-    async execute(id, context) {
+    async execute(id, context, invocation) {
       const definition = commands.get(id);
       if (!definition) return false;
       if (!(definition.isAvailable?.(context) ?? true)) return false;
-      await definition.execute(context);
+      await definition.execute(context, invocation);
       return true;
     },
   };

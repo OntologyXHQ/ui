@@ -7,6 +7,7 @@ export type UiCommandEmphasis = 'quiet' | 'secondary' | 'primary';
 export type UiSelectionMode = 'none' | 'single' | 'multiple';
 export type UiNavigationMode = 'linear' | 'spatial';
 export type UiCollectionPresentation = 'list' | 'grid';
+export type UiWorkspaceRegionRole = 'sidebar' | 'pane' | 'inspector';
 export type UiFieldPurpose =
   | 'text'
   | 'search'
@@ -49,7 +50,11 @@ export type UiCollectionNode = {
   source: UiSemanticId;
   selection?: {
     mode: UiSelectionMode;
+    /** Optional host-owned selection binding. Required for selectable canonical bridges. */
+    binding?: UiSemanticId;
   };
+  /** Optional command invoked when an item is activated. Item identity is passed as command invocation target. */
+  activationCommand?: UiSemanticId;
   navigation?: {
     mode: UiNavigationMode;
   };
@@ -133,7 +138,27 @@ export type UiFormNode = {
   fields: readonly UiFormControlNode[];
 };
 
-export type UiAuthorNode = UiCommandGroupNode | UiCollectionNode | UiConfirmationNode | UiFormNode;
+export type UiWorkspaceRegion = {
+  id: UiSemanticId;
+  role: UiWorkspaceRegionRole;
+  label: string;
+  /** Stable semantic node IDs rendered in this region. */
+  content: readonly UiSemanticId[];
+};
+
+export type UiWorkspaceNode = {
+  kind: 'workspace';
+  id: UiSemanticId;
+  label: string;
+  regions: readonly UiWorkspaceRegion[];
+};
+
+export type UiAuthorNode =
+  | UiCommandGroupNode
+  | UiCollectionNode
+  | UiConfirmationNode
+  | UiFormNode
+  | UiWorkspaceNode;
 
 export type UiDefinition = {
   irVersion: UiIrVersion;

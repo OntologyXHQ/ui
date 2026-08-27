@@ -26,16 +26,16 @@ This file is the active frontier, not historical completion evidence.
 
 - `V2-02` **DONE** — Runtime IR now carries one explicit resolved environment (`container`, `modality`, `density`, `direction`, `pointerPrecision`, bounded capability IDs) rather than host preferences or viewport names; command groups resolve deterministically to inline, inline+overflow or menu while preserving author order and command metadata; semantic choices keep their accepted Select/SegmentedControl/Radio adaptation; dedicated G6 evidence proves the same Author IR across regular pointer, compact touch and wide RTL/keyboard environments.
 
-## V2-03 — semantic collections + workspace model — ACTIVE
+## V2-03 — semantic collections + workspace model — DONE
 
-- `V2-0301` Formalize collection item identity, selection state, activation command and navigation semantics independently from list/grid presentation.
-- `V2-0302` Replace eager collection-array assumptions with a bounded source snapshot contract that can later back virtualization without changing Author IR.
-- `V2-0303` Add workspace/region/sidebar/pane/inspector semantics over accepted Component/System surfaces, keeping window/process/native authority in OXS.
-- `V2-0304` Prove one realistic file/workspace journey in Studio before expanding Tree/DataGrid breadth.
+- `V2-0301` **DONE** — Formalize collection item identity, selection state, activation command and navigation semantics independently from list/grid presentation.
+- `V2-0302` **DONE** — Replace eager collection-array assumptions with a bounded source snapshot contract that can later back virtualization without changing Author IR.
+- `V2-0303` **DONE** — Add workspace/region/sidebar/pane/inspector semantics over accepted Component/System surfaces, keeping window/process/native authority in OXS.
+- `V2-0304` **DONE** — Prove one realistic file/workspace journey in Studio before expanding Tree/DataGrid breadth.
 
 Exit: collection/workspace meaning is stable without coupling Author IR to DOM layout, eager data ownership or host window authority.
 
-## V2-04 — inspection + AI actionability contract — NEXT
+## V2-04 — inspection + AI actionability contract — ACTIVE
 
 - Expose a bounded semantic runtime snapshot: active surface, focus/selection, available commands and relevant state.
 - Let AI/automation invoke registered commands by stable identity instead of DOM scraping.

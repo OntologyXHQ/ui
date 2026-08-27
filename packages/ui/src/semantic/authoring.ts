@@ -9,6 +9,7 @@ import type {
   UiFieldNode,
   UiFormNode,
   UiToggleNode,
+  UiWorkspaceNode,
 } from './model';
 import { UI_IR_VERSION } from './model';
 
@@ -44,5 +45,8 @@ export const ui = {
   },
   toggle(node: Omit<UiToggleNode, 'kind'>): UiToggleNode {
     return { ...node, kind: 'toggle' };
+  },
+  workspace(node: Omit<UiWorkspaceNode, 'kind'>): UiWorkspaceNode {
+    return { ...node, kind: 'workspace' };
   },
 };

@@ -6,6 +6,7 @@ import {
   createUiSourceRegistry,
   defineUiBinding,
   defineUiSource,
+  UI_SOURCE_SNAPSHOT_MAX_ITEMS,
 } from '../data';
 import { UiIrValidationError, validateUiDefinition } from '../diagnostics';
 import { createUiResolverEnvironment } from '../environment';
@@ -64,6 +65,15 @@ function createDataRegistries() {
       read: (context) => context.reducedMotion,
       write: (value, context) => {
         if (typeof value === 'boolean') context.reducedMotion = value;
+      },
+    }),
+    defineUiBinding<Context>({
+      id: 'files.selection',
+      kind: 'string-list',
+      read: (context) => context.selection,
+      write: (value, context) => {
+        if (Array.isArray(value) && value.every((item) => typeof item === 'string'))
+          context.selection = value;
       },
     }),
   ]);
@@ -537,5 +547,181 @@ describe('V2 semantic UI IR', () => {
     expect(runtime.diagnostics).toEqual([
       expect.objectContaining({ code: 'unknown-command', command: 'file.missing' }),
     ]);
+  });
+
+  it('resolves bounded collection snapshots, host-owned selection and semantic activation targets', async () => {
+    const context = createContext();
+    const { bindings } = createDataRegistries();
+    const sources = createUiSourceRegistry<Context>([
+      defineUiSource<Context>({
+        id: 'files.window',
+        kind: 'collection',
+        read: () => ({
+          items: [
+            { id: 'a.ts', label: 'a.ts' },
+            { id: 'b.ts', label: 'b.ts' },
+            { id: 'c.ts', label: 'c.ts' },
+          ],
+          offset: 10,
+          totalCount: 42,
+          hasMore: true,
+        }),
+      }),
+    ]);
+    const activated = vi.fn();
+    const commands = createUiCommandRegistry<Context>([
+      defineCommand<Context>({
+        id: 'file.open',
+        label: 'Open',
+        execute: (_context, invocation) => activated(invocation),
+      }),
+    ]);
+    const definition = defineUi({
+      id: 'files.workspace',
+      nodes: [
+        ui.collection({
+          id: 'files.current',
+          source: 'files.window',
+          selection: { mode: 'multiple', binding: 'files.selection' },
+          navigation: { mode: 'spatial' },
+          activationCommand: 'file.open',
+          presentation: { preferred: 'grid' },
+        }),
+      ],
+    });
+
+    const runtime = resolveUiDefinition(definition, commands, context, {
+      bindings,
+      sources,
+      environment: resolverEnvironment({ container: 'wide' }),
+    });
+    expect(runtime.diagnostics).toEqual([]);
+    expect(runtime.nodes[0]).toMatchObject({
+      kind: 'collection',
+      resolvedPresentation: 'grid',
+      selection: { mode: 'multiple', selected: ['a.ts', 'b.ts'] },
+      sourceState: { offset: 10, totalCount: 42, hasMore: true },
+      activationCommand: { id: 'file.open', enabled: true },
+    });
+    await expect(
+      commands.execute('file.open', context, { target: 'b.ts', selection: ['a.ts', 'b.ts'] }),
+    ).resolves.toBe(true);
+    expect(activated).toHaveBeenCalledWith({ target: 'b.ts', selection: ['a.ts', 'b.ts'] });
+  });
+
+  it('keeps workspace regions semantic and independent from window/process authority', () => {
+    const definition = defineUi({
+      id: 'files.surface',
+      nodes: [
+        ui.collection({ id: 'files.places', source: 'files.places-source' }),
+        ui.collection({ id: 'files.current', source: 'files.current-source' }),
+        ui.workspace({
+          id: 'files.workspace',
+          label: 'Files workspace',
+          regions: [
+            { id: 'places', role: 'sidebar', label: 'Places', content: ['files.places'] },
+            { id: 'content', role: 'pane', label: 'Files', content: ['files.current'] },
+            { id: 'details', role: 'inspector', label: 'Details', content: ['files.current'] },
+          ],
+        }),
+      ],
+    });
+
+    expect(validateUiDefinition(definition)).toEqual([]);
+    expect(JSON.parse(JSON.stringify(definition))).toEqual(definition);
+    expect(JSON.stringify(definition)).not.toMatch(/window|process|native/i);
+  });
+
+  it('keeps host selection independent from the visible bounded source window', () => {
+    const context = createContext();
+    context.selection = ['a.ts', 'offscreen.ts', 'a.ts'];
+    const { bindings } = createDataRegistries();
+    const sources = createUiSourceRegistry<Context>([
+      defineUiSource<Context>({
+        id: 'files.window',
+        kind: 'collection',
+        read: () => ({
+          items: [{ id: 'a.ts', label: 'a.ts' }],
+          offset: 0,
+          totalCount: 42,
+          hasMore: true,
+        }),
+      }),
+    ]);
+    const definition = defineUi({
+      id: 'files.selection-window',
+      nodes: [
+        ui.collection({
+          id: 'files.current',
+          source: 'files.window',
+          selection: { mode: 'multiple', binding: 'files.selection' },
+        }),
+      ],
+    });
+
+    const runtime = resolveUiDefinition(definition, createUiCommandRegistry<Context>([]), context, {
+      bindings,
+      sources,
+    });
+    expect(runtime.nodes[0]).toMatchObject({
+      kind: 'collection',
+      selection: { selected: ['a.ts', 'offscreen.ts'] },
+      sourceState: { items: [{ id: 'a.ts', label: 'a.ts' }], totalCount: 42, hasMore: true },
+    });
+  });
+
+  it('enforces a concrete bounded source window without requiring known total cardinality', () => {
+    const registry = createUiSourceRegistry<Context>([
+      defineUiSource<Context>({
+        id: 'files.unknown-total',
+        kind: 'collection',
+        read: () => ({ items: [{ id: 'a', label: 'A' }], hasMore: true }),
+      }),
+    ]);
+    expect(registry.resolve('files.unknown-total', createContext())).toMatchObject({
+      totalCount: null,
+      hasMore: true,
+      items: [{ id: 'a', label: 'A' }],
+    });
+
+    const oversized = createUiSourceRegistry<Context>([
+      defineUiSource<Context>({
+        id: 'files.oversized',
+        kind: 'collection',
+        read: () =>
+          Array.from({ length: UI_SOURCE_SNAPSHOT_MAX_ITEMS + 1 }, (_, index) => ({
+            id: `item-${index}`,
+            label: `Item ${index}`,
+          })),
+      }),
+    ]);
+    expect(() => oversized.resolve('files.oversized', createContext())).toThrow(
+      /bounded snapshot limit/u,
+    );
+  });
+
+  it('rejects ambiguous workspace region layouts before rendering', () => {
+    const diagnostics = validateUiDefinition({
+      irVersion: 1,
+      kind: 'surface',
+      id: 'workspace.invalid',
+      nodes: [
+        {
+          kind: 'workspace',
+          id: 'workspace.root',
+          label: 'Workspace',
+          regions: [
+            { id: 'left', role: 'sidebar', label: 'Left', content: ['content.one'] },
+            { id: 'right', role: 'sidebar', label: 'Right', content: ['content.two'] },
+          ],
+        },
+      ],
+    });
+    expect(diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ message: expect.stringContaining('at most one sidebar') }),
+        expect.objectContaining({ message: expect.stringContaining('exactly one primary pane') }),
+      ]),
+    );
   });
 });
