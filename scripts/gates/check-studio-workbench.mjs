@@ -17,6 +17,9 @@ const systemDocs = read('packages/ui/src/system/System.docs.tsx');
 const studioCss = read('apps/ui-studio/src/styles/studio.css');
 const scenarios = read('scripts/browser/scenarios.mjs');
 
+const semanticText = read('apps/ui-studio/src/studio/SemanticWorkbench.tsx');
+const studioShellText = read('apps/ui-studio/src/studio/UiKitStudio.tsx');
+
 function parseableDefault(prop) {
   if (!prop.default) return false;
   const value = prop.default.trim();
@@ -173,6 +176,24 @@ for (const token of ['<UiRoot', '<Toolbar', '<Select']) {
 }
 if (!errorText.includes('componentDidUpdate') || !errorText.includes('previous.resetKey')) {
   issues.push('Studio error boundary must recover when its reset key changes');
+}
+
+for (const [token, message] of [
+  [
+    'data-studio-semantic-workbench',
+    'Studio must keep the semantic V2 inspection fixture reachable',
+  ],
+  ['Author IR', 'semantic workbench must expose Author IR'],
+  ['Runtime IR', 'semantic workbench must expose Runtime IR'],
+  ['SemanticForm', 'semantic workbench must render the canonical semantic form bridge'],
+]) {
+  if (!semanticText.includes(token)) issues.push(message);
+}
+if (
+  !routingText.includes("view') === 'semantic'") ||
+  !studioShellText.includes('<SemanticWorkbench')
+) {
+  issues.push('Studio semantic V2 route must stay reachable through normal Studio routing');
 }
 
 for (const token of [

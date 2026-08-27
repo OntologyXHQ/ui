@@ -23,7 +23,7 @@ import { CatalogExample } from './CatalogExample';
 import { CatalogComponentPreview, CatalogPlayground } from './CatalogPlayground';
 import { uiCatalog } from './generated/catalog.generated';
 import { filterCatalog } from './navigation';
-import { type CatalogTab, readCatalogRoute, updateCatalogRoute } from './routing';
+import { type CatalogTab, readCatalogRoute, updateCatalogRoute, updateStudioView } from './routing';
 import type { UiCatalogEntry } from './types';
 
 const sectionOrder: readonly CatalogTab[] = ['overview', 'api', 'examples', 'playground'];
@@ -501,7 +501,14 @@ export function CatalogPage() {
           className="ui-studio-appbar"
           title="OntologyX UI Studio"
           subtitle={`${active.exportName} · ${active.layer} / ${active.category}`}
-          actions={<Badge tone="success">{uiCatalog.length} exports</Badge>}
+          actions={
+            <Row gap="sm" align="center">
+              <Button size="sm" variant="quiet" onClick={() => updateStudioView('semantic')}>
+                Semantic V2
+              </Button>
+              <Badge tone="success">{uiCatalog.length} exports</Badge>
+            </Row>
+          }
         />
         <StudioEnvironmentToolbar />
         <ScrollView

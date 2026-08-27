@@ -10,3 +10,9 @@ export * from './gestures';
 export * from './interaction';
 export * from './motion';
 export * from './scroll';
+export type {
+  SemanticCommandGroupProps,
+  SemanticConfirmationProps,
+  SemanticFormProps,
+} from './semantic/react';
+export { SemanticCommandGroup, SemanticConfirmation, SemanticForm } from './semantic/react';

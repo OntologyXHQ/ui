@@ -18,6 +18,34 @@ export function Example() {
 
 Published JavaScript entries are stylesheet-neutral so Node, SSR, test runners, and other non-CSS hosts can import `@ontologyx/ui` safely. Browser/application hosts must import `@ontologyx/ui/styles.css` once at their composition entry. Advanced infrastructure intended for diagnostics/platform integration is available from `@ontologyx/ui/advanced`.
 
+
+## V2 semantic runtime (experimental)
+
+The V2 surface adds a versioned, JSON-serializable semantic Author IR plus host-owned command, binding and source registries. Author IR describes intent and stable capability references; executable behavior and application values remain outside the IR. `resolveUiDefinition(...)` produces a bounded Runtime IR that canonical semantic bridge components can render through the accepted V1 component contracts.
+
+```tsx
+const settings = defineUi({
+  id: 'settings.main',
+  nodes: [
+    ui.form({
+      id: 'settings.appearance',
+      title: 'Appearance',
+      fields: [
+        ui.choice({
+          id: 'appearance',
+          binding: 'settings.appearance',
+          optionsSource: 'settings.appearance-options',
+          label: 'Appearance',
+          presentation: { preferred: 'segmented' },
+        }),
+      ],
+    }),
+  ],
+});
+```
+
+The semantic contract is experimental until the V2 roadmap closes; V1 component APIs remain the compatibility foundation.
+
 The optional icon vocabulary is a separate package subpath so the canonical entry stays lean:
 
 ```tsx

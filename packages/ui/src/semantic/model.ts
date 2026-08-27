@@ -7,6 +7,16 @@ export type UiCommandEmphasis = 'quiet' | 'secondary' | 'primary';
 export type UiSelectionMode = 'none' | 'single' | 'multiple';
 export type UiNavigationMode = 'linear' | 'spatial';
 export type UiCollectionPresentation = 'list' | 'grid';
+export type UiFieldPurpose =
+  | 'text'
+  | 'search'
+  | 'url'
+  | 'email'
+  | 'number'
+  | 'decimal'
+  | 'telephone'
+  | 'password';
+export type UiChoicePresentation = 'select' | 'segmented' | 'radio';
 
 export type UiCommandReference = {
   /** Stable command identity resolved through the host-owned command registry. */
@@ -26,7 +36,7 @@ export type UiCommandGroupNode = {
   /** Command references only; executable behavior never lives in IR. */
   commands: readonly UiCommandReference[];
   presentation?: {
-    /** Soft author preference; later adaptive resolution may select another canonical presentation. */
+    /** Soft author preference; adaptive resolution may choose another canonical presentation. */
     preferred?: 'inline' | 'menu';
   };
 };
@@ -35,7 +45,7 @@ export type UiCollectionNode = {
   kind: 'collection';
   /** Stable collection identity. */
   id: UiSemanticId;
-  /** Host-owned data source/binding identity. Values are not embedded in the semantic schema. */
+  /** Host-owned data source identity. Values/functions never live in Author IR. */
   source: UiSemanticId;
   selection?: {
     mode: UiSelectionMode;
@@ -69,7 +79,61 @@ export type UiConfirmationNode = {
   intent?: UiCommandIntent;
 };
 
-export type UiAuthorNode = UiCommandGroupNode | UiCollectionNode | UiConfirmationNode;
+export type UiFieldNode = {
+  kind: 'field';
+  id: UiSemanticId;
+  /** Host-owned string binding. */
+  binding: UiSemanticId;
+  label: string;
+  description?: string;
+  placeholder?: string;
+  purpose?: UiFieldPurpose;
+  required?: boolean;
+  disabled?: boolean;
+  readOnly?: boolean;
+};
+
+export type UiChoiceNode = {
+  kind: 'choice';
+  id: UiSemanticId;
+  /** Host-owned string binding containing the selected option value. */
+  binding: UiSemanticId;
+  /** Host-owned options source. */
+  optionsSource: UiSemanticId;
+  label: string;
+  description?: string;
+  placeholder?: string;
+  required?: boolean;
+  disabled?: boolean;
+  readOnly?: boolean;
+  presentation?: {
+    /** Soft author preference; runtime policy may fall back to another canonical control. */
+    preferred?: UiChoicePresentation;
+  };
+};
+
+export type UiToggleNode = {
+  kind: 'toggle';
+  id: UiSemanticId;
+  /** Host-owned boolean binding. */
+  binding: UiSemanticId;
+  label: string;
+  description?: string;
+  disabled?: boolean;
+  readOnly?: boolean;
+};
+
+export type UiFormControlNode = UiFieldNode | UiChoiceNode | UiToggleNode;
+
+export type UiFormNode = {
+  kind: 'form';
+  id: UiSemanticId;
+  title: string;
+  description?: string;
+  fields: readonly UiFormControlNode[];
+};
+
+export type UiAuthorNode = UiCommandGroupNode | UiCollectionNode | UiConfirmationNode | UiFormNode;
 
 export type UiDefinition = {
   irVersion: UiIrVersion;

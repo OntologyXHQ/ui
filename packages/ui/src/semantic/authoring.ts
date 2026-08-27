@@ -1,10 +1,14 @@
 import { assertValidUiDefinition } from './diagnostics';
 import type {
+  UiChoiceNode,
   UiCollectionNode,
   UiCommandGroupNode,
   UiConfirmationNode,
   UiDefinition,
   UiDefinitionInput,
+  UiFieldNode,
+  UiFormNode,
+  UiToggleNode,
 } from './model';
 import { UI_IR_VERSION } from './model';
 
@@ -28,5 +32,17 @@ export const ui = {
   },
   confirmation(node: Omit<UiConfirmationNode, 'kind'>): UiConfirmationNode {
     return { ...node, kind: 'confirmation' };
+  },
+  form(node: Omit<UiFormNode, 'kind'>): UiFormNode {
+    return { ...node, kind: 'form' };
+  },
+  field(node: Omit<UiFieldNode, 'kind'>): UiFieldNode {
+    return { ...node, kind: 'field' };
+  },
+  choice(node: Omit<UiChoiceNode, 'kind'>): UiChoiceNode {
+    return { ...node, kind: 'choice' };
+  },
+  toggle(node: Omit<UiToggleNode, 'kind'>): UiToggleNode {
+    return { ...node, kind: 'toggle' };
   },
 };

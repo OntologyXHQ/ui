@@ -84,237 +84,401 @@ function validateNode(value: unknown, path: string, diagnostics: UiIrDiagnostic[
 
   switch (value.kind) {
     case 'command-group':
-      validateAllowedKeys(
-        value,
-        ['kind', 'id', 'label', 'commands', 'presentation'],
-        path,
-        diagnostics,
-      );
-      if (value.id !== undefined) validateId(value.id, `${path}.id`, diagnostics);
-      if (!nonEmptyString(value.label)) {
-        diagnostics.push({
-          code: 'invalid-node',
-          path: `${path}.label`,
-          message: 'Command group label must be a non-empty string.',
-        });
-      }
-      if (!Array.isArray(value.commands) || value.commands.length === 0) {
-        diagnostics.push({
-          code: 'invalid-node',
-          path: `${path}.commands`,
-          message: 'Command group requires at least one command reference.',
-        });
-      } else {
-        value.commands.forEach((command, index) => {
-          const commandPath = `${path}.commands[${index}]`;
-          if (!isPlainObject(command)) {
-            diagnostics.push({
-              code: 'invalid-command-reference',
-              path: commandPath,
-              message: 'Command reference must be an object.',
-            });
-            return;
-          }
-          validateAllowedKeys(command, ['command', 'label', 'emphasis'], commandPath, diagnostics);
-          validateId(command.command, `${commandPath}.command`, diagnostics);
-          if (command.label !== undefined && !nonEmptyString(command.label)) {
-            diagnostics.push({
-              code: 'invalid-command-reference',
-              path: `${commandPath}.label`,
-              message: 'Command label override must be a non-empty string.',
-            });
-          }
-          if (
-            command.emphasis !== undefined &&
-            !['quiet', 'secondary', 'primary'].includes(String(command.emphasis))
-          ) {
-            diagnostics.push({
-              code: 'invalid-enum',
-              path: `${commandPath}.emphasis`,
-              message: 'Command emphasis must be quiet, secondary or primary.',
-            });
-          }
-        });
-      }
-      if (value.presentation !== undefined) {
-        if (!isPlainObject(value.presentation)) {
-          diagnostics.push({
-            code: 'invalid-node',
-            path: `${path}.presentation`,
-            message: 'Command-group presentation must be an object.',
-          });
-        } else {
-          validateAllowedKeys(
-            value.presentation,
-            ['preferred'],
-            `${path}.presentation`,
-            diagnostics,
-          );
-          if (
-            value.presentation.preferred !== undefined &&
-            !['inline', 'menu'].includes(String(value.presentation.preferred))
-          ) {
-            diagnostics.push({
-              code: 'invalid-enum',
-              path: `${path}.presentation.preferred`,
-              message: 'Command-group presentation preference must be inline or menu.',
-            });
-          }
-        }
-      }
-      break;
-
+      validateCommandGroup(value, path, diagnostics);
+      return;
     case 'collection':
-      validateAllowedKeys(
-        value,
-        ['kind', 'id', 'source', 'selection', 'navigation', 'commands', 'presentation'],
-        path,
-        diagnostics,
-      );
-      validateId(value.id, `${path}.id`, diagnostics);
-      validateId(value.source, `${path}.source`, diagnostics);
-      if (value.selection !== undefined) {
-        if (!isPlainObject(value.selection)) {
-          diagnostics.push({
-            code: 'invalid-node',
-            path: `${path}.selection`,
-            message: 'Collection selection must be an object.',
-          });
-        } else {
-          validateAllowedKeys(value.selection, ['mode'], `${path}.selection`, diagnostics);
-          if (
-            value.selection.mode !== undefined &&
-            !['none', 'single', 'multiple'].includes(String(value.selection.mode))
-          ) {
-            diagnostics.push({
-              code: 'invalid-enum',
-              path: `${path}.selection.mode`,
-              message: 'Selection mode must be none, single or multiple.',
-            });
-          }
-        }
-      }
-      if (value.navigation !== undefined) {
-        if (!isPlainObject(value.navigation)) {
-          diagnostics.push({
-            code: 'invalid-node',
-            path: `${path}.navigation`,
-            message: 'Collection navigation must be an object.',
-          });
-        } else {
-          validateAllowedKeys(value.navigation, ['mode'], `${path}.navigation`, diagnostics);
-          if (
-            value.navigation.mode !== undefined &&
-            !['linear', 'spatial'].includes(String(value.navigation.mode))
-          ) {
-            diagnostics.push({
-              code: 'invalid-enum',
-              path: `${path}.navigation.mode`,
-              message: 'Navigation mode must be linear or spatial.',
-            });
-          }
-        }
-      }
-      if (value.commands !== undefined) {
-        if (!Array.isArray(value.commands)) {
-          diagnostics.push({
-            code: 'invalid-node',
-            path: `${path}.commands`,
-            message: 'Collection commands must be an array of command IDs.',
-          });
-        } else {
-          value.commands.forEach((command, index) =>
-            validateId(command, `${path}.commands[${index}]`, diagnostics),
-          );
-        }
-      }
-      if (value.presentation !== undefined) {
-        if (!isPlainObject(value.presentation)) {
-          diagnostics.push({
-            code: 'invalid-node',
-            path: `${path}.presentation`,
-            message: 'Collection presentation must be an object.',
-          });
-        } else {
-          validateAllowedKeys(
-            value.presentation,
-            ['preferred'],
-            `${path}.presentation`,
-            diagnostics,
-          );
-          if (
-            value.presentation.preferred !== undefined &&
-            !['list', 'grid'].includes(String(value.presentation.preferred))
-          ) {
-            diagnostics.push({
-              code: 'invalid-enum',
-              path: `${path}.presentation.preferred`,
-              message: 'Collection presentation preference must be list or grid.',
-            });
-          }
-        }
-      }
-      break;
-
+      validateCollection(value, path, diagnostics);
+      return;
     case 'confirmation':
-      validateAllowedKeys(
-        value,
-        [
-          'kind',
-          'id',
-          'title',
-          'description',
-          'confirmCommand',
-          'confirmLabel',
-          'cancelLabel',
-          'intent',
-        ],
-        path,
-        diagnostics,
-      );
-      if (value.id !== undefined) validateId(value.id, `${path}.id`, diagnostics);
-      if (!nonEmptyString(value.title)) {
-        diagnostics.push({
-          code: 'invalid-node',
-          path: `${path}.title`,
-          message: 'Confirmation title must be a non-empty string.',
-        });
-      }
-      if (value.description !== undefined && typeof value.description !== 'string') {
-        diagnostics.push({
-          code: 'invalid-node',
-          path: `${path}.description`,
-          message: 'Confirmation description must be a string.',
-        });
-      }
-      validateId(value.confirmCommand, `${path}.confirmCommand`, diagnostics);
-      for (const field of ['confirmLabel', 'cancelLabel'] as const) {
-        if (value[field] !== undefined && !nonEmptyString(value[field])) {
-          diagnostics.push({
-            code: 'invalid-node',
-            path: `${path}.${field}`,
-            message: `${field} must be a non-empty string when provided.`,
-          });
-        }
-      }
-      if (
-        value.intent !== undefined &&
-        !['neutral', 'destructive'].includes(String(value.intent))
-      ) {
-        diagnostics.push({
-          code: 'invalid-enum',
-          path: `${path}.intent`,
-          message: 'Confirmation intent must be neutral or destructive.',
-        });
-      }
-      break;
-
+      validateConfirmation(value, path, diagnostics);
+      return;
+    case 'form':
+      validateForm(value, path, diagnostics);
+      return;
     default:
       diagnostics.push({
         code: 'invalid-node',
         path: `${path}.kind`,
         message: `Unknown UI IR node kind: ${String(value.kind)}.`,
       });
+  }
+}
+
+function validateCommandGroup(
+  value: Record<string, unknown>,
+  path: string,
+  diagnostics: UiIrDiagnostic[],
+) {
+  validateAllowedKeys(
+    value,
+    ['kind', 'id', 'label', 'commands', 'presentation'],
+    path,
+    diagnostics,
+  );
+  if (value.id !== undefined) validateId(value.id, `${path}.id`, diagnostics);
+  requireString(value.label, `${path}.label`, 'Command group label', diagnostics);
+
+  if (!Array.isArray(value.commands) || value.commands.length === 0) {
+    diagnostics.push({
+      code: 'invalid-node',
+      path: `${path}.commands`,
+      message: 'Command group requires at least one command reference.',
+    });
+  } else {
+    value.commands.forEach((command, index) => {
+      const commandPath = `${path}.commands[${index}]`;
+      if (!isPlainObject(command)) {
+        diagnostics.push({
+          code: 'invalid-command-reference',
+          path: commandPath,
+          message: 'Command reference must be an object.',
+        });
+        return;
+      }
+      validateAllowedKeys(command, ['command', 'label', 'emphasis'], commandPath, diagnostics);
+      validateId(command.command, `${commandPath}.command`, diagnostics);
+      if (command.label !== undefined) {
+        requireString(
+          command.label,
+          `${commandPath}.label`,
+          'Command label override',
+          diagnostics,
+          'invalid-command-reference',
+        );
+      }
+      validateEnum(
+        command.emphasis,
+        ['quiet', 'secondary', 'primary'],
+        `${commandPath}.emphasis`,
+        'Command emphasis must be quiet, secondary or primary.',
+        diagnostics,
+      );
+    });
+  }
+
+  validatePreferredPresentation(
+    value.presentation,
+    ['inline', 'menu'],
+    path,
+    'Command-group presentation preference must be inline or menu.',
+    diagnostics,
+  );
+}
+
+function validateCollection(
+  value: Record<string, unknown>,
+  path: string,
+  diagnostics: UiIrDiagnostic[],
+) {
+  validateAllowedKeys(
+    value,
+    ['kind', 'id', 'source', 'selection', 'navigation', 'commands', 'presentation'],
+    path,
+    diagnostics,
+  );
+  validateId(value.id, `${path}.id`, diagnostics);
+  validateId(value.source, `${path}.source`, diagnostics);
+
+  if (value.selection !== undefined) {
+    if (!isPlainObject(value.selection)) {
+      diagnostics.push({
+        code: 'invalid-node',
+        path: `${path}.selection`,
+        message: 'Collection selection must be an object.',
+      });
+    } else {
+      validateAllowedKeys(value.selection, ['mode'], `${path}.selection`, diagnostics);
+      validateEnum(
+        value.selection.mode,
+        ['none', 'single', 'multiple'],
+        `${path}.selection.mode`,
+        'Selection mode must be none, single or multiple.',
+        diagnostics,
+      );
+    }
+  }
+
+  if (value.navigation !== undefined) {
+    if (!isPlainObject(value.navigation)) {
+      diagnostics.push({
+        code: 'invalid-node',
+        path: `${path}.navigation`,
+        message: 'Collection navigation must be an object.',
+      });
+    } else {
+      validateAllowedKeys(value.navigation, ['mode'], `${path}.navigation`, diagnostics);
+      validateEnum(
+        value.navigation.mode,
+        ['linear', 'spatial'],
+        `${path}.navigation.mode`,
+        'Navigation mode must be linear or spatial.',
+        diagnostics,
+      );
+    }
+  }
+
+  if (value.commands !== undefined) {
+    if (!Array.isArray(value.commands)) {
+      diagnostics.push({
+        code: 'invalid-node',
+        path: `${path}.commands`,
+        message: 'Collection commands must be an array of command IDs.',
+      });
+    } else {
+      value.commands.forEach((command, index) =>
+        validateId(command, `${path}.commands[${index}]`, diagnostics),
+      );
+    }
+  }
+
+  validatePreferredPresentation(
+    value.presentation,
+    ['list', 'grid'],
+    path,
+    'Collection presentation preference must be list or grid.',
+    diagnostics,
+  );
+}
+
+function validateConfirmation(
+  value: Record<string, unknown>,
+  path: string,
+  diagnostics: UiIrDiagnostic[],
+) {
+  validateAllowedKeys(
+    value,
+    [
+      'kind',
+      'id',
+      'title',
+      'description',
+      'confirmCommand',
+      'confirmLabel',
+      'cancelLabel',
+      'intent',
+    ],
+    path,
+    diagnostics,
+  );
+  if (value.id !== undefined) validateId(value.id, `${path}.id`, diagnostics);
+  requireString(value.title, `${path}.title`, 'Confirmation title', diagnostics);
+  if (value.description !== undefined && typeof value.description !== 'string') {
+    diagnostics.push({
+      code: 'invalid-node',
+      path: `${path}.description`,
+      message: 'Confirmation description must be a string.',
+    });
+  }
+  validateId(value.confirmCommand, `${path}.confirmCommand`, diagnostics);
+  if (value.confirmLabel !== undefined) {
+    requireString(value.confirmLabel, `${path}.confirmLabel`, 'confirmLabel', diagnostics);
+  }
+  if (value.cancelLabel !== undefined) {
+    requireString(value.cancelLabel, `${path}.cancelLabel`, 'cancelLabel', diagnostics);
+  }
+  validateEnum(
+    value.intent,
+    ['neutral', 'destructive'],
+    `${path}.intent`,
+    'Confirmation intent must be neutral or destructive.',
+    diagnostics,
+  );
+}
+
+function validateForm(value: Record<string, unknown>, path: string, diagnostics: UiIrDiagnostic[]) {
+  validateAllowedKeys(value, ['kind', 'id', 'title', 'description', 'fields'], path, diagnostics);
+  validateId(value.id, `${path}.id`, diagnostics);
+  requireString(value.title, `${path}.title`, 'Form title', diagnostics);
+  if (value.description !== undefined && typeof value.description !== 'string') {
+    diagnostics.push({
+      code: 'invalid-node',
+      path: `${path}.description`,
+      message: 'Form description must be a string.',
+    });
+  }
+  if (!Array.isArray(value.fields) || value.fields.length === 0) {
+    diagnostics.push({
+      code: 'invalid-node',
+      path: `${path}.fields`,
+      message: 'Form requires at least one semantic field.',
+    });
+    return;
+  }
+  value.fields.forEach((field, index) =>
+    validateFormControl(field, `${path}.fields[${index}]`, diagnostics),
+  );
+}
+
+function validateFormControl(value: unknown, path: string, diagnostics: UiIrDiagnostic[]) {
+  if (!isPlainObject(value) || typeof value.kind !== 'string') {
+    diagnostics.push({
+      code: 'invalid-node',
+      path,
+      message: 'Form control must be a plain object with a kind.',
+    });
+    return;
+  }
+
+  if (value.kind === 'field') {
+    validateAllowedKeys(
+      value,
+      [
+        'kind',
+        'id',
+        'binding',
+        'label',
+        'description',
+        'placeholder',
+        'purpose',
+        'required',
+        'disabled',
+        'readOnly',
+      ],
+      path,
+      diagnostics,
+    );
+    validateSharedFormControl(value, path, diagnostics);
+    if (value.placeholder !== undefined && typeof value.placeholder !== 'string') {
+      diagnostics.push({
+        code: 'invalid-node',
+        path: `${path}.placeholder`,
+        message: 'Field placeholder must be a string.',
+      });
+    }
+    validateEnum(
+      value.purpose,
+      ['text', 'search', 'url', 'email', 'number', 'decimal', 'telephone', 'password'],
+      `${path}.purpose`,
+      'Field purpose is not supported.',
+      diagnostics,
+    );
+    return;
+  }
+
+  if (value.kind === 'choice') {
+    validateAllowedKeys(
+      value,
+      [
+        'kind',
+        'id',
+        'binding',
+        'optionsSource',
+        'label',
+        'description',
+        'placeholder',
+        'required',
+        'disabled',
+        'readOnly',
+        'presentation',
+      ],
+      path,
+      diagnostics,
+    );
+    validateSharedFormControl(value, path, diagnostics);
+    validateId(value.optionsSource, `${path}.optionsSource`, diagnostics);
+    if (value.placeholder !== undefined && typeof value.placeholder !== 'string') {
+      diagnostics.push({
+        code: 'invalid-node',
+        path: `${path}.placeholder`,
+        message: 'Choice placeholder must be a string.',
+      });
+    }
+    validatePreferredPresentation(
+      value.presentation,
+      ['select', 'segmented', 'radio'],
+      path,
+      'Choice presentation preference must be select, segmented or radio.',
+      diagnostics,
+    );
+    return;
+  }
+
+  if (value.kind === 'toggle') {
+    validateAllowedKeys(
+      value,
+      ['kind', 'id', 'binding', 'label', 'description', 'disabled', 'readOnly'],
+      path,
+      diagnostics,
+    );
+    validateSharedFormControl(value, path, diagnostics);
+    return;
+  }
+
+  diagnostics.push({
+    code: 'invalid-node',
+    path: `${path}.kind`,
+    message: `Unknown form control kind: ${String(value.kind)}.`,
+  });
+}
+
+function validateSharedFormControl(
+  value: Record<string, unknown>,
+  path: string,
+  diagnostics: UiIrDiagnostic[],
+) {
+  validateId(value.id, `${path}.id`, diagnostics);
+  validateId(value.binding, `${path}.binding`, diagnostics);
+  requireString(value.label, `${path}.label`, 'Field label', diagnostics);
+  if (value.description !== undefined && typeof value.description !== 'string') {
+    diagnostics.push({
+      code: 'invalid-node',
+      path: `${path}.description`,
+      message: 'Field description must be a string.',
+    });
+  }
+  for (const key of ['required', 'disabled', 'readOnly'] as const) {
+    if (value[key] !== undefined && typeof value[key] !== 'boolean') {
+      diagnostics.push({
+        code: 'invalid-node',
+        path: `${path}.${key}`,
+        message: `${key} must be a boolean when provided.`,
+      });
+    }
+  }
+}
+
+function validatePreferredPresentation(
+  value: unknown,
+  allowed: readonly string[],
+  parentPath: string,
+  message: string,
+  diagnostics: UiIrDiagnostic[],
+) {
+  if (value === undefined) return;
+  const path = `${parentPath}.presentation`;
+  if (!isPlainObject(value)) {
+    diagnostics.push({
+      code: 'invalid-node',
+      path,
+      message: 'Presentation must be an object.',
+    });
+    return;
+  }
+  validateAllowedKeys(value, ['preferred'], path, diagnostics);
+  validateEnum(value.preferred, allowed, `${path}.preferred`, message, diagnostics);
+}
+
+function validateEnum(
+  value: unknown,
+  allowed: readonly string[],
+  path: string,
+  message: string,
+  diagnostics: UiIrDiagnostic[],
+) {
+  if (value !== undefined && !allowed.includes(String(value))) {
+    diagnostics.push({ code: 'invalid-enum', path, message });
+  }
+}
+
+function requireString(
+  value: unknown,
+  path: string,
+  label: string,
+  diagnostics: UiIrDiagnostic[],
+  code: UiIrDiagnosticCode = 'invalid-node',
+) {
+  if (!nonEmptyString(value)) {
+    diagnostics.push({ code, path, message: `${label} must be a non-empty string.` });
   }
 }
 
@@ -354,8 +518,13 @@ function validateSerializable(
 ) {
   if (value === null || ['string', 'boolean'].includes(typeof value)) return;
   if (typeof value === 'number') {
-    if (!Number.isFinite(value))
-      diagnostics.push({ code: 'non-serializable', path, message: 'IR numbers must be finite.' });
+    if (!Number.isFinite(value)) {
+      diagnostics.push({
+        code: 'non-serializable',
+        path,
+        message: 'IR numbers must be finite.',
+      });
+    }
     return;
   }
   if (['undefined', 'function', 'symbol', 'bigint'].includes(typeof value)) {

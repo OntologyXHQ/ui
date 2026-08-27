@@ -1,15 +1,79 @@
 import { describe, expect, it, vi } from 'vitest';
 import { defineUi, ui } from '../authoring';
 import { createUiCommandRegistry, defineCommand } from '../commands';
+import {
+  createUiBindingRegistry,
+  createUiSourceRegistry,
+  defineUiBinding,
+  defineUiSource,
+} from '../data';
 import { UiIrValidationError, validateUiDefinition } from '../diagnostics';
 import { resolveUiDefinition } from '../resolve';
 
 type Context = {
   selection: readonly string[];
+  displayName: string;
+  appearance: string;
+  reducedMotion: boolean;
 };
 
+function createContext(): Context {
+  return {
+    selection: ['a.ts', 'b.ts'],
+    displayName: 'OntologyX',
+    appearance: 'system',
+    reducedMotion: false,
+  };
+}
+
+function createDataRegistries() {
+  const bindings = createUiBindingRegistry<Context>([
+    defineUiBinding<Context>({
+      id: 'settings.display-name',
+      kind: 'string',
+      read: (context) => context.displayName,
+      write: (value, context) => {
+        if (typeof value === 'string') context.displayName = value;
+      },
+    }),
+    defineUiBinding<Context>({
+      id: 'settings.appearance',
+      kind: 'string',
+      read: (context) => context.appearance,
+      write: (value, context) => {
+        if (typeof value === 'string') context.appearance = value;
+      },
+    }),
+    defineUiBinding<Context>({
+      id: 'settings.reduced-motion',
+      kind: 'boolean',
+      read: (context) => context.reducedMotion,
+      write: (value, context) => {
+        if (typeof value === 'boolean') context.reducedMotion = value;
+      },
+    }),
+  ]);
+  const sources = createUiSourceRegistry<Context>([
+    defineUiSource<Context>({
+      id: 'settings.appearance-options',
+      kind: 'options',
+      read: () => [
+        { id: 'system', label: 'System', value: 'system' },
+        { id: 'light', label: 'Light', value: 'light' },
+        { id: 'dark', label: 'Dark', value: 'dark' },
+      ],
+    }),
+    defineUiSource<Context>({
+      id: 'files.current-directory',
+      kind: 'collection',
+      read: ({ selection }) => selection.map((id) => ({ id, label: id })),
+    }),
+  ]);
+  return { bindings, sources };
+}
+
 describe('V2 semantic UI IR', () => {
-  it('authors a versioned JSON-serializable surface without behavior functions', () => {
+  it('authors a versioned JSON-serializable surface without behavior functions or embedded state', () => {
     const definition = defineUi({
       id: 'files.main',
       nodes: [
@@ -33,15 +97,39 @@ describe('V2 semantic UI IR', () => {
           confirmCommand: 'file.delete',
           intent: 'destructive',
         }),
+        ui.form({
+          id: 'settings.profile',
+          title: 'Profile settings',
+          fields: [
+            ui.field({
+              id: 'settings.display-name-field',
+              binding: 'settings.display-name',
+              label: 'Display name',
+            }),
+            ui.choice({
+              id: 'settings.appearance-field',
+              binding: 'settings.appearance',
+              optionsSource: 'settings.appearance-options',
+              label: 'Appearance',
+              presentation: { preferred: 'segmented' },
+            }),
+            ui.toggle({
+              id: 'settings.reduced-motion-field',
+              binding: 'settings.reduced-motion',
+              label: 'Reduce motion',
+            }),
+          ],
+        }),
       ],
     });
 
     expect(definition.irVersion).toBe(1);
     expect(JSON.parse(JSON.stringify(definition))).toEqual(definition);
+    expect(JSON.stringify(definition)).not.toContain('OntologyX');
     expect(validateUiDefinition(definition)).toEqual([]);
   });
 
-  it('rejects functions and invalid semantic ids before IR enters the runtime', () => {
+  it('rejects functions, arbitrary presentation fields and invalid semantic ids before IR enters runtime', () => {
     const invalid = {
       irVersion: 1,
       id: 'bad id',
@@ -104,7 +192,7 @@ describe('V2 semantic UI IR', () => {
       ],
     });
 
-    const context = { selection: ['a.ts', 'b.ts'] };
+    const context = createContext();
     const runtime = resolveUiDefinition(definition, registry, context);
 
     expect(runtime.diagnostics).toEqual([]);
@@ -128,6 +216,131 @@ describe('V2 semantic UI IR', () => {
     expect(executeDelete).toHaveBeenCalledTimes(1);
   });
 
+  it('resolves host-owned bindings and sources without putting application values or functions in Author IR', async () => {
+    const context = createContext();
+    const { bindings, sources } = createDataRegistries();
+    const definition = defineUi({
+      id: 'settings.main',
+      nodes: [
+        ui.form({
+          id: 'settings.appearance',
+          title: 'Appearance',
+          fields: [
+            ui.field({
+              id: 'settings.display-name-field',
+              binding: 'settings.display-name',
+              label: 'Display name',
+            }),
+            ui.choice({
+              id: 'settings.appearance-field',
+              binding: 'settings.appearance',
+              optionsSource: 'settings.appearance-options',
+              label: 'Appearance',
+              presentation: { preferred: 'segmented' },
+            }),
+            ui.toggle({
+              id: 'settings.reduced-motion-field',
+              binding: 'settings.reduced-motion',
+              label: 'Reduce motion',
+            }),
+          ],
+        }),
+        ui.collection({
+          id: 'files.current',
+          source: 'files.current-directory',
+          commands: [],
+        }),
+      ],
+    });
+
+    const runtime = resolveUiDefinition(definition, createUiCommandRegistry<Context>([]), context, {
+      bindings,
+      sources,
+    });
+
+    expect(runtime.diagnostics).toEqual([]);
+    expect(runtime.nodes[0]).toMatchObject({
+      kind: 'form',
+      fields: [
+        { kind: 'field', binding: { id: 'settings.display-name', value: 'OntologyX' } },
+        {
+          kind: 'choice',
+          binding: { id: 'settings.appearance', value: 'system' },
+          optionsSource: { id: 'settings.appearance-options', kind: 'options' },
+          resolvedPresentation: 'segmented',
+        },
+        {
+          kind: 'toggle',
+          binding: { id: 'settings.reduced-motion', value: false },
+        },
+      ],
+    });
+    expect(runtime.nodes[1]).toMatchObject({
+      kind: 'collection',
+      sourceState: { id: 'files.current-directory', available: true, itemCount: 2 },
+    });
+    expect(JSON.parse(JSON.stringify(runtime))).toEqual(runtime);
+
+    await expect(bindings.write('settings.display-name', 'OXS', context)).resolves.toBe(true);
+    await expect(bindings.write('settings.reduced-motion', true, context)).resolves.toBe(true);
+    expect(context.displayName).toBe('OXS');
+    expect(context.reducedMotion).toBe(true);
+  });
+
+  it('reports missing and mismatched data capabilities instead of coercing them', () => {
+    const context = createContext();
+    const bindings = createUiBindingRegistry<Context>([
+      defineUiBinding<Context>({
+        id: 'settings.wrong-toggle',
+        kind: 'string',
+        read: () => 'not-a-boolean',
+      }),
+    ]);
+    const sources = createUiSourceRegistry<Context>([
+      defineUiSource<Context>({
+        id: 'settings.wrong-options',
+        kind: 'collection',
+        read: () => [],
+      }),
+    ]);
+    const definition = defineUi({
+      id: 'settings.main',
+      nodes: [
+        ui.form({
+          id: 'settings.form',
+          title: 'Settings',
+          fields: [
+            ui.field({ id: 'missing', binding: 'settings.missing', label: 'Missing' }),
+            ui.toggle({
+              id: 'wrong-toggle',
+              binding: 'settings.wrong-toggle',
+              label: 'Wrong toggle',
+            }),
+            ui.choice({
+              id: 'wrong-choice',
+              binding: 'settings.missing-choice',
+              optionsSource: 'settings.wrong-options',
+              label: 'Wrong choice',
+            }),
+          ],
+        }),
+      ],
+    });
+
+    const runtime = resolveUiDefinition(definition, createUiCommandRegistry<Context>([]), context, {
+      bindings,
+      sources,
+    });
+
+    expect(runtime.nodes[0]).toMatchObject({ kind: 'form', fields: [] });
+    expect(runtime.diagnostics.map((item) => item.code)).toEqual([
+      'unknown-binding',
+      'binding-kind-mismatch',
+      'unknown-binding',
+      'source-kind-mismatch',
+    ]);
+  });
+
   it('records unknown command references as runtime diagnostics instead of inventing behavior', () => {
     const registry = createUiCommandRegistry<Context>([]);
     const definition = defineUi({
@@ -135,7 +348,7 @@ describe('V2 semantic UI IR', () => {
       nodes: [ui.commandGroup({ label: 'File actions', commands: [{ command: 'file.missing' }] })],
     });
 
-    const runtime = resolveUiDefinition(definition, registry, { selection: [] });
+    const runtime = resolveUiDefinition(definition, registry, createContext());
     expect(runtime.nodes[0]).toMatchObject({ kind: 'command-group', commands: [] });
     expect(runtime.diagnostics).toEqual([
       expect.objectContaining({ code: 'unknown-command', command: 'file.missing' }),

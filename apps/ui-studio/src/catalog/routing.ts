@@ -1,6 +1,27 @@
 import type { UiCatalogLayer, UiCatalogStatus } from './types';
 
 export type CatalogTab = 'overview' | 'api' | 'examples' | 'playground';
+
+export type StudioView = 'catalog' | 'semantic';
+
+export function readStudioView(): StudioView {
+  return new URLSearchParams(window.location.search).get('view') === 'semantic'
+    ? 'semantic'
+    : 'catalog';
+}
+
+export function updateStudioView(view: StudioView) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('ui-kit', '1');
+  url.searchParams.set('view', view);
+  if (view === 'semantic') {
+    for (const key of ['entry', 'tab', 'example', 'state', 'q', 'layer', 'status']) {
+      url.searchParams.delete(key);
+    }
+  }
+  window.history.pushState(null, '', url);
+  window.dispatchEvent(new PopStateEvent('popstate'));
+}
 export type CatalogLayerFilter = UiCatalogLayer | 'all';
 export type CatalogStatusFilter = UiCatalogStatus | 'all';
 

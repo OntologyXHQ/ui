@@ -25,6 +25,10 @@ describe('UI package public surfaces', () => {
     expect(PublicUi).toHaveProperty('validateUiDefinition');
     expect(PublicUi).not.toHaveProperty('SemanticCommandGroup');
     expect(PublicUi).not.toHaveProperty('SemanticConfirmation');
+    expect(PublicUi).not.toHaveProperty('SemanticForm');
+    expect(AdvancedUi).toHaveProperty('SemanticCommandGroup');
+    expect(AdvancedUi).toHaveProperty('SemanticConfirmation');
+    expect(AdvancedUi).toHaveProperty('SemanticForm');
   });
 
   it('keeps removed compatibility aliases off the canonical SDK', () => {

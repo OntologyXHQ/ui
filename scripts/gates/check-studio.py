@@ -161,6 +161,7 @@ for path in sorted(module_files - reachable):
     issues.append(f'unreachable Studio module: {path.relative_to(ROOT)}')
 
 allowed_external = {'react', 'react-dom', 'react-dom/client', '@ontologyx/ui', '@ontologyx/ui/icons', '@ontologyx/ui/styles.css'}
+advanced_studio_modules = {STUDIO / 'studio' / 'SemanticWorkbench.tsx'}
 for path in sorted(module_files):
     text = path.read_text(encoding='utf-8')
     if raw_control_re.search(text):
@@ -175,6 +176,8 @@ for path in sorted(module_files):
             )
             continue
         if specifier.startswith('.') or specifier.startswith('@ontologyx/ui-docs/'):
+            continue
+        if specifier == '@ontologyx/ui/advanced' and path in advanced_studio_modules:
             continue
         if specifier not in allowed_external and not specifier.startswith('react/') and not specifier.startswith('react-dom/'):
             issues.append(f'unreviewed Studio external import: {path.relative_to(ROOT)} -> {specifier}')

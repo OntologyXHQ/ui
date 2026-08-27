@@ -18,14 +18,14 @@ V2 adds a semantic author/runtime layer above the accepted visual SDK rather tha
 ```text
 Developer / AI
       ↓
-Semantic Author IR + Command Registry
+Semantic Author IR + Command/Binding/Source Registries
       ↓
 Semantic Resolver / Bridge
       ↓
 Canonical Components / System UI
 ```
 
-IR is versioned and JSON-serializable. It may contain semantic structure, stable IDs, capability references and bounded presentation preferences; it may not contain executable functions, arbitrary DOM/CSS or host/business authority. Executable behavior stays in external registries/adapters.
+IR is versioned and JSON-serializable. It may contain semantic structure, stable IDs, capability references and bounded presentation preferences; it may not contain executable functions, arbitrary DOM/CSS or host/business authority. Executable behavior, live values and application data projections stay in external registries/adapters. Author IR references only stable semantic IDs; Runtime IR may contain the bounded resolved snapshot required for canonical rendering/inspection.
 
 The semantic bridge may consume public Components. Existing Components/System UI do not depend on the semantic layer, so V1 remains usable without adopting V2 authoring.
 

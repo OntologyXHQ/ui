@@ -50,7 +50,7 @@ Package, Studio and demo must typecheck. Generated output, casts or skipped file
 
 `pnpm gate:behavior`
 
-Runs host-safety plus unit/interaction/runtime tests. Tests assert observable contracts at the lowest useful owner. V2 semantic tests must prove serialization/validation, command authority separation, resolution diagnostics and canonical component bridging without embedding executable behavior in IR.
+Runs host-safety plus unit/interaction/runtime tests. Tests assert observable contracts at the lowest useful owner. V2 semantic tests must prove serialization/validation, command/binding/source authority separation, typed mismatch diagnostics and canonical component bridging without embedding executable behavior or host-owned values in Author IR.
 
 ## G4 — Studio integrity
 

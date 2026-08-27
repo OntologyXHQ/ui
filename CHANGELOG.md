@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — V2 semantic runtime foundation
+
+- Added versioned JSON-serializable semantic Author IR with command groups, collections, confirmations and host-bound form/field/choice/toggle semantics.
+- Added host-owned command, binding and source registries so executable behavior, live values and application data stay outside Author IR; Runtime IR reports unknown/mismatched capabilities deterministically.
+- Added canonical semantic React bridges and a dedicated Studio V2 workbench showing Author IR, resolved Runtime IR and live canonical rendering under the existing environment controls.
+- Kept V1 visual/runtime contracts intact and retained permissive fix-forward patch delivery without exact-SHA guards or validation rollback.
+
 ## 2026-08-23 — Final V1 polish Part 4: cross-axis visual certification
 
 - Replaced six non-canonical CSS token references that could silently fall back to browser defaults across package, Studio, and demo surfaces.
