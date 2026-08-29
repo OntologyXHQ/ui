@@ -6384,6 +6384,82 @@ export const browserScenarios = [
     },
   ),
   scenario(
+    'semantic-inspection-actionability-certification',
+    [
+      'semantic-ir',
+      'inspection',
+      'ai-actionability',
+      'focus',
+      'selection',
+      'commands',
+      'host-authority',
+      'keyboard',
+      'a11y',
+      'studio',
+    ],
+    async ({ browser, baseUrl }) => {
+      const context = await browser.newContext({ viewport: { width: 1180, height: 860 } });
+      const page = await context.newPage();
+      const diagnostics = attachRuntimeDiagnostics(page);
+      try {
+        const workbench = await gotoSemanticWorkbench(page, baseUrl, {
+          container: 'wide',
+          modality: 'keyboard',
+          pointer: 'fine',
+          density: 'comfortable',
+          dir: 'ltr',
+          viewport: 'desktop',
+        });
+        const pane = workbench.locator('[data-ui-workspace-region="pane"]');
+        const collection = pane.locator('[data-ui-ir-id="studio.recent-files"]');
+        const readme = collection.locator('[data-ui-collection-item="readme"]');
+        const roadmap = collection.locator('[data-ui-collection-item="roadmap"]');
+        const readmeAction = readme.locator('[data-ui-tile-action]');
+        const roadmapAction = roadmap.locator('[data-ui-tile-action]');
+
+        await readmeAction.click();
+        await workbench.getByText('selected: 1', { exact: true }).waitFor({ state: 'visible' });
+        await roadmapAction.focus();
+        await workbench.getByText('focus: roadmap', { exact: true }).waitFor({ state: 'visible' });
+
+        const inspectionPanel = workbench.locator('[data-studio-semantic-json-panel="inspection"]');
+        assert.equal(await inspectionPanel.count(), 1, 'Semantic inspection panel is missing.');
+        const inspectionText = await inspectionPanel.innerText();
+        assert.match(inspectionText, /"surface": "studio\.semantic-v2"/u);
+        assert.match(inspectionText, /"node": "studio\.recent-files"/u);
+        assert.match(inspectionText, /"item": "roadmap"/u);
+        assert.match(inspectionText, /"ids": \[\s*"readme"/u);
+        assert.match(inspectionText, /"command": "file\.open"/u);
+        assert.match(inspectionText, /"scope": "focused-item"/u);
+        assert.match(inspectionText, /"target": "roadmap"/u);
+        assert.doesNotMatch(inspectionText, /setSelectedFiles|setLastCommand|function/u);
+
+        const invoke = workbench.locator('[data-studio-semantic-ai-invoke="file.open"]');
+        assert.equal(
+          await invoke.isEnabled(),
+          true,
+          'Focused semantic Open action is not invocable.',
+        );
+        await invoke.click();
+        const invocationStatus = workbench.locator('[data-studio-semantic-ai-status]');
+        await invocationStatus.filter({ hasText: 'executed' }).waitFor({ state: 'visible' });
+        assert.equal((await invocationStatus.innerText()).trim(), 'executed');
+        await workbench.getByText('target: roadmap', { exact: true }).waitFor({ state: 'visible' });
+        assert.match(
+          await workbench.innerText(),
+          /Last command:\s*file\.open/u,
+          'Inspection-driven command did not execute through the host registry.',
+        );
+
+        const axe = await runAxe(page, 'V2 semantic inspection actionability');
+        diagnostics.assertClean('V2 semantic inspection actionability');
+        return { axe };
+      } finally {
+        await context.close();
+      }
+    },
+  ),
+  scenario(
     'system-ui-core-certification',
     [
       'system-ui',

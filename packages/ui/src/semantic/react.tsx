@@ -21,6 +21,7 @@ import {
 } from '../components';
 import type { UiCommandRegistry } from './commands';
 import type { UiBindingRegistry } from './data';
+import type { UiInspectionFocus } from './inspection';
 import type {
   UiRuntimeChoiceNode,
   UiRuntimeCollectionNode,
@@ -337,6 +338,8 @@ export type SemanticCollectionProps<Context> = {
   label?: string;
   onCommandError?: (error: unknown, commandId: string) => void;
   onBindingError?: (error: unknown, bindingId: string) => void;
+  /** Reports stable semantic focus without exposing DOM nodes to inspection/automation callers. */
+  onSemanticFocusChange?: (focus: UiInspectionFocus) => void;
 };
 
 export function SemanticCollection<Context>({
@@ -347,6 +350,7 @@ export function SemanticCollection<Context>({
   label,
   onCommandError,
   onBindingError,
+  onSemanticFocusChange,
 }: SemanticCollectionProps<Context>) {
   const selected = new Set(node.selection.selected);
   const selectable = node.selection.mode !== 'none' && Boolean(node.selection.binding?.writable);
@@ -383,6 +387,7 @@ export function SemanticCollection<Context>({
     onDoubleClick: selectable && node.activationCommand ? () => activate(itemId) : undefined,
     'data-ui-collection-item': itemId,
     'data-ui-collection-selected': selected.has(itemId) || undefined,
+    onFocusCapture: () => onSemanticFocusChange?.({ node: node.id, item: itemId }),
   });
 
   const common = {

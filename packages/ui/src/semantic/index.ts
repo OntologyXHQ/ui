@@ -46,6 +46,26 @@ export {
   validateUiDefinition,
 } from './diagnostics';
 export type {
+  UiInspectionCommand,
+  UiInspectionCommandRequest,
+  UiInspectionCommandScope,
+  UiInspectionDiagnostic,
+  UiInspectionDiagnosticCode,
+  UiInspectionFocus,
+  UiInspectionInvocationResult,
+  UiInspectionInvocationStatus,
+  UiInspectionOptions,
+  UiInspectionSelection,
+  UiInspectionSnapshot,
+} from './inspection';
+export {
+  inspectUiRuntime,
+  invokeUiInspectionCommand,
+  UI_INSPECTION_MAX_COMMANDS,
+  UI_INSPECTION_MAX_SELECTION,
+  UI_INSPECTION_VERSION,
+} from './inspection';
+export type {
   UiAuthorNode,
   UiChoiceNode,
   UiChoicePresentation,

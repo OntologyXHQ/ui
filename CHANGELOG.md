@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — V2-04 semantic inspection + AI actionability
+
+- Added a versioned bounded semantic inspection snapshot for active surface, resolved environment, semantic focus, bounded host selection, available command actions and runtime diagnostic codes without exposing executable behavior, binding values or full host/source payloads.
+- Added inspection-derived command invocation: callers choose stable command identity/scope while target and selection come from the inspected runtime; oversized selections block invocation instead of silently truncating action semantics.
+- Kept host authority final by rechecking command availability at execution and refusing direct invocation of confirmation-required actions.
+- Added semantic focus reporting to the provisional Collection bridge and expanded Studio with live Inspection JSON plus an AI/automation actionability proof that invokes `file.open` without DOM selectors or caller-supplied target data.
+- Added dedicated G6 `semantic-inspection-actionability-certification` evidence for focus, selection, inspection serialization, stable command identity, host-registry execution and accessibility.
+
 ## Unreleased — V2-03 semantic collections + workspace
 
 - Added stable collection item identity, host-owned string-list selection, command-target activation and linear/spatial navigation semantics independently from List/Grid presentation.

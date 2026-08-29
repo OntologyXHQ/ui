@@ -58,7 +58,7 @@ Production direction is `Foundations → Primitives → Components → System UI
 
 ## V2 development frontier
 
-V2 adds a versioned, JSON-serializable semantic IR and external command/data authority on top of the accepted V1 interaction/runtime foundation. V2-03 now closes bounded semantic collection snapshots, host-owned selection/activation and workspace region composition over canonical V1 controls; active work moves to inspection and AI actionability without DOM scraping or host-authority leakage. See `ROADMAP.md` and `docs/roadmap/UI_TASK_LIST.md`.
+V2 adds a versioned, JSON-serializable semantic IR and external command/data authority on top of the accepted V1 interaction/runtime foundation. V2-04 now closes bounded semantic inspection and AI/automation command actionability over the resolved runtime: focus/selection/available commands are inspectable without DOM scraping, invocation context is snapshot-derived, and host command implementations recheck authority at execution. Active work moves to the Studio V2 Compose/Inspect/Certify workflow. See `ROADMAP.md` and `docs/roadmap/UI_TASK_LIST.md`.
 
 The normal development contract remains `pnpm quality` / `pnpm verify`. New V2 work should strengthen stable architecture rules only when a reusable invariant is proven; numbered patch/closeout checks are not part of the active workflow.
 

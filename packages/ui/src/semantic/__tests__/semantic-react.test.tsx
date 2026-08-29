@@ -11,7 +11,12 @@ import {
   defineUiSource,
 } from '../data';
 import { createUiResolverEnvironment } from '../environment';
-import { SemanticCommandGroup, SemanticConfirmation, SemanticForm } from '../react';
+import {
+  SemanticCollection,
+  SemanticCommandGroup,
+  SemanticConfirmation,
+  SemanticForm,
+} from '../react';
 import { resolveUiDefinition } from '../resolve';
 
 type Context = {
@@ -179,6 +184,61 @@ describe('V2 semantic React bridge', () => {
     fireEvent.click(confirm);
     expect(execute).toHaveBeenCalledTimes(1);
     expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it('reports semantic collection focus by stable node/item identity without exposing DOM nodes', () => {
+    type CollectionContext = { selection: readonly string[] };
+    const context: CollectionContext = { selection: [] };
+    const bindings = createUiBindingRegistry<CollectionContext>([
+      defineUiBinding<CollectionContext>({
+        id: 'files.selection',
+        kind: 'string-list',
+        read: ({ selection }) => selection,
+      }),
+    ]);
+    const sources = createUiSourceRegistry<CollectionContext>([
+      defineUiSource<CollectionContext>({
+        id: 'files.current',
+        kind: 'collection',
+        read: () => [{ id: 'readme', label: 'README.md' }],
+      }),
+    ]);
+    const commands = createUiCommandRegistry<CollectionContext>([
+      defineCommand<CollectionContext>({
+        id: 'file.open',
+        label: 'Open',
+        execute: () => undefined,
+      }),
+    ]);
+    const definition = defineUi({
+      id: 'files.surface',
+      nodes: [
+        ui.collection({
+          id: 'files.current',
+          source: 'files.current',
+          selection: { mode: 'multiple', binding: 'files.selection' },
+          activationCommand: 'file.open',
+        }),
+      ],
+    });
+    const runtime = resolveUiDefinition(definition, commands, context, { bindings, sources });
+    const node = runtime.nodes[0];
+    if (!node || node.kind !== 'collection') throw new Error('Expected collection');
+    const onSemanticFocusChange = vi.fn();
+
+    renderRoot(
+      <SemanticCollection
+        node={node}
+        commands={commands}
+        bindings={bindings}
+        context={context}
+        onSemanticFocusChange={onSemanticFocusChange}
+      />,
+    );
+
+    fireEvent.focus(screen.getByRole('button', { name: 'README.md' }));
+    expect(onSemanticFocusChange).toHaveBeenCalledWith({ node: 'files.current', item: 'readme' });
+    expect(onSemanticFocusChange.mock.calls[0]?.[0]).not.toHaveProperty('currentTarget');
   });
 
   it('renders semantic form bindings through canonical TextField, Select and Switch controls', () => {

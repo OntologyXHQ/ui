@@ -35,13 +35,16 @@ This file is the active frontier, not historical completion evidence.
 
 Exit: collection/workspace meaning is stable without coupling Author IR to DOM layout, eager data ownership or host window authority.
 
-## V2-04 — inspection + AI actionability contract — ACTIVE
+## V2-04 — inspection + AI actionability contract — DONE
 
-- Expose a bounded semantic runtime snapshot: active surface, focus/selection, available commands and relevant state.
-- Let AI/automation invoke registered commands by stable identity instead of DOM scraping.
-- Keep authorization, data access and mutations in host command implementations.
+- `V2-0401` **DONE** — Expose a versioned bounded semantic inspection snapshot for active surface, resolved environment, semantic focus, bounded selections, available commands and runtime diagnostic codes without serializing host context, binding values, full source payloads or executable behavior.
+- `V2-0402` **DONE** — Derive command invocation target/selection from the inspected semantic context so AI/automation cannot inject arbitrary host targets; oversized selections block actionability rather than truncating execution semantics.
+- `V2-0403` **DONE** — Recheck command availability in the host registry at execution time and keep confirmation actions non-bypassable; authorization, data access and mutation remain host-owned.
+- `V2-0404` **DONE** — Prove semantic focus → inspection → command invocation in Studio and dedicated G6 evidence without DOM scraping.
 
-## V2-05 — Studio V2 — TODO
+Exit: AI/automation can inspect and act through bounded semantic contracts while host command implementations remain the final authority.
+
+## V2-05 — Studio V2 — ACTIVE
 
 - Evolve the first semantic fixture into Compose, Inspect and Certify workflows.
 - Keep Author IR, Runtime IR and canonical rendering inspectable together.

@@ -185,6 +185,19 @@ for (const [token, message] of [
   ],
   ['Author IR', 'semantic workbench must expose Author IR'],
   ['Runtime IR', 'semantic workbench must expose Runtime IR'],
+  ['Inspection', 'semantic workbench must expose the bounded semantic inspection snapshot'],
+  [
+    'inspectUiRuntime',
+    'semantic workbench must resolve inspection from Runtime IR rather than DOM scraping',
+  ],
+  [
+    'invokeUiInspectionCommand',
+    'semantic workbench must prove stable command invocation through inspection',
+  ],
+  [
+    'data-studio-semantic-ai-actions',
+    'semantic workbench must expose AI/automation actionability evidence',
+  ],
   ['SemanticForm', 'semantic workbench must render the canonical semantic form bridge'],
   ['SemanticCollection', 'semantic workbench must render the canonical semantic collection bridge'],
   ['SemanticWorkspace', 'semantic workbench must render the semantic workspace bridge'],

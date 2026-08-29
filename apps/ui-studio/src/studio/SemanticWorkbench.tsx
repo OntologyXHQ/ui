@@ -14,6 +14,8 @@ import {
   defineUiSource,
   Grid,
   Heading,
+  inspectUiRuntime,
+  invokeUiInspectionCommand,
   Label,
   resolveUiDefinition,
   Row,
@@ -23,6 +25,7 @@ import {
   Text,
   ui,
   type UiCommandInvocation,
+  type UiInspectionFocus,
   type UiResolverContainer,
   type UiResolverEnvironment,
 } from '@ontologyx/ui';
@@ -323,6 +326,8 @@ export function SemanticWorkbench() {
   const [lastCommand, setLastCommand] = useState('none');
   const [lastTarget, setLastTarget] = useState('none');
   const [confirmationOpen, setConfirmationOpen] = useState(false);
+  const [inspectionFocus, setInspectionFocus] = useState<UiInspectionFocus | null>(null);
+  const [inspectionStatus, setInspectionStatus] = useState('idle');
 
   const context = useMemo<FixtureContext>(
     () => ({
@@ -348,6 +353,13 @@ export function SemanticWorkbench() {
     pointerPrecision: resolvedEnvironment.pointerPrecision,
   });
   const runtime = resolveSemanticFixture(context, resolverEnvironment);
+  const inspection = inspectUiRuntime(runtime, { focus: inspectionFocus });
+  const focusedOpenAction = inspection.availableCommands.find(
+    (command) =>
+      command.command === 'file.open' &&
+      command.sourceNode === 'studio.recent-files' &&
+      command.scope === 'focused-item',
+  );
   const commandGroup = runtime.nodes.find((node) => node.kind === 'command-group');
   const form = runtime.nodes.find(
     (node) => node.kind === 'form' && node.id === 'studio.settings-form',
@@ -383,13 +395,13 @@ export function SemanticWorkbench() {
             >
               <Stack gap="sm">
                 <Row gap="sm" align="center">
-                  <Badge tone="accent">V2-03</Badge>
-                  <Label emphasis="strong">Semantic collections + workspace</Label>
+                  <Badge tone="accent">V2-04</Badge>
+                  <Label emphasis="strong">Semantic inspection + AI actionability</Label>
                 </Row>
                 <Text tone="secondary" wrap="pretty">
-                  Collection identity, bounded source snapshots, host-owned selection and workspace
-                  regions are resolved without coupling semantic meaning to list/grid layout or host
-                  window authority.
+                  The runtime exposes one bounded semantic inspection snapshot for focus, selection
+                  and available commands. AI/automation invokes stable command identities through
+                  the host registry without scraping DOM nodes or gaining business authority.
                 </Text>
                 <Row gap="sm" className="ui-studio-semantic-facts">
                   <Badge>container: {runtime.environment.container}</Badge>
@@ -412,6 +424,7 @@ export function SemanticWorkbench() {
             >
               <JsonPanel id="author" title="Author IR" value={semanticFixture} />
               <JsonPanel id="runtime" title="Runtime IR" value={runtime} />
+              <JsonPanel id="inspection" title="Inspection" value={inspection} />
             </Grid>
 
             <Surface
@@ -455,6 +468,9 @@ export function SemanticWorkbench() {
                             bindings={bindings}
                             context={context}
                             label={role === 'sidebar' ? 'File places' : 'Current files'}
+                            onSemanticFocusChange={
+                              semanticId === 'studio.recent-files' ? setInspectionFocus : undefined
+                            }
                           />
                         );
                       }
@@ -469,7 +485,36 @@ export function SemanticWorkbench() {
                 <Row gap="sm" align="center">
                   <Badge>selected: {selectedFiles.length}</Badge>
                   <Badge>target: {lastTarget}</Badge>
+                  <Badge>focus: {inspection.focus?.item ?? inspection.focus?.node ?? 'none'}</Badge>
                 </Row>
+
+                <Surface material="subtle" radius="md" data-studio-semantic-ai-actions>
+                  <Stack gap="sm">
+                    <Label emphasis="strong">AI / automation actionability</Label>
+                    <Text tone="secondary" wrap="pretty">
+                      This control invokes the focused semantic action through the inspection
+                      snapshot. The caller supplies no DOM selector, item target or selection
+                      payload.
+                    </Text>
+                    <Row gap="sm" align="center">
+                      <Button
+                        variant="secondary"
+                        disabled={!focusedOpenAction?.invocable}
+                        data-studio-semantic-ai-invoke="file.open"
+                        onClick={() => {
+                          void invokeUiInspectionCommand(inspection, commands, context, {
+                            command: 'file.open',
+                            sourceNode: 'studio.recent-files',
+                            scope: 'focused-item',
+                          }).then((result) => setInspectionStatus(result.status));
+                        }}
+                      >
+                        Invoke focused Open
+                      </Button>
+                      <Badge data-studio-semantic-ai-status>{inspectionStatus}</Badge>
+                    </Row>
+                  </Stack>
+                </Surface>
 
                 <Row gap="sm" align="center">
                   <Button variant="secondary" onClick={() => setConfirmationOpen(true)}>

@@ -24,6 +24,8 @@ describe('UI package public surfaces', () => {
     expect(PublicUi).toHaveProperty('resolveUiDefinition');
     expect(PublicUi).toHaveProperty('createUiResolverEnvironment');
     expect(PublicUi).toHaveProperty('validateUiDefinition');
+    expect(PublicUi).toHaveProperty('inspectUiRuntime');
+    expect(PublicUi).toHaveProperty('invokeUiInspectionCommand');
     expect(PublicUi).not.toHaveProperty('SemanticCommandGroup');
     expect(PublicUi).not.toHaveProperty('SemanticConfirmation');
     expect(PublicUi).not.toHaveProperty('SemanticForm');

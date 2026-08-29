@@ -50,7 +50,7 @@ Package, Studio and demo must typecheck. Generated output, casts or skipped file
 
 `pnpm gate:behavior`
 
-Runs host-safety plus unit/interaction/runtime tests. Tests assert observable contracts at the lowest useful owner. V2 semantic tests must prove serialization/validation, command/binding/source authority separation, typed mismatch diagnostics, resolved-environment projection, deterministic command placement/adaptive choice resolution, bounded collection snapshots, host-owned collection selection/activation, workspace region references and canonical component bridging without embedding executable behavior or host-owned values in Author IR.
+Runs host-safety plus unit/interaction/runtime tests. Tests assert observable contracts at the lowest useful owner. V2 semantic tests must prove serialization/validation, command/binding/source authority separation, typed mismatch diagnostics, resolved-environment projection, deterministic command placement/adaptive choice resolution, bounded collection snapshots, host-owned collection selection/activation, workspace region references, bounded semantic inspection/actionability with host re-authorization, and canonical component bridging without embedding executable behavior or host-owned values in Author IR.
 
 ## G4 — Studio integrity
 
@@ -87,7 +87,7 @@ The browser suite protects the accepted cross-axis runtime contract, including:
 - field/form/native text behavior, secure editable-session boundaries and keyboard-occlusion response;
 - overlay/floating/feedback lifecycle, logical scroll/snap, motion interruption/reduced-motion settlement and measurable frame budgets;
 - gesture arena, drag/drop, editing/clipboard race safety and cursor realm ownership;
-- developer compositions, semantic Author IR → Runtime IR adaptation, semantic collection/workspace identity-selection-activation behavior, System UI core and privileged System surfaces without host-authority leakage;
+- developer compositions, semantic Author IR → Runtime IR adaptation, semantic collection/workspace identity-selection-activation behavior, semantic inspection/focus/command-actionability behavior, System UI core and privileged System surfaces without host-authority leakage;
 - Studio rendering of real public exports and source-bound certification evidence;
 - browser console/page errors and direct DOM isolation violations as blockers.
 
